@@ -10,7 +10,7 @@ The repository contains [Notebooks](https://github.com/GoogleCloudPlatform/verte
 
 ## Contributing
 
-Contributions welcome! See the [Contributing Guide](doc/contributing.md).
+Contributions welcome! See the [Contributing Guide](Contributions welcome! See the [Contributing Guide](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/docs/contributing.md).
 
 ## Getting help
 
