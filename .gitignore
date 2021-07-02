@@ -145,3 +145,10 @@ cython_debug/
 
 # VisualStudioCode
 .vscode/
+
+# Data
+data/
+
+# Misc.
+tmp/
+temp/
