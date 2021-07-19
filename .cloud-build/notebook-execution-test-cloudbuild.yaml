@@ -1,0 +1,40 @@
+steps:
+  # Show the gcloud info and check if gcloud exists
+  - name: ${_PYTHON_IMAGE}
+    entrypoint: /bin/sh
+    args:
+    - -c
+    - 'gcloud config list'
+  # Check the Python version
+  - name: ${_PYTHON_IMAGE}
+    entrypoint: /bin/sh
+    args:
+    - -c
+    - 'python3 .cloud-build/CheckPythonVersion.py'
+  # Fetch base branch if required
+  - name: ${_PYTHON_IMAGE}
+    entrypoint: /bin/sh
+    args:
+    - -c
+    - 'if [ -n "${_BASE_BRANCH}" ]; then git fetch origin "${_BASE_BRANCH}":refs/remotes/origin/"${_BASE_BRANCH}"; else echo "Skipping fetch."; fi'
+  # Install Python dependencies and run testing script
+  - name: ${_PYTHON_IMAGE}
+    entrypoint: /bin/sh
+    args:
+    - -c
+    - 'python3 -m pip install -U -r .cloud-build/requirements.txt && python3 -m pip freeze && python3 .cloud-build/ExecuteChangedNotebooks.py --test_paths_file .kokoro/notebooks/test_folders.txt --base_branch "${_FORCED_BASE_BRANCH}" --output_folder ${BUILD_ID} --variable_project_id ${PROJECT_ID} --variable_region ${_GCP_REGION}'
+    env:
+    - 'IS_TESTING=1'
+  # Manually copy artifacts to GCS
+  - name: gcr.io/cloud-builders/gsutil
+    entrypoint: /bin/sh
+    args: 
+    - -c
+    - 'if [ $(ls -pR "/workspace/${BUILD_ID}"  | grep -v / | grep -v ^$ | wc -l) -ne 0 ]; then gsutil rsync -r "/workspace/${BUILD_ID}" "gs://${_GCS_ARTIFACTS_BUCKET}/test-artifacts/PR_${_PR_NUMBER}/BUILD_${BUILD_ID}/"; else echo "No artifacts to copy."; fi'
+  # Fail if there is anything in the failure folder
+  - name: ${_PYTHON_IMAGE}
+    entrypoint: /bin/sh
+    args: 
+    - -c
+    - 'echo "Download executed notebooks with this command: \"mkdir -p artifacts && gsutil rsync -r gs://${_GCS_ARTIFACTS_BUCKET}/test-artifacts/PR_${_PR_NUMBER}/BUILD_${BUILD_ID} artifacts/\"" && if [ "$(ls -A /workspace/${BUILD_ID}/failure | wc -l)" -ne 0 ]; then exit 1; else exit 0; fi' 
+timeout: 86400s
