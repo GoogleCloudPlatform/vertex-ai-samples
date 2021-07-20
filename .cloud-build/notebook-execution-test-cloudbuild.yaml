@@ -22,7 +22,7 @@ steps:
     entrypoint: /bin/sh
     args:
     - -c
-    - 'python3 -m pip install -U -r .cloud-build/requirements.txt && python3 -m pip freeze && python3 .cloud-build/ExecuteChangedNotebooks.py --test_paths_file .kokoro/notebooks/test_folders.txt --base_branch "${_FORCED_BASE_BRANCH}" --output_folder ${BUILD_ID} --variable_project_id ${PROJECT_ID} --variable_region ${_GCP_REGION}'
+    - 'python3 -m pip install -U -r .cloud-build/requirements.txt && python3 -m pip freeze && python3 .cloud-build/ExecuteChangedNotebooks.py --test_paths_file .cloud-build/test_folders.txt --base_branch "${_FORCED_BASE_BRANCH}" --output_folder ${BUILD_ID} --variable_project_id ${PROJECT_ID} --variable_region ${_GCP_REGION}'
     env:
     - 'IS_TESTING=1'
   # Manually copy artifacts to GCS
