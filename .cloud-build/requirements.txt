@@ -1,5 +1,5 @@
 ipython 
-jupyter>=1.0 
-nbconvert>=6.0
+jupyter==1.0.0 
+nbconvert==6.1.0
 numpy
 pandas
