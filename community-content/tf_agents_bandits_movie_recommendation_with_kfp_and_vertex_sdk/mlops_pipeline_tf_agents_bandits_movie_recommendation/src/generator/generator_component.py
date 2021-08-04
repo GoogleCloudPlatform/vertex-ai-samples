@@ -259,3 +259,18 @@ def generate_movielens_dataset_for_bigquery(
       ["bigquery_dataset_id", "bigquery_location", "bigquery_table_id"])
 
   return outputs(bigquery_dataset_id, bigquery_location, bigquery_table_id)
+
+
+if __name__ == "__main__":
+  from kfp.components import create_component_from_func
+
+  generate_movielens_dataset_for_bigquery_op = create_component_from_func(
+    func=generate_movielens_dataset_for_bigquery,
+    base_image="tensorflow/tensorflow:2.5.0",
+    output_component_file="component.yaml",
+    packages_to_install=[
+      "google-cloud-bigquery==2.20.0",
+      "tensorflow==2.5.0",
+      "tf-agents==0.8.0",
+    ],
+  )
