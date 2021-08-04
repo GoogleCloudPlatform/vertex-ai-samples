@@ -1,0 +1,20 @@
+# These owners will be the default owners for everything in
+# the repo. Unless a later match takes precedence,
+# Our Global Owners: @andrewferlitsch @aribray @dizcology @ivanmkc @morgandu @telpirion @vinnysenthil   
+*       @GoogleCloudPlatform/cloudml-samples-owners
+
+# Notebooks
+/notebooks					@ivanmkc
+
+# Official Notebooks
+
+
+# Community Notebooks
+
+
+
+# Community Content
+/community-content			@morgandu
+
+# Please add a line item below for your community content i.e.
+# /community-content/path_to_your_community_content/		@your-github-username
