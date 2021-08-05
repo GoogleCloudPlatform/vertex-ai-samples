@@ -1,8 +1,9 @@
-# Reinforcement Learning Protytopes on Vertex AI
+# Building TF-Agents Bandits Based Movie Recommendation Systems using KFP and Vertex AI SDK
 
 This directory demos the use of TF-Agents, Kubeflow Pipelines (KFP) and Vertex
 AI in building reinforcement learning applications. The RL applications we build
-are movie recommendation systems based on the MovieLens 100K dataset.
+are movie recommendation systems based on the MovieLens 100K dataset. We adopt
+the contextual bandits formulation.
 
 There are 2 demos:
 
