@@ -1,0 +1,5 @@
+# inviduals defined as owners in the file will be responsible 
+# for the specific tutorials in the unofficial tutorials folder
+
+# PyTorch on Google Cloud folder
+/pytorch-on-google-cloud @RajeshThallam @ultrons
