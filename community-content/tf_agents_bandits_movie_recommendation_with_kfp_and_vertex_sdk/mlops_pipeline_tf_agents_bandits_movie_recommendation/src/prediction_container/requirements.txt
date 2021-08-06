@@ -1,0 +1,2 @@
+tf-agents==0.8.0
+tensorflow==2.5.0
