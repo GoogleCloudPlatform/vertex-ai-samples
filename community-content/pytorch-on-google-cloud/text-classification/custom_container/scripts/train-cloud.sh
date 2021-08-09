@@ -39,7 +39,7 @@ REGION="us-central1"
 JOB_DIR=gs://${BUCKET_NAME}/${JOB_PREFIX}/models/${JOB_NAME}
 
 # IMAGE_REPO_NAME: set a local repo name to distinquish our image
-IMAGE_REPO_NAME=pytorch_gpu_train_bert_classifier
+IMAGE_REPO_NAME=pytorch_gpu_train_finetuned-bert-classifier
 
 # IMAGE_TAG: an easily identifiable tag for your docker image
 IMAGE_TAG=latest

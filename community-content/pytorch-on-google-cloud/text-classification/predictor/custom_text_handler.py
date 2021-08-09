@@ -1,3 +1,4 @@
+
 import os
 import json
 import logging
@@ -19,6 +20,10 @@ class TransformersClassifierHandler(BaseHandler):
         self.initialized = False
 
     def initialize(self, ctx):
+        """ Loads the model.pt file and initialized the model object.
+        Instantiates Tokenizer for preprocessor to use
+        Loads labels to name mapping file for post-processing inference response
+        """
         self.manifest = ctx.manifest
 
         properties = ctx.system_properties
@@ -68,12 +73,10 @@ class TransformersClassifierHandler(BaseHandler):
                                 max_length=128,
                                 truncation=True,
                                 return_tensors = "pt")
-
         return inputs
 
     def inference(self, inputs):
-        """
-        Predict the class of a text using a trained transformer model.
+        """ Predict the class of a text using a trained transformer model.
         """
         prediction = self.model(inputs['input_ids'].to(self.device))[0].argmax().item()
 
