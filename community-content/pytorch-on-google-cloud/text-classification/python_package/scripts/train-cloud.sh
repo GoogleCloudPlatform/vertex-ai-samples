@@ -19,6 +19,7 @@ echo "Submitting Custom Job to Vertex AI to train PyTorch model"
 
 # BUCKET_NAME: Change to your bucket name
 BUCKET_NAME="[your-bucket-name]" # <-- CHANGE TO YOUR BUCKET NAME
+BUCKET_NAME="cloud-ai-platform-2f444b6a-a742-444b-b91a-c7519f51bd77"
 
 # The PyTorch image provided by Vertex AI Training.
 IMAGE_URI="us-docker.pkg.dev/vertex-ai/training/pytorch-gpu.1-7:latest"
@@ -32,7 +33,14 @@ JOB_NAME=${JOB_PREFIX}-$(date +%Y%m%d%H%M%S)-custom-job
 REGION="us-central1"
 
 # JOB_DIR: Where to store prepared package and upload output model.
-JOB_DIR=gs://${BUCKET_NAME}/${JOB_PREFIX}/models/${JOB_NAME}
+JOB_DIR=gs://${BUCKET_NAME}/${JOB_PREFIX}/model/${JOB_NAME}
+
+# validate bucket name
+if [ "${BUCKET_NAME}" = "[your-bucket-name]" ]
+then
+  echo "[ERROR] INVALID VALUE: Please update the variable BUCKET_NAME with valid Cloud Storage bucket name. Exiting the script..."
+  exit 1
+fi
 
 # Submit Custom Job to Vertex AI
 gcloud beta ai custom-jobs create \
