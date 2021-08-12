@@ -13,11 +13,11 @@ If you are opening a PR for `Notebooks` under the [community](https://github.com
 
 
 If you are opening a PR for `Community Content`, and it will NOT be used on cloud.google.com/docs:
-- [ ] Make sure the name of your main content directory is descriptive, informative, includes key products and attributes of your content, so that it is differentiable from other content
+- [ ] Make sure your main `Content Directory Name` is descriptive, informative, and includes some of the key products and attributes of your content, so that it is differentiable from other content
 - [ ] The main content directory has been added to the [CODEOWNERS](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/master/docs/CODEOWNERS) file under the `# Community Content` section, pointing to the author or the author's team.
 
 If you are opening a PR for `Community Content`, and it will be used on cloud.google.com/docs:
-- [ ] Make sure the name of your main content directory is descriptive, informative, includes key products and attributes of your content, so that it is differentiable from other content
+- [ ] Make sure your main `Content Directory Name` is descriptive, informative, and includes some of the key products and attributes of your content, so that it is differentiable from other content
 - [ ] Use the [notebook template](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/master/notebooks/notebook_template.ipynb) for all the notebooks in your content directory.
 - [ ] Follow the style and grammar rules outlined in the above notebook template.
 - [ ] Verify each notebook runs successfully in Colab since the automated tests cannot guarantee this even when it passes.
