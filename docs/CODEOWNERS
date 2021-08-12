@@ -16,7 +16,7 @@
 # Community Content
 /community-content			@morgandu
 /community-content/tf_agents_bandits_movie_recommendation_with_kfp_and_vertex_sdk	@yinghsienwu
-/community-content//pytorch-on-google-cloud		@RajeshThallam @ultrons
+/community-content/pytorch_text_classification_using_vertex_sdk_and_gcloud		@RajeshThallam @ultrons
 
 # Please add a line item below for your community content i.e.
 # /community-content/path_to_your_community_content/		@your-github-username

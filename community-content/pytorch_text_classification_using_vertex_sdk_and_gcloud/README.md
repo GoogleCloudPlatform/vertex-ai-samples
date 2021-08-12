@@ -1,6 +1,8 @@
 # PyTorch on Google Cloud: Text Classification
 
-This tutorial on text classification shows how to train a PyTorch based text classification model by fine tuning a pre-trained Huggingface Transformers model and deploy the model on Vertex AI.
+In the PyTorch on Google Cloud series of blog posts, we aim to share how to build, train and deploy PyTorch models at scale and how to create reproducible machine learning pipelines on Google Cloud with [Vertex AI](https://cloud.google.com/vertex-ai).
+
+This tutorial on text classification shows how to train a PyTorch based text classification model by fine tuning a pre-trained Huggingface Transformers model and deploy the model on [Vertex AI](https://cloud.google.com/vertex-ai/docs/start/client-libraries#python) using Vertex SDK and [`gcloud ai`](https://cloud.google.com/sdk/gcloud/reference/beta/ai).
 
 ## Notebooks
 
