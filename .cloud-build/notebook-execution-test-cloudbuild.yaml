@@ -17,12 +17,16 @@ steps:
     args:
     - -c
     - 'if [ -n "${_BASE_BRANCH}" ]; then git fetch origin "${_BASE_BRANCH}":refs/remotes/origin/"${_BASE_BRANCH}"; else echo "Skipping fetch."; fi'
+  # Install Python dependencies
+  - name: ${_PYTHON_IMAGE}
+    entrypoint: pip
+    args: ['install', '--upgrade',  '--user', '--requirement', '.cloud-build/requirements.txt']
   # Install Python dependencies and run testing script
   - name: ${_PYTHON_IMAGE}
     entrypoint: /bin/sh
     args:
     - -c
-    - 'python3 -m pip install -U -r .cloud-build/requirements.txt && python3 -m pip freeze && python3 .cloud-build/ExecuteChangedNotebooks.py --test_paths_file .cloud-build/test_folders.txt --base_branch "${_FORCED_BASE_BRANCH}" --output_folder ${BUILD_ID} --variable_project_id ${PROJECT_ID} --variable_region ${_GCP_REGION}'
+    - 'python3 -m pip freeze && python3 .cloud-build/ExecuteChangedNotebooks.py --test_paths_file "${_TEST_PATHS_FILE}" --base_branch "${_FORCED_BASE_BRANCH}" --output_folder ${BUILD_ID} --variable_project_id ${PROJECT_ID} --variable_region ${_GCP_REGION}'
     env:
     - 'IS_TESTING=1'
   # Manually copy artifacts to GCS
@@ -30,7 +34,7 @@ steps:
     entrypoint: /bin/sh
     args: 
     - -c
-    - 'if [ $(ls -pR "/workspace/${BUILD_ID}"  | grep -v / | grep -v ^$ | wc -l) -ne 0 ]; then gsutil rsync -r "/workspace/${BUILD_ID}" "gs://${_GCS_ARTIFACTS_BUCKET}/test-artifacts/PR_${_PR_NUMBER}/BUILD_${BUILD_ID}/"; else echo "No artifacts to copy."; fi'
+    - 'if [ $(ls -pR "/workspace/${BUILD_ID}"  | grep -v / | grep -v ^$ | wc -l) -ne 0 ]; then gsutil -m -q rsync -r "/workspace/${BUILD_ID}" "gs://${_GCS_ARTIFACTS_BUCKET}/test-artifacts/PR_${_PR_NUMBER}/BUILD_${BUILD_ID}/"; else echo "No artifacts to copy."; fi'
   # Fail if there is anything in the failure folder
   - name: ${_PYTHON_IMAGE}
     entrypoint: /bin/sh

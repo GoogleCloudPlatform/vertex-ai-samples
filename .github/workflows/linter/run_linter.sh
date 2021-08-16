@@ -32,16 +32,16 @@ RTN="0"
 
 is_test=false
 
-# Process all options supplied on the command line 
+# Process all options supplied on the command line
 while getopts 'tc' arg; do
     case $arg in
-        't')
-            is_test=true
-            ;;
-        *)
-            echo "Unimplemented flag"
-            exit 1
-            ;;
+    't')
+        is_test=true
+        ;;
+    *)
+        echo "Unimplemented flag"
+        exit 1
+        ;;
     esac
 done
 
@@ -50,15 +50,13 @@ echo "Test mode: $is_test"
 # Only check notebooks in test folders modified in this pull request.
 # Note: Use process substitution to persist the data in the array
 notebooks=()
-while read -r file || [ -n "$line" ]; 
-do
+while read -r file || [ -n "$line" ]; do
     notebooks+=("$file")
 done < <(git diff --name-only master... | grep '\.ipynb$')
 
 problematic_notebooks=()
 if [ ${#notebooks[@]} -gt 0 ]; then
-    for notebook in "${notebooks[@]}"
-    do    
+    for notebook in "${notebooks[@]}"; do
         if [ -f "$notebook" ]; then
             echo "Checking notebook: ${notebook}"
 
@@ -68,7 +66,7 @@ if [ ${#notebooks[@]} -gt 0 ]; then
             ISORT_RTN="0"
             FLAKE8_RTN="0"
 
-            if [ "$is_test" = true ] ; then
+            if [ "$is_test" = true ]; then
                 echo "Running nbfmt..."
                 python3 -m tensorflow_docs.tools.nbfmt --remove_outputs --test "$notebook"
                 NBFMT_RTN=$?
@@ -82,12 +80,12 @@ if [ ${#notebooks[@]} -gt 0 ]; then
                 python3 -m nbqa isort "$notebook" --check
                 ISORT_RTN=$?
                 echo "Running flake8..."
-                python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,W503,E203
+                python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,W503,E203,E722
                 FLAKE8_RTN=$?
             else
                 echo "Running black..."
                 python3 -m nbqa black "$notebook" --nbqa-mutate
-                BLACK_RTN=$?            
+                BLACK_RTN=$?
                 echo "Running pyupgrade..."
                 python3 -m nbqa pyupgrade "$notebook" --nbqa-mutate
                 PYUPGRADE_RTN=$?
@@ -98,8 +96,8 @@ if [ ${#notebooks[@]} -gt 0 ]; then
                 python3 -m tensorflow_docs.tools.nbfmt --remove_outputs "$notebook"
                 NBFMT_RTN=$?
                 echo "Running flake8..."
-                python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,W503,E203 --nbqa-mutate
-                FLAKE8_RTN=$?                 
+                python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,W503,E203,E722 --nbqa-mutate
+                FLAKE8_RTN=$?
             fi
 
             NOTEBOOK_RTN="0"
@@ -108,7 +106,7 @@ if [ ${#notebooks[@]} -gt 0 ]; then
                 NOTEBOOK_RTN="$NBFMT_RTN"
                 printf "nbfmt: Failed\n"
             fi
-            
+
             if [ "$BLACK_RTN" != "0" ]; then
                 NOTEBOOK_RTN="$BLACK_RTN"
                 printf "black: Failed\n"
@@ -131,10 +129,9 @@ if [ ${#notebooks[@]} -gt 0 ]; then
 
             echo "Notebook lint finished with return code = $NOTEBOOK_RTN"
             echo ""
-            if [ "$NOTEBOOK_RTN" != "0" ]
-            then                    
-                problematic_notebooks+=("$notebook")            
-                RTN=$NOTEBOOK_RTN                
+            if [ "$NOTEBOOK_RTN" != "0" ]; then
+                problematic_notebooks+=("$notebook")
+                RTN=$NOTEBOOK_RTN
             fi
         fi
     done

@@ -1,5 +1,5 @@
-#!/bin/bash
-# Copyright 2019 Google LLC
+#!/usr/bin/env python
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,21 +12,114 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import argparse
+import dataclasses
+import datetime
+import functools
 import pathlib
+import os
 import subprocess
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import List, Optional
+import concurrent
+from tabulate import tabulate
 
 import ExecuteNotebook
 
 
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ("yes", "true", "t", "y", "1"):
+        return True
+    elif v.lower() in ("no", "false", "f", "n", "0"):
+        return False
+    else:
+        raise argparse.ArgumentTypeError("Boolean value expected.")
+
+
+def format_timedelta(delta: datetime.timedelta) -> str:
+    """Formats a timedelta duration to [N days] %H:%M:%S format"""
+    seconds = int(delta.total_seconds())
+
+    secs_in_a_day = 86400
+    secs_in_a_hour = 3600
+    secs_in_a_min = 60
+
+    days, seconds = divmod(seconds, secs_in_a_day)
+    hours, seconds = divmod(seconds, secs_in_a_hour)
+    minutes, seconds = divmod(seconds, secs_in_a_min)
+
+    time_fmt = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+
+    if days > 0:
+        suffix = "s" if days > 1 else ""
+        return f"{days} day{suffix} {time_fmt}"
+
+    return time_fmt
+
+
+@dataclasses.dataclass
+class NotebookExecutionResult:
+    notebook: str
+    duration: datetime.timedelta
+    is_pass: bool
+    error_message: Optional[str]
+
+
+def execute_notebook(
+    artifacts_path: str,
+    variable_project_id: str,
+    variable_region: str,
+    should_log_output: bool,
+    should_use_new_kernel: bool,
+    notebook: str,
+) -> NotebookExecutionResult:
+    print(f"Running notebook: {notebook}")
+
+    result = NotebookExecutionResult(
+        notebook=notebook,
+        duration=datetime.timedelta(seconds=0),
+        is_pass=False,
+        error_message=None,
+    )
+
+    # TODO: Handle cases where multiple notebooks have the same name
+    time_start = datetime.datetime.now()
+    try:
+        ExecuteNotebook.execute_notebook(
+            notebook_file_path=notebook,
+            output_file_folder=artifacts_path,
+            replacement_map={
+                "PROJECT_ID": variable_project_id,
+                "REGION": variable_region,
+            },
+            should_log_output=should_log_output,
+            should_use_new_kernel=should_use_new_kernel,
+        )
+        result.duration = datetime.datetime.now() - time_start
+        result.is_pass = True
+        print(f"{notebook} PASSED in {format_timedelta(result.duration)}.")
+    except Exception as error:
+        result.duration = datetime.datetime.now() - time_start
+        result.is_pass = False
+        result.error_message = str(error)
+        print(
+            f"{notebook} FAILED in {format_timedelta(result.duration)}: {result.error_message}"
+        )
+
+    return result
+
+
 def run_changed_notebooks(
     test_paths_file: str,
+    base_branch: Optional[str],
     output_folder: str,
     variable_project_id: str,
     variable_region: str,
-    base_branch: Optional[str],
+    should_parallelize: bool,
+    should_use_separate_kernels: bool,
 ):
     """
     Run the notebooks that exist under the folders defined in the test_paths_file.
@@ -49,6 +142,13 @@ def run_changed_notebooks(
             Required. The value for PROJECT_ID to inject into notebooks.
         variable_region (str):
             Required. The value for REGION to inject into notebooks.
+        should_parallelize (bool):
+            Required. Should run notebooks in parallel using a thread pool as opposed to in sequence.
+        should_use_separate_kernels (bool):
+            Note: Dependencies don't install correctly when this is set to True
+            See https://github.com/nteract/papermill/issues/625
+
+            Required. Should run each notebook in a separate and independent virtual environment.
     """
 
     test_paths = []
@@ -84,41 +184,68 @@ def run_changed_notebooks(
     artifacts_path.joinpath("success").mkdir(parents=True, exist_ok=True)
     artifacts_path.joinpath("failure").mkdir(parents=True, exist_ok=True)
 
-    passed_notebooks: List[str] = []
-    failed_notebooks: List[str] = []
+    notebook_execution_results: List[NotebookExecutionResult] = []
 
     if len(notebooks) > 0:
         print(f"Found {len(notebooks)} modified notebooks: {notebooks}")
 
-        for notebook in notebooks:
-            print(f"Running notebook: {notebook}")
-
-            # TODO: Handle cases where multiple notebooks have the same name
-            try:
-                ExecuteNotebook.execute_notebook(
-                    notebook_file_path=notebook,
-                    output_file_folder=artifacts_path,
-                    replacement_map={
-                        "PROJECT_ID": variable_project_id,
-                        "REGION": variable_region,
-                    },
+        if should_parallelize and len(notebooks) > 1:
+            print(
+                "Running notebooks in parallel, so no logs will be displayed. Please wait..."
+            )
+            with concurrent.futures.ThreadPoolExecutor(max_workers=None) as executor:
+                notebook_execution_results = list(
+                    executor.map(
+                        functools.partial(
+                            execute_notebook,
+                            artifacts_path,
+                            variable_project_id,
+                            variable_region,
+                            False,
+                            should_use_separate_kernels,
+                        ),
+                        notebooks,
+                    )
                 )
-                print(f"Notebook finished successfully.")
-                passed_notebooks.append(notebook)
-            except Exception as error:
-                print(f"Notebook finished with failure: {error}")
-                failed_notebooks.append(notebook)
+        else:
+            notebook_execution_results = [
+                execute_notebook(
+                    artifacts_path=artifacts_path,
+                    variable_project_id=variable_project_id,
+                    variable_region=variable_region,
+                    notebook=notebook,
+                    should_log_output=True,
+                    should_use_new_kernel=should_use_separate_kernels,
+                )
+                for notebook in notebooks
+            ]
     else:
         print("No notebooks modified in this pull request.")
 
-    if len(failed_notebooks) > 0:
-        print(f"{len(failed_notebooks)} notebooks failed:")
-        print(failed_notebooks)
-        print(f"{len(passed_notebooks)} notebooks passed:")
-        print(passed_notebooks)
-    elif len(passed_notebooks) > 0:
-        print("All notebooks executed successfully:")
-        print(passed_notebooks)
+    print("\n=== RESULTS ===\n")
+
+    notebooks_sorted = sorted(
+        notebook_execution_results,
+        key=lambda result: result.is_pass,
+        reverse=True,
+    )
+    # Print results
+    print(
+        tabulate(
+            [
+                [
+                    os.path.basename(os.path.normpath(result.notebook)),
+                    "PASSED" if result.is_pass else "FAILED",
+                    format_timedelta(result.duration),
+                    result.error_message or "--",
+                ]
+                for result in notebooks_sorted
+            ],
+            headers=["file", "status", "duration", "error"],
+        )
+    )
+
+    print("\n=== END RESULTS===\n")
 
 
 parser = argparse.ArgumentParser(description="Run changed notebooks.")
@@ -152,6 +279,27 @@ parser.add_argument(
     required=True,
 )
 
+# Note: Dependencies don't install correctly when this is set to True
+parser.add_argument(
+    "--should_parallelize",
+    type=str2bool,
+    nargs="?",
+    const=True,
+    default=False,
+    help="Should run notebooks in parallel.",
+)
+
+# Note: This isn't guaranteed to work correctly due to existing Papermill issue
+# See https://github.com/nteract/papermill/issues/625
+parser.add_argument(
+    "--should_use_separate_kernels",
+    type=str2bool,
+    nargs="?",
+    const=True,
+    default=False,
+    help="(Experimental) Should run each notebook in a separate and independent virtual environment.",
+)
+
 args = parser.parse_args()
 run_changed_notebooks(
     test_paths_file=args.test_paths_file,
@@ -159,4 +307,6 @@ run_changed_notebooks(
     output_folder=args.output_folder,
     variable_project_id=args.variable_project_id,
     variable_region=args.variable_region,
+    should_parallelize=args.should_parallelize,
+    should_use_separate_kernels=args.should_use_separate_kernels,
 )
