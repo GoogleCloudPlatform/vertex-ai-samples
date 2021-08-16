@@ -1,3 +1,2 @@
 notebooks/official
-tutorials/official
 notebooks/notebook_template.ipynb
