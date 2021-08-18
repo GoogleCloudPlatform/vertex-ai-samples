@@ -8,6 +8,11 @@
 
 # Official Notebooks
 
+notebooks/official/model_monitoring/model_monitoring.ipynb  @mco-gh
+notebooks/official/ml_metadata/sdk-metric-parameter-tracking-for-custom-jobs.ipynb  @jialuzh
+notebooks/official/ml_metadata/sdk-metric-parameter-tracking-for-locally-trained-models.ipynb  @jialuzh
+notebooks/official/vizier/gapic-vizier-multi-objective-optimization.ipynb  @halio-g
+notebooks/official/feature_store/gapic-feature-store.ipynb  @protorganizer
 
 # Community Notebooks
 
