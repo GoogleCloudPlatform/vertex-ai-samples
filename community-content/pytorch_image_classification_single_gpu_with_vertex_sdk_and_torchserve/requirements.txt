@@ -1,0 +1,4 @@
+google-cloud-aiplatform
+torch-model-archiver
+torchserve
+captum
