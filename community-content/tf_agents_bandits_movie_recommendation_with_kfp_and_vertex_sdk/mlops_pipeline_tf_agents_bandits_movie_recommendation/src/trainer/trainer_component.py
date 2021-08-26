@@ -16,10 +16,8 @@
 # Import for the function return value type.
 from typing import NamedTuple  # pylint: disable=unused-import
 
-from kfp.v2 import components
 
-
-def training_op(
+def train_reinforcement_learning_policy(
     training_artifacts_dir: str,
     tfrecord_file: str,
     num_epochs: int,
@@ -28,7 +26,7 @@ def training_op(
     tikhonov_weight: float,
     agent_alpha: float
 ) -> NamedTuple("Outputs", [
-    ("training_artifacts_dir", components.OutputPath),
+    ("training_artifacts_dir", str),
 ]):
   """Implements off-policy training for a policy on dataset of TFRecord files.
 
@@ -249,3 +247,17 @@ def training_op(
       ["training_artifacts_dir"])
 
   return outputs(training_artifacts_dir)
+
+
+if __name__ == "__main__":
+  from kfp.components import create_component_from_func
+
+  train_reinforcement_learning_policy_op = create_component_from_func(
+    func=train_reinforcement_learning_policy,
+    base_image="tensorflow/tensorflow:2.5.0",
+    output_component_file="component.yaml",
+    packages_to_install=[
+      "tensorflow==2.5.0",
+      "tf-agents==0.8.0",
+    ],
+  )

@@ -167,3 +167,17 @@ def ingest_bigquery_dataset_into_tfrecord(
       ["tfrecord_file"])
 
   return outputs(tfrecord_file)
+
+
+if __name__ == "__main__":
+  from kfp.components import create_component_from_func
+
+  ingest_bigquery_dataset_into_tfrecord_op = create_component_from_func(
+    func=ingest_bigquery_dataset_into_tfrecord,
+    base_image="tensorflow/tensorflow:2.5.0",
+    output_component_file="component.yaml",
+    packages_to_install=[
+      "google-cloud-bigquery==2.20.0",
+      "tensorflow==2.5.0",
+    ],
+  )
