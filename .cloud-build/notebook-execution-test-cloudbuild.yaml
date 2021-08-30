@@ -29,6 +29,18 @@ steps:
     args:
     - -c
     - 'git diff --name-only origin/master...'
+  # DEBUG: git diff --name-only origin/master
+  - name: ${_PYTHON_IMAGE}
+    entrypoint: /bin/sh
+    args:
+    - -c
+    - 'git diff --name-only origin/master'
+  # DEBUG: git diff --name-only master
+  - name: ${_PYTHON_IMAGE}
+    entrypoint: /bin/sh
+    args:
+    - -c
+    - 'git diff --name-only master'
   # DEBUG: git rev-list origin/master... -v
   - name: ${_PYTHON_IMAGE}
     entrypoint: /bin/sh
