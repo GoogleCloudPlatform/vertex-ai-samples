@@ -11,12 +11,12 @@ steps:
     args:
     - -c
     - 'python3 .cloud-build/CheckPythonVersion.py'
-  # Pull base branch if required
+  # Fetch base branch if required
   - name: ${_PYTHON_IMAGE}
     entrypoint: /bin/sh
     args:
     - -c
-    - 'if [ -n "${_BASE_BRANCH}" ]; then git pull origin "${_BASE_BRANCH}":refs/remotes/origin/"${_BASE_BRANCH}"; else echo "Skipping pull."; fi'
+    - 'if [ -n "${_BASE_BRANCH}" ]; then git fetch origin "${_BASE_BRANCH}":refs/remotes/origin/"${_BASE_BRANCH}"; else echo "Skipping fetch."; fi'
   # DEBUG: git log
   - name: ${_PYTHON_IMAGE}
     entrypoint: /bin/sh
@@ -28,7 +28,13 @@ steps:
     entrypoint: /bin/sh
     args:
     - -c
-    - 'git diff --name-only origin/master...'    
+    - 'git diff --name-only origin/master...'
+  # DEBUG: git rev-list origin/master... -v
+  - name: ${_PYTHON_IMAGE}
+    entrypoint: /bin/sh
+    args:
+    - -c
+    - 'git rev-list origin/master... -v'
 #   # Install Python dependencies
 #   - name: ${_PYTHON_IMAGE}
 #     entrypoint: pip
