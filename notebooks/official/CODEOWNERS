@@ -9,3 +9,8 @@
 /migration @aferlitsch
 /explainabl_ai @aferlitsch
 /pipelines @aferlitsch
+/model_monitoring/model_monitoring.ipynb  @mco-gh
+/ml_metadata/sdk-metric-parameter-tracking-for-custom-jobs.ipynb  @jialuzh
+/ml_metadata/sdk-metric-parameter-tracking-for-locally-trained-models.ipynb  @jialuzh
+/vizier/gapic-vizier-multi-objective-optimization.ipynb  @halio-g
+/feature_store/gapic-feature-store.ipynb  @protorganizer
