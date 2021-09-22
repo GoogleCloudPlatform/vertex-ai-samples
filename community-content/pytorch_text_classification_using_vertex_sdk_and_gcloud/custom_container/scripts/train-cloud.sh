@@ -22,14 +22,17 @@ PROJECT_ID=$(gcloud config list --format 'value(core.project)')
 
 # BUCKET_NAME: Change to your bucket name.
 BUCKET_NAME="[your-bucket-name]" # <-- CHANGE TO YOUR BUCKET NAME
-BUCKET_NAME=cloud-ai-platform-2f444b6a-a742-444b-b91a-c7519f51bd77
+
+# validate bucket name
+if [ "${BUCKET_NAME}" = "[your-bucket-name]" ]
+then
+  echo "[ERROR] INVALID VALUE: Please update the variable BUCKET_NAME with valid Cloud Storage bucket name. Exiting the script..."
+  exit 1
+fi
 
 # JOB_NAME: the name of your job running on AI Platform.
-JOB_PREFIX="finetuned-bert-classifier-pytorch-cstm-cntr-"
+JOB_PREFIX="finetuned-bert-classifier-pytorch-cstm-cntr"
 JOB_NAME=${JOB_PREFIX}-$(date +%Y%m%d%H%M%S)-custom-job
-
-# This can be a GCS location to a zipped and uploaded package
-PACKAGE_PATH=./trainer
 
 # REGION: select a region from https://cloud.google.com/vertex-ai/docs/general/locations#available_regions
 # or use the default '`us-central1`'. The region is where the job will be run.
@@ -41,11 +44,8 @@ JOB_DIR=gs://${BUCKET_NAME}/${JOB_PREFIX}/models/${JOB_NAME}
 # IMAGE_REPO_NAME: set a local repo name to distinquish our image
 IMAGE_REPO_NAME=pytorch_gpu_train_finetuned-bert-classifier
 
-# IMAGE_TAG: an easily identifiable tag for your docker image
-IMAGE_TAG=latest
-
 # IMAGE_URI: the complete URI location for Cloud Container Registry
-CUSTOM_TRAIN_IMAGE_URI=gcr.io/${PROJECT_ID}/${IMAGE_REPO_NAME}:${IMAGE_TAG}
+CUSTOM_TRAIN_IMAGE_URI=gcr.io/${PROJECT_ID}/${IMAGE_REPO_NAME}
 
 # Build the docker image
 docker build --no-cache -f Dockerfile -t $CUSTOM_TRAIN_IMAGE_URI ../python_package
@@ -53,11 +53,19 @@ docker build --no-cache -f Dockerfile -t $CUSTOM_TRAIN_IMAGE_URI ../python_packa
 # Deploy the docker image to Cloud Container Registry
 docker push ${CUSTOM_TRAIN_IMAGE_URI}
 
+# worker pool spec
+worker_pool_spec="\
+replica-count=1,\
+machine-type=n1-standard-8,\
+accelerator-type=NVIDIA_TESLA_V100,\
+accelerator-count=1,\
+container-image-uri=${CUSTOM_TRAIN_IMAGE_URI}"
+
 # Submit Custom Job to Vertex AI
 gcloud beta ai custom-jobs create \
     --display-name=${JOB_NAME} \
     --region ${REGION} \
-    --worker-pool-spec=replica-count=1,machine-type='n1-standard-8',accelerator-type='NVIDIA_TESLA_V100',accelerator-count=1,container-image-uri=${CUSTOM_TRAIN_IMAGE_URI} \
+    --worker-pool-spec="${worker_pool_spec}" \
     --args="--model-name","finetuned-bert-classifier","--job-dir",$JOB_DIR
 
 echo "After the job is completed successfully, model files will be saved at $JOB_DIR/"

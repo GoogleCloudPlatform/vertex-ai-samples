@@ -5,8 +5,7 @@ FROM pytorch/torchserve:latest-cpu
 RUN pip3 install transformers
 
 # copy model artifacts, custom handler and other dependencies
-COPY ./custom_text_handler.py /home/model-server/
-COPY ./index_to_name.json /home/model-server/
+COPY ./custom_text_handler.py ./index_to_name.json /home/model-server/
 COPY ./model/finetuned-bert-classifier/ /home/model-server/
 
 # create torchserve configuration file
