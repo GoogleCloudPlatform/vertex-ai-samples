@@ -28,7 +28,8 @@ The first stage in MLOps is the collection and preparation for the purpose of de
 
 ### Get Started
 
-[Get Started with BQ datasets](get_started_bq.ipynb)
+[Get Started with BQ datasets](get_started_bq_datasets.ipynb)
+
 [Get Started with Vertex datasets](get_started_vertex_datasets.ipynb)
 
 ### E2E Stage Example
