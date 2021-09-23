@@ -23,3 +23,13 @@ The first stage in MLOps is the collection and preparation for the purpose of de
 - Data augmentation is performed on-the-fly and is coupled with model feeding.
 
 <img src='stage1.jpg'>
+
+## Notebooks
+
+### Get Started
+
+[Get Started with BQ datasets](get_started_bq.ipynb)
+[Get Started with Vertex datasets](get_started_vertex_datasets.ipynb)
+
+### E2E Stage Example
+
