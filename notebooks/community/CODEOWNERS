@@ -5,4 +5,5 @@
 
 /sdk/sdk_* @aferlitsch
 /gapic @aferlitsch
+/ml_ops @aferlitsch
 /model_monitoring/* @mco
