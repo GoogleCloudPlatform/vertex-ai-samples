@@ -8,7 +8,7 @@ The purpose of this set of notebooks and markdown files is to demonstrate Google
 
 ## MLOps Stages
 
-1. <a src='stage1'>Data Management</a>
+1. [Data Management](stage1)
 2. Experimentation
 3. Formalization
 4. Evaluation
