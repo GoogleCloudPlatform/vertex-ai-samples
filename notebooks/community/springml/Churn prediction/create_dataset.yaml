@@ -1,0 +1,52 @@
+name: Get dataframe
+inputs:
+- {name: bq_table, type: String}
+outputs:
+- {name: output_data_path, type: Dataset}
+implementation:
+  container:
+    image: python:3.9
+    command:
+    - sh
+    - -c
+    - (python3 -m ensurepip || python3 -m ensurepip --user) && (PIP_DISABLE_PIP_VERSION_CHECK=1
+      python3 -m pip install --quiet                 --no-warn-script-location 'google-cloud-bigquery'
+      'pandas' 'pyarrow' 'kfp==1.8.2' || PIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m
+      pip install --quiet                 --no-warn-script-location 'google-cloud-bigquery'
+      'pandas' 'pyarrow' 'kfp==1.8.2' --user) && "$0" "$@"
+    - sh
+    - -ec
+    - |
+      program_path=$(mktemp -d)
+      printf "%s" "$0" > "$program_path/ephemeral_component.py"
+      python3 -m kfp.v2.components.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+    - |2+
+
+      from kfp.v2.dsl import *
+      from typing import *
+
+      def get_dataframe(
+          bq_table: str,
+          output_data_path: OutputPath("Dataset")
+      ):
+          from google.cloud import bigquery
+          import pandas as pd
+
+          bqclient = bigquery.Client()
+          table = bigquery.TableReference.from_string(
+              bq_table
+          )
+          rows = bqclient.list_rows(
+              table
+          )
+          dataframe = rows.to_dataframe(
+              create_bqstorage_client=True,
+          )
+          dataframe = dataframe.sample(frac=1, random_state=2)
+          dataframe.to_csv(output_data_path)
+
+    args:
+    - --executor_input
+    - {executorInput: null}
+    - --function_to_execute
+    - get_dataframe
