@@ -1,0 +1,59 @@
+name: Sklearn train
+inputs:
+- {name: dataset, type: Dataset}
+outputs:
+- {name: metrics, type: Metrics}
+- {name: model, type: Model}
+implementation:
+  container:
+    image: python:3.9
+    command:
+    - sh
+    - -c
+    - (python3 -m ensurepip || python3 -m ensurepip --user) && (PIP_DISABLE_PIP_VERSION_CHECK=1
+      python3 -m pip install --quiet                 --no-warn-script-location 'sklearn'
+      'pandas' 'joblib' 'kfp==1.8.2' || PIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m
+      pip install --quiet                 --no-warn-script-location 'sklearn' 'pandas'
+      'joblib' 'kfp==1.8.2' --user) && "$0" "$@"
+    - sh
+    - -ec
+    - |
+      program_path=$(mktemp -d)
+      printf "%s" "$0" > "$program_path/ephemeral_component.py"
+      python3 -m kfp.v2.components.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+    - |2+
+
+      from kfp.v2.dsl import *
+      from typing import *
+
+      def sklearn_train(
+          dataset: Input[Dataset],
+          metrics: Output[Metrics],
+          model: Output[Model]
+      ):
+          from sklearn.tree import DecisionTreeClassifier
+          from sklearn.metrics import roc_curve
+          from sklearn.model_selection import train_test_split
+          from joblib import dump
+
+          import pandas as pd
+          df = pd.read_csv(dataset.path)
+          labels = df.pop("churned").tolist()
+          data = df.values.tolist()
+          x_train, x_test, y_train, y_test = train_test_split(data, labels)
+
+          skmodel = DecisionTreeClassifier()
+          skmodel.fit(x_train,y_train)
+          score = skmodel.score(x_test,y_test)
+          print('accuracy is:',score)
+
+          metrics.log_metric("accuracy",(score * 100.0))
+          metrics.log_metric("framework", "Scikit Learn")
+          metrics.log_metric("dataset_size", len(df))
+          dump(skmodel, model.path + ".joblib")
+
+    args:
+    - --executor_input
+    - {executorInput: null}
+    - --function_to_execute
+    - sklearn_train
