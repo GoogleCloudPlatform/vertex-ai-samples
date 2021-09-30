@@ -3,6 +3,14 @@
 # @global-owner1 and @global-owner2 will be requested for
 # review when someone opens a pull request.
 
-# matching_engine floder
+# matching_engine folder
 /matching_engine @shenzhimo2
 
+/migration @aferlitsch
+/explainabl_ai @aferlitsch
+/pipelines @aferlitsch
+/model_monitoring/model_monitoring.ipynb  @mco-gh
+/ml_metadata/sdk-metric-parameter-tracking-for-custom-jobs.ipynb  @jialuzh
+/ml_metadata/sdk-metric-parameter-tracking-for-locally-trained-models.ipynb  @jialuzh
+/vizier/gapic-vizier-multi-objective-optimization.ipynb  @halio-g
+/feature_store/gapic-feature-store.ipynb  @protorganizer

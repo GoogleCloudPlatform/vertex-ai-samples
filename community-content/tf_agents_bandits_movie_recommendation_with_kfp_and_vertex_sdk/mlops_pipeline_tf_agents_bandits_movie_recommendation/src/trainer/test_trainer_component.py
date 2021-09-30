@@ -88,7 +88,7 @@ class TestTrainerComponent(unittest.TestCase):
 
   def test_training_op_execute_all_steps(self):
     """Tests that training_op executes all steps."""
-    trainer_component.training_op(
+    trainer_component.train_reinforcement_learning_policy(
         training_artifacts_dir=TRAINING_ARTIFACTS_DIR,
         tfrecord_file=TFRECORD_FILE,
         num_epochs=NUM_EPOCHS,
@@ -117,7 +117,7 @@ class TestTrainerComponent(unittest.TestCase):
 
   def test_given_zero_epochs_training_op_execute_no_training(self):
     """Tests that training_op executes zero training with zero num_epochs."""
-    trainer_component.training_op(
+    trainer_component.train_reinforcement_learning_policy(
         training_artifacts_dir=TRAINING_ARTIFACTS_DIR,
         tfrecord_file=TFRECORD_FILE,
         num_epochs=0,
@@ -131,7 +131,7 @@ class TestTrainerComponent(unittest.TestCase):
   def test_given_negative_epochs_training_op_execute_no_training(self):
     """Tests that training_op executes zero training with negative num_epochs.
     """
-    trainer_component.training_op(
+    trainer_component.train_reinforcement_learning_policy(
         training_artifacts_dir=TRAINING_ARTIFACTS_DIR,
         tfrecord_file=TFRECORD_FILE,
         num_epochs=-1,
@@ -145,7 +145,7 @@ class TestTrainerComponent(unittest.TestCase):
   def test_given_float_epochs_training_op_raise_exception(self):
     """Tests that training_op raises an exception for float num_epochs."""
     with self.assertRaises(TypeError):
-      trainer_component.training_op(
+      trainer_component.train_reinforcement_learning_policy(
           training_artifacts_dir=TRAINING_ARTIFACTS_DIR,
           tfrecord_file=TFRECORD_FILE,
           num_epochs=0.5,
