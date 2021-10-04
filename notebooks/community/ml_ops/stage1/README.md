@@ -36,3 +36,4 @@ The first stage in MLOps is the collection and preparation for the purpose of de
 
 ### E2E Stage Example
 
+[Stage 1: Data Management](mlops_data_management.ipynb)
