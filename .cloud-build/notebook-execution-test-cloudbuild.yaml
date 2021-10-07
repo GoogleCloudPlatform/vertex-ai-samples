@@ -5,6 +5,12 @@ steps:
     args:
     - -c
     - 'gcloud config list'
+  # Update gcloud if required
+  - name: ${_PYTHON_IMAGE}
+    entrypoint: /bin/sh
+    args:
+    - -c
+    - 'gcloud components update'  
   # Check the Python version
   - name: ${_PYTHON_IMAGE}
     entrypoint: /bin/sh
