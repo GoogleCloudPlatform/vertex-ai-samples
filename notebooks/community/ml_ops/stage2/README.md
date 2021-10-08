@@ -6,6 +6,7 @@ Progressively develop data requirements, model architecture, training procedures
 
 
 ## Recommendations  
+
 The second stage in MLOps is experimenting in developing one or more baseline models. This stage may be done entirely by data scientists. Typically, there is a lot of try this and try that, with variance in the amount of experimental results that are not tracked (dropped on the floor). Flexibility is a key here, where the expectation is DIY (custom) and automatic methods are seamlessly interchangeable. We recommend:
 
 - Use a data pipeline for feeding data to a model.
@@ -22,7 +23,6 @@ The second stage in MLOps is experimenting in developing one or more baseline mo
 - Track training experiments with Vertex Experiments.
 - For experiments that are preserved, track the artifacts, hyperparameters and evaluations in Vertex ML Metadata
 - Use the What-if-Tool (WIT) to explore how the trained model would make predictions in different scenarios.
-
 
 
 <img src='stage2.png'>
