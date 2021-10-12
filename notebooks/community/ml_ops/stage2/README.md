@@ -31,6 +31,12 @@ The second stage in MLOps is experimenting in developing one or more baseline mo
 
 ### Get Started
 
+Get Started with Vertex ML Metadata and Logging
+
+Get Started with Vertex Tensorboard
+
+Get Started with Custom Training Packages
 
 ### E2E Stage Example
 
+[Stage 2: Experimentation](mlops_experimentation.ipynb)
