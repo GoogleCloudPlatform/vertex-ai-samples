@@ -33,7 +33,7 @@ The second stage in MLOps is experimenting in developing one or more baseline mo
 
 [Get Started with Vertex Experiments and Vertex ML Metadata](get_started_vertex_experiments.ipynb)
 
-[Get Started with Vertex Tensorboard](get_started_vertex_tensorboard.ipynb)
+[Get Started with Vertex TensorBoard](get_started_vertex_tensorboard.ipynb)
 
 Get Started with Custom Training Packages
 
