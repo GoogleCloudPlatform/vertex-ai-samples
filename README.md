@@ -6,7 +6,7 @@ Welcome to the Google Cloud [Vertex AI](https://cloud.google.com/vertex-ai/docs/
 
 ## Overview
 
-The repository contains [Notebooks](https://github.com/GoogleCloudPlatform/vertex-ai-samples/tree/main/notebooks) and [Tutorials](https://github.com/GoogleCloudPlatform/vertex-ai-samples/tree/main/tutorials) that demonstrate how to develop and manage ML workflow using Google Cloud Vertex AI. 
+The repository contains [Notebooks](https://github.com/GoogleCloudPlatform/vertex-ai-samples/tree/main/notebooks) and [Community Content](https://github.com/GoogleCloudPlatform/vertex-ai-samples/tree/master/community-content) that demonstrate how to develop and manage ML workflows using Google Cloud Vertex AI. 
 
 ## Contributing
 
