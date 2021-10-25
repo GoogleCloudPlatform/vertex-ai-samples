@@ -21,7 +21,6 @@ from tensorflow.keras import layers, losses
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 
 import distribution_utils
-import utils
 
 VOCAB_SIZE = 10000
 MAX_SEQUENCE_LENGTH = 250
@@ -175,13 +174,18 @@ def main():
   local_checkpoint_dir = './tmp/checkpoints'
   local_tensorboard_log_dir = './tmp/logs'
 
-  #TODO: update when gcsfuse ready
-  gcsfuse_ready = False
-
   model_dir = args.model_dir or local_model_dir
-  checkpoint_dir = (gcsfuse_ready and
-                         args.checkpoint_dir) or local_checkpoint_dir
   tensorboard_log_dir = args.tensorboard_log_dir or local_tensorboard_log_dir
+  checkpoint_dir = args.checkpoint_dir or local_checkpoint_dir
+
+  gs_prefix = 'gs://'
+  gcsfuse_prefix = '/gcs/'
+  if model_dir and model_dir.startswith(gs_prefix):
+    model_dir = model_dir.replace(gs_prefix, gcsfuse_prefix)
+  if tensorboard_log_dir and tensorboard_log_dir.startswith(gs_prefix):
+    tensorboard_log_dir = tensorboard_log_dir.replace(gs_prefix, gcsfuse_prefix)
+  if checkpoint_dir and checkpoint_dir.startswith(gs_prefix):
+    checkpoint_dir = checkpoint_dir.replace(gs_prefix, gcsfuse_prefix)
 
   class_names = ['csharp', 'java', 'javascript', 'python']
   class_indices = dict(zip(class_names, range(len(class_names))))
@@ -278,13 +282,6 @@ def main():
   print(f'Tensorboard logs are saved to: {tensorboard_log_dir}')
 
   print(f'Checkpoints are saved to: {checkpoint_dir}')
-  utils.gcs_upload(
-      dir=checkpoint_dir,
-      local_dir=local_checkpoint_dir,
-      gcs_dir=args.checkpoint_dir,
-      gcsfuse_ready=gcsfuse_ready,
-      local_mode=args.local_mode
-  )
 
   return
 
