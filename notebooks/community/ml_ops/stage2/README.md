@@ -37,9 +37,9 @@ The second stage in MLOps is experimenting in developing one or more baseline mo
 
 [Get Started with Custom Training Packages](get_started_vertex_training.ipynb)
 
-Get Started with Hyperparameter Tuning
+Get Started with Vizier Hyperparameter Tuning(get_started_vertex_vizier.ipynb)
 
-Get Started with AutoML Training
+Get Started with AutoML Training(get_started_automl_training.ipynb)
 
 ### E2E Stage Example
 
