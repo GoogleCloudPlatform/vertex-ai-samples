@@ -19,7 +19,7 @@ Adapted from: https://github.com/narumiruna/pytorch-distributed-example
 
 import argparse
 import os
-import tempfile
+import shutil
 
 import torch
 from torch import distributed
@@ -28,8 +28,6 @@ from torch.utils import data
 from torch.utils.tensorboard import SummaryWriter
 
 from torchvision import datasets, transforms
-
-import utils
 
 def parse_args():
 
@@ -43,6 +41,9 @@ def parse_args():
   parser.add_argument(
       '--tensorboard-log-dir', default=os.getenv('AIP_TENSORBOARD_LOG_DIR'), type=str,
       help='a Cloud Storage URI of a directory intended for saving TensorBoard')
+  parser.add_argument(
+      '--checkpoint-dir', default=os.getenv('AIP_CHECKPOINT_DIR'), type=str,
+      help='a Cloud Storage URI of a directory intended for saving checkpoints')
 
   parser.add_argument(
       '--backend', type=str, default='gloo',
@@ -68,13 +69,18 @@ def parse_args():
       '-lr', '--learning-rate', type=float, default=1e-3)
   parser.add_argument(
       '--batch-size', type=int, default=128)
-
   parser.add_argument(
       '--local-mode', action='store_true', help='use local mode when running on your local machine')
 
   args = parser.parse_args()
 
   return args
+
+def makedirs(model_dir):
+  if os.path.exists(model_dir) and os.path.isdir(model_dir):
+    shutil.rmtree(model_dir)
+  os.makedirs(model_dir)
+  return
 
 def distributed_is_initialized():
   if distributed.is_available():
@@ -176,7 +182,7 @@ class Trainer(object):
 
     for epoch in range(1, epochs + 1):
 
-      print("Epoch: {}, Training ...".format(epoch))
+      print('Epoch: {}, Training ...'.format(epoch))
       train_loss, train_acc = self.train()
 
       if is_chief:
@@ -242,16 +248,30 @@ def main():
   local_data_dir = './tmp/data'
   local_model_dir = './tmp/model'
   local_tensorboard_log_dir = './tmp/logs'
+  local_checkpoint_dir = './tmp/checkpoints'
 
-  #TODO: update when gcsfuse ready
-  gcsfuse_ready = False
-  model_dir = (gcsfuse_ready and args.model_dir) or local_model_dir
-  tensorboard_log_dir = (gcsfuse_ready and
-                         args.tensorboard_log_dir) or local_tensorboard_log_dir
+  model_dir = args.model_dir or local_model_dir
+  tensorboard_log_dir = args.tensorboard_log_dir or local_tensorboard_log_dir
+  checkpoint_dir = args.checkpoint_dir or local_checkpoint_dir
+
+  gs_prefix = 'gs://'
+  gcsfuse_prefix = '/gcs/'
+  if model_dir and model_dir.startswith(gs_prefix):
+    model_dir = model_dir.replace(gs_prefix, gcsfuse_prefix)
+  if tensorboard_log_dir and tensorboard_log_dir.startswith(gs_prefix):
+    tensorboard_log_dir = tensorboard_log_dir.replace(gs_prefix, gcsfuse_prefix)
+  if checkpoint_dir and checkpoint_dir.startswith(gs_prefix):
+    checkpoint_dir = checkpoint_dir.replace(gs_prefix, gcsfuse_prefix)
 
   writer = SummaryWriter(tensorboard_log_dir)
 
   is_chief = args.rank == 0
+  if is_chief:
+    makedirs(checkpoint_dir)
+    print(f'Checkpoints will be saved to {checkpoint_dir}')
+
+  checkpoint_path = os.path.join(checkpoint_dir, 'checkpoint.pt')
+  print(f'checkpoint_path is {checkpoint_path}')
 
   if args.world_size > 1:
     print('Initializing distributed backend with {} nodes'.format(args.world_size))
@@ -261,36 +281,38 @@ def main():
           world_size=args.world_size,
           rank=args.rank,
       )
-    print(f"[{os.getpid()}]: "
-          f"world_size = {distributed.get_world_size()}, "
-          f"rank = {distributed.get_rank()}, "
-          f"backend={distributed.get_backend()} \n", end='')
+    print(f'[{os.getpid()}]: '
+          f'world_size = {distributed.get_world_size()}, '
+          f'rank = {distributed.get_rank()}, '
+          f'backend={distributed.get_backend()} \n', end='')
 
   if torch.cuda.is_available() and not args.no_cuda:
-    device = torch.device("cuda:{}".format(args.rank))
+    device = torch.device('cuda:{}'.format(args.rank))
   else:
-    device = torch.device("cpu")
+    device = torch.device('cpu')
 
   model = Net(device=device)
   if distributed_is_initialized():
+    model.to(device)
     model = DistributedDataParallel(model)
 
-  checkpoint_path = tempfile.gettempdir() + "/model.checkpoint"
   if is_chief:
     # All processes should see same parameters as they all start from same
     # random parameters and gradients are synchronized in backward passes.
     # Therefore, saving it in one process is sufficient.
     torch.save(model.state_dict(), checkpoint_path)
+    print(f'Initial chief checkpoint is saved to {checkpoint_path}')
 
   # Use a barrier() to make sure that process 1 loads the model after process
   # 0 saves it.
   if distributed_is_initialized():
     distributed.barrier()
     # configure map_location properly
-    map_location = {'cuda:%d' % 0: 'cuda:%d' % args.rank}
-    model.load_state_dict(torch.load(checkpoint_path, map_location=map_location))
+    model.load_state_dict(torch.load(checkpoint_path, map_location=device))
+    print(f'Initial chief checkpoint is saved to {checkpoint_path} with map_location {device}')
   else:
     model.load_state_dict(torch.load(checkpoint_path))
+    print(f'Initial chief checkpoint is loaded from {checkpoint_path}')
 
   optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
 
@@ -310,29 +332,12 @@ def main():
   )
   trainer.fit(args.epochs, is_chief, writer)
 
-  if is_chief and model_dir == local_model_dir:
-    utils.makedirs(model_dir)
+  if model_dir == local_model_dir:
+    makedirs(model_dir)
     trainer.save(model_dir)
     print(f'Model is saved to {model_dir}')
 
-  if is_chief and not args.local_mode:
-    utils.gcs_upload(
-      dir=model_dir,
-      local_dir=local_model_dir,
-      gcs_dir=args.model_dir,
-      gcsfuse_ready=gcsfuse_ready,
-      local_mode=args.local_mode,
-  )
-
   print(f'Tensorboard logs are saved to: {tensorboard_log_dir}')
-  if is_chief and not args.local_mode:
-    utils.gcs_upload(
-      dir=tensorboard_log_dir,
-      local_dir=local_tensorboard_log_dir,
-      gcs_dir=args.tensorboard_log_dir,
-      gcsfuse_ready=gcsfuse_ready,
-      local_mode=args.local_mode,
-  )
 
   writer.close()
 

@@ -31,11 +31,17 @@ The second stage in MLOps is experimenting in developing one or more baseline mo
 
 ### Get Started
 
-Get Started with Vertex ML Metadata and Logging
+[Get Started with Vertex Experiments and Vertex ML Metadata](get_started_vertex_experiments.ipynb)
 
-Get Started with Vertex Tensorboard
+[Get Started with Vertex TensorBoard](get_started_vertex_tensorboard.ipynb)
 
-Get Started with Custom Training Packages
+[Get Started with Custom Training Packages](get_started_vertex_training.ipynb)
+
+[Get Started with Distributed Training](get_started_vertex_distributed_training.ipynb)
+
+[Get Started with Vizier Hyperparameter Tuning](get_started_vertex_vizier.ipynb)
+
+[Get Started with AutoML Training](get_started_automl_training.ipynb)
 
 ### E2E Stage Example
 
