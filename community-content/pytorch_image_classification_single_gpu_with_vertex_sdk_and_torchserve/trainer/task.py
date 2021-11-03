@@ -16,6 +16,7 @@ import argparse
 import copy
 import os
 import pathlib
+import shutil
 import time
 
 import torch
@@ -23,8 +24,6 @@ from torch import optim
 from torch.utils.tensorboard import SummaryWriter
 
 from torchvision import datasets, models, transforms
-
-import utils
 
 def parse_args():
 
@@ -61,6 +60,12 @@ def parse_args():
   args = parser.parse_args()
 
   return args
+
+def makedirs(model_dir):
+  if os.path.exists(model_dir) and os.path.isdir(model_dir):
+    shutil.rmtree(model_dir)
+  os.makedirs(model_dir)
+  return
 
 def download_data(data_dir):
 
@@ -207,13 +212,17 @@ def main():
   local_model_dir = './tmp/model'
   local_tensorboard_log_dir = './tmp/logs'
 
-  #TODO: update when gcsfuse ready
-  gcsfuse_ready = False
+  model_dir = args.model_dir or local_model_dir
+  tensorboard_log_dir = args.tensorboard_log_dir or local_tensorboard_log_dir
 
-  model_dir = (gcsfuse_ready and args.model_dir) or local_model_dir
-  tensorboard_log_dir = (gcsfuse_ready and
-                         args.tensorboard_log_dir) or local_tensorboard_log_dir
+  gs_prefix = 'gs://'
+  gcsfuse_prefix = '/gcs/'
+  if model_dir and model_dir.startswith(gs_prefix):
+    model_dir = model_dir.replace(gs_prefix, gcsfuse_prefix)
+  if tensorboard_log_dir and tensorboard_log_dir.startswith(gs_prefix):
+    tensorboard_log_dir = tensorboard_log_dir.replace(gs_prefix, gcsfuse_prefix)
 
+  makedirs(model_dir)
   writer = SummaryWriter(tensorboard_log_dir)
 
   device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -224,9 +233,6 @@ def main():
 
   dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
   print(f'Dataset sizes: {dataset_sizes}')
-
-  if model_dir == local_model_dir:
-    utils.makedirs(model_dir)
 
   dataloaders = {
       x: torch.utils.data.DataLoader(
@@ -266,22 +272,8 @@ def main():
 
   torch.save(model.state_dict(), model_path)
   print(f'Model is saved to {model_dir}')
-  utils.gcs_upload(
-      dir=model_dir,
-      local_dir=local_model_dir,
-      gcs_dir=args.model_dir,
-      gcsfuse_ready=gcsfuse_ready,
-      local_mode=args.local_mode
-  )
 
   print(f'Tensorboard logs are saved to: {tensorboard_log_dir}')
-  utils.gcs_upload(
-      dir=tensorboard_log_dir,
-      local_dir=local_tensorboard_log_dir,
-      gcs_dir=args.tensorboard_log_dir,
-      gcsfuse_ready=gcsfuse_ready,
-      local_mode=args.local_mode
-  )
 
   writer.close()
 
