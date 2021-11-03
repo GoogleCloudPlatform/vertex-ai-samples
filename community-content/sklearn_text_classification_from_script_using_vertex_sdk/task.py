@@ -130,7 +130,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        "--training_data_url",
+        "--dataset_url",
         help="Web url for the training data ",
         type=str
     )
@@ -148,10 +148,10 @@ if __name__ == "__main__":
     client = LogClient(project=arguments["project_id"])
     client.setup_logging(log_level=logging.INFO)
     logging.info("Starting custom training job.")
-    
+
     # download the data from url
-    logging.info("Loadig training from url: {}".format(arguments["training_data_url"]))
-    dataframe = download_dataset_from_url(arguments["training_data_url"])
+    logging.info("Loadig training from url: {}".format(arguments["dataset_url"]))
+    dataframe = download_dataset_from_url(arguments["dataset_url"])
     train_test_data = get_train_test_data(dataframe)
 
     # train and cross validate
@@ -160,10 +160,8 @@ if __name__ == "__main__":
     logging.info(f"Training completed with model score: {score}")
 
     # export model to gcs
-    logging.info("Exporting model ...")
-    model_uri = export_model_to_gcs(model, os.environ["AIP_MODEL_DIR"])
-    logging.info("Exported model to GCS: {}".format(model_uri))
-
-    logging.info("Exporting evaluation report ...")
-    eval_uri = export_evaluation_report_to_gcs(str(score), os.environ["AIP_MODEL_DIR"])
-    logging.info("Exported evaluation report to GCS: {}".format(eval_uri))
+    _gcs_uri = os.environ["AIP_MODEL_DIR"]
+    logging.info("Exporting model artifacts ...")
+    export_model_to_gcs(model, _gcs_uri)
+    export_evaluation_report_to_gcs(str(score), _gcs_uri)
+    logging.info(f"Exported model artifacts to GCS: {_gcs_uri}")
