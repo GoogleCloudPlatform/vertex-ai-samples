@@ -2,19 +2,19 @@
 
 This repository shows how to train and deploy a text classifier using sklearn and Vertex AI.
 
-The main Vertex AI features are:
+The main used Vertex AI features are:
 - Vertex AI Custom Training
 - Vertex AI Model
 - Vertex AI Endpoint
 
-Further GCP services are:
+Further used GCP services are:
 - Google Cloud Logging
 - Google Cloud Storage
 
 ## Repository
 
     ├── README.md
-    ├── create_job.ipynb    # <-- creates the training job and deploys it to an endpoint
+    ├── create_job.ipynb    # <-- creates the training job and deploys the model
     ├── requirements.txt    # <-- requirements for deploying the job
     └── task.py             # <-- contains the training application
 

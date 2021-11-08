@@ -100,7 +100,7 @@ def export_evaluation_report_to_gcs(report: str, gcs_uri: str) -> None:
 
 def train_and_score(X_train: List, y_train: List, X_test: List, y_test: List
 ) -> Tuple[Pipeline, float]:
-    """Trains and scores a text classifier pipeline.
+    """Trains and cross-validates a text classifier pipeline.
 
     Args:
         X_train (List): Train features as list of strings.
@@ -131,13 +131,13 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--dataset_url",
-        help="Web url for the training data ",
+        help="Download url for the training data.",
         type=str
     )
 
     parser.add_argument(
         "--project_id",
-        help="location of training data in gs:// uri or bigquery uri",
+        help="GCP project id for cloud logging.",
         type=str
     )
 
@@ -150,7 +150,7 @@ if __name__ == "__main__":
     logging.info("Starting custom training job.")
 
     # download the data from url
-    logging.info("Loadig training from url: {}".format(arguments["dataset_url"]))
+    logging.info("Downloading training data from: {}".format(arguments["dataset_url"]))
     dataframe = download_dataset_from_url(arguments["dataset_url"])
     train_test_data = get_train_test_data(dataframe)
 
@@ -164,4 +164,4 @@ if __name__ == "__main__":
     logging.info("Exporting model artifacts ...")
     export_model_to_gcs(model, _gcs_uri)
     export_evaluation_report_to_gcs(str(score), _gcs_uri)
-    logging.info(f"Exported model artifacts to GCS: {_gcs_uri}")
+    logging.info(f"Exported model artifacts to GCS bucket: {_gcs_uri}")
