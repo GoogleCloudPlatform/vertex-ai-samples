@@ -1,6 +1,6 @@
-# Train and deploy a sklearn model with Vertex AI
+# Train and deploy a scikit-learn model with Vertex AI
 
-This repository shows how to train and deploy a text classifier using sklearn and Vertex AI.
+This repository shows how to train and deploy a text classifier using scikit-learn and Vertex AI.
 
 The main used Vertex AI features are:
 - Vertex AI Custom Training
