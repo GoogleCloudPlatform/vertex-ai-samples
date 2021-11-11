@@ -1,97 +1,72 @@
-from google.cloud import aiplatform
+from google.protobuf import duration_pb2
+from yaml.loader import FullLoader
+
+import google.auth
+from google.cloud.devtools import cloudbuild_v1
+from google.cloud.devtools.cloudbuild_v1.types import Source, StorageSource
+
+from typing import Optional
+import yaml
 
 from google.cloud.aiplatform import utils
+from google.api_core import operation
 
-from typing import List, Optional, Sequence
-import os
-
-CONTAINER_URI = (
-    "gcr.io/cloud-devrel-public-resources/python-samples-testing-docker:latest"
-)
+CLOUD_BUILD_FILEPATH = ".cloud-build/notebook-execution-test-cloudbuild-single.yaml"
+TIMEOUT_IN_SECONDS = 86400
 
 
-# def _package_and_upload_module(
-#     self,
-#     project: str,
-#     destination_uri: str,
-#     training_script_path: str,
-#     requirements: str,
-# ) -> str:
-#     # Create packager
-#     python_packager = utils.source_utils._TrainingScriptPythonPackager(
-#         script_path=training_script_path, requirements=requirements
-#     )
-
-#     # Package and upload to GCS
-#     package_gcs_uri = python_packager.package_and_copy_to_gcs(
-#         gcs_staging_dir=destination_uri,
-#         project=project,
-#     )
-
-#     print(f"Custom Training Python Package is uploaded to: {package_gcs_uri}")
-
-#     return package_gcs_uri
-
-
-def run_notebook_remote(
-    script_path: str,
-    container_uri: str,
+def execute_notebook_remote(
+    code_archive_uri: str,
     notebook_uri: str,
-    requirements: Optional[Sequence[str]] = None,
-):
-    notebook_name = "notebook_execution"
-    # job = aiplatform.CustomPythonPackageTrainingJob(
-    #     display_name=notebook_name,
-    #     python_package_gcs_uri=package_gcs_uri,
-    #     python_module_name=python_module_name,
-    #     container_uri=container_uri,
-    # )
+    notebook_output_uri: str,
+    container_uri: str,
+    tag: Optional[str],
+) -> operation.Operation:
+    """Create and execute a simple Google Cloud Build configuration,
+    print the in-progress status and print the completed status."""
 
-    job = aiplatform.CustomTrainingJob(
-        display_name=notebook_name,
-        script_path=script_path,
-        container_uri=container_uri,
-        requirements=requirements,
+    # Authorize the client with Google defaults
+    credentials, project_id = google.auth.default()
+    client = cloudbuild_v1.services.cloud_build.CloudBuildClient()
+
+    build = cloudbuild_v1.Build()
+
+    # The following build steps will output "hello world"
+    # For more information on build configuration, see
+    # https://cloud.google.com/build/docs/configuring-builds/create-basic-configuration
+    cloudbuild_config = yaml.load(open(CLOUD_BUILD_FILEPATH), Loader=FullLoader)
+
+    substitutions = {
+        "_PYTHON_IMAGE": container_uri,
+        "_NOTEBOOK_GCS_URI": notebook_uri,
+        "_NOTEBOOK_OUTPUT_GCS_URI": notebook_output_uri,
+    }
+
+    (
+        source_archived_file_gcs_bucket,
+        source_archived_file_gcs_object,
+    ) = utils.extract_bucket_and_prefix_from_gcs_path(code_archive_uri)
+
+    build.source = Source(
+        storage_source=StorageSource(
+            bucket=source_archived_file_gcs_bucket,
+            object_=source_archived_file_gcs_object,
+        )
     )
 
-    job.run(
-        args=["--notebook_uri", notebook_uri],
-        replica_count=1,
-        sync=True,
-    )
+    build.steps = cloudbuild_config["steps"]
+    build.substitutions = substitutions
+    build.timeout = duration_pb2.Duration(seconds=TIMEOUT_IN_SECONDS)
+    build.queue_ttl = duration_pb2.Duration(seconds=TIMEOUT_IN_SECONDS)
 
+    if tag:
+        build.tags = [tag]
 
-PYTHON_MODULE_NAME = f"{utils.source_utils._TrainingScriptPythonPackager._ROOT_MODULE}.{utils.source_utils._TrainingScriptPythonPackager._TASK_MODULE_NAME}"
+    operation = client.create_build(project_id=project_id, build=build)
+    # Print the in-progress operation
+    # print("IN PROGRESS:")
+    # print(operation.metadata)
 
-project = "python-docs-samples-tests"
-staging_bucket = "gs://ivanmkc-test2/notebooks"
-destination_gcs_folder = staging_bucket + "/notebooks"
-
-notebook_path = "notebooks/official/custom/custom-tabular-bq-managed-dataset.ipynb"
-
-# package_gcs_uri = _package_and_upload_module(
-#     project=project,
-#     destination_uri=destination_uri,
-#     training_script_path=".cloud-build/ExecuteChangedNotebooks.py",
-#     requirements="",
-# )
-
-# Upload notebook
-notebook_uri = utils._timestamped_copy_to_gcs(
-    local_file_path=notebook_path, gcs_dir=destination_gcs_folder
-)
-
-aiplatform.init(project=project, staging_bucket=staging_bucket)
-
-# Read requirements.txt
-lines = []
-with open(".cloud-build/requirements.txt") as file:
-    lines = file.readlines()
-    lines = [line.rstrip() for line in lines]
-
-run_notebook_remote(
-    script_path=".cloud-build/ExecuteChangedNotebooks.py",
-    container_uri=CONTAINER_URI,
-    notebook_uri=notebook_uri,
-    requirements=lines,
-)
+    # Print the completed status
+    # print("RESULT:", result.status)
+    return operation
