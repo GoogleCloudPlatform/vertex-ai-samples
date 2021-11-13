@@ -331,7 +331,9 @@ def run_changed_notebooks(
     print("\n=== END RESULTS===\n")
 
     total_notebook_duration = functools.reduce(
-        operator.add, [result.duration for result in results_sorted]
+        operator.add,
+        [datetime.timedelta(seconds=0)]
+        + [result.duration for result in results_sorted],
     )
 
     print(f"Cumulative notebook duration: {format_timedelta(total_notebook_duration)}")
