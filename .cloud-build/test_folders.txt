@@ -1,7 +1,2 @@
-notebooks/official/automl
-notebooks/official/feature_store
-notebooks/official/managed_notebooks
-notebooks/official/ml_metadata
-notebooks/official/model_monitoring
-notebooks/official/vizier
+notebooks/official
 notebooks/notebook_template.ipynb
