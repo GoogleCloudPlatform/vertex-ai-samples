@@ -39,7 +39,9 @@ The third stage in MLOps is formalization to develop an automated pipeline proce
 
 [Get Started with Dataflow components](get_started_with_dataflow_pipeline_components.ipynb)
 
-Get Started with Vertex AI components
+[Get Started with Vertex AI AutoML components](get_started_with_automl_pipeline_components.ipynb)
+
+Get Started with Vertex AI Custom Training components
 
 
 ### E2E Stage Example
