@@ -43,6 +43,8 @@ The second stage in MLOps is experimenting in developing one or more baseline mo
 
 [Get Started with AutoML Training](get_started_automl_training.ipynb)
 
+[Get Started with BQML Training](get_started_bqml_training.ipyn)
+
 ### E2E Stage Example
 
 [Stage 2: Experimentation](mlops_experimentation.ipynb)
