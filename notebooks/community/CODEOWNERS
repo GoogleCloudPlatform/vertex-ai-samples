@@ -1,0 +1,16 @@
+# These owners will be the default owners for everything in
+# the repo. Unless a later match takes precedence,
+# @global-owner1 and @global-owner2 will be requested for
+# review when someone opens a pull request.
+
+/sdk/sdk_* @aferlitsch
+/gapic @aferlitsch
+/ml_ops @aferlitsch
+/model_monitoring/* @mco
+/structured_data/rapid_prototyping_* @rafael-carvalho
+
+/managed_notebooks/ @notebooks-team
+/sdk/SDK_FBProphet_Forecasting_Online.ipynb			@brianchunkang
+/sdk/SDK_AutoML_Forecasting_Model_Training_Example.ipynb @thehardikv
+/sdk/sdk_automl_forecasting_evaluating_a_model.ipynb @thehardikv
+/matching_engine @yinghsienwu

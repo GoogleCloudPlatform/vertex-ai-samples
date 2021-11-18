@@ -123,7 +123,16 @@ def main():
 
   model_dir = args.model_dir or local_model_dir
   tensorboard_log_dir = args.tensorboard_log_dir or local_tensorboard_log_dir
-  checkpoint_dir = local_checkpoint_dir
+  checkpoint_dir = args.checkpoint_dir or local_checkpoint_dir
+
+  gs_prefix = 'gs://'
+  gcsfuse_prefix = '/gcs/'
+  if model_dir and model_dir.startswith(gs_prefix):
+    model_dir = model_dir.replace(gs_prefix, gcsfuse_prefix)
+  if tensorboard_log_dir and tensorboard_log_dir.startswith(gs_prefix):
+    tensorboard_log_dir = tensorboard_log_dir.replace(gs_prefix, gcsfuse_prefix)
+  if checkpoint_dir and checkpoint_dir.startswith(gs_prefix):
+    checkpoint_dir = checkpoint_dir.replace(gs_prefix, gcsfuse_prefix)
 
   num_worker, task_type, task_id = distribution_utils.setup()
   print(f'task_type: {task_type}, '
