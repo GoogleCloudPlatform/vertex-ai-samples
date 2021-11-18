@@ -14,6 +14,7 @@
 /model_monitoring/model_monitoring.ipynb @mco-gh
 /ml_metadata/sdk-metric-parameter-tracking-for-custom-jobs.ipynb @jialuzh
 /ml_metadata/sdk-metric-parameter-tracking-for-locally-trained-models.ipynb @jialuzh
+/ml_metadata/vertex-pipelines-ml-metadata.ipynb @sararob
 /vizier/gapic-vizier-multi-objective-optimization.ipynb @halio-g
 /feature_store/gapic-feature-store.ipynb @protorganizer @diemtvu
 /managed_notebooks @GoogleCloudPlatform/notebooks-team
