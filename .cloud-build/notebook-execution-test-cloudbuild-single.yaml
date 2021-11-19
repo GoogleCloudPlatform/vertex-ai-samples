@@ -11,6 +11,10 @@ steps:
     args:
     - -c
     - 'python3 .cloud-build/CheckPythonVersion.py'
+  # Upgrade pip
+  - name: ${_PYTHON_IMAGE}
+    entrypoint: pip
+    args: ['install', '--upgrade', 'pip']
   # Install Python dependencies
   - name: ${_PYTHON_IMAGE}
     entrypoint: pip
