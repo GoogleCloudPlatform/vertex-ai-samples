@@ -13,14 +13,16 @@ steps:
     - 'python3 .cloud-build/CheckPythonVersion.py'
   # Install Python dependencies
   - name: ${_PYTHON_IMAGE}
-    entrypoint: pip
-    args: ['install', '--upgrade',  '--user', '--requirement', '.cloud-build/requirements.txt']
+    entrypoint: /bin/sh
+    args:
+    - -c
+    - 'python3 -m pip install -U pip && python3 -m pip install -U --user -r .cloud-build/requirements.txt'
   # Install Python dependencies and run testing script
   - name: ${_PYTHON_IMAGE}
     entrypoint: /bin/sh
     args:
     - -c
-    - 'python3 -m pip freeze && python3 .cloud-build/execute_notebook_cli.py --notebook_source "${_NOTEBOOK_GCS_URI}" --output_file_or_uri "${_NOTEBOOK_OUTPUT_GCS_URI}"'
+    - 'python3 -m pip install -U pip && python3 -m pip freeze && python3 .cloud-build/execute_notebook_cli.py --notebook_source "${_NOTEBOOK_GCS_URI}" --output_file_or_uri "${_NOTEBOOK_OUTPUT_GCS_URI}"'
     env:
     - 'IS_TESTING=1'
 timeout: 86400s
