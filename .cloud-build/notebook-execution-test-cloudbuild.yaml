@@ -21,7 +21,7 @@ steps:
     args:
     - -c
     - 'if [ -n "${_BASE_BRANCH}" ]; then git fetch origin "${_BASE_BRANCH}":refs/remotes/origin/"${_BASE_BRANCH}"; else echo "Skipping fetch."; fi'
-  # Install Python dependencies  
+  # Install Python dependencies
   - name: ${_PYTHON_IMAGE}
     entrypoint: /bin/sh
     args:
