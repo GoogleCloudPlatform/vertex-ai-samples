@@ -10,7 +10,7 @@
 /structured_data/rapid_prototyping_* @rafael-carvalho
 
 /managed_notebooks/ @notebooks-team
-/sdk/SDK_FBProphet_Forecasting_Online.ipynb			@brianchunkang
+/pipelines/SDK_FBProphet_Forecasting_Online.ipynb			@brianchunkang
 /sdk/google_cloud_pipeline_components_TPU_model_train_upload_deploy.ipynb @brianchunkang
 /sdk/SDK_AutoML_Forecasting_Model_Training_Example.ipynb @thehardikv
 /sdk/sdk_automl_forecasting_evaluating_a_model.ipynb @thehardikv
