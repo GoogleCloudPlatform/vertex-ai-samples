@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This script automatically formats and lints all notebooks that have changed from the head of the master branch.
+# This script automatically formats and lints all notebooks that have changed from the head of the main branch.
 #
 # Options:
 # -t: Test-mode. Only test if format and linting are required but make no changes to files.
@@ -52,7 +52,7 @@ echo "Test mode: $is_test"
 notebooks=()
 while read -r file || [ -n "$line" ]; do
     notebooks+=("$file")
-done < <(git diff --name-only master... | grep '\.ipynb$')
+done < <(git diff --name-only main... | grep '\.ipynb$')
 
 problematic_notebooks=()
 if [ ${#notebooks[@]} -gt 0 ]; then
