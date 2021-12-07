@@ -15,7 +15,7 @@
 
 from nbconvert.preprocessors import Preprocessor
 from typing import Dict
-import UpdateNotebookVariables
+from . import UpdateNotebookVariables as update_notebook_variables
 
 
 class RemoveNoExecuteCells(Preprocessor):
@@ -41,7 +41,7 @@ class UpdateVariablesPreprocessor(Preprocessor):
         # VARIABLE_NAME = '[description]'
 
         for variable_name, variable_value in replacement_map.items():
-            content = UpdateNotebookVariables.get_updated_value(
+            content = update_notebook_variables.get_updated_value(
                 content=content,
                 variable_name=variable_name,
                 variable_value=variable_value,

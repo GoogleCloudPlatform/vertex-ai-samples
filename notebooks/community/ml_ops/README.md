@@ -10,7 +10,7 @@ The purpose of this set of notebooks and markdown files is to demonstrate Google
 
 1. [Data Management](stage1)
 2. [Experimentation](stage2)
-3. Formalization
+3. [Formalization](stage3)
 4. Evaluation
 5. Deployment
 6. Serving
