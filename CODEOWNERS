@@ -3,4 +3,4 @@
 
 # These owners will be the default owners for everything in
 # the repo. Unless a later match takes precedence.
-*  @GoogleCloudPlatform/vertex-ai-samples-contributors
+*  @GoogleCloudPlatform/vertex-ai-samples-owners
