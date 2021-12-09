@@ -1,0 +1,20 @@
+# These owners will be the default owners for everything in
+# the repo. Unless a later match takes precedence,
+# @global-owner1 and @global-owner2 will be requested for
+# review when someone opens a pull request.
+* @vertex-ai-samples-contributors  @GoogleCloudPlatform/cloudml-samples-owners
+
+# matching_engine folder
+/matching_engine @shenzhimo2
+
+/migration @aferlitsch
+/explainabl_ai @aferlitsch
+/pipelines @aferlitsch
+
+/model_monitoring/model_monitoring.ipynb @mco-gh
+/ml_metadata/sdk-metric-parameter-tracking-for-custom-jobs.ipynb @jialuzh
+/ml_metadata/sdk-metric-parameter-tracking-for-locally-trained-models.ipynb @jialuzh
+/ml_metadata/vertex-pipelines-ml-metadata.ipynb @sararob
+/vizier/gapic-vizier-multi-objective-optimization.ipynb @halio-g
+/feature_store/gapic-feature-store.ipynb @protorganizer @diemtvu
+/managed_notebooks @GoogleCloudPlatform/notebooks-team

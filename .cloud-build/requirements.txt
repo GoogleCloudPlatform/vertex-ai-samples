@@ -1,0 +1,12 @@
+ipython>=7.0
+jupyter>=1.0
+nbconvert>=6.0
+papermill>=2.3
+numpy>=1.19
+pandas>=1.2
+matplotlib>=3.4
+tabulate
+google-cloud-aiplatform
+google-cloud-storage
+google-cloud-build
+gcloud
