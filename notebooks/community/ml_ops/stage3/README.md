@@ -46,4 +46,4 @@ The third stage in MLOps is formalization to develop an automated pipeline proce
 
 ### E2E Stage Example
 
-Stage 3: Formalization
+[Stage 3: Formalization](mlops_formalization.ipynb)
