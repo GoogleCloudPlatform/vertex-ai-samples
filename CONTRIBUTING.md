@@ -31,7 +31,7 @@ pip3 install --user -U nbqa black flake8 isort pyupgrade git+https://github.com/
 You'll likely need to add the directory where these were installed to your PATH:
 
 ```shell
-export PATH=“$HOME/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 ```
 
 Then, set an environment variable for your notebook (or directory):
