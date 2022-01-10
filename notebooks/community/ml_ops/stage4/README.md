@@ -42,6 +42,17 @@ This stage may be done entirely by MLOps. We recommend:
 
 ### Get Started
 
+Get started with Vertex Model Registry
+
+Get started with Vertex ML Metadata
+
+Get started with Google Container Registry
+
+Get started with custom model evaluation
+
+Get started with A/B Testing
+
+Get started with Vertex Explainable AI
 
 ### E2E Stage Example
 
