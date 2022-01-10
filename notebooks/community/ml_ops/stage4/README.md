@@ -20,6 +20,20 @@ Once this static evaluation is completed, one or more dynamic evaluations are pe
 1. Resource utilization and latency in a sandbox environment. 
 2. A business objective using A/B testing.
 
+This stage may be done entirely by MLOps. We recommend:
+
+- Store and retrieve candidate models in Vertex Model Registry.
+- Use Vertex ML Metadata to retain past and present evaluations, per candidate and blessed versions, as part of the model metadata.
+- Tag the evaluations by evaluation slice and version of the slice.
+- Evaluate with the most recent evaluation slices.
+- Use Vertex Batch Prediction to perform a batch prediction request on each evaluation slice.
+- Use a Python batch script to compute custom evaluations from the results of the batch prediction request.
+- Use the Vertex pipeline resource developed during formalization to perform the above.
+- Before blessing a candidate model, deploy the model to an sandbox environment that is identical (or comparable) to the production environment of the existing blessed model. Send copies of live product request traffic to the sandbox environment. Measure and comparable resource utilization and latency. Use Vertex ML - Metadata to retain past and present sandbox performance results.
+- Collect a random sample of prediction requests/results from the sandbox environment. Use Vertex Explainable AI to inspect the reason the prediction was made. This is generally a manual inspection process. Look for things like the right prediction for the wrong reason, and biases.
+- Use Vertex Endpoint resource with traffic split to perform A/B testing between the existing blessed model and candidate model against a business objective.  - - Use Vertex ML Metadata to retain past and present A/B testing results.
+
+
 
 
 <img src='stage4.png'>
