@@ -48,9 +48,6 @@ RUN pip3 install --upgrade pip \
     && pip3 install py3Dmol tqdm \
     && pip3 install --upgrade jax==0.2.14 jaxlib==0.1.69+cuda${CUDA_MAJOR}${CUDA_MINOR} -f \
       https://storage.googleapis.com/jax-releases/jax_releases.html
-   
-# Downgrade because of new base image.
-RUN pip3 install jax==0.2.14 py3Dmol tqdm
 
 # Install alphafold.
 WORKDIR /app/alphafold
