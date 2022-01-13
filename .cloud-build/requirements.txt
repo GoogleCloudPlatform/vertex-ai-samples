@@ -1,4 +1,4 @@
-ipython==7.31.0
+ipython==8.0.0
 jupyter==1.0.0
 nbconvert==6.4.0
 papermill==2.3.3
