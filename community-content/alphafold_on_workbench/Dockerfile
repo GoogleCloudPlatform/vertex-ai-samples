@@ -65,6 +65,6 @@ RUN sudo mkdir -m 777 --parents /tmp/ramdisk
 # details.
 # ENTRYPOINT does not support easily running multiple commands, so instead we
 # write a shell script to wrap them up.
-WORKDIR /app/alphafold
+WORKDIR /home/jupyter
 RUN echo '#!/bin/bash\nldconfig\n\'
 
