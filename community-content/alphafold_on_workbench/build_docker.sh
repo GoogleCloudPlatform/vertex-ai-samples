@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
-PROJECT=peak-responder-337818
-REPOSITORY=alphafold-demo
+# Prod (Publicly viewable)
+PROJECT=cloud-devrel-public-resources
+REPOSITORY=alphafold
 LOCAL_IMAGE=alphafold-on-gcp
 REMOTE_IMAGE=${LOCAL_IMAGE?}
 TAG=latest
