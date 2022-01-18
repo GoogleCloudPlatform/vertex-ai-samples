@@ -14,7 +14,7 @@
 # limitations under the License.
 
 import argparse
-import execute_notebooks_helper
+import execute_notebook_helper
 
 parser = argparse.ArgumentParser(description="Run changed notebooks.")
 parser.add_argument(
@@ -31,7 +31,7 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
-execute_notebooks_helper.execute_notebook(
+execute_notebook_helper.execute_notebook(
     notebook_source=args.notebook_source,
     output_file_or_uri=args.output_file_or_uri,
     should_log_output=True,
