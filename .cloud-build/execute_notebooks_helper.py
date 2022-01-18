@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import argparse
 import concurrent
 import dataclasses
 import datetime
@@ -30,17 +29,6 @@ import operator
 import execute_notebook_remote
 from utils import util, NotebookProcessors
 from google.cloud.devtools.cloudbuild_v1.types import BuildOperationMetadata
-
-
-def str2bool(v):
-    if isinstance(v, bool):
-        return v
-    if v.lower() in ("yes", "true", "t", "y", "1"):
-        return True
-    elif v.lower() in ("no", "false", "f", "n", "0"):
-        return False
-    else:
-        raise argparse.ArgumentTypeError("Boolean value expected.")
 
 
 def format_timedelta(delta: datetime.timedelta) -> str:
@@ -202,41 +190,13 @@ def execute_notebook(
     return result
 
 
-def run_changed_notebooks(
+def get_changed_notebooks(
     test_paths_file: str,
-    container_uri: str,
-    staging_bucket: str,
-    artifacts_bucket: str,
-    variable_project_id: str,
-    variable_region: str,
-    should_parallelize: bool,
     base_branch: Optional[str] = None,
-):
+) -> List[str]:
     """
-    Run the notebooks that exist under the folders defined in the test_paths_file.
-    It only runs notebooks that have differences from the Git base_branch.
-
-    The executed notebooks are saved in the artifacts_bucket.
-
-    Variables are also injected into the notebooks such as the variable_project_id and variable_region.
-
-    Args:
-        test_paths_file (str):
-            Required. The new-line delimited file to folders and files that need checking.
-            Folders are checked recursively.
-        base_branch (str):
-            Optional. If provided, only the files that have changed from the base_branch will be checked.
-            If not provided, all files will be checked.
-        staging_bucket (str):
-            Required. The GCS staging bucket to write source code to.
-        artifacts_bucket (str):
-            Required. The GCS staging bucket to write executed notebooks to.
-        variable_project_id (str):
-            Required. The value for PROJECT_ID to inject into notebooks.
-        variable_region (str):
-            Required. The value for REGION to inject into notebooks.
-        should_parallelize (bool):
-            Required. Should run notebooks in parallel using a thread pool as opposed to in sequence.
+    Get the notebooks that exist under the folders defined in the test_paths_file.
+    It only returns notebooks that have differences from the Git base_branch.
     """
 
     test_paths = []
@@ -266,6 +226,42 @@ def run_changed_notebooks(
     notebooks = [notebook for notebook in notebooks if len(notebook) > 0]
     notebooks = [notebook for notebook in notebooks if pathlib.Path(notebook).exists()]
 
+
+def run_notebooks(
+    notebooks: List[str],
+    container_uri: str,
+    staging_bucket: str,
+    artifacts_bucket: str,
+    variable_project_id: str,
+    variable_region: str,
+    should_parallelize: bool,
+):
+    """
+    Run the notebooks that exist under the folders defined in the test_paths_file.
+    It only runs notebooks that have differences from the Git base_branch.
+
+    The executed notebooks are saved in the artifacts_bucket.
+
+    Variables are also injected into the notebooks such as the variable_project_id and variable_region.
+
+    Args:
+        test_paths_file (str):
+            Required. The new-line delimited file to folders and files that need checking.
+            Folders are checked recursively.
+        base_branch (str):
+            Optional. If provided, only the files that have changed from the base_branch will be checked.
+            If not provided, all files will be checked.
+        staging_bucket (str):
+            Required. The GCS staging bucket to write source code to.
+        artifacts_bucket (str):
+            Required. The GCS staging bucket to write executed notebooks to.
+        variable_project_id (str):
+            Required. The value for PROJECT_ID to inject into notebooks.
+        variable_region (str):
+            Required. The value for REGION to inject into notebooks.
+        should_parallelize (bool):
+            Required. Should run notebooks in parallel using a thread pool as opposed to in sequence.
+    """
     notebook_execution_results: List[NotebookExecutionResult] = []
 
     if len(notebooks) > 0:
@@ -341,67 +337,3 @@ def run_changed_notebooks(
     # Raise error if any notebooks failed
     if not all([result.is_pass for result in results_sorted]):
         raise RuntimeError("Notebook failures detected. See logs for details")
-
-
-parser = argparse.ArgumentParser(description="Run changed notebooks.")
-parser.add_argument(
-    "--test_paths_file",
-    type=pathlib.Path,
-    help="The path to the file that has newline-limited folders of notebooks that should be tested.",
-    required=True,
-)
-parser.add_argument(
-    "--base_branch",
-    help="The base git branch to diff against to find changed files.",
-    required=False,
-)
-parser.add_argument(
-    "--container_uri",
-    type=str,
-    help="The container uri to run each notebook in.",
-    required=True,
-)
-parser.add_argument(
-    "--variable_project_id",
-    type=str,
-    help="The GCP project id. This is used to inject a variable value into the notebook before running.",
-    required=True,
-)
-parser.add_argument(
-    "--variable_region",
-    type=str,
-    help="The GCP region. This is used to inject a variable value into the notebook before running.",
-    required=True,
-)
-parser.add_argument(
-    "--staging_bucket",
-    type=str,
-    help="The GCP directory for staging temporary files.",
-    required=True,
-)
-parser.add_argument(
-    "--artifacts_bucket",
-    type=str,
-    help="The GCP directory for storing executed notebooks.",
-    required=True,
-)
-parser.add_argument(
-    "--should_parallelize",
-    type=str2bool,
-    nargs="?",
-    const=True,
-    default=True,
-    help="Should run notebooks in parallel.",
-)
-
-args = parser.parse_args()
-run_changed_notebooks(
-    test_paths_file=args.test_paths_file,
-    container_uri=args.container_uri,
-    staging_bucket=args.staging_bucket,
-    artifacts_bucket=args.artifacts_bucket,
-    variable_project_id=args.variable_project_id,
-    variable_region=args.variable_region,
-    should_parallelize=args.should_parallelize,
-    base_branch=args.base_branch,
-)
