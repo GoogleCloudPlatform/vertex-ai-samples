@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Methods to run a notebook locally"""
+
 import sys
 import os
 import errno
@@ -30,6 +32,7 @@ def execute_notebook(
     output_file_or_uri: str,
     should_log_output: bool,
 ):
+    """Execute a single notebook using Papermill"""
     file_name = os.path.basename(os.path.normpath(notebook_source))
 
     # Download notebook if it's a GCS URI

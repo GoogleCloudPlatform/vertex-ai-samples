@@ -13,9 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""A CLI to process changed notebooks and execute them on Google Cloud Build"""
+
 import argparse
 import pathlib
-import execute_notebooks_helper
+import execute_changed_notebooks_helper
 
 
 def str2bool(v):
@@ -82,12 +84,12 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-notebooks = execute_notebooks_helper.get_changed_notebooks(
+notebooks = execute_changed_notebooks_helper.get_changed_notebooks(
     test_paths_file=args.test_paths_file,
     base_branch=args.base_branch,
 )
 
-execute_notebooks_helper.run_notebooks(
+execute_changed_notebooks_helper.process_and_execute_notebooks(
     notebooks=notebooks,
     container_uri=args.container_uri,
     staging_bucket=args.staging_bucket,

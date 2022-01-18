@@ -13,10 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""A CLI to download (optional) and run a single notebook locally"""
+
 import argparse
 import execute_notebook_helper
 
-parser = argparse.ArgumentParser(description="Run changed notebooks.")
+parser = argparse.ArgumentParser(description="Run a single notebook locally.")
 parser.add_argument(
     "--notebook_source",
     type=str,
