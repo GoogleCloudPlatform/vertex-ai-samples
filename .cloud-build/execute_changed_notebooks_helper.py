@@ -226,6 +226,8 @@ def get_changed_notebooks(
     notebooks = [notebook for notebook in notebooks if len(notebook) > 0]
     notebooks = [notebook for notebook in notebooks if pathlib.Path(notebook).exists()]
 
+    return notebooks
+
 
 def process_and_execute_notebooks(
     notebooks: List[str],
