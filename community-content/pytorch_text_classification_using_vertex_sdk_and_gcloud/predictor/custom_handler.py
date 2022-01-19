@@ -52,7 +52,8 @@ class TransformersClassifierHandler(BaseHandler):
             with open(mapping_file_path) as f:
                 self.mapping = json.load(f)
         else:
-            logger.warning('Missing the index_to_name.json file. Inference output will not include class name.')
+            logger.warning('Missing the index_to_name.json file. Inference output will default.')
+            self.mapping = {"0": "Negative",  "1": "Positive"}
 
         self.initialized = True
 
@@ -88,4 +89,3 @@ class TransformersClassifierHandler(BaseHandler):
 
     def postprocess(self, inference_output):
         return inference_output
-
