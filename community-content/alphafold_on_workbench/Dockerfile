@@ -72,6 +72,10 @@ RUN patch -p0 < /app/alphafold/docker/openmm.patch
 # Creating a tmp location for jackhmmr; not mounting through to host though.
 RUN sudo mkdir -m 777 --parents /tmp/ramdisk
 
+RUN export NODE_OPTIONS=--max_old_space_size=4096
+RUN pip install jupyter -U && pip install jupyterlab
+RUN jupyter lab build --dev-build=False --minimize=False
+
 # We need to run `ldconfig` first to ensure GPUs are visible, due to some quirk
 # with Debian. See https://github.com/NVIDIA/nvidia-docker/issues/1399 for
 # details.
