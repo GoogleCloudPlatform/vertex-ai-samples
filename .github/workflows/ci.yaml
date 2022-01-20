@@ -1,6 +1,9 @@
 name: ci
-on: pull_request
-
+on:
+  pull_request:
+    paths:
+      - notebooks/official/**
+      - notebooks/notebook_template.ipynb
 jobs:
   format_and_lint:
     name: notebook format and lint
