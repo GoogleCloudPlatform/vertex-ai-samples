@@ -42,7 +42,7 @@ This stage may be done entirely by MLOps. We recommend:
 
 ### Get Started
 
-[Get started with Google Artifact Registry](get_started_google_artifact_registry.ipynb)
+[Get started with Google Artifact Registry](get_started_with_google_artifact_registry.ipynb)
 
 Get started with Vertex Model Registry
 
