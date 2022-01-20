@@ -1,37 +1,27 @@
 
 FROM pytorch/torchserve:latest-cpu
 
-USER root
-# run and update some basic packages software packages, including security libs
-RUN apt-get update &&     apt-get install -y software-properties-common &&     add-apt-repository -y ppa:ubuntu-toolchain-r/test &&     apt-get update &&     apt-get install -y gcc-9 g++-9 apt-transport-https ca-certificates gnupg curl
-
-# Install gcloud tools for gsutil as well as debugging
-RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" |     tee -a /etc/apt/sources.list.d/google-cloud-sdk.list &&     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg |     apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - &&     apt-get update -y &&     apt-get install google-cloud-sdk -y
-
-USER model-server
-
 # install dependencies
-RUN python3 -m pip install --upgrade pip
 RUN pip3 install transformers
 
-ARG MODEL_NAME=finetuned-bert-classifier
-ENV MODEL_NAME="${MODEL_NAME}"
-
-# health and prediction listener ports
-ARG AIP_HTTP_PORT=7080
-ENV AIP_HTTP_PORT="${AIP_HTTP_PORT}"
-
-ARG MODEL_MGMT_PORT=7081
-
-# expose health and prediction listener ports from the image
-EXPOSE "${AIP_HTTP_PORT}"
-EXPOSE "${MODEL_MGMT_PORT}"
-EXPOSE 8080 8081 8082 7070 7071
+# copy model artifacts, custom handler and other dependencies
+COPY ./custom_text_handler.py /home/model-server/
+COPY ./index_to_name.json /home/model-server/
+COPY ./model/finetuned-bert-classifier/ /home/model-server/
 
 # create torchserve configuration file
 USER root
-RUN echo "service_envelope=json\n"     "inference_address=http://0.0.0.0:${AIP_HTTP_PORT}\n"     "management_address=http://0.0.0.0:${MODEL_MGMT_PORT}" >>     /home/model-server/config.properties
+RUN printf "\nservice_envelope=json" >> /home/model-server/config.properties
+RUN printf "\ninference_address=http://0.0.0.0:7080" >> /home/model-server/config.properties
+RUN printf "\nmanagement_address=http://0.0.0.0:7081" >> /home/model-server/config.properties
 USER model-server
 
+# expose health and prediction listener ports from the image
+EXPOSE 7080
+EXPOSE 7081
+
+# create model archive file packaging model artifacts and dependencies
+RUN torch-model-archiver -f   --model-name=finetuned-bert-classifier   --version=1.0   --serialized-file=/home/model-server/pytorch_model.bin   --handler=/home/model-server/custom_text_handler.py   --extra-files "/home/model-server/config.json,/home/model-server/tokenizer.json,/home/model-server/training_args.bin,/home/model-server/tokenizer_config.json,/home/model-server/special_tokens_map.json,/home/model-server/vocab.txt,/home/model-server/index_to_name.json"   --export-path=/home/model-server/model-store
+
 # run Torchserve HTTP serve to respond to prediction requests
-CMD ["echo", "AIP_STORAGE_URI=${AIP_STORAGE_URI}", ";",     "gsutil", "cp", "-r", "${AIP_STORAGE_URI}/${MODEL_NAME}.mar", "/home/model-server/model-store/", ";",     "ls", "-ltr", "/home/model-server/model-store/", ";",     "torchserve", "--start", "--ts-config=/home/model-server/config.properties",     "--models", "${MODEL_NAME}=${MODEL_NAME}.mar",     "--model-store", "/home/model-server/model-store"]
+CMD ["torchserve",      "--start",      "--ts-config=/home/model-server/config.properties",      "--models",      "finetuned-bert-classifier=finetuned-bert-classifier.mar",      "--model-store",      "/home/model-server/model-store"]
