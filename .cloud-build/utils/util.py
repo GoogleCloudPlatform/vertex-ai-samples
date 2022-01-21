@@ -11,7 +11,7 @@ import uuid
 
 
 def download_file(bucket_name: str, blob_name: str, destination_file: str) -> str:
-    """Copies a remote GCS file to a local path."""
+    """Copies a remote GCS file to a local path"""
     remote_file_path = "".join(["gs://", "/".join([bucket_name, blob_name])])
 
     subprocess.check_output(
@@ -25,7 +25,7 @@ def upload_file(
     local_file_path: str,
     remote_file_path: str,
 ) -> str:
-    """Copies a local file to a GCS path."""
+    """Copies a local file to a GCS path"""
     subprocess.check_output(
         ["gsutil", "cp", local_file_path, remote_file_path], encoding="UTF-8"
     )
