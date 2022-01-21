@@ -19,13 +19,19 @@ echo "Submitting Custom Job to Vertex AI to train PyTorch model"
 
 # BUCKET_NAME: Change to your bucket name
 BUCKET_NAME="[your-bucket-name]" # <-- CHANGE TO YOUR BUCKET NAME
-BUCKET_NAME="cloud-ai-platform-2f444b6a-a742-444b-b91a-c7519f51bd77"
+
+# validate bucket name
+if [ "${BUCKET_NAME}" = "[your-bucket-name]" ]
+then
+  echo "[ERROR] INVALID VALUE: Please update the variable BUCKET_NAME with valid Cloud Storage bucket name. Exiting the script..."
+  exit 1
+fi
 
 # The PyTorch image provided by Vertex AI Training.
 IMAGE_URI="us-docker.pkg.dev/vertex-ai/training/pytorch-gpu.1-7:latest"
 
 # JOB_NAME: the name of your job running on Vertex AI.
-JOB_PREFIX="finetuned-bert-classifier-pytorch-pkg-ar-"
+JOB_PREFIX="finetuned-bert-classifier-pytorch-pkg-ar"
 JOB_NAME=${JOB_PREFIX}-$(date +%Y%m%d%H%M%S)-custom-job
 
 # REGION: select a region from https://cloud.google.com/vertex-ai/docs/general/locations#available_regions
@@ -35,19 +41,21 @@ REGION="us-central1"
 # JOB_DIR: Where to store prepared package and upload output model.
 JOB_DIR=gs://${BUCKET_NAME}/${JOB_PREFIX}/model/${JOB_NAME}
 
-# validate bucket name
-if [ "${BUCKET_NAME}" = "[your-bucket-name]" ]
-then
-  echo "[ERROR] INVALID VALUE: Please update the variable BUCKET_NAME with valid Cloud Storage bucket name. Exiting the script..."
-  exit 1
-fi
+# worker pool spec
+worker_pool_spec="\
+replica-count=1,\
+machine-type=n1-standard-8,\
+accelerator-type=NVIDIA_TESLA_V100,\
+accelerator-count=1,\
+executor-image-uri=${IMAGE_URI},\
+python-module=trainer.task,\
+local-package-path=../python_package/"
 
 # Submit Custom Job to Vertex AI
 gcloud beta ai custom-jobs create \
     --display-name=${JOB_NAME} \
     --region ${REGION} \
-    --python-package-uris=${PACKAGE_PATH} \
-    --worker-pool-spec=replica-count=1,machine-type='n1-standard-8',accelerator-type='NVIDIA_TESLA_V100',accelerator-count=1,executor-image-uri=${IMAGE_URI},python-module='trainer.task',local-package-path="../python_package/" \
+    --worker-pool-spec="${worker_pool_spec}" \
     --args="--model-name","finetuned-bert-classifier","--job-dir",$JOB_DIR
 
 echo "After the job is completed successfully, model files will be saved at $JOB_DIR/"

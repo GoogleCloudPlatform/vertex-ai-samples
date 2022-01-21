@@ -122,6 +122,9 @@ def run(args):
     # Train / Test the model
     trainer = train(args, text_classifier, train_dataset, test_dataset)
 
+    metrics = trainer.evaluate(eval_dataset=test_dataset)
+    trainer.save_metrics("all", metrics)
+
     # Export the trained model
     trainer.save_model(os.path.join("/tmp", args.model_name))
 

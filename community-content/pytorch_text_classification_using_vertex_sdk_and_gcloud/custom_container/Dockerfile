@@ -1,6 +1,7 @@
 
 # Use pytorch GPU base image
-FROM gcr.io/cloud-aiplatform/training/pytorch-gpu.1-7
+# FROM gcr.io/cloud-aiplatform/training/pytorch-gpu.1-7
+FROM us-docker.pkg.dev/vertex-ai/training/pytorch-gpu.1-10:latest
 
 # set working directory
 WORKDIR /app

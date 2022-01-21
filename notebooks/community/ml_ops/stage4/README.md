@@ -46,7 +46,7 @@ This stage may be done entirely by MLOps. We recommend:
 
 Get started with Vertex Model Registry
 
-Get started with Vertex ML Metadata
+[Get started with Vertex ML Metadata](get_started_with_vertex_ml_metadata.ipynb)
 
 Get started with custom model evaluation
 
