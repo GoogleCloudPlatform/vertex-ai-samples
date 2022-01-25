@@ -1,10 +1,10 @@
 ipython
 numpy
-jupyter==1.0.0
-nbconvert==6.4.0
-papermill==2.3.4
-pandas==1.4.0
-matplotlib==3.5.1
+jupyter
+nbconvert
+papermill
+panda
+matplotlib
 tabulate
 google-cloud-aiplatform
 google-cloud-storage
