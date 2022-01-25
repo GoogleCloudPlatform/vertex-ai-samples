@@ -1,8 +1,8 @@
 ipython
+numpy
 jupyter==1.0.0
 nbconvert==6.4.0
 papermill==2.3.4
-numpy==1.22.1
 pandas==1.4.0
 matplotlib==3.5.1
 tabulate
