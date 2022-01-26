@@ -15,6 +15,7 @@
 
 """Methods to run a notebook on Google Cloud Build"""
 
+from re import sub
 from google.protobuf import duration_pb2
 from yaml.loader import FullLoader
 
@@ -37,6 +38,7 @@ def execute_notebook_remote(
     notebook_uri: str,
     notebook_output_uri: str,
     container_uri: str,
+    private_pool_id: Optional[str],
     tag: Optional[str],
 ) -> operation.Operation:
     """Create and execute a single notebook on Google Cloud Build"""
@@ -57,6 +59,9 @@ def execute_notebook_remote(
         "_NOTEBOOK_GCS_URI": notebook_uri,
         "_NOTEBOOK_OUTPUT_GCS_URI": notebook_output_uri,
     }
+
+    if private_pool_id:
+        substitutions["_PRIVATE_POOL_NAME"] = private_pool_id
 
     (
         source_archived_file_gcs_bucket,
