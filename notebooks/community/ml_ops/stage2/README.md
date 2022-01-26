@@ -35,7 +35,9 @@ The second stage in MLOps is experimenting in developing one or more baseline mo
 
 [Get Started with Vertex TensorBoard](get_started_vertex_tensorboard.ipynb)
 
-[Get Started with Custom Training Packages](get_started_vertex_training.ipynb)
+[Get Started with Custom Training Packages (Tensorflow)](get_started_vertex_training.ipynb)
+
+[Get Started with Custom Training Packages (Scikit-Learn)](get_started_vertex_training_sklearn.ipynb)
 
 [Get Started with Distributed Training](get_started_vertex_distributed_training.ipynb)
 
