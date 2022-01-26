@@ -3,7 +3,7 @@ ipython
 jupyter
 nbconvert
 black==21.10b0
-pyupgrade==2.29.1
+pyupgrade==2.31.0
 isort==5.10.1
 flake8==4.0.1
 nbqa==1.2.3
