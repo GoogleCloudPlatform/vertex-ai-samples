@@ -109,6 +109,7 @@ def process_and_execute_notebook(
     artifacts_bucket: str,
     variable_project_id: str,
     variable_region: str,
+    private_pool_id: Optional[str],
     notebook: str,
     should_get_tail_logs: bool = False,
 ) -> NotebookExecutionResult:
@@ -150,6 +151,7 @@ def process_and_execute_notebook(
             notebook_output_uri=notebook_output_uri,
             container_uri=container_uri,
             tag=tag,
+            private_pool_id=private_pool_id,
         )
 
         operation_metadata = BuildOperationMetadata(mapping=operation.metadata)
@@ -236,6 +238,7 @@ def process_and_execute_notebooks(
     artifacts_bucket: str,
     variable_project_id: str,
     variable_region: str,
+    private_pool_id: Optional[str],
     should_parallelize: bool,
 ):
     """
@@ -283,6 +286,7 @@ def process_and_execute_notebooks(
                             artifacts_bucket,
                             variable_project_id,
                             variable_region,
+                            private_pool_id,
                         ),
                         notebooks,
                     )
@@ -295,6 +299,7 @@ def process_and_execute_notebooks(
                     artifacts_bucket=artifacts_bucket,
                     variable_project_id=variable_project_id,
                     variable_region=variable_region,
+                    private_pool_id=private_pool_id,
                     notebook=notebook,
                 )
                 for notebook in notebooks
