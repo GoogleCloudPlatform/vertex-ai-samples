@@ -39,6 +39,8 @@ The second stage in MLOps is experimenting in developing one or more baseline mo
 
 [Get Started with Custom Training Packages (Scikit-Learn)](get_started_vertex_training_sklearn.ipynb)
 
+[Get Started with Custom Training Packages (XGBoost)](get_started_vertex_training_xgboost.ipynb)
+
 [Get Started with Distributed Training](get_started_vertex_distributed_training.ipynb)
 
 [Get Started with Vizier Hyperparameter Tuning](get_started_vertex_vizier.ipynb)
