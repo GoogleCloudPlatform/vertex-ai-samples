@@ -77,7 +77,7 @@ parser.add_argument(
     "--private_pool_id",
     type=str,
     help="The private pool id.",
-    required=True,
+    required=False,
 )
 parser.add_argument(
     "--should_parallelize",
