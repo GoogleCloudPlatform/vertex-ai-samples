@@ -67,6 +67,7 @@ def execute_notebook_remote(
 
     if private_pool_id:
         substitutions["_PRIVATE_POOL_NAME"] = private_pool_id
+        build.options = cloudbuild_config["options"]
 
     (
         source_archived_file_gcs_bucket,
@@ -81,7 +82,6 @@ def execute_notebook_remote(
     )
 
     build.steps = cloudbuild_config["steps"]
-    build.options = cloudbuild_config["options"]
     build.substitutions = substitutions
     build.timeout = duration_pb2.Duration(seconds=TIMEOUT_IN_SECONDS)
     build.queue_ttl = duration_pb2.Duration(seconds=TIMEOUT_IN_SECONDS)
