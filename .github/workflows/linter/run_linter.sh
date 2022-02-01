@@ -84,19 +84,19 @@ if [ ${#notebooks[@]} -gt 0 ]; then
                 FLAKE8_RTN=$?
             else
                 echo "Running black..."
-                python3 -m nbqa black "$notebook" --nbqa-mutate
+                python3 -m nbqa black "$notebook"
                 BLACK_RTN=$?
                 echo "Running pyupgrade..."
-                python3 -m nbqa pyupgrade "$notebook" --nbqa-mutate
+                python3 -m nbqa pyupgrade "$notebook"
                 PYUPGRADE_RTN=$?
                 echo "Running isort..."
-                python3 -m nbqa isort "$notebook" --nbqa-mutate
+                python3 -m nbqa isort "$notebook"
                 ISORT_RTN=$?
                 echo "Running nbfmt..."
                 python3 -m tensorflow_docs.tools.nbfmt --remove_outputs "$notebook"
                 NBFMT_RTN=$?
                 echo "Running flake8..."
-                python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,W503,E203,E722,W293,W291 --nbqa-mutate
+                python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,W503,E203,E722,W293,W291
                 FLAKE8_RTN=$?
             fi
 
