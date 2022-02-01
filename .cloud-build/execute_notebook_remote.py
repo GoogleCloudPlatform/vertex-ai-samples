@@ -45,18 +45,7 @@ def execute_notebook_remote(
     tag: Optional[str],
 ) -> operation.Operation:
     """Create and execute a single notebook on Google Cloud Build"""
-
-    # Authorize the client with Google defaults
-    credentials, project_id = google.auth.default()
-
-    options = client_options.ClientOptions(api_endpoint=f"{region}-{SERVICE_BASE_PATH}")
-
-    client = cloudbuild_v1.services.cloud_build.CloudBuildClient(client_options=options)
-    build = cloudbuild_v1.Build()
-
-    # The following build steps will output "hello world"
-    # For more information on build configuration, see
-    # https://cloud.google.com/build/docs/configuring-builds/create-basic-configuration
+    # Load build steps from YAML
     cloudbuild_config = yaml.load(open(CLOUD_BUILD_FILEPATH), Loader=FullLoader)
 
     substitutions = {
@@ -65,9 +54,22 @@ def execute_notebook_remote(
         "_NOTEBOOK_OUTPUT_GCS_URI": notebook_output_uri,
     }
 
+    build = cloudbuild_v1.Build()
+
+    options: Optional[client_options.ClientOptions] = None
     if private_pool_id:
         substitutions["_PRIVATE_POOL_NAME"] = private_pool_id
         build.options = cloudbuild_config["options"]
+
+        # Switch to the regional endpoint of the pool
+        options = client_options.ClientOptions(
+            api_endpoint=f"{region}-{SERVICE_BASE_PATH}"
+        )
+
+    # Authorize the client with Google defaults
+    credentials, project_id = google.auth.default()
+
+    client = cloudbuild_v1.services.cloud_build.CloudBuildClient(client_options=options)
 
     (
         source_archived_file_gcs_bucket,
