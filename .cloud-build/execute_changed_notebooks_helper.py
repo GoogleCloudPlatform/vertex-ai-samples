@@ -151,6 +151,7 @@ def process_and_execute_notebook(
             notebook_output_uri=notebook_output_uri,
             container_uri=container_uri,
             tag=tag,
+            region=variable_region,
             private_pool_id=private_pool_id,
         )
 

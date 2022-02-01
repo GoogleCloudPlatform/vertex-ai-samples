@@ -27,10 +27,12 @@ from typing import Optional
 import yaml
 
 from google.cloud.aiplatform import utils
-from google.api_core import operation
+from google.api_core import operation, client_options
+
 
 CLOUD_BUILD_FILEPATH = ".cloud-build/notebook-execution-test-cloudbuild-single.yaml"
 TIMEOUT_IN_SECONDS = 86400
+SERVICE_BASE_PATH = "cloudbuild.googleapis.com"
 
 
 def execute_notebook_remote(
@@ -38,6 +40,7 @@ def execute_notebook_remote(
     notebook_uri: str,
     notebook_output_uri: str,
     container_uri: str,
+    region: str,
     private_pool_id: Optional[str],
     tag: Optional[str],
 ) -> operation.Operation:
@@ -45,8 +48,10 @@ def execute_notebook_remote(
 
     # Authorize the client with Google defaults
     credentials, project_id = google.auth.default()
-    client = cloudbuild_v1.services.cloud_build.CloudBuildClient()
 
+    options = client_options.ClientOptions(api_endpoint=f"{region}-{SERVICE_BASE_PATH}")
+
+    client = cloudbuild_v1.services.cloud_build.CloudBuildClient(client_options=options)
     build = cloudbuild_v1.Build()
 
     # The following build steps will output "hello world"
