@@ -1,6 +1,6 @@
 # PyTorch on Google Cloud: Text Classification
 
-In the PyTorch on Google Cloud series of blog posts, we aim to share how to build, train and deploy PyTorch models at scale and how to create reproducible machine learning pipelines on Google Cloud with [Vertex AI](https://cloud.google.com/vertex-ai).
+In the PyTorch on Google Cloud series of blog posts, we aim to share how to build, train, deploy and orchestrate PyTorch models at scale and how to create reproducible machine learning pipelines on Google Cloud with [Vertex AI](https://cloud.google.com/vertex-ai).
 
 This tutorial on text classification shows how to train a PyTorch based text classification model by fine tuning a pre-trained Huggingface Transformers model and deploy the model on [Vertex AI](https://cloud.google.com/vertex-ai/docs/start/client-libraries#python) using Vertex SDK and [`gcloud ai`](https://cloud.google.com/sdk/gcloud/reference/beta/ai).
 
@@ -9,6 +9,7 @@ This tutorial on text classification shows how to train a PyTorch based text cla
 | <h4>Notebook</h4> | <h4>Description</h4>                       |
 | :-------- | :------- |
 | [pytorch-text-classification-vertex-ai-train-tune-deploy.ipynb](./pytorch-text-classification-vertex-ai-train-tune-deploy.ipynb) | Notebook to show training, hyper-parameter tuning and deploying a PyTorch model on Vertex AI |
+| [pytorch-text-classification-vertex-ai-pipelines.ipynb](./pytorch-text-classification-vertex-ai-pipelines.ipynb) | Notebook to show orchestration of PyTorch ML workflows on Vertex AI Pipelines using Kubeflow Pipelines SDK |
 
 ## Folders
 

@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This script automatically formats and lints all notebooks that have changed from the head of the master branch.
+# This script automatically formats and lints all notebooks that have changed from the head of the main branch.
 #
 # Options:
 # -t: Test-mode. Only test if format and linting are required but make no changes to files.
@@ -52,7 +52,7 @@ echo "Test mode: $is_test"
 notebooks=()
 while read -r file || [ -n "$line" ]; do
     notebooks+=("$file")
-done < <(git diff --name-only master... | grep '\.ipynb$')
+done < <(git diff --name-only main... | grep '\.ipynb$')
 
 problematic_notebooks=()
 if [ ${#notebooks[@]} -gt 0 ]; then
@@ -84,19 +84,19 @@ if [ ${#notebooks[@]} -gt 0 ]; then
                 FLAKE8_RTN=$?
             else
                 echo "Running black..."
-                python3 -m nbqa black "$notebook" --nbqa-mutate
+                python3 -m nbqa black "$notebook"
                 BLACK_RTN=$?
                 echo "Running pyupgrade..."
-                python3 -m nbqa pyupgrade "$notebook" --nbqa-mutate
+                python3 -m nbqa pyupgrade "$notebook"
                 PYUPGRADE_RTN=$?
                 echo "Running isort..."
-                python3 -m nbqa isort "$notebook" --nbqa-mutate
+                python3 -m nbqa isort "$notebook"
                 ISORT_RTN=$?
                 echo "Running nbfmt..."
                 python3 -m tensorflow_docs.tools.nbfmt --remove_outputs "$notebook"
                 NBFMT_RTN=$?
                 echo "Running flake8..."
-                python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,W503,E203,E722,W293,W291 --nbqa-mutate
+                python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,W503,E203,E722,W293,W291
                 FLAKE8_RTN=$?
             fi
 
