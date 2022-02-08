@@ -35,19 +35,104 @@ The third stage in MLOps is formalization to develop an automated pipeline proce
 
 [Get Started with Kubeflow pipelines](get_started_with_kubeflow_pipelines.ipynb)
 
+```
+The steps performed include:
+
+- Building KFP lightweight Python function components.
+- Assembling and compiling KFP components into a pipeline.
+- Executing a KFP pipeline using Vertex AI Pipelines.
+- Building sequential, parallel, multiple output components.
+- Building control flow into pipelines.
+```
+
 [Get Started with BQ and TFDV components](get_started_with_bq_tfdv_pipeline_components.ipynb)
+
+```
+The steps performed include:
+
+- Build and execute a pipeline component for creating a Vertex AI Tabular Dataset from a BigQuery table.
+- Build and execute a pipeline component for generating TFDV statistics and schema from a Vertex AI Tabular Dataset.
+- Execute a Vertex AI pipeline.
+```
 
 [Get Started with Dataflow components](get_started_with_dataflow_pipeline_components.ipynb)
 
+```
+The steps performed include:
+
+- Build an Apache Beam data pipeline.
+- Encapsulate the Apache Beam data pipeline with a Dataflow component in a Vertex AI pipeline.
+- Execute a Vertex AI pipeline.
+```
+
 [Get Started with Vertex AI AutoML components](get_started_with_automl_pipeline_components.ipynb)
+
+```
+The steps performed include:
+
+- Construct a pipeline for:
+    - Training a Vertex AI AutoML trained model.
+    - Test the serving binary with a batch prediction job.
+    - Deploying a Vertex AI AutoML trained model.
+- Execute a Vertex AI pipeline.
+```
 
 [Get Started with Vertex AI Custom Training components](get_started_with_custom_training_pipeline_components.ipynb)
 
+```
+The steps performed include:
+
+- Construct a pipeline for:
+    - Training a Vertex AI custom trained model.
+    - Test the serving binary with a batch prediction job.
+    - Deploying a Vertex AI custom trained model.
+- Execute a Vertex AI pipeline.
+```
+
 [Get Started with Vertex AI Hyperparameter Tuning components](get_started_with_hpt_pipeline_components.ipynb)
 
+```
+- Construct a pipeline for:
+    - Training BigQuery ML model.
+    - Evaluating the BigQuery ML model.
+    - Exporting the BigQuery ML model.
+    - Importing the BigQuery ML model to a Vertex AI model.
+    - Deploy the Vertex AI model.
+- Execute a Vertex AI pipeline.
+- Make a prediction with the deployed Vertex AI model.
+```
+
 [Get Started with BQML components](get_started_with_bqml_pipeline_components.ipynb)
+
+```
+The steps performed include:
+
+- Construct a pipeline for:
+    - Hyperparameter tune/train a custom model.
+    - Retrieve the tuned hyperparameter values and metrics to optimize.
+    - If the metrics exceed a specified threshold.
+      - Get the location of the model artifacts for the best tuned model.
+      - Upload the model artifacts to a `Vertex AI Model` resource.
+- Execute a Vertex AI pipeline.
+```
 
 
 ### E2E Stage Example
 
 [Stage 3: Formalization](mlops_formalization.ipynb)
+
+```
+The steps performed include:
+
+- Obtain resources from the experimentation stage.
+    - Baseline model.
+    - Dataset schema/statistics for baseline model.
+- Formalize a data preprocessing pipeline.
+    - Extract columns/rows from BigQuery table to local BigQuery table.
+    - Use Tensorflow Data Validation library to determine statistics, schema, and features.
+    - Use Dataflow to preprocess the data.
+    - Create a Vertex AI Dataset.
+- Formalize a build model architecture pipeline.
+    - Create the Vertex AI Model base model.
+- Formalize a training pipeline.
+```
