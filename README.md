@@ -19,3 +19,7 @@ Please use the [issues page](https://github.com/GoogleCloudPlatform/vertex-ai-sa
 ## Disclaimer
 
 This is not an officially supported Google product. The code in this repository is for demonstrative purposes only.
+
+## Feedback
+
+Please feel free to fill out our [survey](https://bit.ly/vertex-ai-samples-survey) to give us feedback on the repo and its content.
