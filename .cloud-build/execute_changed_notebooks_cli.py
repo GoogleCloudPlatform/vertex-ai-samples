@@ -74,6 +74,12 @@ parser.add_argument(
     required=True,
 )
 parser.add_argument(
+    "--private_pool_id",
+    type=str,
+    help="The private pool id.",
+    required=False,
+)
+parser.add_argument(
     "--should_parallelize",
     type=str2bool,
     nargs="?",
@@ -96,5 +102,6 @@ execute_changed_notebooks_helper.process_and_execute_notebooks(
     artifacts_bucket=args.artifacts_bucket,
     variable_project_id=args.variable_project_id,
     variable_region=args.variable_region,
+    private_pool_id=args.private_pool_id if not "default" else None,
     should_parallelize=args.should_parallelize,
 )

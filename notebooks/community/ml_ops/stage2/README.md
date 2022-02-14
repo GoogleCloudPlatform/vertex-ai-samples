@@ -33,29 +33,168 @@ The second stage in MLOps is experimenting in developing one or more baseline mo
 
 [Get Started with Vertex Experiments and Vertex ML Metadata](get_started_vertex_experiments.ipynb)
 
+```
+The steps performed include:
+
+- Use Python logging to log training configuration/results locally.
+- Use Google Cloud Logging to log training configuration/results in cloud storage.
+- Create a Vertex AI `Experiment` resource.
+- Instantiate an experiment run.
+- Log parameters for the run.
+- Log metrics for the run.
+- Display the logged experiment run.
+```
+
 [Get Started with Vertex TensorBoard](get_started_vertex_tensorboard.ipynb)
+
+```
+The steps performed include:
+
+- Create a TensorBoard callback when training a model.
+- Using Tensorboard with locally trained model.
+- Using Vertex AI TensorBoard with Vertex AI Training.
+```
 
 [Get Started with Custom Training Packages (Tensorflow)](get_started_vertex_training.ipynb)
 
+```
+The steps performed include:
+
+- Training using a single Python script.
+- Training using a Python package.
+- Training using a custom training image.
+- Laying out a training package.
+```
+
 [Get Started with Custom Training Packages (Scikit-Learn)](get_started_vertex_training_sklearn.ipynb)
+
+```
+The steps performed include:
+
+- Training using a Python package.
+- Report accuracy when hyperparameter tuning.
+- Save the model artifacts to Cloud Storage using GCSFuse.
+- Create a `Vertex AI Model` resource.
+```
 
 [Get Started with Custom Training Packages (XGBoost)](get_started_vertex_training_xgboost.ipynb)
 
+```
+The steps performed include:
+
+- Training using a Python package.
+- Report accuracy when hyperparameter tuning.
+- Save the model artifacts to Cloud Storage using GCSFuse.
+- Create a `Vertex AI Model` resource.
+```
+
 [Get Started with Custom Training Packages (Pytorch)](get_started_vertex_training_pytorch.ipynb)
+
+```
+The steps performed include:
+
+- Single node training using a Python package.
+- Report accuracy when hyperparameter tuning.
+- Save the model artifacts to Cloud Storage using GCSFuse.
+- Create a `Vertex AI Model` resource.
+```
 
 [Get Started with Custom Training Packages (R)](get_started_vertex_training_r.ipynb)
 
+```
+The steps performed include:
+
+- Locally train an R model in a notebook using %%R magic commands
+- Create a deployment image with trained R model and serving functions.
+- Test the deployment image locally.
+- Create a `Vertex AI Model` resource for the deployment image with embedded R model.
+- Deploy the deployment image with embedded R model to a `Vertex AI Endpoint` resource.
+- Test the deployment image with embedded R model.
+- Create a R-to-Python training package.
+- Create a training image for training the model.
+- Train a R model using `Vertex AI Trainingh` service with the R-to-Python training package.
+```
 
 [Get Started with Distributed Training](get_started_vertex_distributed_training.ipynb)
 
+```
+The steps performed include:
+
+- `MirroredStrategy`: Train on a single VM with multiple GPUs.
+- `MultiWorkerMirroredStrategy`: Train on multiple VMs with automatic setup of replicas.
+- `MultiWorkerMirroredStrategy`: Train on multiple VMs with fine grain control of replicas.
+- `ReductionServer`: Train on multiple VMS and sync updates across VMS with `Vertex AI Reduction Server`.
+- `TPUTraining`: Train with multiple Cloud TPUs.
+```
+
 [Get Started with Vizier Hyperparameter Tuning](get_started_vertex_vizier.ipynb)
+
+```
+The steps performed include:
+
+- Hyperparameter tuning with Random algorithm.
+- Hyperparameter tuning with Vizier (Bayesian) algorithm.
+```
 
 [Get Started with AutoML Training](get_started_automl_training.ipynb)
 
+```
+The steps performed include:
+
+- Train an image model.
+- Export the image model as an edge model.
+- Train a tabular model.
+- Export the tabular model as a cloud model.
+- Train a text model.
+```
+
 [Get Started with BQML Training](get_started_bqml_training.ipynb)
 
+```
+The steps performed include:
+
+- Create a local BQ table in your project.
+- Train a BQML model.
+- Evaluate the BQML model.
+- Export the BQML model as a cloud model.
+- Upload the exported model as a Vertex AI Model resource.
+- Hyperparameter tune a BQML model with Vertex AI Vizier.
+```
+
 [Get Started with Vertex Feature Store](get_started_vertex_feature_store.ipynb)
+
+```
+The steps performed include:
+
+- Creating a Vertex AI `Featurestore` resource.
+    - Creating `EntityType` resources for the `Featurestore` resource.
+    - Creating `Feature` resources for each `EntityType` resource.
+- Import feature values (entity data items) into `Featurestore` resource.
+- Perform online serving from a `Featurestore` resource.
+- Perform batch serving from a `Featurestore` resource.
+```
 
 ### E2E Stage Example
 
 [Stage 2: Experimentation](mlops_experimentation.ipynb)
+
+```
+The steps performed include:
+
+- Review the `Dataset` resource created during stage 1.
+- Train an AutoML tabular binary classifier model in the background.
+- Build the experimental model architecture.
+- Construct a custom training package for the `Dataset` resource.
+- Test the custom training package locally.
+- Test the custom training package in the cloud with Vertex AI Training.
+- Hyperparameter tune the model training with Vertex AI Vizier.
+- Train the custom model with Vertex AI Training.
+- Add a serving function for online/batch prediction to the custom model.
+- Test the custom model with the serving function.
+- Evaluate the custom model using Vertex AI Batch Prediction
+- Wait for the AutoML training job to complete.
+- Evaluate the AutoML model using Vertex AI Batch Prediction with the same evaluation slices as the custom model.
+- Set the evaluation results of the AutoML model as the baseline.
+- If the evaluation of the custom model is below baseline, continue to experiment with the custom model.
+- If the evaluation of the custom model is above baseline, save the model as the first best model.
+```
