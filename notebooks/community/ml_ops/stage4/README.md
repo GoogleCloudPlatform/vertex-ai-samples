@@ -52,7 +52,7 @@ Get started with custom model evaluation
 
 Get started with A/B Testing
 
-Get started with Vertex Explainable AI
+[Get started with Vertex Explainable AI](get_started_with_vertex_xai.ipynb)
 
 ### E2E Stage Example
 
