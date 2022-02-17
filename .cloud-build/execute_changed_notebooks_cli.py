@@ -39,11 +39,6 @@ parser.add_argument(
     required=True,
 )
 parser.add_argument(
-    "--base_branch",
-    help="The base git branch to diff against to find changed files.",
-    required=False,
-)
-parser.add_argument(
     "--container_uri",
     type=str,
     help="The container uri to run each notebook in.",
@@ -74,18 +69,29 @@ parser.add_argument(
     required=True,
 )
 parser.add_argument(
-    "--private_pool_id",
-    type=str,
-    help="The private pool id.",
-    required=False,
-)
-parser.add_argument(
     "--should_parallelize",
     type=str2bool,
     nargs="?",
     const=True,
     default=True,
     help="Should run notebooks in parallel.",
+)
+parser.add_argument(
+    "--base_branch",
+    help="The base git branch to diff against to find changed files.",
+    required=False,
+)
+parser.add_argument(
+    "--variable_vpc_network",
+    type=str,
+    help="The full VPC network name. See https://cloud.google.com/compute/docs/networks-and-firewalls#networks. Format is projects/{project}/global/networks/{network}, where {project} is a project number, as in '12345', and {network} is network name. See <https://cloud.google.com/compute/docs/reference/rest/v1/networks/insert> for details. This is used to inject a variable value into the notebook before running.",
+    required=False,
+)
+parser.add_argument(
+    "--private_pool_id",
+    type=str,
+    help="The private pool id.",
+    required=False,
 )
 
 args = parser.parse_args()
@@ -102,6 +108,7 @@ execute_changed_notebooks_helper.process_and_execute_notebooks(
     artifacts_bucket=args.artifacts_bucket,
     variable_project_id=args.variable_project_id,
     variable_region=args.variable_region,
-    private_pool_id=args.private_pool_id if not "default" else None,
+    variable_vpc_network=args.variable_vpc_network,
+    private_pool_id=args.private_pool_id,
     should_parallelize=args.should_parallelize,
 )
