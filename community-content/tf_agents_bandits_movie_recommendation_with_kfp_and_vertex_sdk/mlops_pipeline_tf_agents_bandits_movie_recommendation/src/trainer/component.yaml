@@ -27,14 +27,14 @@ outputs:
 - {name: training_artifacts_dir, type: String}
 implementation:
   container:
-    image: tensorflow/tensorflow:2.5.0
+    image: python:3.7
     command:
     - sh
     - -c
     - (PIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet --no-warn-script-location
-      'tensorflow==2.5.0' 'tf-agents==0.8.0' || PIP_DISABLE_PIP_VERSION_CHECK=1 python3
-      -m pip install --quiet --no-warn-script-location 'tensorflow==2.5.0' 'tf-agents==0.8.0'
-      --user) && "$0" "$@"
+      'tensorflow==2.5.0' 'tf-agents==0.8.0' 'Pillow' || PIP_DISABLE_PIP_VERSION_CHECK=1
+      python3 -m pip install --quiet --no-warn-script-location 'tensorflow==2.5.0'
+      'tf-agents==0.8.0' 'Pillow' --user) && "$0" "$@"
     - sh
     - -ec
     - |
@@ -270,7 +270,8 @@ implementation:
 
       def _serialize_str(str_value: str) -> str:
           if not isinstance(str_value, str):
-              raise TypeError('Value "{}" has type "{}" instead of str.'.format(str(str_value), str(type(str_value))))
+              raise TypeError('Value "{}" has type "{}" instead of str.'.format(
+                  str(str_value), str(type(str_value))))
           return str_value
 
       import argparse
