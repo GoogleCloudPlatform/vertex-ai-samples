@@ -20,7 +20,7 @@ outputs:
 - {name: tfrecord_file, type: String}
 implementation:
   container:
-    image: tensorflow/tensorflow:2.5.0
+    image: python:3.7
     command:
     - sh
     - -c
@@ -187,7 +187,8 @@ implementation:
 
       def _serialize_str(str_value: str) -> str:
           if not isinstance(str_value, str):
-              raise TypeError('Value "{}" has type "{}" instead of str.'.format(str(str_value), str(type(str_value))))
+              raise TypeError('Value "{}" has type "{}" instead of str.'.format(
+                  str(str_value), str(type(str_value))))
           return str_value
 
       import argparse
