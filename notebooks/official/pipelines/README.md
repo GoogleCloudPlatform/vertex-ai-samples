@@ -15,6 +15,7 @@ The following examples show how to use the components defined in [google_cloud_p
 - [automl_tabular_classification_beans.ipynb](./automl_tabular_classification_beans.ipynb) (tabular classification model)
 - [google-cloud-pipeline-components_automl_text.ipynb](.google-cloud-pipeline-components_automl_text.ipynb)
 - (Experimental) [google_cloud_pipeline_components_model_train_upload_deploy.ipynb](./google_cloud_pipeline_components_model_train_upload_deploy.ipynb): includes an experimental component to run a custom training job directly by defining its worker specs
+- (Experimental) [google_cloud_pipeline_components_model_upload_predict_evaluate.ipynb](./google_cloud_pipeline_components_model_upload_predict_evaluate.ipynb): includes an experimental evaluation component to generate evaluation metrics for a model given ground truth and predictions
 
 **Note**: Currently, pipelines built using `kfp.v2`, such as these examples, will work only with Vertex Pipelines.
 A 'compatibility mode', which will allow these pipelines to be run on OSS KFP as well, is coming soon.
