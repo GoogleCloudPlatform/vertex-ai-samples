@@ -1,5 +1,7 @@
 name: ci
 on: pull_request
+  paths:
+    - '**.ipynb'
 
 jobs:
   format_and_lint:
