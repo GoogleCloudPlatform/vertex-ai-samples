@@ -19,5 +19,5 @@
 /neo4j @benofben @htappen
 /sdk/pytorch_lightning_custom_container_training.ipynb @brianchunkang
 /tensorboard @yfang1 @wattli
-/feature_store @nayaknishant @morgandu
+/feature_store @nayaknishant @morgandu @inardini
 /vertex_endpoints/tf_hub_obj_detection/deploy_tfhub_object_detection_on_vertex_endpoints.ipynb @jfacevedo
