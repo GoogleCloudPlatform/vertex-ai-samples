@@ -41,6 +41,7 @@ The steps performed include:
 - Building KFP lightweight Python function components.
 - Assembling and compiling KFP components into a pipeline.
 - Executing a KFP pipeline using Vertex AI Pipelines.
+- Loading component and pipeline definitions from a source code repository.
 - Building sequential, parallel, multiple output components.
 - Building control flow into pipelines.
 ```
