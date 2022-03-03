@@ -3,13 +3,13 @@
 # @global-owner1 and @global-owner2 will be requested for
 # review when someone opens a pull request.
 
-/sdk/sdk_* @aferlitsch
-/gapic @aferlitsch
-/ml_ops @aferlitsch
+/sdk/sdk_* @andrewferlitsch
+/gapic @andrewferlitsch
+/ml_ops @andrewferlitsch
 /model_monitoring/* @mco-gh
 /structured_data/rapid_prototyping_* @rafael-carvalho
 
-/managed_notebooks/ notebooks-team
+/managed_notebooks/
 /sdk/SDK_FBProphet_Forecasting_Online.ipynb @brianchunkang
 /pipelines/google_cloud_pipeline_components_TPU_model_train_upload_deploy.ipynb @brianchunkang
 /matching_engine/sdk_matching_engine_for_indexing.ipynb @ivanmkc
