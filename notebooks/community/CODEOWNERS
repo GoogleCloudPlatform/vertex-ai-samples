@@ -14,8 +14,7 @@
 /pipelines/google_cloud_pipeline_components_TPU_model_train_upload_deploy.ipynb @brianchunkang
 /matching_engine/sdk_matching_engine_for_indexing.ipynb @ivanmkc
 /matching_engine/matching_engine_for_indexing.ipynb @yinghsienwu
-/neo4j @benofben
 /sdk/pytorch_lightning_custom_container_training.ipynb @brianchunkang
 /tensorboard @yfang1
-/feature_store @nayaknishant @morgandu @inardini
+/feature_store @nayaknishant @morgandu
 /vertex_endpoints/tf_hub_obj_detection/deploy_tfhub_object_detection_on_vertex_endpoints.ipynb @entrpn
