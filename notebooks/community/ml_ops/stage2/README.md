@@ -169,10 +169,22 @@ The steps performed include:
 - Creating a Vertex AI `Featurestore` resource.
     - Creating `EntityType` resources for the `Featurestore` resource.
     - Creating `Feature` resources for each `EntityType` resource.
-- Import feature values (entity data items) into `Featurestore` resource.
+- Import feature values (entity data items) into `Featurestore` resource from Cloud Storage.
+- Import feature values (entity data items) into `Featurestore` resource from pandas DataFrame.
 - Perform online serving from a `Featurestore` resource.
 - Perform batch serving from a `Featurestore` resource.
 ```
+
+[Get Started with Google CMEK Training](get_started_with_cmek_training.ipynb)
+
+```
+The steps performed include:
+
+- Creating a customer managed encryption key.
+- Creating an image dataset with CMEK encryption.
+- Train an AutoML model with CMEK encryption.
+```
+
 
 ### E2E Stage Example
 
