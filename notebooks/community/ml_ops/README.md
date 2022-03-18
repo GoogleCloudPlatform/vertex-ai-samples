@@ -13,6 +13,6 @@ The purpose of this set of notebooks and markdown files is to demonstrate Google
 3. [Formalization](stage3)
 4. [Evaluation](stage4)
 5. Deployment
-6. Serving
+6. [Serving](stage6)
 7. Monitoring
 8. Continuous Training
