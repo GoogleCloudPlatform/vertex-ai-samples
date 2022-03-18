@@ -21,3 +21,12 @@ This stage may be done entirely by MLOps. We recommend:
 - Deploy serving binaries within regions that are the closest to where the requests originate. Deploy in multiple regions, when requests span regional boundaries.
 - Use Cloud Functions as a proxy when prediction requests originate externally to Google Cloud core infrastructure, or must otherwise cross firewall boundaries that cannot not otherwise be handled by IAM role settings.
 - Features that dynamically change per example (e.g., bank balance) are stored in Vertex Feature Store.
+
+
+<img src='stage6.png'>
+
+## Notebooks
+
+### Get Started
+
+[Get started with Custom Prediction Routine](get_started_with_cpr.ipynb)
