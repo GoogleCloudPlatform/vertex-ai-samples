@@ -30,3 +30,29 @@ This stage may be done entirely by MLOps. We recommend:
 ### Get Started
 
 [Get started with Custom Prediction Routine](get_started_with_cpr.ipynb)
+
+```
+The steps performed include:
+
+- Write a custom data preprocessor.
+- Train the model.
+- Build a custom scikit-learn serving container with custom data preprocessing using the Custom Prediction Routine model server.
+    - Test the model serving container locally.
+    - Upload and deploy the model serving container to Vertex AI Endpoint.
+    - Make a prediction request.
+- Build a custom scikit-learn serving container with custom predictor (post-processing) using the Custom Prediction Routine model server.
+    - Implement custom predictor.
+    - Test the model serving container locally.
+    - Upload and deploy the model serving container to Vertex AI Endpoint.
+    - Make a prediction request.
+- Build a custom scikit-learn serving container with custom predictor and HTTP request handler using the Custom Prediction Routine model server.
+    - Implement a custom handler.
+    - Test the model serving container locally.
+    - Upload and deploy the model serving container to Vertex AI Endpoint.
+    - Make a prediction request.
+- Customize the Dockerfile for a custom scikit-learn serving container with custom predictor and HTTP request handler using the Custom Prediction Routine model server.
+    - Implement a custom Dockerfile.
+    - Test the model serving container locally.
+    - Upload and deploy the model serving container to Vertex AI Endpoint.
+    - Make a prediction request.
+```
