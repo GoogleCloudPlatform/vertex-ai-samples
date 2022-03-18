@@ -22,13 +22,13 @@ from src.training import task
 
 
 # Paths and configurations
-DATA_PATH = "gs://[your-bucket-name]/[your-dataset-dir]/u.data"  # FILL IN
+DATA_PATH = "gs://[your-bucket-name]/artifacts/u.data"  # FILL IN
 ROOT_DIR = "gs://[your-bucket-name]/artifacts"  # FILL IN
 ARTIFACTS_DIR = "gs://[your-bucket-name]/artifacts"  # FILL IN
 PROFILER_DIR = "gs://[your-bucket-name]/profiler"  # FILL IN
 HPTUNING_RESULT_DIR = "[your-hptuning-result-dir]/"  # FILL IN
 HPTUNING_RESULT_PATH = os.path.join(HPTUNING_RESULT_DIR,
-                                    "[your-file-name].json")  # FILL IN
+                                    "result.json")  # FILL IN
 RAW_BUCKET_NAME = "[your-hptuning-result-bucket-name]"  # FILL IN
 
 # Hyperparameters
