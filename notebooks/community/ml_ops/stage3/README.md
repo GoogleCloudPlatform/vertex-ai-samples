@@ -93,19 +93,6 @@ The steps performed include:
 [Get Started with Vertex AI Hyperparameter Tuning components](get_started_with_hpt_pipeline_components.ipynb)
 
 ```
-- Construct a pipeline for:
-    - Training BigQuery ML model.
-    - Evaluating the BigQuery ML model.
-    - Exporting the BigQuery ML model.
-    - Importing the BigQuery ML model to a Vertex AI model.
-    - Deploy the Vertex AI model.
-- Execute a Vertex AI pipeline.
-- Make a prediction with the deployed Vertex AI model.
-```
-
-[Get Started with BQML components](get_started_with_bqml_pipeline_components.ipynb)
-
-```
 The steps performed include:
 
 - Construct a pipeline for:
@@ -117,6 +104,34 @@ The steps performed include:
 - Execute a Vertex AI pipeline.
 ```
 
+[Get Started with BQML components](get_started_with_bqml_pipeline_components.ipynb)
+
+```
+The steps performed include:
+
+- Construct a pipeline for:
+    - Training BigQuery ML model.
+    - Evaluating the BigQuery ML model.
+    - Exporting the BigQuery ML model.
+    - Importing the BigQuery ML model to a Vertex AI model.
+    - Deploy the Vertex AI model.
+- Execute a Vertex AI pipeline.
+- Make a prediction with the deployed Vertex AI model.
+```
+
+[Get Started with rapid prototyping with BQML and AutoML components](get_started_with_rapid_prototyping_bqml_automl.ipynb)
+
+
+```
+The steps performed include:
+
+- Creating a BigQuery and Vertex AI training dataset.
+- Training a BigQuery ML and AutoML model.
+- Extracting evaluation metrics from the BigQueryML and AutoML models.
+- Selecting the best trained model.
+- Deploying the best trained model.
+- Testing the deployed model infrastructure.
+```
 
 ### E2E Stage Example
 
