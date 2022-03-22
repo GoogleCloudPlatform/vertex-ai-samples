@@ -7,7 +7,7 @@ The JuliaCon 2020 presentation: [Interactive notebooks ~ Pluto.jl]() provides a 
 
 ## Create a Vertex AI JupyterLab Instance
 
-1. From the GCP console "hamburger menu"
+1. From the [GCP console](https://console.cloud.google.com) "hamburger menu"
 
    select Vertex AI > Workbench
 2. Click NEW NOTEBOOK
@@ -23,7 +23,7 @@ The JuliaCon 2020 presentation: [Interactive notebooks ~ Pluto.jl]() provides a 
 1. Open a terminal by clicking the Terminal icon.
 1. Install the plutoserver
 pip3 install git+https://github.com/fonsp/pluto-on-jupyterlab.git
-1. In a browser go to julialang.org/downloads
+1. In a browser go to [julialang.org/downloads](https://julialang.org/downloads/)
 1. In the Current stable release right click on the `Generic Linux on x86 / 64-bit (glibc)` link
 Select copy link address
 1. Back in the terminal switch to root via
