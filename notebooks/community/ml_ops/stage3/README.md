@@ -66,6 +66,17 @@ The steps performed include:
 - Execute a Vertex AI pipeline.
 ```
 
+[Get Started with Dataproc components](get_started_with_dataproc_pipeline_components.ipynb)
+
+```
+The steps performed include:
+
+- DataprocPySparkBatchOp for PySpark batch workloads.
+- DataprocSparkBatchOp for Spark batch workloads.
+- DataprocSparkSqlBatchOp for running Spark SQL batch workloads.
+- DataprocSparkRBatchOp for running SparkR batch workloads.
+```
+
 [Get Started with Vertex AI AutoML components](get_started_with_automl_pipeline_components.ipynb)
 
 ```
