@@ -13,7 +13,7 @@
 ### Get Started
 
 
-[Get started with Vertex Endpoints](get_started_with_vertex_endpoints.ipynb)
+[Get started with Vertex AI Endpoints](get_started_with_vertex_endpoints.ipynb)
 
 ```
 The steps include:
