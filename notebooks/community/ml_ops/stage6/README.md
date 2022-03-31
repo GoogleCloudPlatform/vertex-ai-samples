@@ -23,7 +23,9 @@ This stage may be done entirely by MLOps. We recommend:
 - Features that dynamically change per example (e.g., bank balance) are stored in Vertex Feature Store.
 
 
-<img src='stage6.png'>
+<img src='stage6a.png'>
+<img src='stage6b.png'>
+<img src='stage6c.png'>
 
 ## Notebooks
 
@@ -55,4 +57,25 @@ The steps performed include:
     - Test the model serving container locally.
     - Upload and deploy the model serving container to Vertex AI Endpoint.
     - Make a prediction request.
+```
+
+[Get started with Vertex Endpoints](get_started_with_vertex_endpoints.ipynb)
+
+```
+The steps include:
+
+- Creating an `Endpoint` resource.
+- List all `Endpoint` resources.
+- List `Endpoint` resources by query filter.
+- Configuring the serving binary of a `Model` resource for deployment to an `Endpoint` resource.
+- Deploying a single `Model` resource to an `Endpoint` resource.
+- Get deployment settings for a deployed `Model` resource.
+- Configuring auto-scaling.
+- Deploying multiple `Model` resources to an `Endpoint` resource and configuring a traffic split.
+- Dynamically change the traffic split for an `Endpoint` resource.
+- Undeploy a single `Model` resource to an `Endpoint` resource.
+- Undeploy all `Model` resources from an `Endpoint` resource.
+- Delete an `Endpoint` resource.
+- In pipeline: Create an `Endpoint` resource and deploy an existing `Model` resource to the `Endpoint` resource.
+- In pipeline: Deploy an existing `Model` resource to an existing `Endpoint` resource.
 ```
