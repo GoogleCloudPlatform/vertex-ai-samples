@@ -74,4 +74,6 @@ The steps include:
 - Undeploy a single `Model` resource to an `Endpoint` resource.
 - Undeploy all `Model` resources from an `Endpoint` resource.
 - Delete an `Endpoint` resource.
+- In pipeline: Create an `Endpoint` resource and deploy an existing `Model` resource to the `Endpoint` resource.
+- In pipeline: Deploy an existing `Model` resource to an existing `Endpoint` resource.
 ```
