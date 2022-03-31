@@ -185,6 +185,21 @@ The steps performed include:
 - Train an AutoML model with CMEK encryption.
 ```
 
+[Get Started with TensorFlow Hub models](get_started_with_tfhub_models.ipynb)
+
+```
+The steps performed include:
+
+- Download a TensorFlow Hub prebuilt model.
+- Add the task component as a classifier for the CIFAR-10 dataset.
+- Fine tune locally the model with transfer learning training.
+- Construct a custom training script:
+    - Get training data from TensorFlow Datasets
+    - Get model architecture from TensorFlow Hub
+    - Train then model
+    - Save model artifacts and upload as Vertex AI Model resource.
+```
+
 
 ### E2E Stage Example
 
