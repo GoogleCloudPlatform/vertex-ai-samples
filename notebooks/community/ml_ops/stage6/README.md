@@ -56,3 +56,10 @@ The steps performed include:
     - Upload and deploy the model serving container to Vertex AI Endpoint.
     - Make a prediction request.
 ```
+
+[Get started with Vertex Endpoints)(get_started_with_vertex_endpoints.ipynb)
+
+```
+The steps include:
+
+```
