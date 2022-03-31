@@ -1,4 +1,4 @@
-# Stage 6: Deployment
+# Stage 5: Deployment
 
 ## Purpose
 
