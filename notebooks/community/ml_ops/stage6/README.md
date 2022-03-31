@@ -23,7 +23,9 @@ This stage may be done entirely by MLOps. We recommend:
 - Features that dynamically change per example (e.g., bank balance) are stored in Vertex Feature Store.
 
 
-<img src='stage6.png'>
+<img src='stage6a.png'>
+<img src='stage6b.png'>
+<img src='stage6c.png'>
 
 ## Notebooks
 
@@ -74,4 +76,6 @@ The steps include:
 - Undeploy a single `Model` resource to an `Endpoint` resource.
 - Undeploy all `Model` resources from an `Endpoint` resource.
 - Delete an `Endpoint` resource.
+- In pipeline: Create an `Endpoint` resource and deploy an existing `Model` resource to the `Endpoint` resource.
+- In pipeline: Deploy an existing `Model` resource to an existing `Endpoint` resource.
 ```
