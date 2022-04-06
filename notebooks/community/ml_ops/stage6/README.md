@@ -86,3 +86,16 @@ The steps performed include:
 - Deploying the `Model` resource to an `Endpoint` resource with `TensorFlow Serving` serving binary.
 - Make an online prediction to the `Model` resource instance deployed to the `Endpoint` resource.
 ```
+
+[Get started with FastAPI serving binary](get_started_with_fastapi.ipynb)
+
+```
+The steps performed include:
+
+- Download a pretrained image classification model from TensorFlow Hub.
+- Create a serving function to receive compressed image data, and output decomopressed preprocessed data for the model input.
+- Upload the TensorFlow Hub model and serving function as a `Vertex AI Model` resource.
+- Creating an `Endpoint` resource.
+- Deploying the `Model` resource to an `Endpoint` resource with `FastAPI` custom serving binary.
+- Make an online prediction to the `Model` resource instance deployed to the `Endpoint` resource.
+```
