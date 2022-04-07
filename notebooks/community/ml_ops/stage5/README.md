@@ -33,3 +33,15 @@ The steps include:
 - In pipeline: Create an `Endpoint` resource and deploy an existing `Model` resource to the `Endpoint` resource.
 - In pipeline: Deploy an existing `Model` resource to an existing `Endpoint` resource.
 ```
+
+[Get started with Vertex AI Private Endpoints](get_started_with_vertex_private_endpoints.ipynb)
+
+```
+The steps performed include:
+
+- Creating a `Private Endpoint` resource.
+- Configure a VPC peering connection.
+- Configuring the serving binary of a `Model` resource for deployment to a `Private Endpoint` resource.
+- Deploying a `Model` resource to a `Private Endpoint` resource.
+- Send a prediction request to a `Private Endpoint`
+```
