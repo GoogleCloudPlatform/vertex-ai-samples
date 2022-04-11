@@ -100,7 +100,7 @@ The steps performed include:
 - Make an online prediction to the `Model` resource instance deployed to the `Endpoint` resource.
 ```
 
-[Get started with TensorFlow Enterprise optimized run-time container](get_started_with_tfe_opt_bert.ipynb)
+[Get started with TensorFlow Enterprise optimized run-time container](get_started_with_optimized_tfe_bert.ipynb)
 
 ```
 The steps performed include:
