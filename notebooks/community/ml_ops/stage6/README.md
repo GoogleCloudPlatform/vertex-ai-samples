@@ -99,3 +99,22 @@ The steps performed include:
 - Deploying the `Model` resource to an `Endpoint` resource with `FastAPI` custom serving binary.
 - Make an online prediction to the `Model` resource instance deployed to the `Endpoint` resource.
 ```
+
+[Get started with Vertex AI Prediction optimized TensorFlow run-time container](get_started_with_optimized_tfe_bert.ipynb)
+
+```
+The steps performed include:
+
+- Download a pretrained BERT model from TensorFlow Hub.
+- Fine-tune (transfer learning) the BERT model as a binary classifier.
+- Upload the TensorFlow Hub model as a `Vertex AI Model` resource, with standard TensorFlow serving container.
+- Upload the TensorFlow Hub model as a `Vertex AI Model` resource, with `Vertex AI Prediction optimized TensorFlow runtime` container
+- Create two `Endpoint` resources.
+- Deploying both `Model` resources to separate `Endpoint` resources.
+- Make the same online prediction requests to both `Model` resource instances deployed to the `Endpoint` resources.
+- Compare the prediction accuracy between the two deployed `Model` resources.
+- Configuring container settings for fine-tune control of optimizations.
+- Create a `Private Endpoint` resource.
+- Deploy the `Model` resoure with then `Vertex AI Prediction optimized TensorFlow runtime` to the `Private Endpoint` resource.
+- Make an online prediction request to the `Private Endpoint` resource.
+```

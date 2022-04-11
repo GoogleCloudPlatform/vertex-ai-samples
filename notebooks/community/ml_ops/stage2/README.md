@@ -153,12 +153,13 @@ The steps performed include:
 ```
 The steps performed include:
 
-- Create a local BQ table in your project.
-- Train a BQML model.
-- Evaluate the BQML model.
-- Export the BQML model as a cloud model.
-- Upload the exported model as a Vertex AI Model resource.
-- Hyperparameter tune a BQML model with Vertex AI Vizier.
+- Create a local BigQuery table in your project
+- Train a BQML model
+- Evaluate the BQML model
+- Export the BQML model as a cloud model
+- Upload the exported model as a `Vertex AI Model` resource
+- Hyperparameter tune a BQML model with `Vertex AI Vizier`
+- Automatically register a BQML model to `Vertex AI Model Registry`
 ```
 
 [Get Started with Vertex Feature Store](get_started_vertex_feature_store.ipynb)
