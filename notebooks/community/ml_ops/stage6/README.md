@@ -59,11 +59,22 @@ The steps performed include:
     - Make a prediction request.
 ```
 
+[Get started with Vertex AI Raw Prediction](get_started_with_raw_predict.ipynb)
+
+```
+The steps performed include:
+
+- Download a pretrained tabular classification model artifacts for a TensorFlow 1.x estimator.
+- Upload the TensorFlow estimator model as a `Vertex AI Model` resource.
+- Creating an `Endpoint` resource.
+- Deploying the `Model` resource to an `Endpoint` resource.
+- Make an online raw prediction to the `Model` resource instance deployed to the `Endpoint` resource.
+```
+
 
 [Get started with serving functions for TensorFlow model](get_started_with_tf_serving_function.ipynb)
 
 ```
-
 The steps performed include:
 
 - Download a pretrained image classification model from TensorFlow Hub.
