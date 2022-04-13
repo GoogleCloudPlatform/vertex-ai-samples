@@ -11,7 +11,6 @@ logging = tf.get_logger()
 logging.propagate = False
 logging.setLevel("INFO")
 
-# TODO, move this code to a separate .py file and load it here
 def benchmark_qps(send_request, requests, qps):
     logging.info("Running gRPC benchmark at {} qps".format(qps))
     # List appends are thread safe
