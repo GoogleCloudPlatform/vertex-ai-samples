@@ -12,7 +12,7 @@ logging.propagate = False
 logging.setLevel("INFO")
 
 def benchmark_qps(send_request, requests, qps):
-    logging.info("Running gRPC benchmark at {} qps".format(qps))
+    logging.info("Running benchmark at {} qps".format(qps))
     # List appends are thread safe
     num_requests = len(requests)
     success = []
