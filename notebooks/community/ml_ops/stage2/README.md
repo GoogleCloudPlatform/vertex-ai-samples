@@ -153,12 +153,13 @@ The steps performed include:
 ```
 The steps performed include:
 
-- Create a local BQ table in your project.
-- Train a BQML model.
-- Evaluate the BQML model.
-- Export the BQML model as a cloud model.
-- Upload the exported model as a Vertex AI Model resource.
-- Hyperparameter tune a BQML model with Vertex AI Vizier.
+- Create a local BigQuery table in your project
+- Train a BQML model
+- Evaluate the BQML model
+- Export the BQML model as a cloud model
+- Upload the exported model as a `Vertex AI Model` resource
+- Hyperparameter tune a BQML model with `Vertex AI Vizier`
+- Automatically register a BQML model to `Vertex AI Model Registry`
 ```
 
 [Get Started with Vertex Feature Store](get_started_vertex_feature_store.ipynb)
@@ -183,6 +184,21 @@ The steps performed include:
 - Creating a customer managed encryption key.
 - Creating an image dataset with CMEK encryption.
 - Train an AutoML model with CMEK encryption.
+```
+
+[Get Started with TensorFlow Hub models](get_started_with_tfhub_models.ipynb)
+
+```
+The steps performed include:
+
+- Download a TensorFlow Hub prebuilt model.
+- Add the task component as a classifier for the CIFAR-10 dataset.
+- Fine tune locally the model with transfer learning training.
+- Construct a custom training script:
+    - Get training data from TensorFlow Datasets
+    - Get model architecture from TensorFlow Hub
+    - Train then model
+    - Save model artifacts and upload as Vertex AI Model resource.
 ```
 
 
