@@ -201,6 +201,20 @@ The steps performed include:
     - Save model artifacts and upload as Vertex AI Model resource.
 ```
 
+[Get Started with Vertex AI TabNet builtin algorithm](get_started_with_tabnet.ipynb)
+```
+The steps performed include:
+
+- Get the training data.
+- Configure training parameters for the Vertex AI TabNet container.
+- Train the model using Vertex AI Training using CSV data.
+- Upload the model as a Vertex AI Model resource.
+- Deploy the Vertex AI Model resource to a Vertex AI Endpoint resource.
+- Make a prediction with the deployed model.
+- Hyperparameter tuning the Vertex AI TabNet model.
+- Train the model using Vertex AI Training using BigQuery table.
+```
+
 
 ### E2E Stage Example
 
