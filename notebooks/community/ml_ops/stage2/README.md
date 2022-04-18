@@ -153,12 +153,13 @@ The steps performed include:
 ```
 The steps performed include:
 
-- Create a local BQ table in your project.
-- Train a BQML model.
-- Evaluate the BQML model.
-- Export the BQML model as a cloud model.
-- Upload the exported model as a Vertex AI Model resource.
-- Hyperparameter tune a BQML model with Vertex AI Vizier.
+- Create a local BigQuery table in your project
+- Train a BQML model
+- Evaluate the BQML model
+- Export the BQML model as a cloud model
+- Upload the exported model as a `Vertex AI Model` resource
+- Hyperparameter tune a BQML model with `Vertex AI Vizier`
+- Automatically register a BQML model to `Vertex AI Model Registry`
 ```
 
 [Get Started with Vertex Feature Store](get_started_vertex_feature_store.ipynb)
@@ -198,6 +199,33 @@ The steps performed include:
     - Get model architecture from TensorFlow Hub
     - Train then model
     - Save model artifacts and upload as Vertex AI Model resource.
+```
+
+[Get Started with Vertex AI TabNet builtin algorithm](get_started_with_tabnet.ipynb)
+```
+The steps performed include:
+
+- Get the training data.
+- Configure training parameters for the Vertex AI TabNet container.
+- Train the model using Vertex AI Training using CSV data.
+- Upload the model as a Vertex AI Model resource.
+- Deploy the Vertex AI Model resource to a Vertex AI Endpoint resource.
+- Make a prediction with the deployed model.
+- Hyperparameter tuning the Vertex AI TabNet model.
+- Train the model using Vertex AI Training using BigQuery table.
+```
+[Get Started with Vertex AI TabNet builtin algorithm](get_started_with_tabnet.ipynb)
+```
+The steps performed include:
+
+- Get the training data.
+- Configure training parameters for the Vertex AI TabNet container.
+- Train the model using Vertex AI Training using CSV data.
+- Upload the model as a Vertex AI Model resource.
+- Deploy the Vertex AI Model resource to a Vertex AI Endpoint resource.
+- Make a prediction with the deployed model.
+- Hyperparameter tuning the Vertex AI TabNet model.
+- Train the model using Vertex AI Training using BigQuery table.
 ```
 
 
