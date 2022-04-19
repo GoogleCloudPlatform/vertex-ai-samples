@@ -58,6 +58,7 @@ def execute_notebook(
             output_path=notebook_source,
             progress_bar=should_log_output,
             request_save_on_cell_execute=should_log_output,
+            kernel_name="python3",
             log_output=should_log_output,
             stdout_file=sys.stdout if should_log_output else None,
             stderr_file=sys.stderr if should_log_output else None,
