@@ -76,6 +76,18 @@ The steps performed include:
     - image data
 ```
 
+[Get Started with Data Labeling](get_started_data_labeling.ipynb)
+
+```
+The steps performed include:
+
+- Create a Specialist Pool for data labelers.
+- Create a data labeling job.
+- Submit the data labeling job.
+- List data labeling jobs.
+- Cancel a data labeling job.
+```
+
 ### E2E Stage Example
 
 [Stage 1: Data Management](mlops_data_management.ipynb)
