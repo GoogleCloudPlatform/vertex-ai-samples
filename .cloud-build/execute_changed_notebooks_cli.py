@@ -102,6 +102,6 @@ execute_changed_notebooks_helper.process_and_execute_notebooks(
     artifacts_bucket=args.artifacts_bucket,
     variable_project_id=args.variable_project_id,
     variable_region=args.variable_region,
-    private_pool_id=args.private_pool_id if not "default" else None,
+    private_pool_id=args.private_pool_id,
     should_parallelize=args.should_parallelize,
 )

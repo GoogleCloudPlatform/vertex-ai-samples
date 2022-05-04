@@ -17,6 +17,7 @@ import concurrent
 import dataclasses
 import datetime
 import functools
+from ratemate import RateLimit
 import os
 import pathlib
 import nbformat
@@ -103,6 +104,9 @@ def _create_tag(filepath: str) -> str:
     return tag
 
 
+rate_limit = RateLimit(max_count=50, per=60, greedy=True)
+
+
 def process_and_execute_notebook(
     container_uri: str,
     staging_bucket: str,
@@ -113,6 +117,8 @@ def process_and_execute_notebook(
     notebook: str,
     should_get_tail_logs: bool = False,
 ) -> NotebookExecutionResult:
+    rate_limit.wait()  # wait before creating the task
+
     print(f"Running notebook: {notebook}")
 
     # Create paths
@@ -151,8 +157,8 @@ def process_and_execute_notebook(
             notebook_output_uri=notebook_output_uri,
             container_uri=container_uri,
             tag=tag,
-            region=variable_region,
             private_pool_id=private_pool_id,
+            private_pool_region=variable_region,
         )
 
         operation_metadata = BuildOperationMetadata(mapping=operation.metadata)
@@ -277,7 +283,9 @@ def process_and_execute_notebooks(
             print(
                 "Running notebooks in parallel, so no logs will be displayed. Please wait..."
             )
-            with concurrent.futures.ThreadPoolExecutor(max_workers=None) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
+                print(f"Max workers: {executor._max_workers}")
+
                 notebook_execution_results = list(
                     executor.map(
                         functools.partial(
