@@ -16,19 +16,16 @@
 """Methods to run a notebook on Google Cloud Build"""
 
 from re import sub
-from google.protobuf import duration_pb2
-from yaml.loader import FullLoader
+from typing import Optional
 
 import google.auth
+import yaml
+from google.api_core import client_options, operation
+from google.cloud.aiplatform import utils
 from google.cloud.devtools import cloudbuild_v1
 from google.cloud.devtools.cloudbuild_v1.types import Source, StorageSource
-
-from typing import Optional
-import yaml
-
-from google.cloud.aiplatform import utils
-from google.api_core import operation, client_options
-
+from google.protobuf import duration_pb2
+from yaml.loader import FullLoader
 
 CLOUD_BUILD_FILEPATH = ".cloud-build/notebook-execution-test-cloudbuild-single.yaml"
 TIMEOUT_IN_SECONDS = 86400

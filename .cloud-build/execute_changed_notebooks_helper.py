@@ -17,19 +17,19 @@ import concurrent
 import dataclasses
 import datetime
 import functools
-from ratemate import RateLimit
+import operator
 import os
 import pathlib
-import nbformat
 import re
 import subprocess
 from typing import List, Optional
-from tabulate import tabulate
-import operator
 
 import execute_notebook_remote
-from utils import util, NotebookProcessors
+import nbformat
 from google.cloud.devtools.cloudbuild_v1.types import BuildOperationMetadata
+from ratemate import RateLimit
+from tabulate import tabulate
+from utils import NotebookProcessors, util
 
 
 def format_timedelta(delta: datetime.timedelta) -> str:
