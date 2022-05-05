@@ -144,6 +144,17 @@ The steps performed include:
 - Testing the deployed model infrastructure.
 ```
 
+[Get Started with TFX Pipelines with Vertex AI](get_started_with_tfx_pipeline.ipynb)
+
+```
+The steps performed include:
+
+- Create a TFX e2e pipeline.
+- Execute the pipeline locally.
+- Execute the pipeline on Google Cloud using `Vertex AI Training`
+- Execute the pipeline using `Vertex AI Pipelines`.
+```
+
 ### E2E Stage Example
 
 [Stage 3: Formalization](mlops_formalization.ipynb)
