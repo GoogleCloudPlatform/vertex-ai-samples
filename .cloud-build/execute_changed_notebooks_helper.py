@@ -31,6 +31,9 @@ from ratemate import RateLimit
 from tabulate import tabulate
 from utils import NotebookProcessors, util
 
+# A buffer so that workers finish before the orchestrating job
+WORKER_TIMEOUT_BUFFER_IN_SECONDS: int = 60 * 60
+
 
 def format_timedelta(delta: datetime.timedelta) -> str:
     """Formats a timedelta duration to [N days] %H:%M:%S format"""
@@ -114,6 +117,7 @@ def process_and_execute_notebook(
     variable_project_id: str,
     variable_region: str,
     private_pool_id: Optional[str],
+    deadline: datetime,
     notebook: str,
     should_get_tail_logs: bool = False,
 ) -> NotebookExecutionResult:
@@ -151,6 +155,11 @@ def process_and_execute_notebook(
         # Upload the pre-processed code to a GCS bucket
         code_archive_uri = util.archive_code_and_upload(staging_bucket=staging_bucket)
 
+        # Calculate timeout in seconds
+        timeout_in_seconds = max(
+            int((deadline - datetime.datetime.now()).total_seconds()), 1
+        )
+
         operation = execute_notebook_remote.execute_notebook_remote(
             code_archive_uri=code_archive_uri,
             notebook_uri=notebook,
@@ -159,6 +168,7 @@ def process_and_execute_notebook(
             tag=tag,
             private_pool_id=private_pool_id,
             private_pool_region=variable_region,
+            timeout_in_seconds=timeout_in_seconds,
         )
 
         operation_metadata = BuildOperationMetadata(mapping=operation.metadata)
@@ -247,6 +257,7 @@ def process_and_execute_notebooks(
     variable_region: str,
     private_pool_id: Optional[str],
     should_parallelize: bool,
+    timeout: int,
 ):
     """
     Run the notebooks that exist under the folders defined in the test_paths_file.
@@ -273,8 +284,15 @@ def process_and_execute_notebooks(
             Required. The value for REGION to inject into notebooks.
         should_parallelize (bool):
             Required. Should run notebooks in parallel using a thread pool as opposed to in sequence.
+        timeout (str):
+            Required. Timeout string according to https://cloud.google.com/build/docs/build-config-file-schema#timeout.
     """
     notebook_execution_results: List[NotebookExecutionResult] = []
+
+    # Calculate deadline
+    deadline = datetime.datetime.now() + datetime.timedelta(
+        seconds=max(timeout - WORKER_TIMEOUT_BUFFER_IN_SECONDS, 0)
+    )
 
     if len(notebooks) > 0:
         print(f"Found {len(notebooks)} modified notebooks: {notebooks}")
@@ -296,6 +314,7 @@ def process_and_execute_notebooks(
                             variable_project_id,
                             variable_region,
                             private_pool_id,
+                            deadline,
                         ),
                         notebooks,
                     )
@@ -309,6 +328,7 @@ def process_and_execute_notebooks(
                     variable_project_id=variable_project_id,
                     variable_region=variable_region,
                     private_pool_id=private_pool_id,
+                    deadline=deadline,
                     notebook=notebook,
                 )
                 for notebook in notebooks

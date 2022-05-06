@@ -28,7 +28,6 @@ from google.protobuf import duration_pb2
 from yaml.loader import FullLoader
 
 CLOUD_BUILD_FILEPATH = ".cloud-build/notebook-execution-test-cloudbuild-single.yaml"
-TIMEOUT_IN_SECONDS = 86400
 SERVICE_BASE_PATH = "cloudbuild.googleapis.com"
 
 
@@ -40,6 +39,7 @@ def execute_notebook_remote(
     private_pool_id: Optional[str],
     private_pool_region: Optional[str],
     tag: Optional[str],
+    timeout_in_seconds: Optional[int] = None,
 ) -> operation.Operation:
     """Create and execute a single notebook on Google Cloud Build"""
     # Load build steps from YAML
@@ -84,8 +84,8 @@ def execute_notebook_remote(
 
     build.steps = cloudbuild_config["steps"]
     build.substitutions = substitutions
-    build.timeout = duration_pb2.Duration(seconds=TIMEOUT_IN_SECONDS)
-    build.queue_ttl = duration_pb2.Duration(seconds=TIMEOUT_IN_SECONDS)
+    build.timeout = duration_pb2.Duration(seconds=timeout_in_seconds)
+    build.queue_ttl = duration_pb2.Duration(seconds=timeout_in_seconds)
 
     if tag:
         build.tags = [tag]

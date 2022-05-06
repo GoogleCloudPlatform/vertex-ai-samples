@@ -75,6 +75,13 @@ parser.add_argument(
     required=True,
 )
 parser.add_argument(
+    "--timeout",
+    type=int,
+    help="Timeout in seconds",
+    default=86400,
+    required=False,
+)
+parser.add_argument(
     "--private_pool_id",
     type=str,
     help="The private pool id.",
@@ -105,4 +112,5 @@ execute_changed_notebooks_helper.process_and_execute_notebooks(
     variable_region=args.variable_region,
     private_pool_id=args.private_pool_id,
     should_parallelize=args.should_parallelize,
+    timeout=args.timeout,
 )
