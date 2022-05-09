@@ -129,3 +129,17 @@ The steps performed include:
 - Deploy the `Model` resoure with then `Vertex AI Prediction optimized TensorFlow runtime` to the `Private Endpoint` resource.
 - Make an online prediction request to the `Private Endpoint` resource.
 ```
+
+[Get started with Nvidia Triton Server](get_started_with_nvidia_triton_server.ipynb)
+
+```
+The steps performed in this tutorial include:
+
+- Download the model artifacts from TensorFlow Hub.
+- Create Triton serving configuration file for the model.
+- Construct a custom container, with Triton serving image, for model deployment.
+- Upload the model as a Vertex AI Model resource.
+- Deploy the Vertex AI Model resource to a Vertex AI Endpoint resource.
+- Make a prediction request
+- Undeploy the Model resource and delete the Endpoint
+```
