@@ -228,6 +228,20 @@ The steps performed include:
 - Train the model using Vertex AI Training using BigQuery table.
 ```
 
+[Get Started with Vision API and AutoML](get_started_with_visionapi_and_automl.ipynb)
+```
+The steps performed include:
+
+- Preprocess training files using `Vision AI` APIs to extract the text from PDF files.
+- Create a custom import file that includes annotation data based on the sample `BigQuery` dataset.
+- Create a `Vertex AI Dataset` resource.
+- Train the model.
+- View the model evaluation.
+- Deploy the `Vertex AI Model` resource to a serving `Endpoint` resource.
+- Make a prediction.
+- Undeploy the `Model`.
+```
+
 
 ### E2E Stage Example
 
