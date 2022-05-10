@@ -155,6 +155,17 @@ The steps performed include:
 - Execute the pipeline using `Vertex AI Pipelines`.
 ```
 
+[Get Started with machine management](get_started_with_machine_management.ipynb)
+
+```
+The steps performed in this tutorial include:
+
+- Create a custom component with a self-contained training job.
+- Execute pipeline using component-level settings for machine resources
+- Convert the self-contained training componnt into a Vertex AI CustomJob.
+- Execute pipeline using customjob-level settings for machine resources
+```
+
 ### E2E Stage Example
 
 [Stage 3: Formalization](mlops_formalization.ipynb)
