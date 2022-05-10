@@ -138,6 +138,7 @@ The steps performed in this tutorial include:
 - Download the model artifacts from TensorFlow Hub.
 - Create Triton serving configuration file for the model.
 - Construct a custom container, with Triton serving image, for model deployment.
+- Locally test the custom container.
 - Upload the model as a Vertex AI Model resource.
 - Deploy the Vertex AI Model resource to a Vertex AI Endpoint resource.
 - Make a prediction request
