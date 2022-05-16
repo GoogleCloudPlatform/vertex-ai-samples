@@ -144,3 +144,16 @@ The steps performed in this tutorial include:
 - Make a prediction request
 - Undeploy the Model resource and delete the Endpoint
 ```
+
+[Get started with Vertex AI Matching Engine](get_started_with_matching_engine.ipynb)
+
+```
+The steps performed include:
+
+- Create ANN Index.
+- Create an IndexEndpoint with VPC Network
+- Deploy ANN Index
+- Perform online query
+- Deploy brute force Index.
+- Perform calibration between ANN and brute force index.
+```
