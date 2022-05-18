@@ -67,6 +67,7 @@ def _process_notebook(
     notebook_path: str,
     variable_project_id: str,
     variable_region: str,
+    variable_vpc_network: Optional[str],
 ):
     # Read notebook
     with open(notebook_path) as f:
@@ -78,6 +79,7 @@ def _process_notebook(
         replacement_map={
             "PROJECT_ID": variable_project_id,
             "REGION": variable_region,
+            "VPC_NETWORK": variable_vpc_network,
         },
     )
 
@@ -109,11 +111,19 @@ def process_and_execute_notebook(
     artifacts_bucket: str,
     variable_project_id: str,
     variable_region: str,
+    variable_vpc_network: Optional[str],
     private_pool_id: Optional[str],
     notebook: str,
     should_get_tail_logs: bool = False,
 ) -> NotebookExecutionResult:
     print(f"Running notebook: {notebook}")
+
+    # Handle empty strings
+    if not variable_vpc_network:
+        variable_vpc_network = None
+
+    if not private_pool_id:
+        private_pool_id = None
 
     # Create paths
     notebook_output_uri = "/".join([artifacts_bucket, pathlib.Path(notebook).name])
@@ -140,6 +150,7 @@ def process_and_execute_notebook(
             notebook_path=notebook,
             variable_project_id=variable_project_id,
             variable_region=variable_region,
+            variable_vpc_network=variable_vpc_network,
         )
 
         # Upload the pre-processed code to a GCS bucket
@@ -239,6 +250,7 @@ def process_and_execute_notebooks(
     artifacts_bucket: str,
     variable_project_id: str,
     variable_region: str,
+    variable_vpc_network: Optional[str],
     private_pool_id: Optional[str],
     should_parallelize: bool,
 ):
@@ -287,6 +299,7 @@ def process_and_execute_notebooks(
                             artifacts_bucket,
                             variable_project_id,
                             variable_region,
+                            variable_vpc_network,
                             private_pool_id,
                         ),
                         notebooks,
@@ -300,6 +313,7 @@ def process_and_execute_notebooks(
                     artifacts_bucket=artifacts_bucket,
                     variable_project_id=variable_project_id,
                     variable_region=variable_region,
+                    variable_vpc_network=variable_vpc_network,
                     private_pool_id=private_pool_id,
                     notebook=notebook,
                 )
