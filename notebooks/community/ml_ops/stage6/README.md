@@ -164,10 +164,17 @@ The steps performed include:
 The steps performed include:
 
 1. Train the `Two-Tower` algorithm to generate embeddings (encoder) for the dataset.
-2. Make example predictions (embeddings) from then trained encoder.
-3. Generate embeddings using the trained `Two-Tower` builtin algorithm.
-4. Store embeddings to format supported by `Matching Engine`.
-5. Create a `Matching Engine Index` for the embeddings.
-6. Deploy the `Matching Engine Index` to a `Index Endpoint`.
-6. Make a matching engine prediction request.
-``
+2. Hyperparameter tune the trained `Two-Tower` encoder.
+3. Make example predictions (embeddings) from then trained encoder.
+4. Generate embeddings using the trained `Two-Tower` builtin algorithm.
+5. Store embeddings to format supported by `Matching Engine`.
+6. Create a `Matching Engine Index` for the embeddings.
+7. Deploy the `Matching Engine Index` to a `Index Endpoint`.
+8. Make a matching engine prediction request.
+```
+
+[Get started with Vertex AI Matching Engine using Swivel builtin algorithm](get_started_with_matchine_swivel.ipynb)
+
+```
+The steps performed include:
+```
