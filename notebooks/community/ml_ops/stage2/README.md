@@ -114,7 +114,6 @@ The steps performed include:
 - Create a training image for training the model.
 - Train a R model using `Vertex AI Trainingh` service with the R-to-Python training package.
 ```
-```
 
 [Get Started with Custom Training Packages (LightGBM)](get_started_vertex_training_lightgbm.ipynb)
 
