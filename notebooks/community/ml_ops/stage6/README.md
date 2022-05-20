@@ -177,4 +177,13 @@ The steps performed include:
 
 ```
 The steps performed include:
+
+1. Train the `Swivel` algorithm to generate embeddings (encoder) for the dataset.
+2. Hyperparameter tune the trained `Swivel` encoder.
+3. Make example predictions (embeddings) from then trained encoder.
+4. Generate embeddings using the trained `Swivel` builtin algorithm.
+5. Store embeddings to format supported by `Matching Engine`.
+6. Create a `Matching Engine Index` for the embeddings.
+7. Deploy the `Matching Engine Index` to a `Index Endpoint`.
+8. Make a matching engine prediction request.
 ```
