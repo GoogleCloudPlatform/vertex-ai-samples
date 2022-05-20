@@ -114,6 +114,20 @@ The steps performed include:
 - Create a training image for training the model.
 - Train a R model using `Vertex AI Trainingh` service with the R-to-Python training package.
 ```
+```
+
+[Get Started with Custom Training Packages (LightGBM)](get_started_vertex_training_lightgbm.ipynb)
+
+```
+The steps performed include:
+
+- Training using a Python package.
+- Save the model artifacts to Cloud Storage using GCSFuse.
+- Construct a FastAPI prediction server.
+- Construct a Dockerfile deployment image.
+- Test the deployment image locally.
+- Create a `Vertex AI Model` resource.
+```
 
 [Get Started with Distributed Training](get_started_vertex_distributed_training.ipynb)
 
