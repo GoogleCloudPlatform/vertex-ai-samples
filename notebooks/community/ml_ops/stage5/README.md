@@ -2,6 +2,8 @@
 
 ## Purpose
 
+Configure compute and networking requirements for containerized serving binaries for a production load.
+
 
 ## Recommendations  
 
