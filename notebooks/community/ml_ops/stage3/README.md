@@ -27,7 +27,7 @@ The third stage in MLOps is formalization to develop an automated pipeline proce
 - Use early stop procedure in training script to detect failure to achieve training objective.
 - Store the results of the trained model evaluation in Vertex AI ML Metadata.
 
-<img src='stage3.png'>
+<img src='stage3v2.png'>
 
 ## Notebooks
 
