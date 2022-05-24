@@ -23,9 +23,7 @@ This stage may be done entirely by MLOps. We recommend:
 - Features that dynamically change per example (e.g., bank balance) are stored in Vertex Feature Store.
 
 
-<img src='stage6a.png'>
-<img src='stage6b.png'>
-<img src='stage6c.png'>
+<img src='stage6v2.png'>
 
 ## Notebooks
 
