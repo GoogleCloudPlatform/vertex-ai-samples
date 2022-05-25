@@ -25,7 +25,7 @@ The second stage in MLOps is experimenting in developing one or more baseline mo
 - Use the What-if-Tool (WIT) to explore how the trained model would make predictions in different scenarios.
 
 
-<img src='stage2v2.png'>
+<img src='stage2v3.png'>
 
 ## Notebooks
 
