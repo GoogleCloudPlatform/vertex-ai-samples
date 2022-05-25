@@ -26,9 +26,9 @@ The second stage in MLOps is experimenting in developing one or more baseline mo
 
 
 <img src='stage2v3.png'>
-
-
-
+<br/>
+<br/>
+<br/>
 <img src='stage2.2v1.png'>
 
 ## Notebooks
