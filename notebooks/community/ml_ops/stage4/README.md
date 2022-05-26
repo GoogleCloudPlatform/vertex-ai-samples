@@ -36,7 +36,7 @@ This stage may be done entirely by MLOps. We recommend:
 
 
 
-<img src='stage4v2.png'>
+<img src='stage4v3.png'>
 
 ## Notebooks
 
