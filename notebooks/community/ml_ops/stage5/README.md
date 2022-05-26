@@ -18,7 +18,7 @@ The fifth stage in MLOps is deployment to production of the blessed model, which
 - Use Vertex Prediction to set your criteria for scaling and load balancing.
 
 
-<img src='stage5v2.png'>
+<img src='stage5v3.png'>
 
 ## Notebooks
 
