@@ -185,3 +185,20 @@ The steps performed include:
 7. Deploy the `Matching Engine Index` to a `Index Endpoint`.
 8. Make a matching engine prediction request.
 ```
+
+[Get started with Explainable AI and custom model server](get_started_with_xai_and_custom_server.ipynb)
+
+```
+The steps performed include:
+
+- Locally train a Pytorch tabular classifier.
+- Locally test the trained model.
+- Build a HTTP server using FastAPI.
+- Create a custom serving container with the trained model and FastAPI server.
+- Locally test the custom serving container.
+- Push the custom serving container to the Artifact Registry.
+- Upload the custom serving container as a `Model` resource.
+- Deploy the `Model` resource to an `Endpoint` resource.
+- Make a prediction request to the deployed custom serving container.
+- Make an explanation request to the deployed custom serving container.
+```
