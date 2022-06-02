@@ -2,11 +2,23 @@
 
 ## Purpose
 
+Configure compute and networking requirements for containerized serving binaries for a production load.
+
 
 ## Recommendations  
 
+The fifth stage in MLOps is deployment to production of the blessed model, which will replace the previous blessed model in production. This stage may be done entirely by MLOps. We recommend:
 
-<img src='stage5.png'>
+- Deploy the blessed model from the Vertex Model Registry.
+- Use the Google Container Registry for the deployment container.
+- Attach, if any, serving function from the Vertex Model Registry to the deployed model.
+- Use Vertex Pipelines for the deployment.
+- For cloud models, deploy within the Google Cloud infrastructure.
+- Use Vertex Prediction traffic split for production rollout.
+- Use Vertex Prediction to set your criteria for scaling and load balancing.
+
+
+<img src='stage5v3.png'>
 
 ## Notebooks
 
