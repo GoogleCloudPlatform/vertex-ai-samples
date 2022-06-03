@@ -353,10 +353,11 @@ def process_and_execute_notebooks(
                         "PASSED" if result.is_pass else "FAILED",
                         format_timedelta(result.duration),
                         result.log_url,
+                        result.output_uri,
                     ]
                     for result in results_sorted
                 ],
-                headers=["build_tag", "status", "duration", "log_url"],
+                headers=["build_tag", "status", "duration", "log_url", "output_url"],
             )
         )
 
@@ -380,7 +381,7 @@ def process_and_execute_notebooks(
         notebook = notebooks[0]
         execute_notebook_helper.execute_notebook(
             notebook_source=notebook,
-            notebook_output_uri="/".join(
+            output_file_or_uri="/".join(
                 [artifacts_bucket, pathlib.Path(notebook).name]
             ),
             should_log_output=True,
