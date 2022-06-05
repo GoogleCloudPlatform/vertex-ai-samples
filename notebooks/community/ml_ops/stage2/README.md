@@ -25,7 +25,11 @@ The second stage in MLOps is experimenting in developing one or more baseline mo
 - Use the What-if-Tool (WIT) to explore how the trained model would make predictions in different scenarios.
 
 
-<img src='stage2.png'>
+<img src='stage2v3.png'>
+<br/>
+<br/>
+<br/>
+<img src='stage2.2v1.png'>
 
 ## Notebooks
 
@@ -113,6 +117,19 @@ The steps performed include:
 - Create a R-to-Python training package.
 - Create a training image for training the model.
 - Train a R model using `Vertex AI Trainingh` service with the R-to-Python training package.
+```
+
+[Get Started with Custom Training Packages (LightGBM)](get_started_vertex_training_lightgbm.ipynb)
+
+```
+The steps performed include:
+
+- Training using a Python package.
+- Save the model artifacts to Cloud Storage using GCSFuse.
+- Construct a FastAPI prediction server.
+- Construct a Dockerfile deployment image.
+- Test the deployment image locally.
+- Create a `Vertex AI Model` resource.
 ```
 
 [Get Started with Distributed Training](get_started_vertex_distributed_training.ipynb)
@@ -226,6 +243,20 @@ The steps performed include:
 - Make a prediction with the deployed model.
 - Hyperparameter tuning the Vertex AI TabNet model.
 - Train the model using Vertex AI Training using BigQuery table.
+```
+
+[Get Started with Vision API and AutoML](get_started_with_visionapi_and_automl.ipynb)
+```
+The steps performed include:
+
+- Preprocess training files using `Vision AI` APIs to extract the text from PDF files.
+- Create a custom import file that includes annotation data based on the sample `BigQuery` dataset.
+- Create a `Vertex AI Dataset` resource.
+- Train the model.
+- View the model evaluation.
+- Deploy the `Vertex AI Model` resource to a serving `Endpoint` resource.
+- Make a prediction.
+- Undeploy the `Model`.
 ```
 
 
