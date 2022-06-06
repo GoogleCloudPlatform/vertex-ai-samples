@@ -16,22 +16,18 @@
 """Methods to run a notebook on Google Cloud Build"""
 
 from re import sub
+from typing import Optional
+
+import google.auth
+import yaml
+from google.api_core import client_options, operation
+from google.cloud.aiplatform import utils
+from google.cloud.devtools import cloudbuild_v1
+from google.cloud.devtools.cloudbuild_v1.types import Source, StorageSource
 from google.protobuf import duration_pb2
 from yaml.loader import FullLoader
 
-import google.auth
-from google.cloud.devtools import cloudbuild_v1
-from google.cloud.devtools.cloudbuild_v1.types import Source, StorageSource
-
-from typing import Optional
-import yaml
-
-from google.cloud.aiplatform import utils
-from google.api_core import operation, client_options
-
-
 CLOUD_BUILD_FILEPATH = ".cloud-build/notebook-execution-test-cloudbuild-single.yaml"
-TIMEOUT_IN_SECONDS = 86400
 SERVICE_BASE_PATH = "cloudbuild.googleapis.com"
 
 
@@ -40,12 +36,14 @@ def execute_notebook_remote(
     notebook_uri: str,
     notebook_output_uri: str,
     container_uri: str,
-    region: str,
     private_pool_id: Optional[str],
+    private_pool_region: Optional[str],
     tag: Optional[str],
+    timeout_in_seconds: Optional[int] = None,
 ) -> operation.Operation:
     """Create and execute a single notebook on Google Cloud Build"""
     # Load build steps from YAML
+
     cloudbuild_config = yaml.load(open(CLOUD_BUILD_FILEPATH), Loader=FullLoader)
 
     substitutions = {
@@ -57,13 +55,14 @@ def execute_notebook_remote(
     build = cloudbuild_v1.Build()
 
     options: Optional[client_options.ClientOptions] = None
-    if private_pool_id:
-        substitutions["_PRIVATE_POOL_NAME"] = private_pool_id
-        build.options = cloudbuild_config["options"]
+    if private_pool_id and private_pool_region:
+        # substitutions["_PRIVATE_POOL_NAME"] = private_pool_id
+        build.options = cloudbuild_config.get("options")
+        build.options.pool = {"name": private_pool_id}
 
         # Switch to the regional endpoint of the pool
         options = client_options.ClientOptions(
-            api_endpoint=f"{region}-{SERVICE_BASE_PATH}"
+            api_endpoint=f"{private_pool_region}-{SERVICE_BASE_PATH}"
         )
 
     # Authorize the client with Google defaults
@@ -85,8 +84,8 @@ def execute_notebook_remote(
 
     build.steps = cloudbuild_config["steps"]
     build.substitutions = substitutions
-    build.timeout = duration_pb2.Duration(seconds=TIMEOUT_IN_SECONDS)
-    build.queue_ttl = duration_pb2.Duration(seconds=TIMEOUT_IN_SECONDS)
+    build.timeout = duration_pb2.Duration(seconds=timeout_in_seconds)
+    build.queue_ttl = duration_pb2.Duration(seconds=timeout_in_seconds)
 
     if tag:
         build.tags = [tag]
