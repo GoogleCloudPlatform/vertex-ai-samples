@@ -75,6 +75,25 @@ The steps performed include:
     - Query your pipeline run metadata.
 ```
 
+[Get started with Vertex ML Metadata and AutoML](get_started_with_vertex_ml_metadata_and_automl.ipynb)
+
+```
+The steps performed include:
+
+- Create a `Dataset` resource.
+- Create a corresponding `google.VertexDataset` artifact.
+- Train a model using `AutoML`.
+- Create a corresponding `google.VertexModel` artifact.
+- Create an `Endpoint` resource.
+- Create a corresponding `google.Endpoint` artifact.
+- Deploy the train model to the `Endpoint`.
+- Create an execution and context for the `AutoML` training job and deployment.
+- Add the corresponding artifacts and context to the execution.
+- Add artifact links (event) to the execution.
+- Display the execution graph.
+```
+
+
 Get started with custom model evaluation
 
 Get started with A/B Testing
