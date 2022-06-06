@@ -36,7 +36,7 @@ This stage may be done entirely by MLOps. We recommend:
 
 
 
-<img src='stage4.png'>
+<img src='stage4v3.png'>
 
 ## Notebooks
 
@@ -44,15 +44,84 @@ This stage may be done entirely by MLOps. We recommend:
 
 [Get started with Google Artifact Registry](get_started_with_google_artifact_registry.ipynb)
 
+```
+The steps performed include:
+
+- Creating a private Docker repository.
+- Tagging a container image, specific to the private Docker repository.
+- Pushing a container image to the private Docker repository.
+- Pulling a container image from the private Docker repository.
+- Deleting a private Docker repository.
+```
+
 Get started with Vertex Model Registry
 
 [Get started with Vertex ML Metadata](get_started_with_vertex_ml_metadata.ipynb)
+
+```
+The steps performed include:
+
+- Create a `Metadatastore` resource.
+- Create (record)/List an `Artifact`, with artifacts and metadata.
+- Create (record)/List an `Execution`.
+- Create (record)/List a `Context`.
+- Add `Artifact` to `Execution` as events.
+- Add `Execution` and `Artifact` into the `Context`
+- Delete `Artifact`, `Execution` and `Context`.
+- Create and run a `Vertex AI Pipeline` ML workflow to train and deploy a scikit-learn model.
+    - Create custom pipeline components that generate artifacts and metadata.
+    - Compare Vertex AI Pipelines runs.
+    - Trace the lineage for pipeline-generated artifacts.
+    - Query your pipeline run metadata.
+```
+
+[Get started with Vertex ML Metadata and AutoML](get_started_with_vertex_ml_metadata_and_automl.ipynb)
+
+```
+The steps performed include:
+
+- Create a `Dataset` resource.
+- Create a corresponding `google.VertexDataset` artifact.
+- Train a model using `AutoML`.
+- Create a corresponding `google.VertexModel` artifact.
+- Create an `Endpoint` resource.
+- Create a corresponding `google.Endpoint` artifact.
+- Deploy the train model to the `Endpoint`.
+- Create an execution and context for the `AutoML` training job and deployment.
+- Add the corresponding artifacts and context to the execution.
+- Add artifact links (event) to the execution.
+- Display the execution graph.
+```
+
 
 Get started with custom model evaluation
 
 Get started with A/B Testing
 
 [Get started with Vertex Explainable AI](get_started_with_vertex_xai.ipynb)
+
+```
+The steps performed include:
+
+- Train an AutoML tabular model.
+    - Do a batch prediction with explanations.
+    - Do an online prediction with explanations.
+- Train an custom TensorFlow tabular model.
+    - Manually set configuration metadata.
+    - Do a batch prediction with explanations.
+    - Do an online prediction with explanations.
+    - Automatically set configuration metadata.
+- Train an custom TensorFlow image model.
+    - Manually set configuration metadata.
+    - Do a batch prediction with explanations.
+    - Do an online prediction with explanations.
+- Train an custom XGBoost tabular model.
+    - Manually set configuration metadata.
+    - Do an online prediction with explanations.
+- Train an custom scikit-learn tabular model.
+    - Manually set configuration metadata.
+    - Do an online prediction with explanations.
+```
 
 ### E2E Stage Example
 
