@@ -27,7 +27,7 @@ The third stage in MLOps is formalization to develop an automated pipeline proce
 - Use early stop procedure in training script to detect failure to achieve training objective.
 - Store the results of the trained model evaluation in Vertex AI ML Metadata.
 
-<img src='stage3.png'>
+<img src='stage3v3.png'>
 
 ## Notebooks
 
@@ -153,6 +153,17 @@ The steps performed include:
 - Execute the pipeline locally.
 - Execute the pipeline on Google Cloud using `Vertex AI Training`
 - Execute the pipeline using `Vertex AI Pipelines`.
+```
+
+[Get Started with machine management](get_started_with_machine_management.ipynb)
+
+```
+The steps performed in this tutorial include:
+
+- Create a custom component with a self-contained training job.
+- Execute pipeline using component-level settings for machine resources
+- Convert the self-contained training componnt into a Vertex AI CustomJob.
+- Execute pipeline using customjob-level settings for machine resources
 ```
 
 ### E2E Stage Example
