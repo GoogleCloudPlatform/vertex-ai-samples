@@ -127,7 +127,7 @@ The steps performed include:
 - Create a custom R serving script
 - Create a custom R deployment (serving) container.
 - Train the model using `Vertex AI` custom training.
-- Create an `Endpoint` resouce.
+- Create an `Endpoint` resource.
 - Deploy the `Model` resource (trained R model) to the `Endpoint` resource.
 - Make an online prediction.
 ```
