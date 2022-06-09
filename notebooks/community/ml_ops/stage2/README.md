@@ -119,6 +119,19 @@ The steps performed include:
 - Train a R model using `Vertex AI Trainingh` service with the R-to-Python training package.
 ```
 
+[Get Started with Custom Training Packages (R) and Deployment in R environment](get_started_vertex_training_r_using_r_kernel.ipynb)
+```
+The steps performed include:
+
+- Create a custom R training script
+- Create a custom R serving script
+- Create a custom R deployment (serving) container.
+- Train the model using `Vertex AI` custom training.
+- Create an `Endpoint` resource.
+- Deploy the `Model` resource (trained R model) to the `Endpoint` resource.
+- Make an online prediction.
+```
+
 [Get Started with Custom Training Packages (LightGBM)](get_started_vertex_training_lightgbm.ipynb)
 
 ```
@@ -218,19 +231,6 @@ The steps performed include:
     - Save model artifacts and upload as Vertex AI Model resource.
 ```
 
-[Get Started with Vertex AI TabNet builtin algorithm](get_started_with_tabnet.ipynb)
-```
-The steps performed include:
-
-- Get the training data.
-- Configure training parameters for the Vertex AI TabNet container.
-- Train the model using Vertex AI Training using CSV data.
-- Upload the model as a Vertex AI Model resource.
-- Deploy the Vertex AI Model resource to a Vertex AI Endpoint resource.
-- Make a prediction with the deployed model.
-- Hyperparameter tuning the Vertex AI TabNet model.
-- Train the model using Vertex AI Training using BigQuery table.
-```
 [Get Started with Vertex AI TabNet builtin algorithm](get_started_with_tabnet.ipynb)
 ```
 The steps performed include:
