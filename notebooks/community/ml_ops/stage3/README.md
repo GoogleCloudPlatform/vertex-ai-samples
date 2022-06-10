@@ -166,6 +166,17 @@ The steps performed in this tutorial include:
 - Execute pipeline using customjob-level settings for machine resources
 ```
 
+[Get Started with Apache Airflow and Vertex AI Pipelines](get_started_with_airflow_and_vertex_pipelines.ipynb)
+
+```
+The steps performed in this tutorial include:
+
+- Create Cloud Composer environment.
+- Upload Airflow DAG to Composer environment that performs data processing -- i.e., creates a BigQuery table from a CSV file.
+- Create a Vertex Pipeline that triggers the Airflow DAG.
+- Execute the `Vertex AI Pipeline`.
+```
+
 ### E2E Stage Example
 
 [Stage 3: Formalization](mlops_formalization.ipynb)

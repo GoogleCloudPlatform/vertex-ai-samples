@@ -379,6 +379,14 @@ def process_and_execute_notebooks(
 
     elif len(notebooks) == 1:
         notebook = notebooks[0]
+
+        # Pre-process notebook by substituting variable names
+        _process_notebook(
+            notebook_path=notebook,
+            variable_project_id=variable_project_id,
+            variable_region=variable_region,
+        )
+
         execute_notebook_helper.execute_notebook(
             notebook_source=notebook,
             output_file_or_uri="/".join(
