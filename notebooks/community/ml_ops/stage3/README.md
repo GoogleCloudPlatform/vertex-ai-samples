@@ -27,7 +27,7 @@ The third stage in MLOps is formalization to develop an automated pipeline proce
 - Use early stop procedure in training script to detect failure to achieve training objective.
 - Store the results of the trained model evaluation in Vertex AI ML Metadata.
 
-<img src='stage3.png'>
+<img src='stage3v3.png'>
 
 ## Notebooks
 
@@ -142,6 +142,39 @@ The steps performed include:
 - Selecting the best trained model.
 - Deploying the best trained model.
 - Testing the deployed model infrastructure.
+```
+
+[Get Started with TFX Pipelines with Vertex AI](get_started_with_tfx_pipeline.ipynb)
+
+```
+The steps performed include:
+
+- Create a TFX e2e pipeline.
+- Execute the pipeline locally.
+- Execute the pipeline on Google Cloud using `Vertex AI Training`
+- Execute the pipeline using `Vertex AI Pipelines`.
+```
+
+[Get Started with machine management](get_started_with_machine_management.ipynb)
+
+```
+The steps performed in this tutorial include:
+
+- Create a custom component with a self-contained training job.
+- Execute pipeline using component-level settings for machine resources
+- Convert the self-contained training componnt into a Vertex AI CustomJob.
+- Execute pipeline using customjob-level settings for machine resources
+```
+
+[Get Started with Apache Airflow and Vertex AI Pipelines](get_started_with_airflow_and_vertex_pipelines.ipynb)
+
+```
+The steps performed in this tutorial include:
+
+- Create Cloud Composer environment.
+- Upload Airflow DAG to Composer environment that performs data processing -- i.e., creates a BigQuery table from a CSV file.
+- Create a Vertex Pipeline that triggers the Airflow DAG.
+- Execute the `Vertex AI Pipeline`.
 ```
 
 ### E2E Stage Example

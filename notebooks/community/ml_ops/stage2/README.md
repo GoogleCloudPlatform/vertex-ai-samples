@@ -25,7 +25,11 @@ The second stage in MLOps is experimenting in developing one or more baseline mo
 - Use the What-if-Tool (WIT) to explore how the trained model would make predictions in different scenarios.
 
 
-<img src='stage2.png'>
+<img src='stage2v3.png'>
+<br/>
+<br/>
+<br/>
+<img src='stage2.2v1.png'>
 
 ## Notebooks
 
@@ -115,6 +119,32 @@ The steps performed include:
 - Train a R model using `Vertex AI Trainingh` service with the R-to-Python training package.
 ```
 
+[Get Started with Custom Training Packages (R) and Deployment in R environment](get_started_vertex_training_r_using_r_kernel.ipynb)
+```
+The steps performed include:
+
+- Create a custom R training script
+- Create a custom R serving script
+- Create a custom R deployment (serving) container.
+- Train the model using `Vertex AI` custom training.
+- Create an `Endpoint` resource.
+- Deploy the `Model` resource (trained R model) to the `Endpoint` resource.
+- Make an online prediction.
+```
+
+[Get Started with Custom Training Packages (LightGBM)](get_started_vertex_training_lightgbm.ipynb)
+
+```
+The steps performed include:
+
+- Training using a Python package.
+- Save the model artifacts to Cloud Storage using GCSFuse.
+- Construct a FastAPI prediction server.
+- Construct a Dockerfile deployment image.
+- Test the deployment image locally.
+- Create a `Vertex AI Model` resource.
+```
+
 [Get Started with Distributed Training](get_started_vertex_distributed_training.ipynb)
 
 ```
@@ -153,12 +183,13 @@ The steps performed include:
 ```
 The steps performed include:
 
-- Create a local BQ table in your project.
-- Train a BQML model.
-- Evaluate the BQML model.
-- Export the BQML model as a cloud model.
-- Upload the exported model as a Vertex AI Model resource.
-- Hyperparameter tune a BQML model with Vertex AI Vizier.
+- Create a local BigQuery table in your project
+- Train a BQML model
+- Evaluate the BQML model
+- Export the BQML model as a cloud model
+- Upload the exported model as a `Vertex AI Model` resource
+- Hyperparameter tune a BQML model with `Vertex AI Vizier`
+- Automatically register a BQML model to `Vertex AI Model Registry`
 ```
 
 [Get Started with Vertex Feature Store](get_started_vertex_feature_store.ipynb)
@@ -183,6 +214,49 @@ The steps performed include:
 - Creating a customer managed encryption key.
 - Creating an image dataset with CMEK encryption.
 - Train an AutoML model with CMEK encryption.
+```
+
+[Get Started with TensorFlow Hub models](get_started_with_tfhub_models.ipynb)
+
+```
+The steps performed include:
+
+- Download a TensorFlow Hub prebuilt model.
+- Add the task component as a classifier for the CIFAR-10 dataset.
+- Fine tune locally the model with transfer learning training.
+- Construct a custom training script:
+    - Get training data from TensorFlow Datasets
+    - Get model architecture from TensorFlow Hub
+    - Train then model
+    - Save model artifacts and upload as Vertex AI Model resource.
+```
+
+[Get Started with Vertex AI TabNet builtin algorithm](get_started_with_tabnet.ipynb)
+```
+The steps performed include:
+
+- Get the training data.
+- Configure training parameters for the Vertex AI TabNet container.
+- Train the model using Vertex AI Training using CSV data.
+- Upload the model as a Vertex AI Model resource.
+- Deploy the Vertex AI Model resource to a Vertex AI Endpoint resource.
+- Make a prediction with the deployed model.
+- Hyperparameter tuning the Vertex AI TabNet model.
+- Train the model using Vertex AI Training using BigQuery table.
+```
+
+[Get Started with Vision API and AutoML](get_started_with_visionapi_and_automl.ipynb)
+```
+The steps performed include:
+
+- Preprocess training files using `Vision AI` APIs to extract the text from PDF files.
+- Create a custom import file that includes annotation data based on the sample `BigQuery` dataset.
+- Create a `Vertex AI Dataset` resource.
+- Train the model.
+- View the model evaluation.
+- Deploy the `Vertex AI Model` resource to a serving `Endpoint` resource.
+- Make a prediction.
+- Undeploy the `Model`.
 ```
 
 
