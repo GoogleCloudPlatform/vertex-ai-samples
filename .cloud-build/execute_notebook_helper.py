@@ -15,14 +15,14 @@
 
 """Methods to run a notebook locally"""
 
-import sys
-import os
 import errno
-import papermill as pm
+import os
 import shutil
+import sys
 
-from utils import util
+import papermill as pm
 from google.cloud.aiplatform import utils
+from utils import util
 
 # This script is used to execute a notebook and write out the output notebook.
 
