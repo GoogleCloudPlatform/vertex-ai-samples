@@ -22,7 +22,7 @@ The first stage in MLOps is the collection and preparation for the purpose of de
 - Data is preprocessed for training and evaluation using Dataflow.
 - Data augmentation is performed on-the-fly and is coupled with model feeding.
 
-<img src='stage1.jpg'>
+<img src='stage1v2.png'>
 
 ## Notebooks
 
@@ -76,7 +76,7 @@ The steps performed include:
     - image data
 ```
 
-[Get Started with Data Labeling](get_started_data_labeling.ipynb)
+[Get Started with Data Labeling](get_started_with_data_labeling.ipynb)
 
 ```
 The steps performed include:
