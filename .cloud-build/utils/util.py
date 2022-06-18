@@ -1,13 +1,13 @@
-from datetime import datetime
-from typing import Optional
-from google.cloud import storage
-from google.cloud.aiplatform import utils
-from google.auth import credentials as auth_credentials
 import os
-
 import subprocess
 import tarfile
 import uuid
+from datetime import datetime
+from typing import Optional
+
+from google.auth import credentials as auth_credentials
+from google.cloud import storage
+from google.cloud.aiplatform import utils
 
 
 def download_file(bucket_name: str, blob_name: str, destination_file: str) -> str:

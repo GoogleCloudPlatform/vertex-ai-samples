@@ -16,6 +16,7 @@
 """A CLI to download (optional) and run a single notebook locally"""
 
 import argparse
+
 import execute_notebook_helper
 
 parser = argparse.ArgumentParser(description="Run a single notebook locally.")

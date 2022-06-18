@@ -9,4 +9,4 @@ tabulate
 google-cloud-aiplatform
 google-cloud-storage
 google-cloud-build
-gcloud
+ratemate

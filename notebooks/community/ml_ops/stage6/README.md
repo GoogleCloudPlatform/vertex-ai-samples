@@ -23,9 +23,7 @@ This stage may be done entirely by MLOps. We recommend:
 - Features that dynamically change per example (e.g., bank balance) are stored in Vertex Feature Store.
 
 
-<img src='stage6a.png'>
-<img src='stage6b.png'>
-<img src='stage6c.png'>
+<img src='stage6v2.png'>
 
 ## Notebooks
 
@@ -128,4 +126,79 @@ The steps performed include:
 - Create a `Private Endpoint` resource.
 - Deploy the `Model` resoure with then `Vertex AI Prediction optimized TensorFlow runtime` to the `Private Endpoint` resource.
 - Make an online prediction request to the `Private Endpoint` resource.
+```
+
+[Get started with Nvidia Triton Server](get_started_with_nvidia_triton_server.ipynb)
+
+```
+The steps performed in this tutorial include:
+
+- Download the model artifacts from TensorFlow Hub.
+- Create Triton serving configuration file for the model.
+- Construct a custom container, with Triton serving image, for model deployment.
+- Locally test the custom container.
+- Upload the model as a Vertex AI Model resource.
+- Deploy the Vertex AI Model resource to a Vertex AI Endpoint resource.
+- Make a prediction request
+- Undeploy the Model resource and delete the Endpoint
+```
+
+[Get started with Vertex AI Matching Engine](get_started_with_matching_engine.ipynb)
+
+```
+The steps performed include:
+
+- Create ANN Index.
+- Create an IndexEndpoint with VPC Network
+- Deploy ANN Index
+- Perform online query
+- Deploy brute force Index.
+- Perform calibration between ANN and brute force index.
+```
+
+[Get started with Vertex AI Matching Engine using Two Towers builtin algorithm](get_started_with_matchine_engine_twotowers.ipynb)
+
+```
+The steps performed include:
+
+1. Train the `Two-Tower` algorithm to generate embeddings (encoder) for the dataset.
+2. Hyperparameter tune the trained `Two-Tower` encoder.
+3. Make example predictions (embeddings) from then trained encoder.
+4. Generate embeddings using the trained `Two-Tower` builtin algorithm.
+5. Store embeddings to format supported by `Matching Engine`.
+6. Create a `Matching Engine Index` for the embeddings.
+7. Deploy the `Matching Engine Index` to a `Index Endpoint`.
+8. Make a matching engine prediction request.
+```
+
+[Get started with Vertex AI Matching Engine using Swivel builtin algorithm](get_started_with_matchine_swivel.ipynb)
+
+```
+The steps performed include:
+
+1. Train the `Swivel` algorithm to generate embeddings (encoder) for the dataset.
+2. Hyperparameter tune the trained `Swivel` encoder.
+3. Make example predictions (embeddings) from then trained encoder.
+4. Generate embeddings using the trained `Swivel` builtin algorithm.
+5. Store embeddings to format supported by `Matching Engine`.
+6. Create a `Matching Engine Index` for the embeddings.
+7. Deploy the `Matching Engine Index` to a `Index Endpoint`.
+8. Make a matching engine prediction request.
+```
+
+[Get started with Explainable AI and custom model server](get_started_with_xai_and_custom_server.ipynb)
+
+```
+The steps performed include:
+
+- Locally train a Pytorch tabular classifier.
+- Locally test the trained model.
+- Build a HTTP server using FastAPI.
+- Create a custom serving container with the trained model and FastAPI server.
+- Locally test the custom serving container.
+- Push the custom serving container to the Artifact Registry.
+- Upload the custom serving container as a `Model` resource.
+- Deploy the `Model` resource to an `Endpoint` resource.
+- Make a prediction request to the deployed custom serving container.
+- Make an explanation request to the deployed custom serving container.
 ```
