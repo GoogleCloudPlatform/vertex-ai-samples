@@ -76,7 +76,7 @@ The steps performed include:
     - image data
 ```
 
-[Get Started with Data Labeling](get_started_data_labeling.ipynb)
+[Get Started with Data Labeling](get_started_with_data_labeling.ipynb)
 
 ```
 The steps performed include:
