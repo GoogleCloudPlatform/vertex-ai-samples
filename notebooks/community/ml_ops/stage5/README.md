@@ -73,3 +73,19 @@ The steps performed include:
 - Make a prediction request with first deployed model (model A).
 - Make a prediction request with second deployed model (model B).
 ```
+
+[Get started with Auto-Scaling for Vertex AI Endpoints](get_started_with_autoscaling.ipynb)
+
+```
+The steps performed include:
+
+- Download a pretrained image classification model from TensorFlow Hub.
+- Upload the pretrained model as a `Model` resource.
+- Create an `Endpoint` resource.
+- Deploy `Model` resource for no-scaling (single node).
+- Deploy `Model` resource for manual scaling.
+- Deploy `Model` resource for auto-scaling.
+- Fine-tune scaling thresholds for CPU utilization.
+- Fine-tune scaling thresholds for GPU utilization.
+- Deploy mix of CPU and GPU model instances with auto-scaling to an `Endpoint` resource.
+```
