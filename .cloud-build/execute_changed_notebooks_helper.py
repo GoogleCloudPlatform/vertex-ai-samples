@@ -24,6 +24,7 @@ import re
 import subprocess
 from typing import List, Optional
 
+import execute_notebook_helper
 import execute_notebook_remote
 import nbformat
 from google.cloud.devtools.cloudbuild_v1.types import BuildOperationMetadata
@@ -287,14 +288,15 @@ def process_and_execute_notebooks(
         timeout (str):
             Required. Timeout string according to https://cloud.google.com/build/docs/build-config-file-schema#timeout.
     """
-    notebook_execution_results: List[NotebookExecutionResult] = []
 
     # Calculate deadline
     deadline = datetime.datetime.now() + datetime.timedelta(
         seconds=max(timeout - WORKER_TIMEOUT_BUFFER_IN_SECONDS, 0)
     )
 
-    if len(notebooks) > 0:
+    if len(notebooks) > 1:
+        notebook_execution_results: List[NotebookExecutionResult] = []
+
         print(f"Found {len(notebooks)} modified notebooks: {notebooks}")
 
         if should_parallelize and len(notebooks) > 1:
@@ -333,43 +335,64 @@ def process_and_execute_notebooks(
                 )
                 for notebook in notebooks
             ]
+
+        print("\n=== RESULTS ===\n")
+
+        results_sorted = sorted(
+            notebook_execution_results,
+            key=lambda result: result.is_pass,
+            reverse=True,
+        )
+
+        # Print results
+        print(
+            tabulate(
+                [
+                    [
+                        result.name,
+                        "PASSED" if result.is_pass else "FAILED",
+                        format_timedelta(result.duration),
+                        result.log_url,
+                        result.output_uri,
+                    ]
+                    for result in results_sorted
+                ],
+                headers=["build_tag", "status", "duration", "log_url", "output_url"],
+            )
+        )
+
+        print("\n=== END RESULTS===\n")
+
+        total_notebook_duration = functools.reduce(
+            operator.add,
+            [datetime.timedelta(seconds=0)]
+            + [result.duration for result in results_sorted],
+        )
+
+        print(
+            f"Cumulative notebook duration: {format_timedelta(total_notebook_duration)}"
+        )
+
+        # Raise error if any notebooks failed
+        if not all([result.is_pass for result in results_sorted]):
+            raise RuntimeError("Notebook failures detected. See logs for details")
+
+    elif len(notebooks) == 1:
+        notebook = notebooks[0]
+
+        # Pre-process notebook by substituting variable names
+        _process_notebook(
+            notebook_path=notebook,
+            variable_project_id=variable_project_id,
+            variable_region=variable_region,
+        )
+
+        execute_notebook_helper.execute_notebook(
+            notebook_source=notebook,
+            output_file_or_uri="/".join(
+                [artifacts_bucket, pathlib.Path(notebook).name]
+            ),
+            should_log_output=True,
+        )
     else:
         print("No notebooks modified in this pull request.")
-
-    print("\n=== RESULTS ===\n")
-
-    results_sorted = sorted(
-        notebook_execution_results,
-        key=lambda result: result.is_pass,
-        reverse=True,
-    )
-
-    # Print results
-    print(
-        tabulate(
-            [
-                [
-                    result.name,
-                    "PASSED" if result.is_pass else "FAILED",
-                    format_timedelta(result.duration),
-                    result.log_url,
-                ]
-                for result in results_sorted
-            ],
-            headers=["build_tag", "status", "duration", "log_url"],
-        )
-    )
-
-    print("\n=== END RESULTS===\n")
-
-    total_notebook_duration = functools.reduce(
-        operator.add,
-        [datetime.timedelta(seconds=0)]
-        + [result.duration for result in results_sorted],
-    )
-
-    print(f"Cumulative notebook duration: {format_timedelta(total_notebook_duration)}")
-
-    # Raise error if any notebooks failed
-    if not all([result.is_pass for result in results_sorted]):
-        raise RuntimeError("Notebook failures detected. See logs for details")
