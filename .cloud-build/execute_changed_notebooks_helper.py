@@ -17,18 +17,23 @@ import concurrent
 import dataclasses
 import datetime
 import functools
+import operator
 import os
 import pathlib
-import nbformat
 import re
 import subprocess
 from typing import List, Optional
-from tabulate import tabulate
-import operator
 
+import execute_notebook_helper
 import execute_notebook_remote
-from utils import util, NotebookProcessors
+import nbformat
 from google.cloud.devtools.cloudbuild_v1.types import BuildOperationMetadata
+from ratemate import RateLimit
+from tabulate import tabulate
+from utils import NotebookProcessors, util
+
+# A buffer so that workers finish before the orchestrating job
+WORKER_TIMEOUT_BUFFER_IN_SECONDS: int = 60 * 60
 
 
 def format_timedelta(delta: datetime.timedelta) -> str:
@@ -103,6 +108,9 @@ def _create_tag(filepath: str) -> str:
     return tag
 
 
+rate_limit = RateLimit(max_count=50, per=60, greedy=True)
+
+
 def process_and_execute_notebook(
     container_uri: str,
     staging_bucket: str,
@@ -110,9 +118,12 @@ def process_and_execute_notebook(
     variable_project_id: str,
     variable_region: str,
     private_pool_id: Optional[str],
+    deadline: datetime,
     notebook: str,
     should_get_tail_logs: bool = False,
 ) -> NotebookExecutionResult:
+    rate_limit.wait()  # wait before creating the task
+
     print(f"Running notebook: {notebook}")
 
     # Create paths
@@ -145,14 +156,20 @@ def process_and_execute_notebook(
         # Upload the pre-processed code to a GCS bucket
         code_archive_uri = util.archive_code_and_upload(staging_bucket=staging_bucket)
 
+        # Calculate timeout in seconds
+        timeout_in_seconds = max(
+            int((deadline - datetime.datetime.now()).total_seconds()), 1
+        )
+
         operation = execute_notebook_remote.execute_notebook_remote(
             code_archive_uri=code_archive_uri,
             notebook_uri=notebook,
             notebook_output_uri=notebook_output_uri,
             container_uri=container_uri,
             tag=tag,
-            region=variable_region,
             private_pool_id=private_pool_id,
+            private_pool_region=variable_region,
+            timeout_in_seconds=timeout_in_seconds,
         )
 
         operation_metadata = BuildOperationMetadata(mapping=operation.metadata)
@@ -241,6 +258,7 @@ def process_and_execute_notebooks(
     variable_region: str,
     private_pool_id: Optional[str],
     should_parallelize: bool,
+    timeout: int,
 ):
     """
     Run the notebooks that exist under the folders defined in the test_paths_file.
@@ -267,17 +285,27 @@ def process_and_execute_notebooks(
             Required. The value for REGION to inject into notebooks.
         should_parallelize (bool):
             Required. Should run notebooks in parallel using a thread pool as opposed to in sequence.
+        timeout (str):
+            Required. Timeout string according to https://cloud.google.com/build/docs/build-config-file-schema#timeout.
     """
-    notebook_execution_results: List[NotebookExecutionResult] = []
 
-    if len(notebooks) > 0:
+    # Calculate deadline
+    deadline = datetime.datetime.now() + datetime.timedelta(
+        seconds=max(timeout - WORKER_TIMEOUT_BUFFER_IN_SECONDS, 0)
+    )
+
+    if len(notebooks) > 1:
+        notebook_execution_results: List[NotebookExecutionResult] = []
+
         print(f"Found {len(notebooks)} modified notebooks: {notebooks}")
 
         if should_parallelize and len(notebooks) > 1:
             print(
                 "Running notebooks in parallel, so no logs will be displayed. Please wait..."
             )
-            with concurrent.futures.ThreadPoolExecutor(max_workers=None) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
+                print(f"Max workers: {executor._max_workers}")
+
                 notebook_execution_results = list(
                     executor.map(
                         functools.partial(
@@ -288,6 +316,7 @@ def process_and_execute_notebooks(
                             variable_project_id,
                             variable_region,
                             private_pool_id,
+                            deadline,
                         ),
                         notebooks,
                     )
@@ -301,47 +330,69 @@ def process_and_execute_notebooks(
                     variable_project_id=variable_project_id,
                     variable_region=variable_region,
                     private_pool_id=private_pool_id,
+                    deadline=deadline,
                     notebook=notebook,
                 )
                 for notebook in notebooks
             ]
+
+        print("\n=== RESULTS ===\n")
+
+        results_sorted = sorted(
+            notebook_execution_results,
+            key=lambda result: result.is_pass,
+            reverse=True,
+        )
+
+        # Print results
+        print(
+            tabulate(
+                [
+                    [
+                        result.name,
+                        "PASSED" if result.is_pass else "FAILED",
+                        format_timedelta(result.duration),
+                        result.log_url,
+                        result.output_uri,
+                    ]
+                    for result in results_sorted
+                ],
+                headers=["build_tag", "status", "duration", "log_url", "output_url"],
+            )
+        )
+
+        print("\n=== END RESULTS===\n")
+
+        total_notebook_duration = functools.reduce(
+            operator.add,
+            [datetime.timedelta(seconds=0)]
+            + [result.duration for result in results_sorted],
+        )
+
+        print(
+            f"Cumulative notebook duration: {format_timedelta(total_notebook_duration)}"
+        )
+
+        # Raise error if any notebooks failed
+        if not all([result.is_pass for result in results_sorted]):
+            raise RuntimeError("Notebook failures detected. See logs for details")
+
+    elif len(notebooks) == 1:
+        notebook = notebooks[0]
+
+        # Pre-process notebook by substituting variable names
+        _process_notebook(
+            notebook_path=notebook,
+            variable_project_id=variable_project_id,
+            variable_region=variable_region,
+        )
+
+        execute_notebook_helper.execute_notebook(
+            notebook_source=notebook,
+            output_file_or_uri="/".join(
+                [artifacts_bucket, pathlib.Path(notebook).name]
+            ),
+            should_log_output=True,
+        )
     else:
         print("No notebooks modified in this pull request.")
-
-    print("\n=== RESULTS ===\n")
-
-    results_sorted = sorted(
-        notebook_execution_results,
-        key=lambda result: result.is_pass,
-        reverse=True,
-    )
-
-    # Print results
-    print(
-        tabulate(
-            [
-                [
-                    result.name,
-                    "PASSED" if result.is_pass else "FAILED",
-                    format_timedelta(result.duration),
-                    result.log_url,
-                ]
-                for result in results_sorted
-            ],
-            headers=["build_tag", "status", "duration", "log_url"],
-        )
-    )
-
-    print("\n=== END RESULTS===\n")
-
-    total_notebook_duration = functools.reduce(
-        operator.add,
-        [datetime.timedelta(seconds=0)]
-        + [result.duration for result in results_sorted],
-    )
-
-    print(f"Cumulative notebook duration: {format_timedelta(total_notebook_duration)}")
-
-    # Raise error if any notebooks failed
-    if not all([result.is_pass for result in results_sorted]):
-        raise RuntimeError("Notebook failures detected. See logs for details")
