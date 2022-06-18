@@ -2,11 +2,23 @@
 
 ## Purpose
 
+Configure compute and networking requirements for containerized serving binaries for a production load.
+
 
 ## Recommendations  
 
+The fifth stage in MLOps is deployment to production of the blessed model, which will replace the previous blessed model in production. This stage may be done entirely by MLOps. We recommend:
 
-<img src='stage5.png'>
+- Deploy the blessed model from the Vertex Model Registry.
+- Use the Google Container Registry for the deployment container.
+- Attach, if any, serving function from the Vertex Model Registry to the deployed model.
+- Use Vertex Pipelines for the deployment.
+- For cloud models, deploy within the Google Cloud infrastructure.
+- Use Vertex Prediction traffic split for production rollout.
+- Use Vertex Prediction to set your criteria for scaling and load balancing.
+
+
+<img src='stage5v3.png'>
 
 ## Notebooks
 
@@ -44,4 +56,36 @@ The steps performed include:
 - Configuring the serving binary of a `Model` resource for deployment to a `Private Endpoint` resource.
 - Deploying a `Model` resource to a `Private Endpoint` resource.
 - Send a prediction request to a `Private Endpoint`
+```
+
+[Get started with Vertex AI Endpoints and co-hosting models on shared VM](get_started_with_vertex_endpoint_and_shared_vm.ipynb)
+
+```
+The steps performed include:
+
+- Upload a pre-trained image classification model as a `Model` resource (model A).
+- Upload a pre-trained text sentence encoder model as a `Model` resource (model B).
+- Create a shared VM deployment resource pool.
+- List shared VM deployment resource pools.
+- Create two `Endpoint` resources.
+- Deploy first model (model A) to first `Endpoint` resource using shared VM deployment resource pool.
+- Deploy second model (model B) to second `Endpoint` resource using shared VM deployment resource pool.
+- Make a prediction request with first deployed model (model A).
+- Make a prediction request with second deployed model (model B).
+```
+
+[Get started with Auto-Scaling for Vertex AI Endpoints](get_started_with_autoscaling.ipynb)
+
+```
+The steps performed include:
+
+- Download a pretrained image classification model from TensorFlow Hub.
+- Upload the pretrained model as a `Model` resource.
+- Create an `Endpoint` resource.
+- Deploy `Model` resource for no-scaling (single node).
+- Deploy `Model` resource for manual scaling.
+- Deploy `Model` resource for auto-scaling.
+- Fine-tune scaling thresholds for CPU utilization.
+- Fine-tune scaling thresholds for GPU utilization.
+- Deploy mix of CPU and GPU model instances with auto-scaling to an `Endpoint` resource.
 ```
