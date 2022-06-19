@@ -10,3 +10,4 @@ google-cloud-aiplatform
 google-cloud-storage
 google-cloud-build
 ratemate
+protobuf
