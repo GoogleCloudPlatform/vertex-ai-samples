@@ -207,6 +207,29 @@ The steps performed include:
 
 [Custom image classification model with online explanations](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/explainable_ai/sdk_custom_image_classification_online_explain.ipynb)
 
+<blockquote>
+In this tutorial, you learn to use `Vertex AI Training and Explainable AI` to create a custom image classification model with explanations, and then you learn to use `Vertex AI Prediction` to make an online prediction request with explanations. 
+
+This tutorial uses the following Google Cloud ML services:
+
+- `Vertex AI Training`
+- `Vertex AI Online Prediction`
+- `Vertex Explainable AI`
+- `Vertex AI Model` resource
+- `Vertex AI Endpoint` resource
+
+The steps performed include:
+
+- Create a `Vertex AI` custom job for training a TensorFlow model.
+- View the model evaluation for the trained model.
+- Set explanation parameters for when the model is deployed.
+- Upload the trained model artifacts and explanations as a `Model` resource.
+- Create a serving `Endpoint` resource.
+- Deploy the `Model` resource to a serving `Endpoint` resource.
+- Make a prediction with explanation.
+- Undeploy the `Model` resource.
+</blockquote>
+
 ### Vertex Feature Store
 
 [Managing features in a feature store](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/feature_store/gapic-feature-store.ipynb)
@@ -354,25 +377,25 @@ The steps performed include:
 [Custom training using prebuilt and custom components pipeline](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/google_cloud_pipeline_components_model_train_upload_deploy.ipynb)
 
 <blockquote>
-In this tutorial, you learn to use Vertex AI Pipelines and Google Cloud Pipeline Components to build and deploy a custom model.
+In this tutorial, you learn to use `Vertex AI Pipelines` and `Google Cloud Pipeline Components` to build and deploy a custom model.
 
 This tutorial uses the following Google Cloud ML services:
 
-- Vertex AI Pipelines
-- Google Cloud Pipeline Components
-- Vertex AI Training
-- Vertex AI Model resource
-- Vertex AI Endpoint resource
+- `Vertex AI Pipelines`
+- `Google Cloud Pipeline Components`
+- `Vertex AI Training`
+- `Vertex AI Model` resource
+- `Vertex AI Endpoint` resource
 
 The steps performed include:
 
 - Create a KFP pipeline:
     - Train a custom model.
-    - Uploads the trained model as a Model resource.
-    - Creates an Endpoint resource.
-    - Deploys the Model resource to the Endpoint resource.
+    - Uploads the trained model as a `Model` resource.
+    - Creates an `Endpoint` resource.
+    - Deploys the `Model` resource to the `Endpoint` resource.
 - Compile the KFP pipeline.
-- Execute the KFP pipeline using Vertex AI Pipelines
+- Execute the KFP pipeline using `Vertex AI Pipelines`
 </blockquote>
     
 [Introduction to control flow in pipelines](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/control_flow_kfp.ipynb)
@@ -382,20 +405,20 @@ In this tutorial, you use the KFP SDK to build pipelines that use loops and cond
 
 This tutorial uses the following Google Cloud ML services:
 
-- Vertex AI Pipelines
+- `Vertex AI Pipelines`
 
 The steps performed include:
 
 - Create a KFP pipeline:
     - Use control flow components
 - Compile the KFP pipeline.
-- Execute the KFP pipeline using Vertex AI Pipelines
+- Execute the KFP pipeline using `Vertex AI Pipelines`
 </blockquote>
 
 [Introduction to KFP components and pipelines](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/pipelines_intro_kfp.ipynb)
 
 <blockquote>
-In this tutorial, you use the KFP SDK to build pipelines.\n",
+In this tutorial, you use the KFP SDK to build pipelines.
 
 This tutorial uses the following Google Cloud ML services:
 
