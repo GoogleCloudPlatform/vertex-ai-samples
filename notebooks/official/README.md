@@ -370,7 +370,30 @@ The steps performed include:
 - Compile the KFP pipeline.
 - Execute the KFP pipeline using `Vertex AI Pipelines`
 </blockquote>
+
 [AutoML text classification model pipeline](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/google_cloud_pipeline_components_automl_text.ipynb)
+
+<blockquote>
+In this tutorial, you learn to use `Vertex AI Pipelines` and `Google Cloud Pipeline Components` to build an `AutoML` text classification model.
+
+This tutorial uses the following Google Cloud ML services:
+
+- `Vertex AI Pipelines`
+- `Google Cloud Pipeline Components`
+- `Vertex AutoML`
+- `Vertex AI Model` resource
+"- `Vertex AI Endpoint` resource
+
+The steps performed include:
+
+- Create a KFP pipeline:
+    - Create a `Dataset` resource.
+    - Train an AutoML text classification `Model` resource.
+    - Create an `Endpoint` resource.
+    - Deploys the `Model` resource to the `Endpoint` resource.
+- Compile the KFP pipeline.
+- Execute the KFP pipeline using `Vertex AI Pipelines`
+</blockquote>
 
 [Custom training and batch prediction using prebuilt components pipeline](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/custom_model_training_and_batch_prediction.ipynb)
 
