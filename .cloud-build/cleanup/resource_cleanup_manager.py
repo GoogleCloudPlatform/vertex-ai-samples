@@ -75,6 +75,14 @@ class VertexAIResourceCleanupManager(ResourceCleanupManager):
         return (current_time - update_time).total_seconds()
 
 
+class TabularDatasetResourceCleanupManager(VertexAIResourceCleanupManager):
+    vertex_ai_resource = aiplatform.TabularDataset
+
+
+class TimeSeriesDatasetResourceCleanupManager(VertexAIResourceCleanupManager):
+    vertex_ai_resource = aiplatform.TimeSeriesDataset
+
+
 class DatasetResourceCleanupManager(VertexAIResourceCleanupManager):
     vertex_ai_resource = aiplatform.datasets._Dataset
     dataset_types = [
