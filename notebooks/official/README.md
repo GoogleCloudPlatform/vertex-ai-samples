@@ -22,31 +22,31 @@ This tutorial uses the following Google Cloud ML services:
 
 The steps performed include:
 
-- Create a `Vertex AI Dataset`.\n",
-- Train an `AutoML` text classification `Model` resource.\n",
-- Obtain the evaluation metrics for the `Model` resource.\n",
-- Create an `Endpoint` resource.\n",
-- Deploy the `Model` resource to the `Endpoint` resource.\n",
-- Make an online prediction\n",
-- Make a batch prediction\n",
+- Create a `Vertex AI Dataset`
+- Train an `AutoML` text classification `Model` resource.
+- Obtain the evaluation metrics for the `Model` resource.
+- Create an `Endpoint` resource.
+- Deploy the `Model` resource to the `Endpoint` resource.
+- Make an online prediction.
+- Make a batch prediction.
 </blockquote>
 
 [AutoML tabular forecasting model](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/sdk_automl_tabular_forecasting_batch.ipynb)
 
 <blockquote>
-In this tutorial, you create an AutoML tabular forecasting model from a Python script, and then do a batch prediction using the Vertex AI SDK. 
+In this tutorial, you create an `AutoML` tabular forecasting model from a Python script, and then do a batch prediction using the Vertex AI SDK. 
 
 This tutorial uses the following Google Cloud ML services:
 
-- AutoML Training
-- Vertex AI Batch Prediction
-- Vertex AI Model resource
+- `AutoML Training`
+- `Vertex AI Batch Prediction`
+- `Vertex AI Model` resource
 
 The steps performed include:
 
-- Create a Vertex AI Dataset resource.
-- Train an AutoML tabular forecasting Model resource.
-- Obtain the evaluation metrics for the Model resource.
+- Create a `Vertex AI Dataset` resource.
+- Train an `AutoML` tabular forecasting `Model` resource.
+- Obtain the evaluation metrics for the `Model` resource.
 - Make a batch prediction.
 </blockquote>
 
@@ -55,43 +55,41 @@ The steps performed include:
 [Custom image classification model training and batch prediction](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/custom/sdk-custom-image-classification-batch.ipynb)
 
 <blockquote>
-In this tutorial, you learn to use Vertex AI Training to create a custom trained model and use Vertex AI Batch Prediction to do a batch prediction on the trained model.
-
-create a custom-trained model from a Python script in a Docker container using the Vertex AI SDK for Python, and then do a prediction on the deployed model by sending data. 
+In this tutorial, you learn to use `Vertex AI Training` to create a custom trained model and use `Vertex AI Batch Prediction` to do a batch prediction on the trained model.
 
 This tutorial uses the following Google Cloud ML services:
 
-- Vertex AI Training
-- Vertex AI Batch Prediction
-- Vertex AI Model resource
+- `Vertex AI Training`
+- `Vertex AI Batch Prediction`
+- `Vertex AI Mode`l resource
 
 The steps performed include:
 
-- Create a Vertex AI custom job for training a TensorFlow model.
-- Upload the trained model artifacts as a Model resource.
+- Create a `Vertex AI` custom job for training a TensorFlow model.
+- Upload the trained model artifacts as a `Model` resource.
 - Make a batch prediction.
 </blockquote>
 
 [Custom image classification model training and online prediction](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/custom/sdk-custom-image-classification-online.ipynb)
 
 <blockquote>
-In this tutorial, you learn to use Vertex AI Training to create a custom-trained model from a Python script in a Docker container, and learn to use Vertex AI Prediction to do a prediction on the deployed model by sending data. 
+In this tutorial, you learn to use `Vertex AI Training` to create a custom-trained model from a Python script in a Docker container, and learn to use `Vertex AI Prediction` to do a prediction on the deployed model by sending data. 
 
 This tutorial uses the following Google Cloud ML services:
 
-- Vertex AI Training
-- Vertex AI Prediction
-- Vertex AI Model resource
-- Vertex AI Endpoint resource
+- `Vertex AI Training`
+- `Vertex AI Prediction`
+- `Vertex AI Model` resource
+- `Vertex AI Endpoint` resource
 
 The steps performed include:
 
-- Create a Vertex AI custom job for training a TensorFlow model.
-- Upload the trained model artifacts to a Model resource.
-- Create a serving Endpoint resource.
-- Deploy the Model resource to a serving Endpoint resource.
+- Create a `Vertex AI` custom job for training a TensorFlow model.
+- Upload the trained model artifacts to a `Model` resource.
+- Create a serving `Endpoint` resource.
+- Deploy the Model resource to a serving `Endpoint` resource.
 - Make a prediction.
-- Undeploy the Model resource.
+- Undeploy the `Model` resource.
 </blockquote>
 
 ### Vertex Explainable AI
