@@ -278,6 +278,20 @@ The steps performed include:
 
 [Tracking hyperparameters and metrics in custom training job](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/ml_metadata/sdk-metric-parameter-tracking-for-custom-jobs.ipynb)
 
+<blockquote>
+In this notebook, you learn how to use `Vertex ML Metadata` to track training parameters and evaluation metrics.
+
+This tutorial uses the following Google Cloud ML services:
+
+- `Vertex ML Metadata`
+- `Vertex AI Experiments`
+
+The steps performed include:
+
+- Track parameters and metrics for a `Vertex AI` custom trained model.
+- Extract and perform analysis for all parameters and metrics within an Experiment.
+</blockquote>
+
 [Tracking hyperparameters and metrics in locally trained job](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/ml_metadata/sdk-metric-parameter-tracking-for-locally-trained-models.ipynb)
 
 <blockquote>
