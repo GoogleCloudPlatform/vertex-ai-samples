@@ -35,6 +35,7 @@ The steps performed include:
 
 [Custom image classification model training and batch prediction](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/custom/sdk-custom-image-classification-batch.ipynb)
 
+<blockquote>
 In this tutorial, you learn to use Vertex AI Training to create a custom trained model and use Vertex AI Batch Prediction to do a batch prediction on the trained model.
 
 create a custom-trained model from a Python script in a Docker container using the Vertex AI SDK for Python, and then do a prediction on the deployed model by sending data. 
@@ -50,9 +51,11 @@ The steps performed include:
 - Create a Vertex AI custom job for training a TensorFlow model.
 - Upload the trained model artifacts as a Model resource.
 - Make a batch prediction.
+</blockquote>
 
 [Custom image classification model training and online prediction](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/custom/sdk-custom-image-classification-online.ipynb)
 
+<blockquote>
 In this tutorial, you learn to use Vertex AI Training to create a custom-trained model from a Python script in a Docker container, and learn to use Vertex AI Prediction to do a prediction on the deployed model by sending data. 
 
 This tutorial uses the following Google Cloud ML services:
@@ -70,7 +73,7 @@ The steps performed include:
 - Deploy the Model resource to a serving Endpoint resource.
 - Make a prediction.
 - Undeploy the Model resource.
-
+</blockquote>
 
 ### Vertex Explainable AI
 
@@ -78,6 +81,7 @@ The steps performed include:
 
 [AutoML tabular binary classification model with online explanations](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/explainable_ai/sdk_automl_tabular_classification_online_explain.ipynb)
 
+<blockquote>
 In this tutorial, you learn to use AutoML to create a tabular binary classification model from a Python script, and then learn to use Vertex AI Online Prediction to make online predictions with explanations. 
 
 This tutorial uses the following Google Cloud ML services:
@@ -97,9 +101,11 @@ The steps performed include:
 - Deploy the Model resource to a serving Endpoint resource.
 - Make an online prediction request with explainability.
 - Undeploy the Model resource.
+</blockquote>
 
 [Custom tabular regression model with batch explanations](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/explainable_ai/sdk_custom_tabular_regression_batch_explain.ipynb)
 
+<blockquote>
 In this tutorial, you learn to use Vertex AI Training and Explainable AI to create a custom image classification model with explanations, and then you learn to use Vertex AI Batch Prediction to make a batch prediction request with explanations. 
 
 This tutorial uses the following Google Cloud ML services:
@@ -116,9 +122,11 @@ The steps performed include:
 - Set explanation parameters for when the model is deployed.
 - Upload the trained model artifacts and explanations as a Model resource.
 - Make a batch prediction with explanations.
-
+</blockquote>
+    
 [Custom tabular regression model with online explanations](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/explainable_ai/sdk_custom_tabular_regression_online_explain.ipynb)
 
+<blockquote>
 In this tutorial, you learn to use Vertex AI Training and Explainable AI to create a custom image classification model with explanations, and then you learn to use Vertex AI Prediction to make an online prediction request with explanations.
 
 This tutorial uses the following Google Cloud ML services:
@@ -139,7 +147,8 @@ The steps performed include:
 - Deploy the Model resource to a serving Endpoint resource.
 - Make a prediction with explanation.
 - Undeploy the Model resource.
-
+</blockquote>
+    
 [Custom image classification model with batch predictions](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/explainable_ai/sdk_custom_image_classification_batch_explain.ipynb)
 
 [Custom image classification model with online predictions](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/explainable_ai/sdk_custom_image_classification_online_explain.ipynb)
@@ -152,6 +161,7 @@ The steps performed include:
 
 [Monitoring drift detection in online serving](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/model_monitoring/model_monitoring.ipynb)
 
+<blockquote>
 In this notebook, you learn to use the Vertex AI Model Monitoring service to detect drift and anomalies in prediction requests from a deployed Vertex AI Model resource.
 
 This tutorial uses the following Google Cloud ML services:
@@ -169,13 +179,15 @@ The steps performed include:
 - Configure the Endpoint resource for model monitoring.
 - Generate synthetic prediction requests.
 - Understand how to interpret the statistics, visualizations, other data reported by the model monitoring feature.
-
+</blockquote>
+    
 ### Vertex ML Metadata
 
 [Tracking hyperparameters and metrics in custom training job](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/ml_metadata/sdk-metric-parameter-tracking-for-custom-jobs.ipynb)
 
 [Tracking hyperparameters and metrics in locally trained job](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/ml_metadata/sdk-metric-parameter-tracking-for-locally-trained-models.ipynb)
 
+<blockquote>
 In this notebook, you learn how to use Vertex ML Metadata to track training parameters and evaluation metrics.
 
 This tutorial uses the following Google Cloud ML services:
@@ -187,11 +199,13 @@ The steps performed include:
 
 - Track parameters and metrics for a locally trained model.
 - Extract and perform analysis for all parameters and metrics within an Experiment.
-
+</blockquote>
+    
 ### Vertex AI Pipelines
 
 [Creating Python function KFP components](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/lightweight_functions_component_io_kfp.ipynb)
 
+<blockquote>
 In this tutorial, you learn to use the KFP SDK to build lightweight Python function-based components, and then you learn to use Vertex AI Pipelines to execute the pipeline.
 
 This tutorial uses the following Google Cloud ML services:
@@ -206,9 +220,11 @@ The steps performed include:
     - Use the kfp.dsl.importer method.
 - Compile the KFP pipeline.
 - Execute the KFP pipeline using Vertex AI Pipelines
-
+</blockquote>
+    
 [AutoML image classification model pipeline](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/google_cloud_pipeline_components_automl_images.ipynb)
 
+<blockquote>
 In this tutorial, you learn to use Vertex AI Pipelines and Google Cloud Pipeline Components to build an AutoML image classification model.
 
 This tutorial uses the following Google Cloud ML services:
@@ -228,9 +244,11 @@ The steps performed include:
     - Deploys the Model resource to the Endpoint resource.
 - Compile the KFP pipeline.
 - Execute the KFP pipeline using Vertex AI Pipelines
-
+</blockquote>
+    
 [AutoML tabular classification model pipeline](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/automl_tabular_classification_beans.ipynb)
 
+<blockquote>
 In this tutorial, you learn to use Vertex AI Pipelines and Google Cloud Pipeline Components to build an AutoML tabular classification model.
 
 This tutorial uses the following Google Cloud ML services:
@@ -250,9 +268,11 @@ The steps performed include:
     - Deploys the Model resource to the Endpoint resource.
 - Compile the KFP pipeline.
 - Execute the KFP pipeline using Vertex AI Pipelines
-
+</blockquote>
+    
 [AutoML tabular regression model pipeline](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/google_cloud_pipeline_components_automl_tabular.ipynb)
 
+<blockquote>
 In this tutorial, you learn to use Vertex AI Pipelines and Google Cloud Pipeline Components to build an AutoML tabular regression model.
 
 This tutorial uses the following Google Cloud ML services:
@@ -272,13 +292,14 @@ The steps performed include:
     - Deploys the Model resource to the Endpoint resource.
 - Compile the KFP pipeline.
 - Execute the KFP pipeline using Vertex AI Pipelines
-
+</blockquote>
 [AutoML text classification model pipeline](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/google_cloud_pipeline_components_automl_text.ipynb)
 
 [Custom training and batch prediction using prebuilt components pipeline](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/custom_model_training_and_batch_prediction.ipynb)
 
 [Custom training using prebuilt and custom components pipeline](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/google_cloud_pipeline_components_model_train_upload_deploy.ipynb)
 
+<blockquote>
 In this tutorial, you learn to use Vertex AI Pipelines and Google Cloud Pipeline Components to build and deploy a custom model.
 
 This tutorial uses the following Google Cloud ML services:
@@ -298,9 +319,11 @@ The steps performed include:
     - Deploys the Model resource to the Endpoint resource.
 - Compile the KFP pipeline.
 - Execute the KFP pipeline using Vertex AI Pipelines
-
+</blockquote>
+    
 [Introduction to control flow in pipelines](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/control_flow_kfp.ipynb)
 
+<blockquote>
 In this tutorial, you use the KFP SDK to build pipelines that use loops and conditionals, including nested examples.
 
 This tutorial uses the following Google Cloud ML services:
@@ -313,6 +336,7 @@ The steps performed include:
     - Use control flow components
 - Compile the KFP pipeline.
 - Execute the KFP pipeline using Vertex AI Pipelines
+</blockquote>
 
 [Introduction to KFP components and pipelines](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/pipelines_intro_kfp.ipynb)
 
