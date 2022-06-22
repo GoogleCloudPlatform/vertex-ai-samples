@@ -234,6 +234,22 @@ The steps performed include:
 
 [Managing features in a feature store](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/feature_store/gapic-feature-store.ipynb)
 
+<blockquote>
+In this notebook, you will learn how to use `Vertex AI Feature Store` to import feature data, and to access the feature data for both online serving and offline tasks, such as training.
+
+This tutorial uses the following Google Cloud ML services:
+
+- `Vertex AI Feature Store`
+    
+The steps performed include:
+
+- Create featurestore, entity type, and feature resources.
+- Import feature data into `Vertex AI Feature Store` resource.
+- Serve online prediction requests using the imported features.
+- Access imported features in offline jobs, such as training jobs.
+
+</blockquote>
+
 ### Vertex Model Monitoring
 
 [Monitoring drift detection in online serving](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/model_monitoring/model_monitoring.ipynb)
