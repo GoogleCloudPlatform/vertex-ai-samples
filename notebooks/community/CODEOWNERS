@@ -22,3 +22,4 @@
 /vertex_endpoints/nvidia-triton/nvidia-triton-custom-container-prediction.ipynb @RajeshThallam
 /vertex_endpoints/optimized_tensorflow_runtime @vlasenkoalexey
 /notebooks/community/ml_ops/stage2/get_started_with_visionapi_and_automl.ipynb @mansari
+/notebooks/community/ml_ops/stage1/get_started_with_visionapi_and_vertex_datasets.ipynb @mansari
