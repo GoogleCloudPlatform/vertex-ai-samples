@@ -14,6 +14,7 @@ The notebooks are organized into subfolders by Cloud AI services.
 
 [AutoML tabular forecasting model](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/sdk_automl_tabular_forecasting_batch.ipynb)
 
+<blockquote>
 In this tutorial, you create an AutoML tabular forecasting model from a Python script, and then do a batch prediction using the Vertex AI SDK. 
 
 This tutorial uses the following Google Cloud ML services:
@@ -28,6 +29,7 @@ The steps performed include:
 - Train an AutoML tabular forecasting Model resource.
 - Obtain the evaluation metrics for the Model resource.
 - Make a batch prediction.
+</blockquote>
 
 ### Vertex AI Training
 
