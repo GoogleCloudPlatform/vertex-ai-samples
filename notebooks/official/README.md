@@ -12,6 +12,25 @@ The notebooks are organized into subfolders by Cloud AI services.
 
 [AutoML text classification model](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/automl-text-classification.ipynb)
 
+<blockquote>
+In this tutorial, you learn how to use `AutoML` to train a text classification model.
+
+This tutorial uses the following Google Cloud ML services:
+
+- `AutoML Training`
+- `Vertex AI Model resource`
+
+The steps performed include:
+
+- Create a `Vertex AI Dataset`.\n",
+- Train an `AutoML` text classification `Model` resource.\n",
+- Obtain the evaluation metrics for the `Model` resource.\n",
+- Create an `Endpoint` resource.\n",
+- Deploy the `Model` resource to the `Endpoint` resource.\n",
+- Make an online prediction\n",
+- Make a batch prediction\n",
+</blockquote>
+
 [AutoML tabular forecasting model](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/sdk_automl_tabular_forecasting_batch.ipynb)
 
 <blockquote>
