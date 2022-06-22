@@ -305,6 +305,8 @@ def get_changed_notebooks(
     repo = git.Repo(os.getcwd())
     index = repo.index
 
+    print(f"repo.heads: {repo.heads}")
+
     if base_branch:
         # Get the point at which this branch branches off from main
         branching_commits = repo.merge_base("HEAD", f"origin/{base_branch}")
