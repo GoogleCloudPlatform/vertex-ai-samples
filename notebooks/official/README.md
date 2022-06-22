@@ -99,71 +99,71 @@ The steps performed include:
 [AutoML tabular binary classification model with online explanations](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/explainable_ai/sdk_automl_tabular_classification_online_explain.ipynb)
 
 <blockquote>
-In this tutorial, you learn to use AutoML to create a tabular binary classification model from a Python script, and then learn to use Vertex AI Online Prediction to make online predictions with explanations. 
+In this tutorial, you learn to use `AutoML` to create a tabular binary classification model from a Python script, and then learn to use `Vertex AI Online Prediction` to make online predictions with explanations. 
 
 This tutorial uses the following Google Cloud ML services:
 
-- Vertex AI AutoML
-- Vertex AI Prediction
-- Vertex Explainable AI
-- Vertex AI Model resource
-- Vertex AI Endpoint resource
+- `Vertex AI AutoML`
+- `Vertex AI Prediction`
+- `Vertex Explainable AI`
+- `Vertex AI Model` resource
+- `Vertex AI Endpoint` resource
 
 The steps performed include:
 
-- Create a Vertex Dataset resource.
-- Train an AutoML tabular binary classification model.
+- Create a `Vertex AI Dataset` resource.
+- Train an `AutoML` tabular binary classification model.
 - View the model evaluation metrics for the trained model.
-- Create a serving Endpoint resource.
-- Deploy the Model resource to a serving Endpoint resource.
+- Create a serving `Endpoint` resource.
+- Deploy the `Model` resource to a serving `Endpoint` resource.
 - Make an online prediction request with explainability.
-- Undeploy the Model resource.
+- Undeploy the `Model` resource.
 </blockquote>
 
 [Custom tabular regression model with batch explanations](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/explainable_ai/sdk_custom_tabular_regression_batch_explain.ipynb)
 
 <blockquote>
-In this tutorial, you learn to use Vertex AI Training and Explainable AI to create a custom image classification model with explanations, and then you learn to use Vertex AI Batch Prediction to make a batch prediction request with explanations. 
+In this tutorial, you learn to use `Vertex AI Training` and `Explainable AI` to create a custom image classification model with explanations, and then you learn to use `Vertex AI Batch Prediction` to make a batch prediction request with explanations. 
 
 This tutorial uses the following Google Cloud ML services:
 
-- Vertex AI Training
-- Vertex AI Batch Prediction
-- Vertex Explainable AI
-- Vertex AI Model resource
+- `Vertex AI Training`
+- `Vertex AI Batch Prediction`
+- `Vertex Explainable AI`
+- `Vertex AI Mode`l resource
 
 The steps performed include:
 
-- Create a Vertex AI custom job for training a TensorFlow model.
+- Create a `Vertex A`I custom job for training a TensorFlow model.
 - View the model evaluation for the trained model.
 - Set explanation parameters for when the model is deployed.
-- Upload the trained model artifacts and explanations as a Model resource.
+- Upload the trained model artifacts and explanations as a `Model` resource.
 - Make a batch prediction with explanations.
 </blockquote>
     
 [Custom tabular regression model with online explanations](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/explainable_ai/sdk_custom_tabular_regression_online_explain.ipynb)
 
 <blockquote>
-In this tutorial, you learn to use Vertex AI Training and Explainable AI to create a custom image classification model with explanations, and then you learn to use Vertex AI Prediction to make an online prediction request with explanations.
+In this tutorial, you learn to use `Vertex AI Training` and `Explainable AI` to create a custom image classification model with explanations, and then you learn to use `Vertex AI Prediction` to make an online prediction request with explanations.
 
 This tutorial uses the following Google Cloud ML services:
 
-- Vertex AI Training
-- Vertex AI Prediction
-- Vertex Explainable AI
-- Vertex AI Model resource
-- Vertex AI Endpoint resource
+- `Vertex AI Training`
+- `Vertex AI Prediction`
+- `Vertex Explainable AI`
+- `Vertex AI Model` resource
+- `Vertex AI Endpoint` resource
 
 The steps performed include:
 
-- Create a Vertex AI custom job for training a TensorFlow model.
+- Create a `Vertex AI` custom job for training a TensorFlow model.
 - View the model evaluation for the trained model.
 - Set explanation parameters for when the model is deployed.
-- Upload the trained model artifacts and explanations as a Model resource.
-- Create a serving Endpoint resource.
-- Deploy the Model resource to a serving Endpoint resource.
+- Upload the trained model artifacts and explanations as a `Model` resource.
+- Create a serving `Endpoint` resource.
+- Deploy the `Model` resource to a serving `Endpoint` resource.
 - Make a prediction with explanation.
-- Undeploy the Model resource.
+- Undeploy the `Model` resource.
 </blockquote>
     
 [Custom image classification model with batch predictions](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/explainable_ai/sdk_custom_image_classification_batch_explain.ipynb)
@@ -179,21 +179,21 @@ The steps performed include:
 [Monitoring drift detection in online serving](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/model_monitoring/model_monitoring.ipynb)
 
 <blockquote>
-In this notebook, you learn to use the Vertex AI Model Monitoring service to detect drift and anomalies in prediction requests from a deployed Vertex AI Model resource.
+In this notebook, you learn to use the `Vertex AI Model Monitoring` service to detect drift and anomalies in prediction requests from a deployed `Vertex AI Model` resource.
 
 This tutorial uses the following Google Cloud ML services:
 
-- Vertex AI Model Monitoring
-- Vertex AI Prediction
-- Vertex AI Model resource
-- Vertex AI Endpoint resource
+- `Vertex AI Model Monitoring`
+- `Vertex AI Prediction`
+- `Vertex AI Model` resource
+- `Vertex AI Endpoint` resource
 
 The steps performed include:
 
-- Upload a pre-trained model as a Vertex AI Model resource.
-- Create an Vertex AI Endpoint resource.
-- Deploy the Model resource to the Endpoint resource.
-- Configure the Endpoint resource for model monitoring.
+- Upload a pre-trained model as a `Vertex AI Model` resource.
+- Create an `Vertex AI Endpoint` resource.
+- Deploy the `Model` resource to the `Endpoint` resource.
+- Configure the `Endpoint` resource for model monitoring.
 - Generate synthetic prediction requests.
 - Understand how to interpret the statistics, visualizations, other data reported by the model monitoring feature.
 </blockquote>
@@ -205,12 +205,12 @@ The steps performed include:
 [Tracking hyperparameters and metrics in locally trained job](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/ml_metadata/sdk-metric-parameter-tracking-for-locally-trained-models.ipynb)
 
 <blockquote>
-In this notebook, you learn how to use Vertex ML Metadata to track training parameters and evaluation metrics.
+In this notebook, you learn how to use `Vertex ML Metadata` to track training parameters and evaluation metrics.
 
 This tutorial uses the following Google Cloud ML services:
 
-- Vertex ML Metadata
-- Vertex AI Experiments
+- `Vertex ML Metadata`
+- `Vertex AI Experiments`
 
 The steps performed include:
 
@@ -223,11 +223,11 @@ The steps performed include:
 [Creating Python function KFP components](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/lightweight_functions_component_io_kfp.ipynb)
 
 <blockquote>
-In this tutorial, you learn to use the KFP SDK to build lightweight Python function-based components, and then you learn to use Vertex AI Pipelines to execute the pipeline.
+In this tutorial, you learn to use the KFP SDK to build lightweight Python function-based components, and then you learn to use `Vertex AI Pipelines` to execute the pipeline.
 
 This tutorial uses the following Google Cloud ML services:
 
-- Vertex AI Pipelines
+- `Vertex AI Pipelines`
 
 The steps performed include:
 
@@ -236,31 +236,31 @@ The steps performed include:
     - Pass Artifacts and parameters between components, both by path reference and by value.
     - Use the kfp.dsl.importer method.
 - Compile the KFP pipeline.
-- Execute the KFP pipeline using Vertex AI Pipelines
+- Execute the KFP pipeline using `Vertex AI Pipelines`
 </blockquote>
     
 [AutoML image classification model pipeline](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/google_cloud_pipeline_components_automl_images.ipynb)
 
 <blockquote>
-In this tutorial, you learn to use Vertex AI Pipelines and Google Cloud Pipeline Components to build an AutoML image classification model.
+In this tutorial, you learn to use `Vertex AI Pipelines` and `Google Cloud Pipeline Components` to build an `AutoML` image classification model.
 
 This tutorial uses the following Google Cloud ML services:
 
-- Vertex AI Pipelines
-- Google Cloud Pipeline Components
-- Vertex AutoML
-- Vertex AI Model resource
-- Vertex AI Endpoint resource
+- `Vertex AI Pipelines`
+- `Google Cloud Pipeline Components`
+- `Vertex AutoML`
+- `Vertex AI Model` resource
+- `Vertex AI Endpoint` resource
 
 The steps performed include:
 
 - Create a KFP pipeline:
-    - Create a Dataset resource.
-    - Train an AutoML image classification Model resource.
-    - Create an Endpoint resource.
-    - Deploys the Model resource to the Endpoint resource.
+    - Create a `Vertex AI Dataset` resource.
+    - Train an `AutoML` image classification `Model` resource.
+    - Create an `Endpoint` resource.
+    - Deploys the `Model` resource to the `Endpoint` resource.
 - Compile the KFP pipeline.
-- Execute the KFP pipeline using Vertex AI Pipelines
+- Execute the KFP pipeline using `Vertex AI Pipelines`
 </blockquote>
     
 [AutoML tabular classification model pipeline](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/automl_tabular_classification_beans.ipynb)
@@ -356,6 +356,20 @@ The steps performed include:
 </blockquote>
 
 [Introduction to KFP components and pipelines](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/pipelines_intro_kfp.ipynb)
+
+<blockquote>
+In this tutorial, you use the KFP SDK to build pipelines.\n",
+
+This tutorial uses the following Google Cloud ML services:
+
+- `Vertex AI Pipelines`
+
+The steps performed include:
+
+- Define and compile a `Vertex AI` pipeline.
+- Schedule a recurring pipeline run.
+- Specify which service account to use for a pipeline run.
+</blockquote>
 
 ### Vertex AI Vizier
 
