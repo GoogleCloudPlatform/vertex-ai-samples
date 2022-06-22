@@ -397,6 +397,27 @@ The steps performed include:
 
 [Custom training and batch prediction using prebuilt components pipeline](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/custom_model_training_and_batch_prediction.ipynb)
 
+<blockquote>
+In this tutorial, you learn to use `Vertex AI Pipelines` and `Google Cloud Pipeline Components` to build a custom model.
+
+This tutorial uses the following Google Cloud ML services:
+
+- `Vertex AI Pipelines`
+- `Google Cloud Pipeline Components`
+- `Vertex AI Training`
+- `Vertex AI Model` resource
+- `Vertex AI Endpoint` resource
+
+The steps performed include:
+
+- Create a KFP pipeline:
+    - Train a custom model.
+    - Upload the trained model as a `Model` resource.
+    - Create an `Endpoint` resource.
+- Deploy the `Model` resource to the `Endpoint` resource.
+- Make a batch prediction request.
+</blockquote>
+
 [Custom training using prebuilt and custom components pipeline](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/google_cloud_pipeline_components_model_train_upload_deploy.ipynb)
 
 <blockquote>
