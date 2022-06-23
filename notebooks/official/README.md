@@ -1,10 +1,8 @@
 # Google Cloud Vertex AI Official Notebooks
 
-The official notebooks are organized by Google Cloud Vertex AI products.
-
 The official notebooks are a collection of curated and non-curated notebooks authored by Google Cloud staff members. The curated notebooks are linked to in the [Vertex AI online web documentation](https://cloud.google.com/vertex-ai/docs/tutorials/jupyter-notebooks).
 
-The notebooks are organized into subfolders by Cloud AI services.
+The official notebooks are organized by Google Cloud Vertex AI services.
 
 ## Manifest of Curated Notebooks
 
@@ -234,6 +232,22 @@ The steps performed include:
 
 [Managing features in a feature store](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/feature_store/gapic-feature-store.ipynb)
 
+<blockquote>
+In this notebook, you will learn how to use `Vertex AI Feature Store` to import feature data, and to access the feature data for both online serving and offline tasks, such as training.
+
+This tutorial uses the following Google Cloud ML services:
+
+- `Vertex AI Feature Store`
+    
+The steps performed include:
+
+- Create featurestore, entity type, and feature resources.
+- Import feature data into `Vertex AI Feature Store` resource.
+- Serve online prediction requests using the imported features.
+- Access imported features in offline jobs, such as training jobs.
+
+</blockquote>
+
 ### Vertex Model Monitoring
 
 [Monitoring drift detection in online serving](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/model_monitoring/model_monitoring.ipynb)
@@ -261,6 +275,20 @@ The steps performed include:
 ### Vertex ML Metadata
 
 [Tracking hyperparameters and metrics in custom training job](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/ml_metadata/sdk-metric-parameter-tracking-for-custom-jobs.ipynb)
+
+<blockquote>
+In this notebook, you learn how to use `Vertex ML Metadata` to track training parameters and evaluation metrics.
+
+This tutorial uses the following Google Cloud ML services:
+
+- `Vertex ML Metadata`
+- `Vertex AI Experiments`
+
+The steps performed include:
+
+- Track parameters and metrics for a `Vertex AI` custom trained model.
+- Extract and perform analysis for all parameters and metrics within an Experiment.
+</blockquote>
 
 [Tracking hyperparameters and metrics in locally trained job](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/ml_metadata/sdk-metric-parameter-tracking-for-locally-trained-models.ipynb)
 
@@ -370,9 +398,53 @@ The steps performed include:
 - Compile the KFP pipeline.
 - Execute the KFP pipeline using `Vertex AI Pipelines`
 </blockquote>
+
 [AutoML text classification model pipeline](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/google_cloud_pipeline_components_automl_text.ipynb)
 
+<blockquote>
+In this tutorial, you learn to use `Vertex AI Pipelines` and `Google Cloud Pipeline Components` to build an `AutoML` text classification model.
+
+This tutorial uses the following Google Cloud ML services:
+
+- `Vertex AI Pipelines`
+- `Google Cloud Pipeline Components`
+- `Vertex AutoML`
+- `Vertex AI Model` resource
+"- `Vertex AI Endpoint` resource
+
+The steps performed include:
+
+- Create a KFP pipeline:
+    - Create a `Dataset` resource.
+    - Train an AutoML text classification `Model` resource.
+    - Create an `Endpoint` resource.
+    - Deploys the `Model` resource to the `Endpoint` resource.
+- Compile the KFP pipeline.
+- Execute the KFP pipeline using `Vertex AI Pipelines`
+</blockquote>
+
 [Custom training and batch prediction using prebuilt components pipeline](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/custom_model_training_and_batch_prediction.ipynb)
+
+<blockquote>
+In this tutorial, you learn to use `Vertex AI Pipelines` and `Google Cloud Pipeline Components` to build a custom model.
+
+This tutorial uses the following Google Cloud ML services:
+
+- `Vertex AI Pipelines`
+- `Google Cloud Pipeline Components`
+- `Vertex AI Training`
+- `Vertex AI Model` resource
+- `Vertex AI Endpoint` resource
+
+The steps performed include:
+
+- Create a KFP pipeline:
+    - Train a custom model.
+    - Upload the trained model as a `Model` resource.
+    - Create an `Endpoint` resource.
+- Deploy the `Model` resource to the `Endpoint` resource.
+- Make a batch prediction request.
+</blockquote>
 
 [Custom training using prebuilt and custom components pipeline](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/google_cloud_pipeline_components_model_train_upload_deploy.ipynb)
 
