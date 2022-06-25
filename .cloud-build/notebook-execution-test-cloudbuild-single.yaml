@@ -10,7 +10,7 @@ steps:
     entrypoint: /bin/sh
     args:
     - -c
-    - 'python3 .cloud-build/CheckPythonVersion.py'
+    - python3 .cloud-build/CheckPythonVersion.py
   # Create a virtual environment
   - name: ${_PYTHON_IMAGE}
     entrypoint: /bin/sh
@@ -37,6 +37,7 @@ steps:
   - name: ${_PYTHON_IMAGE}
     entrypoint: /bin/sh
     args:
+    - -c
     - | 
       . workspace/env/bin/activate &&
       python3 .cloud-build/execute_notebook_cli.py --notebook_source "${_NOTEBOOK_GCS_URI}" --output_file_or_uri "${_NOTEBOOK_OUTPUT_GCS_URI}"
