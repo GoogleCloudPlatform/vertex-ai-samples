@@ -257,6 +257,7 @@ def get_changed_notebooks(
         print(f"Looking for all notebooks.")
         notebooks = subprocess.check_output(["git", "ls-files"] + test_paths)
 
+    print(f"notebooks: {notebooks}")
     notebooks = [notebook for notebook in notebooks if notebook.endswith(".ipynb")]
     notebooks = [notebook for notebook in notebooks if len(notebook) > 0]
     notebooks = [notebook for notebook in notebooks if pathlib.Path(notebook).exists()]
