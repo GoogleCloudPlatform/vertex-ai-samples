@@ -14,7 +14,7 @@ steps:
   # Fetch full repo for diff purposes
   - name: gcr.io/cloud-builders/git
     args: [fetch, --unshallow]
-  # Create a virtual environment and activate it
+  # Create a virtual environment
   - name: ${_PYTHON_IMAGE}
     entrypoint: /bin/sh
     args:
@@ -22,7 +22,7 @@ steps:
     - python3 -m venv workspace/env
   # Install Python dependencies
   - name: ${_PYTHON_IMAGE}
-    entrypoint: bash
+    entrypoint: /bin/sh
     args:
     - -c 
     - . workspace/env/bin/activate &&
