@@ -17,6 +17,7 @@ import concurrent
 import dataclasses
 import datetime
 import functools
+import git
 import operator
 import os
 import pathlib
@@ -232,19 +233,39 @@ def get_changed_notebooks(
 
     # Find notebooks
     notebooks = []
+
+    # Instantiate GitPython objects
+    repo = git.Repo(os.getcwd())
+    index = repo.index
+
     if base_branch:
-        print(f"Looking for notebooks that changed from branch: {base_branch}")
-        notebooks = subprocess.check_output(
-            ["git", "diff", "--name-only", f"origin/{base_branch}..."] + test_paths
-        )
+        # Get the point at which this branch branches off from main
+        branching_commits = repo.merge_base("HEAD", f"origin/{base_branch}")
+
+        if len(branching_commits) > 0:
+            branching_commit = branching_commits[0]
+            print(f"Looking for notebooks that changed from branch: {branching_commit}")
+
+            notebooks = [
+                diff.b_path
+                for diff in index.diff(branching_commit, paths=test_paths)
+                if diff.b_path is not None
+            ]
+        else:
+            notebooks = []
     else:
         print(f"Looking for all notebooks.")
         notebooks = subprocess.check_output(["git", "ls-files"] + test_paths)
+        notebooks = notebooks.decode("utf-8").split("\n")
 
-    notebooks = notebooks.decode("utf-8").split("\n")
     notebooks = [notebook for notebook in notebooks if notebook.endswith(".ipynb")]
     notebooks = [notebook for notebook in notebooks if len(notebook) > 0]
     notebooks = [notebook for notebook in notebooks if pathlib.Path(notebook).exists()]
+
+    if len(notebooks) > 0:
+        print(f"Found {len(notebooks)} notebooks:")
+        for notebook in notebooks:
+            print(f"\t{notebook}")
 
     return notebooks
 
