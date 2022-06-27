@@ -11,12 +11,9 @@ steps:
     args:
     - -c
     - 'python3 .cloud-build/CheckPythonVersion.py'
-  # Fetch base branch if required
-  - name: ${_PYTHON_IMAGE}
-    entrypoint: /bin/sh
-    args:
-    - -c
-    - 'if [ -n "${_BASE_BRANCH}" ]; then git fetch origin "${_BASE_BRANCH}":refs/remotes/origin/"${_BASE_BRANCH}"; else echo "Skipping fetch."; fi'
+  # Fetch full repo for diff purposes
+  - name: gcr.io/cloud-builders/git
+    args: [fetch, --unshallow]
   # Install Python dependencies
   - name: ${_PYTHON_IMAGE}
     entrypoint: /bin/sh
