@@ -18,6 +18,7 @@
 /sdk/pytorch_lightning_custom_container_training.ipynb @brianchunkang
 /tensorboard @yfang1
 /feature_store @nayaknishant @morgandu
+/prediction @googleapis/vertex-prediction-team
 /vertex_endpoints/tf_hub_obj_detection/deploy_tfhub_object_detection_on_vertex_endpoints.ipynb @entrpn
 /vertex_endpoints/nvidia-triton/nvidia-triton-custom-container-prediction.ipynb @RajeshThallam
 /vertex_endpoints/optimized_tensorflow_runtime @vlasenkoalexey
