@@ -24,3 +24,4 @@
 /pipelines/google_cloud_pipeline_components_bqml_text.ipynb @inardini
 /pipelines/google_cloud_pipelines_dataproc_tabular @inardini
 /automl/automl_forecasting_bqml_arima_plus_comparison.ipynb @TheMichaelHu
+/automl/automl_tabular_on_vertex_pipelines.ipynb @helinwang
