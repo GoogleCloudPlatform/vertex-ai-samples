@@ -73,6 +73,7 @@ def _process_notebook(
     notebook_path: str,
     variable_project_id: str,
     variable_region: str,
+    variable_service_account: str,
 ):
     # Read notebook
     with open(notebook_path) as f:
@@ -84,6 +85,7 @@ def _process_notebook(
         replacement_map={
             "PROJECT_ID": variable_project_id,
             "REGION": variable_region,
+            "SERVICE_ACCOUNT": variable_service_account,
         },
     )
 
@@ -118,6 +120,7 @@ def process_and_execute_notebook(
     artifacts_bucket: str,
     variable_project_id: str,
     variable_region: str,
+    variable_service_account: str,
     private_pool_id: Optional[str],
     deadline: datetime,
     notebook: str,
@@ -152,6 +155,7 @@ def process_and_execute_notebook(
             notebook_path=notebook,
             variable_project_id=variable_project_id,
             variable_region=variable_region,
+            variable_service_account=variable_service_account,
         )
 
         # Upload the pre-processed code to a GCS bucket
@@ -277,6 +281,7 @@ def process_and_execute_notebooks(
     artifacts_bucket: str,
     variable_project_id: str,
     variable_region: str,
+    variable_service_account: str,
     private_pool_id: Optional[str],
     should_parallelize: bool,
     timeout: int,
@@ -336,6 +341,7 @@ def process_and_execute_notebooks(
                             artifacts_bucket,
                             variable_project_id,
                             variable_region,
+                            variable_service_account,
                             private_pool_id,
                             deadline,
                         ),
@@ -350,6 +356,7 @@ def process_and_execute_notebooks(
                     artifacts_bucket=artifacts_bucket,
                     variable_project_id=variable_project_id,
                     variable_region=variable_region,
+                    variable_service_account=variable_service_account,
                     private_pool_id=private_pool_id,
                     deadline=deadline,
                     notebook=notebook,
@@ -406,6 +413,7 @@ def process_and_execute_notebooks(
             notebook_path=notebook,
             variable_project_id=variable_project_id,
             variable_region=variable_region,
+            variable_service_account=variable_service_account,
         )
 
         execute_notebook_helper.execute_notebook(
