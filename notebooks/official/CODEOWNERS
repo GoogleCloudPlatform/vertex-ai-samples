@@ -12,7 +12,7 @@
 /migration @aferlitsch
 /explainabl_ai @aferlitsch
 /pipelines @aferlitsch
-/experiments @inardini
+/tensorboard @zbl94
 
 /model_monitoring/model_monitoring.ipynb @mco-gh
 /ml_metadata/sdk-metric-parameter-tracking-for-custom-jobs.ipynb @jialuzh
