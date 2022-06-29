@@ -88,6 +88,17 @@ The steps performed include:
 - Cancel a data labeling job.
 ```
 
+[Get Started with Vision API and Vertex AI Datasets](get_started_with_visionapi_and_vertex_datasets.ipynb)
+
+```
+The steps performed include:
+
+- Using Vision API to perform Optical Character Recognition (OCR) to extract text from PDF files.
+- Processing the results and saving them to text files.
+- Generating a Vertex AI Dataset import file.
+- Creating a new unlabelled text entity extraction Vertex AI Dataset resource in Vertex AI.
+```
+
 ### E2E Stage Example
 
 [Stage 1: Data Management](mlops_data_management.ipynb)
