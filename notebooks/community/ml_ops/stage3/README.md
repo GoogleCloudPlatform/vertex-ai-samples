@@ -178,7 +178,7 @@ The steps performed in this tutorial include:
 ```
 
 
-[Get Started with Vertex AI Model Registry](get_started_with_vertex_model_registry.ipynb)
+[Get Started with Vertex AI Model Registry](get_started_with_model_registry.ipynb)
 
 ```
 The steps performed in this tutorial include:
