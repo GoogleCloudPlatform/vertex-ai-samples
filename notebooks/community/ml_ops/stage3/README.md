@@ -192,6 +192,24 @@ The steps performed in this tutorial include:
 - Delete a `Model` resource along with all model versions.
 ```
 
+[Get Started with AutoML Tabular Pipeline Workflow](get_started_with_automl_tabular_pipeline_workflow.ipynb)
+
+```
+The steps performed in this tutorial include:
+
+- Define training specification.
+    - Dataset specification
+    - Hyperparameter overide specification
+    - machine specifications
+- Construct tabular workflow pipeline.
+- Compile and execute pipeline.
+- View evaluation metrics artifact.
+- Export AutoML model as an OSS TF model.
+- Create `Endpoint` resource.
+- Deploy exported OSS TF model.
+- Make a prediction.
+```
+
 ### E2E Stage Example
 
 [Stage 3: Formalization](mlops_formalization.ipynb)
