@@ -1,0 +1,8 @@
+absl-py
+fastapi
+uvicorn
+timm
+smart_open
+
+google-cloud-storage>=1.26.0,<2.0.0dev
+google-cloud-aiplatform[prediction] @ git+https://github.com/googleapis/python-aiplatform.git@custom-prediction-routine
