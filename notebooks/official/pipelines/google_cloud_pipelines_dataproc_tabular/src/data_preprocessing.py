@@ -130,8 +130,7 @@ def main(logger, args):
 
     spark = (SparkSession.builder
              .master("local[*]")
-             .appName("spark go live")
-             .config('spark.ui.port', '4050')
+             .appName("loan eligibility")
              .getOrCreate())
     try:
         logger.info(f'spark version: {spark.sparkContext.version}')
@@ -150,12 +149,7 @@ def main(logger, args):
         training_data_raw_df.show(truncate=False)
 
         logger.info(f'load prepared data to {output_data_path}.')
-        if output_data_path.startswith('gs://'):
-            training_data_raw_df.write.mode('overwrite').csv(str(output_data_path), header=True)
-        else:
-            output_file_path = Path(output_data_path)
-            output_file_path.mkdir(parents=True, exist_ok=True)
-            training_data_raw_df.write.mode('overwrite').csv(str(output_file_path), header=True)
+        training_data_raw_df.write.mode('overwrite').csv(str(output_data_path), header=True)
     except RuntimeError as main_error:
         logger.error(main_error)
     else:
