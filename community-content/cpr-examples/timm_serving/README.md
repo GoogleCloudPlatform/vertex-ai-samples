@@ -2,13 +2,15 @@
 
 ## About CPR
 
-CPR (custom prediction routines) is a framework designed by Google Cloud developers to make it easier to combine machine learning models with custom preprocessing and postprocessing logic in a real-time serving application. 
+CPR ([custom prediction routines](https://github.com/googleapis/python-aiplatform/blob/custom-prediction-routine/google/cloud/aiplatform/prediction/README.md)) is a framework designed by Google Cloud developers to make it easier to combine machine learning models with custom preprocessing and postprocessing logic in a real-time serving application. 
 
 ## Using this example
 
 This code is a self-contained example of a custom model server project built using CPR.
 
-As is, you can use it to serve the ViT-Small image classification model from Ross Wightman's fantastic [`timm`](https://github.com/rwightman/pytorch-image-models) library of image model implementations in PyTorch. Other Imagenet-based image classification models from timm probably also work. Both CPU and GPU are supported.
+As is, you can use it to serve the ViT-Small image classification model from Ross Wightman's [`timm`](https://github.com/rwightman/pytorch-image-models) library of image model implementations in PyTorch. Both CPU and GPU are supported.
+
+You can also consider using the code here as a template for your own CPR project if you want to use a different model from `timm`, a different PyTorch model, or an entirely different framework.
 
 ### Requirements
 
@@ -86,4 +88,6 @@ Then deploy it:
 python build.py deploy
 ```
 
-If you run the deploy command again, it will create a new endpoint. If you want to undeploy the model, you can do so using the Vertex AI dashboard on the Google Cloud console, or use `gsutil ai endpoints undeploy` from the command line.
+If you run the deploy command again, it will create a new endpoint. If you want to undeploy the model, you can do so using the Vertex AI dashboard on the Google Cloud console, or use `gcloud ai endpoints undeploy` from the command line.
+
+After deploying successfully, you can run `python build.py probe` to send a sample request to the deployed model. 

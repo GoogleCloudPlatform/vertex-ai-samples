@@ -25,7 +25,7 @@ import base64
 import binascii
 import io
 import os
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from fastapi import HTTPException
 from google.cloud.aiplatform import prediction as cpr
@@ -63,7 +63,7 @@ class TimmPredictor(cpr.predictor.Predictor):
     if artifacts_uri:
       artifact_path = os.path.join(artifacts_uri)
       if not (os.path.isdir(artifact_path) 
-              or artifact_path.startswith("gs://") and artifact_path.endswith("/")):
+              or artifact_path.startswith("gs://")):
         raise ValueError("Provided artifact_uri is not a directory.")
     else:
       artifact_path = os.getcwd()
@@ -151,7 +151,20 @@ class TimmPredictor(cpr.predictor.Predictor):
     return class_scores
 
   def postprocess(self, class_scores: torch.Tensor
-                  ) -> Dict[str, List[List[str]]]:
+                  ) -> Dict[str, List[Dict[str, Union[str, int, float]]]]:
+    """Translate the model output into a classification result.
+
+    Args:
+      class_scores: torch.Tensor with type torch.float32 and shape
+        [?, 1000], containing the scores assigned to each class by
+        the model.
+
+    Returns:
+      Dictionary containing the list of classification results. Each
+        classification result contains the probabilities, class names, and 
+        class indices of the classes with the top class scores as reported by
+        the model.
+    """
     class_probs = F.softmax(class_scores, dim=1)
     top_k = class_probs.topk(self.NUM_TOP_CLASSES_TO_RETURN)
     top_k_values = top_k.values.numpy().tolist()

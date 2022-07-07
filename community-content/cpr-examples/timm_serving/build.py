@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Build the model server container."""
+import json
+import logging
 import os
 import pathlib
 from typing import Sequence
@@ -79,6 +81,11 @@ def deploy_model(config: CPRConfig) -> aiplatform.Endpoint:
   config.endpoint_name = endpoint.resource_name
   config.save()
 
+def probe_prediction(config: CPRConfig, request_path: str) -> None:
+  aiplatform.init(project=config.project_id, location=config.region)
+  aip_endpoint = aiplatform.Endpoint(endpoint_name=config.endpoint_name)
+  with open(request_path) as f:
+    logging.info(aip_endpoint.predict(**json.load(f)))
 
 def main(argv: Sequence[str]):
   config = CPRConfig()
@@ -94,6 +101,8 @@ def main(argv: Sequence[str]):
     upload_model(config)
   if "deploy" in actions:
     deploy_model(config)
+  if "probe" in actions:
+    probe_prediction(config, request_path="sample_request.json")
 
 if __name__ == "__main__":
   app.run(main)
