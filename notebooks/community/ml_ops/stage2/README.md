@@ -35,18 +35,36 @@ The second stage in MLOps is experimenting in developing one or more baseline mo
 
 ### Get Started
 
-[Get Started with Vertex Experiments and Vertex ML Metadata](get_started_vertex_experiments.ipynb)
+[Get Started with Logging](get_started_with_logging.ipynb)
 
 ```
 The steps performed include:
 
 - Use Python logging to log training configuration/results locally.
 - Use Google Cloud Logging to log training configuration/results in cloud storage.
-- Create a Vertex AI `Experiment` resource.
-- Instantiate an experiment run.
-- Log parameters for the run.
-- Log metrics for the run.
-- Display the logged experiment run.
+```
+
+[Get Started with Vertex Experiments and Vertex ML Metadata](get_started_vertex_experiments.ipynb)
+
+```
+The steps performed include:
+
+- Local (notebook) Training
+    - Create an experiment
+    - Create a first run in the experiment
+    - Log parameters and metrics
+    - Create artifact lineage
+    - Visualize the experiment results
+    - Execute a second run
+    - Compare the two runs in the experiment
+- Cloud (`Vertex AI`) Training
+    - Within the training script:
+        - Create an experiment
+        - Log parameters and metrics
+        - Create artifact lineage
+    - Create a `Vertex AI Training` custom job
+    - Execute the custom job
+    - Visualize the experiment results
 ```
 
 [Get Started with Vertex TensorBoard](get_started_vertex_tensorboard.ipynb)
