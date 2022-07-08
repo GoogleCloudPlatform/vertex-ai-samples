@@ -80,12 +80,14 @@ def deploy_model(config: CPRConfig) -> aiplatform.Endpoint:
     """Deploy the model server to a Vertex Prediction endpoint."""
     aiplatform.init(project=config.project_id, location=config.region)
     aip_model = aiplatform.Model(model_name=config.model_name)
-    endpoint = aip_model.deploy(machine_type="n1-standard-4")
+    endpoint = aip_model.deploy(machine_type=config.machine_type)
     config.endpoint_name = endpoint.resource_name
     config.save()
+    return endpoint
 
 
 def probe_prediction(config: CPRConfig, request_path: str) -> None:
+    """Send a sample prediction request to the Vertex Prediction endpoint."""
     aiplatform.init(project=config.project_id, location=config.region)
     aip_endpoint = aiplatform.Endpoint(endpoint_name=config.endpoint_name)
     with open(request_path) as f:

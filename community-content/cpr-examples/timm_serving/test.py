@@ -4,7 +4,7 @@ import json
 import logging
 import os
 import pickle
-from typing import List
+from typing import List, Dict
 
 from absl import flags
 from absl import logging
@@ -33,7 +33,9 @@ def b64_encode_file(path: str) -> str:
         return str(base64.b64encode(f.read()), encoding="utf-8")
 
 
-def make_instance_dict(image_paths: List[str], base64_encodings: List[str]) -> str:
+def make_instance_dict(
+    image_paths: List[str], base64_encodings: List[str]
+) -> Dict[str, List[str]]:
     """Generate a dictionary similar to a parsed prediction server request.
 
     Args:
