@@ -39,7 +39,7 @@ def build_container(config: CPRConfig, tag: str) -> cpr.LocalModel:
     Returns:
       LocalModel exposing the built model server.
     """
-    return cpr.LocalModel.create_cpr_model(
+    return cpr.LocalModel.build_cpr_model(
         src_dir=os.path.join(os.getcwd()),
         output_image_uri=tag,
         base_image=config.base_image,
@@ -67,7 +67,8 @@ def upload_model(config: CPRConfig) -> aiplatform.Model:
     local_model = build_container(config, tag=ar_tag)
     aiplatform.init(project=config.project_id, location=config.region)
     local_model.push_image()
-    aip_model = local_model.upload(
+    aip_model = aiplatform.Model.upload(
+        local_model=local_model,
         display_name=predictor.TimmPredictor.TIMM_MODEL_NAME,
         artifact_uri=config.artifact_gcs_dir,
     )

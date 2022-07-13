@@ -63,6 +63,7 @@ class CPRConfig(object):
     artifact_gcs_dir: str = "gs://samthrasher-cpr-example/timm-vit224/"
     model_name: str = ""
     endpoint_name: str = ""
+    machine_type: str = "n1-standard-2"
 
     def save(self):
         with open(self.config_file, "w") as f:
