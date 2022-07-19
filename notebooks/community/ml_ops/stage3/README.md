@@ -177,6 +177,39 @@ The steps performed in this tutorial include:
 - Execute the `Vertex AI Pipeline`.
 ```
 
+
+[Get Started with Vertex AI Model Registry](get_started_with_model_registry.ipynb)
+
+```
+The steps performed in this tutorial include:
+
+- Create and register a first version of a model to `Vertex AI Model Registry`
+- Create and register a second version of a model to `Vertex AI Model Registry`
+- List all versions of a `Model` resource.
+- Change the default version of a `Model` resource`
+- Deploy the default version of a `Model` resource.
+- Delete a model version from a `Model` resource.
+- Delete a `Model` resource along with all model versions.
+```
+
+[Get Started with AutoML Tabular Pipeline Workflow](get_started_with_automl_tabular_pipeline_workflow.ipynb)
+
+```
+The steps performed in this tutorial include:
+
+- Define training specification.
+    - Dataset specification
+    - Hyperparameter overide specification
+    - machine specifications
+- Construct tabular workflow pipeline.
+- Compile and execute pipeline.
+- View evaluation metrics artifact.
+- Export AutoML model as an OSS TF model.
+- Create `Endpoint` resource.
+- Deploy exported OSS TF model.
+- Make a prediction.
+```
+
 ### E2E Stage Example
 
 [Stage 3: Formalization](mlops_formalization.ipynb)
