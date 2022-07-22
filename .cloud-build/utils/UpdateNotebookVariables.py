@@ -35,7 +35,7 @@ Variables in conditionals can also be replaced:
 
 def get_updated_value(content: str, variable_name: str, variable_value: str) -> str:
     return re.sub(
-        rf"({variable_name}.*?=.*?[\",\'])\[.+?\]([\",\'].*?)",
+        rf"({variable_name}.*? = .*?[\",\'])\[.+?\]([\",\'].*?)",
         rf"\1{variable_value}\2",
         content,
         flags=re.M,
@@ -79,3 +79,12 @@ def test_region():
         variable_value="us-central1",
     )
     assert new_content == 'REGION = "us-central1"  # @param {type:"string"}'
+
+def test_region_equal_equals_ignore():
+    # Tests that == is ignored
+    new_content = get_updated_value(
+        content='REGION == "[your-region]"  # @param {type:"string"}',
+        variable_name="REGION",
+        variable_value="us-central1",
+    )
+    assert new_content == 'REGION == "[your-region]"  # @param {type:"string"}'
