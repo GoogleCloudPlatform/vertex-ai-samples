@@ -25,7 +25,7 @@ cd cpr-example && source bin/activate
 
 Then, clone the [vertex-ai-samples repo](https://github.com/GoogleCloudPlatform/vertex-ai-samples) in that directory:
 ```sh
-git clone https://github.com/GoogleCloudPlatform/vertex-ai-samples.git
+git clone https://github.com/GoogleCloudPlatform/vertex-ai-samples.gitgit 
 cd vertex-ai-samples/community-content/cpr-examples/timm_serving
 ```
 
@@ -33,6 +33,23 @@ Finally, install the Python modules required to build and run the model server:
 ```sh
 pip install -r requirements.txt
 ```
+
+### Auth
+
+This example uses Google Cloud Storage for hosting model artifacts and Artifact Registry to store the container image. 
+You'll need to authorize yourself before you can interact with these.
+
+First, log in to GCP with application default credentials:
+```sh
+gcloud auth application-default login
+```
+
+Next, if you haven't done so already, set up the [gcloud credential helper](https://cloud.google.com/artifact-registry/docs/docker/authentication)
+for the Artifact Registry region where you intend to host the image.  
+```
+gcloud auth configure-docker <region>-docker.pkg.dev
+```
+
 
 ### Predictor
 
