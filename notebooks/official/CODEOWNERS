@@ -2,16 +2,16 @@
 # the repo. Unless a later match takes precedence,
 # @global-owner1 and @global-owner2 will be requested for
 # review when someone opens a pull request.
-* @vertex-ai-samples-contributors  @GoogleCloudPlatform/cloudml-samples-owners
+* @GoogleCloudPlatform/vertex-ai-samples-contributors  @GoogleCloudPlatform/caiis-tw
 
 # matching_engine folder
 /matching_engine @shenzhimo2
 
 /tabnet/tabnet_vertex_tutorial.ipynb @longtle
 
-/migration @aferlitsch
-/explainabl_ai @aferlitsch
-/pipelines @aferlitsch
+/migration @andrewferlitsch
+/explainabl_ai @andrewferlitsch
+/pipelines @andrewferlitsch
 /experiments @inardini
 
 /model_monitoring/model_monitoring.ipynb @mco-gh
