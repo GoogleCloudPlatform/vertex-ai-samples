@@ -67,6 +67,13 @@ class NotebookExecutionResult:
     output_uri: str
     build_id: str
     error_message: Optional[str]
+    
+    @property
+    def output_uri_web(self) -> Optional[str]:
+        if self.output_uri.startswith("gs://"):
+            return f"https://storage.googleapis.com/{self.output_uri[5:]}"
+        else:
+            return None
 
 
 def _process_notebook(
@@ -382,10 +389,11 @@ def process_and_execute_notebooks(
                         format_timedelta(result.duration),
                         result.log_url,
                         result.output_uri,
+                        result.output_uri_web
                     ]
                     for result in results_sorted
                 ],
-                headers=["build_tag", "status", "duration", "log_url", "output_url"],
+                headers=["build_tag", "status", "duration", "log_url", "output_uri", "output_uri_web"],
             )
         )
 
