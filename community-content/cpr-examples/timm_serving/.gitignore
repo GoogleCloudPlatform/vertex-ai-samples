@@ -3,3 +3,4 @@ entrypoint.py
 state_dict.pth
 config.json
 **/__pycache__
+!testdata/**

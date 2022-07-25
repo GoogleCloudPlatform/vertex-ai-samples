@@ -34,6 +34,23 @@ Finally, install the Python modules required to build and run the model server:
 pip install -r requirements.txt
 ```
 
+### Auth
+
+This example uses Google Cloud Storage for hosting model artifacts and Artifact Registry to store the container image. 
+You'll need to authorize yourself before you can interact with these.
+
+First, log in to GCP with application default credentials:
+```sh
+gcloud auth application-default login
+```
+
+Next, if you haven't done so already, set up the [gcloud credential helper](https://cloud.google.com/artifact-registry/docs/docker/authentication)
+for the Artifact Registry region where you intend to host the image.  
+```
+gcloud auth configure-docker <region>-docker.pkg.dev
+```
+
+
 ### Predictor
 
 The `TimmPredictor` class in `timm_serving/predictor.py` implements most of the important logic for the server.
