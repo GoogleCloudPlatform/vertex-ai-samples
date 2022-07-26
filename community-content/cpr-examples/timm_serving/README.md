@@ -25,7 +25,7 @@ cd cpr-example && source bin/activate
 
 Then, clone the [vertex-ai-samples repo](https://github.com/GoogleCloudPlatform/vertex-ai-samples) in that directory:
 ```sh
-git clone https://github.com/GoogleCloudPlatform/vertex-ai-samples.gitgit 
+git clone https://github.com/GoogleCloudPlatform/vertex-ai-samples.git
 cd vertex-ai-samples/community-content/cpr-examples/timm_serving
 ```
 
