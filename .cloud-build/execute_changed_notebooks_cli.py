@@ -17,6 +17,7 @@
 
 import argparse
 import pathlib
+
 import execute_changed_notebooks_helper
 
 
@@ -62,6 +63,12 @@ parser.add_argument(
     required=True,
 )
 parser.add_argument(
+    "--variable_service_account",
+    type=str,
+    help="A service account. This is used to inject a variable value into the notebook before running. This is not the account that will run the notebook.",
+    required=True,
+)
+parser.add_argument(
     "--staging_bucket",
     type=str,
     help="The GCP directory for staging temporary files.",
@@ -72,6 +79,13 @@ parser.add_argument(
     type=str,
     help="The GCP directory for storing executed notebooks.",
     required=True,
+)
+parser.add_argument(
+    "--timeout",
+    type=int,
+    help="Timeout in seconds",
+    default=86400,
+    required=False,
 )
 parser.add_argument(
     "--private_pool_id",
@@ -102,6 +116,8 @@ execute_changed_notebooks_helper.process_and_execute_notebooks(
     artifacts_bucket=args.artifacts_bucket,
     variable_project_id=args.variable_project_id,
     variable_region=args.variable_region,
-    private_pool_id=args.private_pool_id if not "default" else None,
+    variable_service_account=args.variable_service_account,
+    private_pool_id=args.private_pool_id,
     should_parallelize=args.should_parallelize,
+    timeout=args.timeout,
 )

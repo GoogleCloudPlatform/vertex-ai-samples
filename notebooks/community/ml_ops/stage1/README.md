@@ -22,7 +22,7 @@ The first stage in MLOps is the collection and preparation for the purpose of de
 - Data is preprocessed for training and evaluation using Dataflow.
 - Data augmentation is performed on-the-fly and is coupled with model feeding.
 
-<img src='stage1.jpg'>
+<img src='stage1v2.png'>
 
 ## Notebooks
 
@@ -74,6 +74,29 @@ The steps performed include:
 - Upstream preprocessing of data:
     - tabular data
     - image data
+```
+
+[Get Started with Data Labeling](get_started_with_data_labeling.ipynb)
+
+```
+The steps performed include:
+
+- Create a Specialist Pool for data labelers.
+- Create a data labeling job.
+- Submit the data labeling job.
+- List data labeling jobs.
+- Cancel a data labeling job.
+```
+
+[Get Started with Vision API and Vertex AI Datasets](get_started_with_visionapi_and_vertex_datasets.ipynb)
+
+```
+The steps performed include:
+
+- Using Vision API to perform Optical Character Recognition (OCR) to extract text from PDF files.
+- Processing the results and saving them to text files.
+- Generating a Vertex AI Dataset import file.
+- Creating a new unlabelled text entity extraction Vertex AI Dataset resource in Vertex AI.
 ```
 
 ### E2E Stage Example
