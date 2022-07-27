@@ -203,7 +203,7 @@ The steps performed include:
 - Make an explanation request to the deployed custom serving container.
 ```
 
-[Get started with reimporting an exported AutoML Tabular model](get_started_with_automl_tabular_export_deploy.ipynb)
+[Get started with reimporting an exported AutoML Tabular model](get_started_automl_tabular_export_deploy.ipynb)
 
 ```
 The steps performed include:
