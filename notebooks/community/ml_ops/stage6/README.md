@@ -202,3 +202,14 @@ The steps performed include:
 - Make a prediction request to the deployed custom serving container.
 - Make an explanation request to the deployed custom serving container.
 ```
+
+[Get started with reimporting an exported AutoML Tabular model](get_started_automl_tabular_exported_deploy.ipynb)
+
+```
+The steps performed include:
+
+- Importing a pretrained AutoML tabular exported model artifacts, as a `Model` resource.
+- Create an `Endpoint` resource.
+- Deploy the `Model` resource to the `Endpoint` resource.
+- Make a prediction.
+```
