@@ -2,7 +2,7 @@
 
 ## About CPR
 
-CPR ([custom prediction routines](https://github.com/googleapis/python-aiplatform/blob/custom-prediction-routine/google/cloud/aiplatform/prediction/README.md)) is a framework designed by Google Cloud developers to make it easier to combine machine learning models with custom preprocessing and postprocessing logic in a real-time serving application. 
+CPR ([custom prediction routines](https://github.com/googleapis/python-aiplatform/blob/main/google/cloud/aiplatform/prediction/README.md)) is a framework designed by Google Cloud developers to make it easier to combine machine learning models with custom preprocessing and postprocessing logic in a real-time serving application. 
 
 ## Using this example
 

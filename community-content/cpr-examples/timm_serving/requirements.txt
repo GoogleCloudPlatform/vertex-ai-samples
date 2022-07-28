@@ -5,4 +5,4 @@ timm==0.5.4
 smart_open==6.0.0
 
 google-cloud-storage>=1.26.0,<2.0.0dev
-google-cloud-aiplatform[prediction] @ git+https://github.com/googleapis/python-aiplatform.git@custom-prediction-routine
+google-cloud-aiplatform[prediction]>=1.16.0
