@@ -303,8 +303,7 @@ def main(logger, args):
         logger.info('start spark session.')
         spark = (SparkSession.builder
                  .master("local[*]")
-                 .appName("spark go live")
-                 .config('spark.ui.port', '4050')
+                 .appName("loan eligibility")
                  .getOrCreate())
         logger.info(f'spark version: {spark.sparkContext.version}')
         logger.info('start bulding pipeline.')
@@ -329,23 +328,12 @@ def main(logger, args):
 
         logger.info(f'load model pipeline in {model_path}.')
         pipeline.write().overwrite().save(model_path)
-        if model_path.startswith('gs://'):
-            pipeline.write().overwrite().save(model_path)
-        else:
-            path(model_path).mkdir(parents=True, exist_ok=True)
-            pipeline.write().overwrite().save(model_path)
 
-        logger.info(f'Upload metrics under {metrics_path}.')
-        if metrics_path.startswith('gs://'):
-            bucket = urlparse(model_path).netloc
-            metrics_file_path = urlparse(metrics_path).path.strip('/')
-            write_metrics(bucket, metrics, metrics_file_path)
-        else:
-            metrics_version_path = path(metrics_path).parents[0]
-            metrics_version_path.mkdir(parents=True, exist_ok=True)
-            with open(metrics_path, 'w') as json_file:
-                json.dump(metrics, json_file)
-            json_file.close()
+        logger.info(f'Upload metrics under {metrics_path}.')     
+        bucket = urlparse(model_path).netloc
+        metrics_file_path = urlparse(metrics_path).path.strip('/')
+        write_metrics(bucket, metrics, metrics_file_path)
+        
     except RuntimeError as main_error:
         logger.error(main_error)
     else:

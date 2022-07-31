@@ -303,12 +303,7 @@ def main(logger, args):
         logger.info('start spark session.')
         spark = (SparkSession.builder
                  .master("local[*]")
-                 .appName("spark go live")
-                 .config('spark.ui.port', '4050')
-                 .config('spark.jars.packages', 'ml.combust.mleap:mleap-runtime_2.12:0.19.0')
-                 .config('spark.jars.packages', 'ml.combust.mleap:mleap-base_2.12:0.19.0')
-                 .config('spark.jars.packages', 'ml.combust.mleap:mleap-spark_2.12:0.19.0')
-                 .config('spark.jars.packages', 'ml.combust.mleap:mleap-spark-extension_2.12:0.19.0')
+                 .appName("loan eligibility")
                  .getOrCreate())
         logger.info(f'spark version: {spark.sparkContext.version}')
         logger.info('start building pipeline.')
@@ -318,12 +313,7 @@ def main(logger, args):
         pipeline_cross_validator = build_hp_pipeline(preprocessing_stages, feature_engineering_stages,
                                                      model_training_stage)
         logger.info(f'load train data from {train_path}.')
-        if train_path.startswith('bq://'):
-            raw_data = spark.read.format('bigquery') \
-                .option('table', train_path.replace('bq://', '')) \
-                .load()
-        else:
-            raw_data = (spark.read.format('csv')
+        raw_data = (spark.read.format('csv')
                         .option("header", "true")
                         .schema(DATA_SCHEMA)
                         .load(train_path))
@@ -336,23 +326,12 @@ def main(logger, args):
             print(f'{m}: {v}')
 
         logger.info(f'load model pipeline in {model_path}.')
-        if model_path.startswith('gs://'):
-            pipeline_model.write().overwrite().save(model_path)
-        else:
-            path(model_path).mkdir(parents=True, exist_ok=True)
-            pipeline_model.write().overwrite().save(model_path)
+        pipeline_model.write().overwrite().save(model_path)
 
         logger.info(f'Upload metrics under {metrics_path}.')
-        if metrics_path.startswith('gs://'):
-            bucket = urlparse(model_path).netloc
-            metrics_file_path = urlparse(metrics_path).path.strip('/')
-            write_metrics(bucket, metrics, metrics_file_path)
-        else:
-            metrics_version_path = path(metrics_path).parents[0]
-            metrics_version_path.mkdir(parents=True, exist_ok=True)
-            with open(metrics_path, 'w') as json_file:
-                json.dump(metrics, json_file)
-            json_file.close()
+        bucket = urlparse(model_path).netloc
+        metrics_file_path = urlparse(metrics_path).path.strip('/')
+        write_metrics(bucket, metrics, metrics_file_path)
     except RuntimeError as main_error:
         logger.error(main_error)
     else:
