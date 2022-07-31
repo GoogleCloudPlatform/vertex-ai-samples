@@ -11,6 +11,7 @@
 /structured_data/rapid_prototyping_* @rafael-carvalho
 
 /managed_notebooks/
+/bigquery_ml/ @polong
 /sdk/SDK_FBProphet_Forecasting_Online.ipynb @brianchunkang
 /pipelines/google_cloud_pipeline_components_TPU_model_train_upload_deploy.ipynb @brianchunkang
 /explainable_ai/SDK_Custom_Container_XAI.ipynb @brianchunkang
