@@ -17,6 +17,7 @@ import concurrent
 import dataclasses
 import datetime
 import functools
+import git
 import operator
 import os
 import pathlib
@@ -66,12 +67,20 @@ class NotebookExecutionResult:
     output_uri: str
     build_id: str
     error_message: Optional[str]
+    
+    @property
+    def output_uri_web(self) -> Optional[str]:
+        if self.output_uri.startswith("gs://"):
+            return f"https://storage.googleapis.com/{self.output_uri[5:]}"
+        else:
+            return None
 
 
 def _process_notebook(
     notebook_path: str,
     variable_project_id: str,
     variable_region: str,
+    variable_service_account: str,
 ):
     # Read notebook
     with open(notebook_path) as f:
@@ -83,6 +92,7 @@ def _process_notebook(
         replacement_map={
             "PROJECT_ID": variable_project_id,
             "REGION": variable_region,
+            "SERVICE_ACCOUNT": variable_service_account,
         },
     )
 
@@ -117,6 +127,7 @@ def process_and_execute_notebook(
     artifacts_bucket: str,
     variable_project_id: str,
     variable_region: str,
+    variable_service_account: str,
     private_pool_id: Optional[str],
     deadline: datetime,
     notebook: str,
@@ -151,6 +162,7 @@ def process_and_execute_notebook(
             notebook_path=notebook,
             variable_project_id=variable_project_id,
             variable_region=variable_region,
+            variable_service_account=variable_service_account,
         )
 
         # Upload the pre-processed code to a GCS bucket
@@ -232,19 +244,39 @@ def get_changed_notebooks(
 
     # Find notebooks
     notebooks = []
+
+    # Instantiate GitPython objects
+    repo = git.Repo(os.getcwd())
+    index = repo.index
+
     if base_branch:
-        print(f"Looking for notebooks that changed from branch: {base_branch}")
-        notebooks = subprocess.check_output(
-            ["git", "diff", "--name-only", f"origin/{base_branch}..."] + test_paths
-        )
+        # Get the point at which this branch branches off from main
+        branching_commits = repo.merge_base("HEAD", f"origin/{base_branch}")
+
+        if len(branching_commits) > 0:
+            branching_commit = branching_commits[0]
+            print(f"Looking for notebooks that changed from branch: {branching_commit}")
+
+            notebooks = [
+                diff.b_path
+                for diff in index.diff(branching_commit, paths=test_paths)
+                if diff.b_path is not None
+            ]
+        else:
+            notebooks = []
     else:
         print(f"Looking for all notebooks.")
         notebooks = subprocess.check_output(["git", "ls-files"] + test_paths)
+        notebooks = notebooks.decode("utf-8").split("\n")
 
-    notebooks = notebooks.decode("utf-8").split("\n")
     notebooks = [notebook for notebook in notebooks if notebook.endswith(".ipynb")]
     notebooks = [notebook for notebook in notebooks if len(notebook) > 0]
     notebooks = [notebook for notebook in notebooks if pathlib.Path(notebook).exists()]
+
+    if len(notebooks) > 0:
+        print(f"Found {len(notebooks)} notebooks:")
+        for notebook in notebooks:
+            print(f"\t{notebook}")
 
     return notebooks
 
@@ -256,6 +288,7 @@ def process_and_execute_notebooks(
     artifacts_bucket: str,
     variable_project_id: str,
     variable_region: str,
+    variable_service_account: str,
     private_pool_id: Optional[str],
     should_parallelize: bool,
     timeout: int,
@@ -315,6 +348,7 @@ def process_and_execute_notebooks(
                             artifacts_bucket,
                             variable_project_id,
                             variable_region,
+                            variable_service_account,
                             private_pool_id,
                             deadline,
                         ),
@@ -329,6 +363,7 @@ def process_and_execute_notebooks(
                     artifacts_bucket=artifacts_bucket,
                     variable_project_id=variable_project_id,
                     variable_region=variable_region,
+                    variable_service_account=variable_service_account,
                     private_pool_id=private_pool_id,
                     deadline=deadline,
                     notebook=notebook,
@@ -354,10 +389,11 @@ def process_and_execute_notebooks(
                         format_timedelta(result.duration),
                         result.log_url,
                         result.output_uri,
+                        result.output_uri_web
                     ]
                     for result in results_sorted
                 ],
-                headers=["build_tag", "status", "duration", "log_url", "output_url"],
+                headers=["build_tag", "status", "duration", "log_url", "output_uri", "output_uri_web"],
             )
         )
 
@@ -385,6 +421,7 @@ def process_and_execute_notebooks(
             notebook_path=notebook,
             variable_project_id=variable_project_id,
             variable_region=variable_region,
+            variable_service_account=variable_service_account,
         )
 
         execute_notebook_helper.execute_notebook(
