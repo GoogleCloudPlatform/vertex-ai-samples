@@ -107,6 +107,9 @@ def parse_notebook(path):
         cell, nth = get_cell(path, cells, nth)
         if not cell['source'][0].startswith("### Objective"):
             report_error(path, 12, "Objective section not found")
+            costs = []
+        else:
+            title, uses, steps, costs = parse_objective(path, cell)
             
         # (optional) Recommendation
         cell, nth = get_cell(path, cells, nth)
@@ -121,6 +124,16 @@ def parse_notebook(path):
         cell, nth = get_cell(path, cells, nth)
         if not cell['source'][0].startswith("### Costs"):
             report_error(path, 14, "Costs section not found")
+        else:
+            text = ''
+            for line in cell['source']:
+                text += line
+            if 'BQ' in costs and 'BigQuery' not in text:
+                report_error(path, 20, 'Costs section missing reference to BiqQuery')
+            if 'Vertex' in costs and 'Vertex' not in text:
+                report_error(path, 20, 'Costs section missing reference to Vertex')
+            if 'Dataflow' in costs and 'Dataflow' not in text:    
+                report_error(path, 20, 'Costs section missing reference to Dataflow')
 
 def get_cell(path, cells, nth):
     while empty_cell(path, cells, nth):
@@ -173,6 +186,50 @@ def report_error(notebook, code, msg):
             print(notebook, ',', code)
         else:
             print(f"{notebook}: ERROR ({code}): {msg}")
+            
+def parse_objective(path, cell):
+    title = ''
+    in_title = True
+    uses = ''
+    in_uses = False
+    steps = ''
+    in_steps = False
+    costs = []
+    
+    for line in cell['source']:
+        if line.startswith('This tutorial uses'):
+            in_title = False
+            in_steps = False
+            in_uses = True
+        elif line.startswith('The steps performed'):
+            in_title = False
+            in_uses = False
+            in_steps = True
+            
+        if in_title:
+            title += line
+        elif in_uses:
+            uses += line
+        elif in_steps:
+            steps += line
+            
+    if title == '':
+        report_error(path, 17, "Objective section missing title")
+        
+    if uses == '':
+        report_error(path, 18, "Objective section missing uses services list")
+    else:
+        if 'BigQuery' in uses:
+            costs.append('BQ')
+        if 'Vertex' in uses:
+            costs.append('Vertex')
+        if 'Dataflow' in uses:
+            costs.append('Dataflow')
+            
+    if steps == '':
+        report_error(path, 19, "Objective section missing steps list")
+            
+    return title, uses, steps, costs
             
         
 parse_dir(args.notebook_dir)
