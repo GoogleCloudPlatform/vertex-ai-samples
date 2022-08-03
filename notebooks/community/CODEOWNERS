@@ -5,11 +5,13 @@
 
 /sdk/sdk_* @andrewferlitsch
 /gapic @andrewferlitsch
+/gapic/custom/showcase_custom_image_classification_online_explain_example_based_api.ipynb @inardini
 /ml_ops @andrewferlitsch
 /model_monitoring/* @mco-gh
 /structured_data/rapid_prototyping_* @rafael-carvalho
 
 /managed_notebooks/
+/bigquery_ml/ @polong
 /sdk/SDK_FBProphet_Forecasting_Online.ipynb @brianchunkang
 /pipelines/google_cloud_pipeline_components_TPU_model_train_upload_deploy.ipynb @brianchunkang
 /explainable_ai/SDK_Custom_Container_XAI.ipynb @brianchunkang

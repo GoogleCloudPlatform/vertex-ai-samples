@@ -2,7 +2,7 @@
 # the repo. Unless a later match takes precedence,
 # @global-owner1 and @global-owner2 will be requested for
 # review when someone opens a pull request.
-* @vertex-ai-samples-contributors  @GoogleCloudPlatform/cloudml-samples-owners
+* @GoogleCloudPlatform/vertex-ai-samples-contributors  @GoogleCloudPlatform/caiis-tw
 
 # matching_engine folder
 /matching_engine @shenzhimo2
@@ -12,17 +12,18 @@
 /migration @aferlitsch
 /explainabl_ai @aferlitsch
 /pipelines @aferlitsch
-/experiments @inardini
+/tensorboard @zbl94
 
 /model_monitoring/model_monitoring.ipynb @mco-gh
 /ml_metadata/sdk-metric-parameter-tracking-for-custom-jobs.ipynb @jialuzh
 /ml_metadata/sdk-metric-parameter-tracking-for-locally-trained-models.ipynb @jialuzh
 /ml_metadata/vertex-pipelines-ml-metadata.ipynb @sararob
 /vizier/gapic-vizier-multi-objective-optimization.ipynb @halio-g
-/feature_store/gapic-feature-store.ipynb @protorganizer @diemtvu
+/feature_store/gapic-feature-store.ipynb @diemtvu
 /managed_notebooks @GoogleCloudPlatform/notebooks-team
 /pipelines/google_cloud_pipeline_components_bqml_text.ipynb @inardini
 /pipelines/google_cloud_pipelines_dataproc_tabular @inardini
 /automl/automl_forecasting_bqml_arima_plus_comparison.ipynb @TheMichaelHu
 /automl/automl_tabular_on_vertex_pipelines.ipynb @helinwang
+/custom/custom_training_tensorboard_profiler.ipynb @itseric
 /custom/get_started_with_vertex_endpoint_and_shared_vm.ipynb @andrewferlitsch @xingziye
