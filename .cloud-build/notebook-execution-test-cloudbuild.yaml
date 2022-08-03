@@ -28,14 +28,6 @@ steps:
     - . workspace/env/bin/activate &&
       python3 -m pip -q install -U pip &&
       python3 -m pip -q install -U -r .cloud-build/requirements.txt
-  # pip freeze
-  - name: ${_PYTHON_IMAGE}
-    entrypoint: /bin/sh
-    args:
-    - -c
-    - |
-      . workspace/env/bin/activate &&
-      python3 -m pip freeze
   # Install Python dependencies and run testing script
   # TODO: Only pass in private_pool_id if it is set
   - name: ${_PYTHON_IMAGE}
