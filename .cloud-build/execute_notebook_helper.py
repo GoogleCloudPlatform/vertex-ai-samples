@@ -72,8 +72,15 @@ def execute_notebook(
 
             print("\n=== EXECUTION FINISHED ===\n")
             print(
-                f"Please debug the executed notebook by downloading: {output_file_or_uri}"
+                f"Please debug the executed notebook by downloading the executed notebook:"
             )
+
+            print("Option 1. Using gsutil. Run the following command in your terminal.")
+            print(f"\tgsutil cp \"{output_file_or_uri}\" .")
+
+            print("Option 2. Using this link.")
+            print(f"\thttps://storage.googleapis.com/{output_file_or_uri[5:]}")
+                   
             print("\n======\n")
         else:
             # Create directories if they don't exist
