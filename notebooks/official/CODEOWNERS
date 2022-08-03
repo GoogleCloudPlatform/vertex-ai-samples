@@ -9,10 +9,10 @@
 
 /tabnet/tabnet_vertex_tutorial.ipynb @longtle
 
-/migration @andrewferlitsch
-/explainabl_ai @andrewferlitsch
-/pipelines @andrewferlitsch
-/experiments @inardini
+/migration @aferlitsch
+/explainabl_ai @aferlitsch
+/pipelines @aferlitsch
+/tensorboard @zbl94
 
 /model_monitoring/model_monitoring.ipynb @mco-gh
 /ml_metadata/sdk-metric-parameter-tracking-for-custom-jobs.ipynb @jialuzh
