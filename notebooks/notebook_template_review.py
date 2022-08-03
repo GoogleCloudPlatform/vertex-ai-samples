@@ -11,6 +11,8 @@ parser.add_argument('--errors', dest='errors',
                     default=False, type=bool, help='Report errors')
 parser.add_argument('--errors-csv', dest='errors_csv',
                     default=False, type=bool, help='Report errors as CSV')
+parser.add_argument('--errors-codes', dest='errors_codes',
+                    default=None, type=str, help='Report only specified errors')
 parser.add_argument('--desc', dest='desc',
                     default=False, type=bool, help='Output description')
 parser.add_argument('--uses', dest='uses',
@@ -18,6 +20,9 @@ parser.add_argument('--uses', dest='uses',
 parser.add_argument('--steps', dest='steps',
                     default=False, type=bool, help='Ouput steps')
 args = parser.parse_args()
+
+if args.errors_codes:
+    args.errors_codes = args.errors_codes.split(',')
 
 if not os.path.isdir(args.notebook_dir):
     print("Error: not a directory:", args.notebook_dir)
@@ -111,6 +116,11 @@ def parse_notebook(path):
         # Dataset
         if not cell['source'][0].startswith("### Dataset") and not cell['source'][0].startswith("### Model") and not cell['source'][0].startswith("### Embedding"):
             report_error(path, 13, "Dataset/Model section not found")
+            
+        # Costs
+        cell, nth = get_cell(path, cells, nth)
+        if not cell['source'][0].startswith("### Costs"):
+            report_error(path, 14, "Costs section not found")
 
 def get_cell(path, cells, nth):
     while empty_cell(path, cells, nth):
@@ -155,6 +165,10 @@ def check_sentence_case(path, heading):
             
 def report_error(notebook, code, msg):
     if args.errors:
+        if args.errors_codes:
+            if str(code) not in args.errors_codes:
+                return
+            
         if args.errors_csv:
             print(notebook, ',', code)
         else:
