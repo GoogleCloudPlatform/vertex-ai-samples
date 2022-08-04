@@ -191,10 +191,14 @@ def parse_notebook(path):
             cell, nth = get_cell(path, cells, nth) # code cell
             if cell['cell_type'] != 'code':
                 report_error(path, 28, "Restart the kernel code section not found")
-            
+                
+        # (optional) Check package versions
+        cell, nth = get_cell(path, cells, nth)
+        if cell['source'][0].startswith('#### Check package versions'):
+            cell, nth = get_cell(path, cells, nth) # code cell
+            cell, nth = get_cell(path, cells, nth) # next text cell
             
         # Before you begin
-        cell, nth = get_cell(path, cells, nth)
         if not cell['source'][0].startswith("## Before you begin"):
             report_error(path, 29, "Before you begin section not found")
         else:
@@ -242,9 +246,13 @@ def check_text_cell(path, cell):
         if 'Vertex XAI' in line:
             report_error(path, 27, f"Branding: Vertex Explainable AI: {line}")
         if 'Vertex Experiments' in line:
-            report_error(path, 27, f"Branding: Vertex Experiments: {line}")
+            report_error(path, 27, f"Branding: Vertex AI Experiments: {line}")
         if 'Vertex TensorBoard' in line:
-            report_error(path, 27, f"Branding: Vertex TensorBoard: {line}")
+            report_error(path, 27, f"Branding: Vertex AI TensorBoard: {line}")
+        if 'Vertex Pipelines' in line:
+            report_error(path, 27, f"Branding: Vertex AI Pipelines: {line}")
+        if 'Vertex Hyperparameter Tuning' in line:
+            report_error(path, 27, f"Branding: Vertex AI Hyperparameter Tuning: {line}")
         if 'Tensorflow' in line:
             report_error(path, 27, f"Branding: TensorFlow: {line}")
         if 'Tensorboard' in line:
