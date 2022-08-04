@@ -134,6 +134,76 @@ def parse_notebook(path):
                 report_error(path, 20, 'Costs section missing reference to Vertex')
             if 'Dataflow' in costs and 'Dataflow' not in text:    
                 report_error(path, 20, 'Costs section missing reference to Dataflow')
+                
+        # (optional) Setup local environment
+        cell, nth = get_cell(path, cells, nth)
+        if cell['source'][0].startswith('### Set up your local development environment'):
+            cell, nth = get_cell(path, cells, nth)
+            if cell['source'][0].startswith('**Otherwise**, make sure your environment meets'):
+                cell, nth = get_cell(path, cells, nth)
+                
+        # (optional) Helper functions
+        if 'helper' in cell['source'][0]:
+            cell, nth = get_cell(path, cells, nth)
+            cell, nth = get_cell(path, cells, nth)
+                
+        # Installation
+        if not cell['source'][0].startswith("## Install"):
+            if cell['source'][0].startswith("### Install"):
+                report_error(path, 27, "Installation section needs to be H2 heading")
+            else:
+                report_error(path, 21, "Installation section not found")
+        else:
+            cell, nth = get_cell(path, cells, nth)
+            if cell['cell_type'] != 'code':
+                report_error(path, 22, "Installation code section not found")
+            else:
+                text = ''
+                for line in cell['source']:
+                    text += line
+                    if 'pip ' in line:
+                        if 'pip3' not in line:
+                            report_error(path, 23, "Installation code section: use pip3")
+                        if line.endswith('\\\n'):
+                            continue
+                        if '-q' not in line:
+                            report_error(path, 23, "Installation code section: use -q with pip3")
+                        if 'USER_FLAG' not in line and 'sh(' not in line:
+                            report_error(path, 23, "Installation code section: use {USER_FLAG} with pip3")
+                if 'if IS_WORKBENCH_NOTEBOOK:' not in text:
+                    report_error(path, 24, "Installation code section out of date (see template)")
+            
+        # Restart kernel
+        while True:
+            cont = False
+            cell, nth = get_cell(path, cells, nth)
+            for line in cell['source']:
+                if 'pip' in line:
+                    report_error(path, 25, f"All pip installations must be in a single code cell: {line}")
+                    cont = True
+                    break
+            if not cont:
+                break
+           
+        if not cell['source'][0].startswith("### Restart the kernel"):
+            report_error(path, 26, "Restart the kernel section not found")
+        else:
+            cell, nth = get_cell(path, cells, nth) # code cell
+            if cell['cell_type'] != 'code':
+                report_error(path, 28, "Restart the kernel code section not found")
+            
+            
+        # Before you begin
+        cell, nth = get_cell(path, cells, nth)
+        if not cell['source'][0].startswith("## Before you begin"):
+            report_error(path, 29, "Before you begin section not found")
+        else:
+            # maybe one or two cells
+            if len(cell['source']) < 2:
+                cell, nth = get_cell(path, cells, nth)
+                if not cell['source'][0].startswith("### Set up your Google Cloud project"):
+                    report_error(path, 30, "Before you begin section incomplete")
+                
 
 def get_cell(path, cells, nth):
     while empty_cell(path, cells, nth):
@@ -160,6 +230,25 @@ def check_text_cell(path, cell):
             report_error(path, 15, f'Do not use first person (e.g., we), replace with 2nd person (you): {line}')
         if 'will' in line.lower() or 'would' in line.lower():
             report_error(path, 16, f'Do not use future tense (e.g., will), replace with present tense: {line}')
+            
+        if 'Vertex SDK' in line:
+            report_error(path, 27, f"Branding: Vertex AI SDK: {line}")
+        if 'Vertex Training' in line:
+            report_error(path, 27, f"Branding: Vertex AI Training: {line}")
+        if 'Vertex Prediction' in line:
+            report_error(path, 27, f"Branding: Vertex AI Prediction: {line}")
+        if 'Vertex Batch Prediction' in line:
+            report_error(path, 27, f"Branding: Vertex AI Batch Prediction {line}")
+        if 'Vertex XAI' in line:
+            report_error(path, 27, f"Branding: Vertex Explainable AI: {line}")
+        if 'Vertex Experiments' in line:
+            report_error(path, 27, f"Branding: Vertex Experiments: {line}")
+        if 'Vertex TensorBoard' in line:
+            report_error(path, 27, f"Branding: Vertex TensorBoard: {line}")
+        if 'Tensorflow' in line:
+            report_error(path, 27, f"Branding: TensorFlow: {line}")
+        if 'Tensorboard' in line:
+            report_error(path, 27, f"Branding: TensorBoard: {line}")
 
 
 def check_sentence_case(path, heading):
