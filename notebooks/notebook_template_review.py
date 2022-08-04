@@ -207,7 +207,22 @@ def parse_notebook(path):
                 cell, nth = get_cell(path, cells, nth)
                 if not cell['source'][0].startswith("### Set up your Google Cloud project"):
                     report_error(path, 30, "Before you begin section incomplete")
-                
+              
+        # (optional) enable APIs
+        cell, nth = get_cell(path, cells, nth)
+        if cell['source'][0].startswith("### Enable APIs"):
+            cell, nth = get_cell(path, cells, nth) # code cell
+            cell, nth = get_cell(path, cells, nth) # next text cell
+            
+        # Set project ID
+        if not cell['source'][0].startswith('#### Set your project ID'):
+            report_error(path, 31, "Set project ID section not found")
+        else: 
+            cell, nth = get_cell(path, cells, nth)
+            if cell['cell_type'] != 'code':
+                report_error(path, 32, "Set project ID code section not found")
+            elif not cell['source'][0].startswith('PROJECT_ID = "[your-project-id]"'):
+                report_error(path, 33, f"Set project ID not match template: {line}")
 
 def get_cell(path, cells, nth):
     while empty_cell(path, cells, nth):
@@ -267,7 +282,7 @@ def check_sentence_case(path, heading):
     for word in words[1:]:
         word = word.replace(':', '').replace('(', '').replace(')', '')
         if word in ['E2E', 'Vertex', 'AutoML', 'ML', 'AI', 'GCP', 'API', 'R', 'CMEK', 'TFX', 'TFDV', 'SDK',
-                    'VM', 'CPR', 'NVIDIA']:
+                    'VM', 'CPR', 'NVIDIA', 'ID']:
             continue
         if word.isupper():
             report_error(path, 3, f"heading is not sentence case: {word}")
