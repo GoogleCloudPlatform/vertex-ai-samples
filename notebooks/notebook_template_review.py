@@ -223,6 +223,22 @@ def parse_notebook(path):
                 report_error(path, 32, "Set project ID code section not found")
             elif not cell['source'][0].startswith('PROJECT_ID = "[your-project-id]"'):
                 report_error(path, 33, f"Set project ID not match template: {line}")
+            
+            cell, nth = get_cell(path, cells, nth)
+            if cell['cell_type'] != 'code' or 'or PROJECT_ID == "[your-project-id]":' not in cell['source'][0]:
+                report_error(path, 33, f"Set project ID not match template: {line}")  
+            
+            cell, nth = get_cell(path, cells, nth)
+            if cell['cell_type'] != 'code' or '! gcloud config set project' not in cell['source'][0]:
+                report_error(path, 33, f"Set project ID not match template: {line}")   
+            
+        '''
+        # Region
+        cell, nth = get_cell(path, cells, nth)
+        if cell['source'][0].startswith("### Region"): 
+            report_error(path, 34, "Region section not found")
+        '''
+                
 
 def get_cell(path, cells, nth):
     while empty_cell(path, cells, nth):
@@ -313,17 +329,33 @@ def parse_objective(path, cell):
             in_desc = False
             in_steps = False
             in_uses = True
+            uses += line
+            continue
         elif line.startswith('The steps performed'):
             in_desc = False
             in_uses = False
             in_steps = True
+            steps += line
+            continue
             
         if in_desc:
             desc += line
         elif in_uses:
-            uses += line
+            sline = line.strip()
+            if len(sline) == 0:
+                uses += '\n'
+            else:
+                ch = sline[0]
+                if ch in ['-', '*', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                    uses += line
         elif in_steps:
-            steps += line
+            sline = line.strip()
+            if len(sline) == 0:
+                steps += '\n'
+            else:
+                ch = sline[0]
+                if ch in ['-', '*', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                    steps += line
             
     if desc == '':
         report_error(path, 17, "Objective section missing desc")
