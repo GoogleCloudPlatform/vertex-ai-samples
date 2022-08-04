@@ -1,0 +1,347 @@
+
+import argparse
+import json
+import os
+import urllib.request
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--notebook-dir', dest='notebook_dir',
+                    required=True, type=str, help='Notebook directory')
+parser.add_argument('--errors', dest='errors',
+                    default=False, type=bool, help='Report errors')
+parser.add_argument('--errors-csv', dest='errors_csv',
+                    default=False, type=bool, help='Report errors as CSV')
+parser.add_argument('--errors-codes', dest='errors_codes',
+                    default=None, type=str, help='Report only specified errors')
+parser.add_argument('--desc', dest='desc',
+                    default=False, type=bool, help='Output description')
+parser.add_argument('--uses', dest='uses',
+                    default=False, type=bool, help='Output uses (resources)')
+parser.add_argument('--steps', dest='steps',
+                    default=False, type=bool, help='Ouput steps')
+args = parser.parse_args()
+
+if args.errors_codes:
+    args.errors_codes = args.errors_codes.split(',')
+
+if not os.path.isdir(args.notebook_dir):
+    print("Error: not a directory:", args.notebook_dir)
+    exit(1)
+    
+def parse_dir(directory):
+    entries = os.scandir(directory)
+    for entry in entries:
+        if entry.is_dir():
+            if entry.name[0] == '.':
+                continue
+            if entry.name == 'src' or entry.name == 'images':
+                continue
+            parse_dir(entry.path)
+        elif entry.name.endswith('.ipynb'):
+            parse_notebook(entry.path)
+            
+def parse_notebook(path):
+    with open(path, 'r') as f:
+        try:
+            content = json.load(f)
+        except:
+            print("Corrupted notebook:", path)
+            return
+        
+        cells = content['cells']
+        
+        # cell 1 is copyright
+        nth = 0
+        cell, nth = get_cell(path, cells, nth)
+        if not cell['source'][0].startswith('# Copyright'):
+            report_error(path, 0, "missing copyright cell")
+            
+        # check for notices
+        cell, nth = get_cell(path, cells, nth)
+        if cell['source'][0].startswith('This notebook'):
+            cell, nth = get_cell(path, cells, nth)
+            
+        # cell 2 is title and links
+        if not cell['source'][0].startswith('# '):
+            report_error(path, 1, "title cell must start with H1 heading")
+        else:
+            title = cell['source'][0][2:].strip()
+            check_sentence_case(path, title)
+           
+        # check links.
+        source = ''
+        for line in cell['source']:
+            source += line
+            if '<a href="https://github.com' in line:
+                link = line.strip()[9:-2]
+                try:
+                    code = urllib.request.urlopen(link).getcode()
+                except Exception as e:
+                    report_error(path, 7, f"bad GitHub link: {link}")
+            if '<a href="https://colab.research.google.com/' in line:
+                link = 'https://github.com/' + line.strip()[50:-2]
+                try:
+                    code = urllib.request.urlopen(link).getcode()
+                except Exception as e:
+                    report_error(path, 8, f"bad Colab link: {link}")
+            if '<a href="https://console.cloud.google.com/vertex-ai/workbench/' in line:
+                link = line.strip()[91:-2]
+                try:
+                    code = urllib.request.urlopen(link).getcode()
+                except Exception as e:
+                    report_error(path, 9, f"bad Workbench link: {link}")
+
+        if 'View on GitHub' not in source:
+            report_error(path, 4, 'Missing link for GitHub')
+        if 'Open in Vertex AI Workbench' not in source:
+            report_error(path, 5, 'Missing link for Workbench')
+        if 'master' in source:
+            report_error(path, 6, 'Outdated branch (master) used in link')
+            
+        # Overview
+        cell, nth = get_cell(path, cells, nth)
+        if not cell['source'][0].startswith("## Overview"):
+            report_error(path, 11, "Overview section not found")
+            
+        # Objective
+        cell, nth = get_cell(path, cells, nth)
+        if not cell['source'][0].startswith("### Objective"):
+            report_error(path, 12, "Objective section not found")
+            costs = []
+        else:
+            title, uses, steps, costs = parse_objective(path, cell)
+            
+        # (optional) Recommendation
+        cell, nth = get_cell(path, cells, nth)
+        if cell['source'][0].startswith("### Recommendations"):
+            cell, nth = get_cell(path, cells, nth)
+            
+        # Dataset
+        if not cell['source'][0].startswith("### Dataset") and not cell['source'][0].startswith("### Model") and not cell['source'][0].startswith("### Embedding"):
+            report_error(path, 13, "Dataset/Model section not found")
+            
+        # Costs
+        cell, nth = get_cell(path, cells, nth)
+        if not cell['source'][0].startswith("### Costs"):
+            report_error(path, 14, "Costs section not found")
+        else:
+            text = ''
+            for line in cell['source']:
+                text += line
+            if 'BQ' in costs and 'BigQuery' not in text:
+                report_error(path, 20, 'Costs section missing reference to BiqQuery')
+            if 'Vertex' in costs and 'Vertex' not in text:
+                report_error(path, 20, 'Costs section missing reference to Vertex')
+            if 'Dataflow' in costs and 'Dataflow' not in text:    
+                report_error(path, 20, 'Costs section missing reference to Dataflow')
+                
+        # (optional) Setup local environment
+        cell, nth = get_cell(path, cells, nth)
+        if cell['source'][0].startswith('### Set up your local development environment'):
+            cell, nth = get_cell(path, cells, nth)
+            if cell['source'][0].startswith('**Otherwise**, make sure your environment meets'):
+                cell, nth = get_cell(path, cells, nth)
+                
+        # (optional) Helper functions
+        if 'helper' in cell['source'][0]:
+            cell, nth = get_cell(path, cells, nth)
+            cell, nth = get_cell(path, cells, nth)
+                
+        # Installation
+        if not cell['source'][0].startswith("## Install"):
+            if cell['source'][0].startswith("### Install"):
+                report_error(path, 27, "Installation section needs to be H2 heading")
+            else:
+                report_error(path, 21, "Installation section not found")
+        else:
+            cell, nth = get_cell(path, cells, nth)
+            if cell['cell_type'] != 'code':
+                report_error(path, 22, "Installation code section not found")
+            else:
+                text = ''
+                for line in cell['source']:
+                    text += line
+                    if 'pip ' in line:
+                        if 'pip3' not in line:
+                            report_error(path, 23, "Installation code section: use pip3")
+                        if line.endswith('\\\n'):
+                            continue
+                        if '-q' not in line:
+                            report_error(path, 23, "Installation code section: use -q with pip3")
+                        if 'USER_FLAG' not in line and 'sh(' not in line:
+                            report_error(path, 23, "Installation code section: use {USER_FLAG} with pip3")
+                if 'if IS_WORKBENCH_NOTEBOOK:' not in text:
+                    report_error(path, 24, "Installation code section out of date (see template)")
+            
+        # Restart kernel
+        while True:
+            cont = False
+            cell, nth = get_cell(path, cells, nth)
+            for line in cell['source']:
+                if 'pip' in line:
+                    report_error(path, 25, f"All pip installations must be in a single code cell: {line}")
+                    cont = True
+                    break
+            if not cont:
+                break
+           
+        if not cell['source'][0].startswith("### Restart the kernel"):
+            report_error(path, 26, "Restart the kernel section not found")
+        else:
+            cell, nth = get_cell(path, cells, nth) # code cell
+            if cell['cell_type'] != 'code':
+                report_error(path, 28, "Restart the kernel code section not found")
+                
+        # (optional) Check package versions
+        cell, nth = get_cell(path, cells, nth)
+        if cell['source'][0].startswith('#### Check package versions'):
+            cell, nth = get_cell(path, cells, nth) # code cell
+            cell, nth = get_cell(path, cells, nth) # next text cell
+            
+        # Before you begin
+        if not cell['source'][0].startswith("## Before you begin"):
+            report_error(path, 29, "Before you begin section not found")
+        else:
+            # maybe one or two cells
+            if len(cell['source']) < 2:
+                cell, nth = get_cell(path, cells, nth)
+                if not cell['source'][0].startswith("### Set up your Google Cloud project"):
+                    report_error(path, 30, "Before you begin section incomplete")
+              
+        # (optional) enable APIs
+        cell, nth = get_cell(path, cells, nth)
+        if cell['source'][0].startswith("### Enable APIs"):
+            cell, nth = get_cell(path, cells, nth) # code cell
+            cell, nth = get_cell(path, cells, nth) # next text cell
+            
+        # Set project ID
+        if not cell['source'][0].startswith('#### Set your project ID'):
+            report_error(path, 31, "Set project ID section not found")
+        else: 
+            cell, nth = get_cell(path, cells, nth)
+            if cell['cell_type'] != 'code':
+                report_error(path, 32, "Set project ID code section not found")
+            elif not cell['source'][0].startswith('PROJECT_ID = "[your-project-id]"'):
+                report_error(path, 33, f"Set project ID not match template: {line}")
+
+def get_cell(path, cells, nth):
+    while empty_cell(path, cells, nth):
+        nth += 1
+        
+    cell = cells[nth]
+    if cell['cell_type'] == 'markdown':
+        check_text_cell(path, cell)
+    return cell, nth + 1
+
+                
+def empty_cell(path, cells, nth):
+    if len(cells[nth]['source']) == 0:
+        report_error(path, 10, f'empty cell: cell #{nth}')
+        return True
+    else:
+        return False
+    
+def check_text_cell(path, cell):
+    for line in cell['source']:
+        if 'TODO' in line:
+            report_error(path, 14, f'TODO in cell: {line}')
+        if 'we ' in line.lower() or "let's" in line.lower() in line.lower():
+            report_error(path, 15, f'Do not use first person (e.g., we), replace with 2nd person (you): {line}')
+        if 'will' in line.lower() or 'would' in line.lower():
+            report_error(path, 16, f'Do not use future tense (e.g., will), replace with present tense: {line}')
+            
+        if 'Vertex SDK' in line:
+            report_error(path, 27, f"Branding: Vertex AI SDK: {line}")
+        if 'Vertex Training' in line:
+            report_error(path, 27, f"Branding: Vertex AI Training: {line}")
+        if 'Vertex Prediction' in line:
+            report_error(path, 27, f"Branding: Vertex AI Prediction: {line}")
+        if 'Vertex Batch Prediction' in line:
+            report_error(path, 27, f"Branding: Vertex AI Batch Prediction {line}")
+        if 'Vertex XAI' in line:
+            report_error(path, 27, f"Branding: Vertex Explainable AI: {line}")
+        if 'Vertex Experiments' in line:
+            report_error(path, 27, f"Branding: Vertex AI Experiments: {line}")
+        if 'Vertex TensorBoard' in line:
+            report_error(path, 27, f"Branding: Vertex AI TensorBoard: {line}")
+        if 'Vertex Pipelines' in line:
+            report_error(path, 27, f"Branding: Vertex AI Pipelines: {line}")
+        if 'Vertex Hyperparameter Tuning' in line:
+            report_error(path, 27, f"Branding: Vertex AI Hyperparameter Tuning: {line}")
+        if 'Tensorflow' in line:
+            report_error(path, 27, f"Branding: TensorFlow: {line}")
+        if 'Tensorboard' in line:
+            report_error(path, 27, f"Branding: TensorBoard: {line}")
+
+
+def check_sentence_case(path, heading):
+    words = heading.split(' ')
+    if not words[0][0].isupper():
+        report_error(path, 2, f"heading must start with capitalized word: {words[0]}")
+        
+    for word in words[1:]:
+        word = word.replace(':', '').replace('(', '').replace(')', '')
+        if word in ['E2E', 'Vertex', 'AutoML', 'ML', 'AI', 'GCP', 'API', 'R', 'CMEK', 'TFX', 'TFDV', 'SDK',
+                    'VM', 'CPR', 'NVIDIA', 'ID']:
+            continue
+        if word.isupper():
+            report_error(path, 3, f"heading is not sentence case: {word}")
+            
+            
+def report_error(notebook, code, msg):
+    if args.errors:
+        if args.errors_codes:
+            if str(code) not in args.errors_codes:
+                return
+            
+        if args.errors_csv:
+            print(notebook, ',', code)
+        else:
+            print(f"{notebook}: ERROR ({code}): {msg}")
+            
+def parse_objective(path, cell):
+    title = ''
+    in_title = True
+    uses = ''
+    in_uses = False
+    steps = ''
+    in_steps = False
+    costs = []
+    
+    for line in cell['source']:
+        if line.startswith('This tutorial uses'):
+            in_title = False
+            in_steps = False
+            in_uses = True
+        elif line.startswith('The steps performed'):
+            in_title = False
+            in_uses = False
+            in_steps = True
+            
+        if in_title:
+            title += line
+        elif in_uses:
+            uses += line
+        elif in_steps:
+            steps += line
+            
+    if title == '':
+        report_error(path, 17, "Objective section missing title")
+        
+    if uses == '':
+        report_error(path, 18, "Objective section missing uses services list")
+    else:
+        if 'BigQuery' in uses:
+            costs.append('BQ')
+        if 'Vertex' in uses:
+            costs.append('Vertex')
+        if 'Dataflow' in uses:
+            costs.append('Dataflow')
+            
+    if steps == '':
+        report_error(path, 19, "Objective section missing steps list")
+            
+    return title, uses, steps, costs
+            
+        
+parse_dir(args.notebook_dir)
