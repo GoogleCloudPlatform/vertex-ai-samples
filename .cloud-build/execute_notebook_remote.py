@@ -54,7 +54,7 @@ def execute_notebook_remote(
     }
 
     if python_version is not None:
-      substitutions["_PYTHON_VERION"] = python_version
+      substitutions["_PYTHON_VERSION"] = "python" + python_version
 
     build = cloudbuild_v1.Build()
 
