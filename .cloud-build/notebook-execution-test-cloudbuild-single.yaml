@@ -10,21 +10,21 @@ steps:
     entrypoint: /bin/sh
     args:
     - -c
-    - ${_PYTHON_VERION} .cloud-build/CheckPythonVersion.py -q
+    - ${_PYTHON_VERSION} .cloud-build/CheckPythonVersion.py -q
   # Create a virtual environment
   - name: ${_PYTHON_IMAGE}
     entrypoint: /bin/sh
     args:
     - -c
-    - ${_PYTHON_VERION} -m venv workspace/env
+    - ${_PYTHON_VERSION} -m venv workspace/env
   # Install Python dependencies
   - name: ${_PYTHON_IMAGE}
     entrypoint: /bin/sh
     args:
     - -c
     - . workspace/env/bin/activate &&
-      ${_PYTHON_VERION} -m pip -q install -U pip &&
-      ${_PYTHON_VERION} -m pip -q install -U -r .cloud-build/requirements.txt
+      ${_PYTHON_VERSION} -m pip -q install -U pip &&
+      ${_PYTHON_VERSION} -m pip -q install -U -r .cloud-build/requirements.txt
   # Install Python dependencies and run testing script
   - name: ${_PYTHON_IMAGE}
     entrypoint: /bin/sh
@@ -32,7 +32,7 @@ steps:
     - -c
     - |
       . workspace/env/bin/activate &&
-      ${_PYTHON_VERION} .cloud-build/execute_notebook_cli.py --notebook_source "${_NOTEBOOK_GCS_URI}" --output_file_or_uri "${_NOTEBOOK_OUTPUT_GCS_URI}"
+      ${_PYTHON_VERSION} .cloud-build/execute_notebook_cli.py --notebook_source "${_NOTEBOOK_GCS_URI}" --output_file_or_uri "${_NOTEBOOK_OUTPUT_GCS_URI}"
     env:
     - 'IS_TESTING=1'
 timeout: 86400s
