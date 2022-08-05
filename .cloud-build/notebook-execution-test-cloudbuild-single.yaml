@@ -10,21 +10,21 @@ steps:
     entrypoint: /bin/sh
     args:
     - -c
-    - python3 .cloud-build/CheckPythonVersion.py -q
+    - ${_PYTHON_VERION} .cloud-build/CheckPythonVersion.py -q
   # Create a virtual environment
   - name: ${_PYTHON_IMAGE}
     entrypoint: /bin/sh
     args:
     - -c
-    - python3 -m venv workspace/env
+    - ${_PYTHON_VERION} -m venv workspace/env
   # Install Python dependencies
   - name: ${_PYTHON_IMAGE}
     entrypoint: /bin/sh
     args:
     - -c
     - . workspace/env/bin/activate &&
-      python3 -m pip -q install -U pip &&
-      python3 -m pip -q install -U -r .cloud-build/requirements.txt
+      ${_PYTHON_VERION} -m pip -q install -U pip &&
+      ${_PYTHON_VERION} -m pip -q install -U -r .cloud-build/requirements.txt
   # Install Python dependencies and run testing script
   - name: ${_PYTHON_IMAGE}
     entrypoint: /bin/sh
