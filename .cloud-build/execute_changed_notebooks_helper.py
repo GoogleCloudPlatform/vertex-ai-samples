@@ -206,6 +206,7 @@ def process_and_execute_notebook(
             private_pool_id=private_pool_id,
             private_pool_region=variable_region,
             timeout_in_seconds=timeout_in_seconds,
+            python_version=notebook_exec_python_version
         )
 
         operation_metadata = BuildOperationMetadata(mapping=operation.metadata)
