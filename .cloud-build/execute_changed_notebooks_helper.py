@@ -67,7 +67,7 @@ class NotebookExecutionResult:
     output_uri: str
     build_id: str
     error_message: Optional[str]
-    
+
     @property
     def output_uri_web(self) -> Optional[str]:
         if self.output_uri.startswith("gs://"):
@@ -107,6 +107,15 @@ def _process_notebook(
     with open(notebook_path, mode="w", encoding="utf-8") as new_file:
         nbformat.write(nb, new_file)
 
+
+def _get_notebook_python_version(notebook_path: str) -> str:
+  """
+  Get the python version for running the notebook if it is specified in
+  the notebbok.
+  """
+  python_version = "3.1"
+
+  return python_version
 
 def _create_tag(filepath: str) -> str:
     tag = os.path.basename(os.path.normpath(filepath))
@@ -164,6 +173,10 @@ def process_and_execute_notebook(
             variable_region=variable_region,
             variable_service_account=variable_service_account,
         )
+
+        # Get the python version for ruuning the notebook if specified
+        notebook_exec_python_version = _get_notebook_python_version(notebook)
+        print(f"Running notebook with python {notebook_exec_python_version}")
 
         # Upload the pre-processed code to a GCS bucket
         code_archive_uri = util.archive_code_and_upload(staging_bucket=staging_bucket)
