@@ -9,9 +9,9 @@
 
 /tabnet/tabnet_vertex_tutorial.ipynb @longtle
 
-/migration @aferlitsch
-/explainabl_ai @aferlitsch
-/pipelines @aferlitsch
+/migration @andrewferlitsch
+/explainabl_ai  @andrewferlitsch
+/pipelines @andrewferlitsch
 /tensorboard @zbl94
 
 /model_monitoring/model_monitoring.ipynb @mco-gh
