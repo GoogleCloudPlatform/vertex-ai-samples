@@ -4,16 +4,16 @@ steps:
     entrypoint: /bin/sh
     args:
     - -c
-    - gcloud config list
+    - gcloud config list --quiet
   # Check the Python version
   - name: ${_PYTHON_IMAGE}
     entrypoint: /bin/sh
     args:
     - -c
-    - python3 .cloud-build/CheckPythonVersion.py
+    - python3 .cloud-build/CheckPythonVersion.py -q
   # Fetch full repo for diff purposes
   - name: gcr.io/cloud-builders/git
-    args: [fetch, --unshallow]
+    args: [fetch, --unshallow, --quiet]
   # Create a virtual environment
   - name: ${_PYTHON_IMAGE}
     entrypoint: /bin/sh
@@ -24,27 +24,19 @@ steps:
   - name: ${_PYTHON_IMAGE}
     entrypoint: /bin/sh
     args:
-    - -c 
-    - . workspace/env/bin/activate &&
-      python3 -m pip install -U pip &&
-      python3 -m pip install -U -r .cloud-build/requirements.txt
-  # pip freeze
-  - name: ${_PYTHON_IMAGE}
-    entrypoint: /bin/sh
-    args:
     - -c
-    - |
-      . workspace/env/bin/activate &&
-      python3 -m pip freeze
+    - . workspace/env/bin/activate &&
+      python3 -m pip -q install -U pip &&
+      python3 -m pip -q install -U -r .cloud-build/requirements.txt
   # Install Python dependencies and run testing script
   # TODO: Only pass in private_pool_id if it is set
   - name: ${_PYTHON_IMAGE}
     entrypoint: /bin/sh
     args:
     - -c
-    - | 
+    - |
       . workspace/env/bin/activate &&
-      python3 .cloud-build/execute_changed_notebooks_cli.py --test_paths_file "${_TEST_PATHS_FILE}" --base_branch "${_FORCED_BASE_BRANCH}" --container_uri ${_PYTHON_IMAGE} --staging_bucket ${_GCS_STAGING_BUCKET}  --artifacts_bucket ${_GCS_STAGING_BUCKET}/executed_notebooks/PR_${_PR_NUMBER}/BUILD_${BUILD_ID} --variable_project_id ${PROJECT_ID} --variable_region ${_GCP_REGION} `if [ ! -z "${_PRIVATE_POOL_NAME}" ]; then echo "--private_pool_id ${_PRIVATE_POOL_NAME}"; fi`
+      python3 .cloud-build/execute_changed_notebooks_cli.py --test_paths_file "${_TEST_PATHS_FILE}" --base_branch "${_FORCED_BASE_BRANCH}" --container_uri ${_PYTHON_IMAGE} --staging_bucket ${_GCS_STAGING_BUCKET}  --artifacts_bucket ${_GCS_STAGING_BUCKET}/executed_notebooks/PR_${_PR_NUMBER}/BUILD_${BUILD_ID} --variable_project_id ${PROJECT_ID} --variable_region ${_GCP_REGION} --variable_service_account ${_GCP_SERVICE_ACCOUNT} `if [ ! -z "${_PRIVATE_POOL_NAME}" ]; then echo "--private_pool_id ${_PRIVATE_POOL_NAME}"; fi`
     env:
     - 'IS_TESTING=1'
 timeout: 86400s
