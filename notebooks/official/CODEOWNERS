@@ -10,9 +10,11 @@
 /tabnet/tabnet_vertex_tutorial.ipynb @longtle
 
 /migration @andrewferlitsch
-/explainabl_ai @andrewferlitsch
+/explainabl_ai   
 /pipelines @andrewferlitsch
-/experiments @inardini
+/ml_metadata @andrewferlitsch
+/model_monitoring @andrewferlitsch
+/tensorboard @zbl94
 
 /model_monitoring/model_monitoring.ipynb @mco-gh
 /ml_metadata/sdk-metric-parameter-tracking-for-custom-jobs.ipynb @jialuzh
@@ -26,3 +28,4 @@
 /automl/automl_forecasting_bqml_arima_plus_comparison.ipynb @TheMichaelHu
 /automl/automl_tabular_on_vertex_pipelines.ipynb @helinwang
 /custom/custom_training_tensorboard_profiler.ipynb @itseric
+/workbench/spark/spark_sample_notebook.ipynb @bmiro
