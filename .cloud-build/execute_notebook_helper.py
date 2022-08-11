@@ -50,6 +50,20 @@ def execute_notebook(
 
     execution_exception = None
 
+
+    print("\n=== DOWNLOAD EXECUTED NOTEBOOK ===\n")
+    print(
+                f"Please debug the executed notebook by downloading the executed notebook:"
+            )
+
+    print("Option 1. Using gsutil. Run the following command in your terminal.")
+    print(f"\tgsutil cp \"{output_file_or_uri}\" .")
+
+    print("Option 2. Using this link.")
+    print(f"\thttps://storage.googleapis.com/{output_file_or_uri[5:]}")
+
+    print("\n======\n")
+
     # Execute notebook
     try:
         # Execute notebook
@@ -71,17 +85,6 @@ def execute_notebook(
             util.upload_file(notebook_source, remote_file_path=output_file_or_uri)
 
             print("\n=== EXECUTION FINISHED ===\n")
-            print(
-                f"Please debug the executed notebook by downloading the executed notebook:"
-            )
-
-            print("Option 1. Using gsutil. Run the following command in your terminal.")
-            print(f"\tgsutil cp \"{output_file_or_uri}\" .")
-
-            print("Option 2. Using this link.")
-            print(f"\thttps://storage.googleapis.com/{output_file_or_uri[5:]}")
-                   
-            print("\n======\n")
         else:
             # Create directories if they don't exist
             if not os.path.exists(os.path.dirname(output_file_or_uri)):
