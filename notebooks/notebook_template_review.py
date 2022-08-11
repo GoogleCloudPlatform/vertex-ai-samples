@@ -263,27 +263,27 @@ def empty_cell(path, cells, nth):
     
 def check_text_cell(path, cell):
     
-    branding = [
-        {'Vertex SDK', 'Vertex AI SDK'},
-        {'Vertex Training', 'Vertex AI Training'},
-        {'Vertex Prediction', 'Vertex AI Prediction'},
-        {'Vertex Batch Prediction', 'Vertex AI Batch Prediction'},
-        {'Vertex XAI', 'Vertex Explainable AI'},
-        {'Vertex Experiments', 'Vertex AI Experiments'},
-        {'Vertex TensorBoard', 'Vertex AI TensorBoard'},
-        {'Vertex Pipelines', 'Vertex AI Pipelines'},
-        {'Vertex Hyperparameter Tuning', 'Vertex AI Hyperparameter Tuning'},
-        {'Vertex Metadata', 'Vertex ML Metadata'},
-        {'Vertex AI Metadata', 'Vertex ML Metadata'},
-        {'Vertex Vizier', 'Vertex AI Vizier'},
-        {'Vertex Dataset', 'Vertex AI Dataset'},
-        {'Vertex Model', 'Vertex AI Model'},
-        {'Vertex Endpoint', 'Vertex AI Endpoint'},
-        {'Vertex Private Endpoint', 'Vertex AI Private Endpoint'},
-        {'Tensorflow', 'TensorFlow'},
-        {'Tensorboard', 'TensorBoard'},
-        {'Google Cloud Notebooks', 'Vertex AI Workbench Notebooks'}
-    ]
+    branding = {
+        'Vertex SDK': 'Vertex AI SDK',
+        'Vertex Training': 'Vertex AI Training',
+        'Vertex Prediction': 'Vertex AI Prediction',
+        'Vertex Batch Prediction': 'Vertex AI Batch Prediction',
+        'Vertex XAI': 'Vertex Explainable AI',
+        'Vertex Experiments': 'Vertex AI Experiments',
+        'Vertex TensorBoard': 'Vertex AI TensorBoard',
+        'Vertex Pipelines': 'Vertex AI Pipelines',
+        'Vertex Hyperparameter Tuning': 'Vertex AI Hyperparameter Tuning',
+        'Vertex Metadata': 'Vertex ML Metadata',
+        'Vertex AI Metadata': 'Vertex ML Metadata',
+        'Vertex Vizier': 'Vertex AI Vizier',
+        'Vertex Dataset': 'Vertex AI Dataset',
+        'Vertex Model': 'Vertex AI Model',
+        'Vertex Endpoint': 'Vertex AI Endpoint',
+        'Vertex Private Endpoint': 'Vertex AI Private Endpoint',
+        'Tensorflow': 'TensorFlow',
+        'Tensorboard': 'TensorBoard',
+        'Google Cloud Notebooks': 'Vertex AI Workbench Notebooks'
+    }
     
     for line in cell['source']:
         if 'TODO' in line:
@@ -293,7 +293,7 @@ def check_text_cell(path, cell):
         if 'will' in line.lower() or 'would' in line.lower():
             report_error(path, 16, f'Do not use future tense (e.g., will), replace with present tense: {line}')
             
-        for mistake, brand in branding:
+        for mistake, brand in branding.items():
             if mistake in line:
                 report_error(path, 27, f"Branding {brand}: {line}")
 
