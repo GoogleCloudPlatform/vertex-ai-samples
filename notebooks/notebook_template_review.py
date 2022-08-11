@@ -25,6 +25,10 @@ args = parser.parse_args()
 
 if args.errors_codes:
     args.errors_codes = args.errors_codes.split(',')
+    args.errors = True
+    
+if args.errors_csv:
+    args.errors = True
     
 def parse_dir(directory):
     entries = os.scandir(directory)
@@ -258,6 +262,29 @@ def empty_cell(path, cells, nth):
         return False
     
 def check_text_cell(path, cell):
+    
+    branding = [
+        {'Vertex SDK', 'Vertex AI SDK'},
+        {'Vertex Training', 'Vertex AI Training'},
+        {'Vertex Prediction', 'Vertex AI Prediction'},
+        {'Vertex Batch Prediction', 'Vertex AI Batch Prediction'},
+        {'Vertex XAI', 'Vertex Explainable AI'},
+        {'Vertex Experiments', 'Vertex AI Experiments'},
+        {'Vertex TensorBoard', 'Vertex AI TensorBoard'},
+        {'Vertex Pipelines', 'Vertex AI Pipelines'},
+        {'Vertex Hyperparameter Tuning', 'Vertex AI Hyperparameter Tuning'},
+        {'Vertex Metadata', 'Vertex ML Metadata'},
+        {'Vertex AI Metadata', 'Vertex ML Metadata'},
+        {'Vertex Vizier', 'Vertex AI Vizier'},
+        {'Vertex Dataset', 'Vertex AI Dataset'},
+        {'Vertex Model', 'Vertex AI Model'},
+        {'Vertex Endpoint', 'Vertex AI Endpoint'},
+        {'Vertex Private Endpoint', 'Vertex AI Private Endpoint'},
+        {'Tensorflow', 'TensorFlow'},
+        {'Tensorboard', 'TensorBoard'},
+        {'Google Cloud Notebooks', 'Vertex AI Workbench Notebooks'}
+    ]
+    
     for line in cell['source']:
         if 'TODO' in line:
             report_error(path, 14, f'TODO in cell: {line}')
@@ -266,32 +293,9 @@ def check_text_cell(path, cell):
         if 'will' in line.lower() or 'would' in line.lower():
             report_error(path, 16, f'Do not use future tense (e.g., will), replace with present tense: {line}')
             
-        if 'Vertex SDK' in line:
-            report_error(path, 27, f"Branding: Vertex AI SDK: {line}")
-        if 'Vertex Training' in line:
-            report_error(path, 27, f"Branding: Vertex AI Training: {line}")
-        if 'Vertex Prediction' in line:
-            report_error(path, 27, f"Branding: Vertex AI Prediction: {line}")
-        if 'Vertex Batch Prediction' in line:
-            report_error(path, 27, f"Branding: Vertex AI Batch Prediction {line}")
-        if 'Vertex XAI' in line:
-            report_error(path, 27, f"Branding: Vertex Explainable AI: {line}")
-        if 'Vertex Experiments' in line:
-            report_error(path, 27, f"Branding: Vertex AI Experiments: {line}")
-        if 'Vertex TensorBoard' in line:
-            report_error(path, 27, f"Branding: Vertex AI TensorBoard: {line}")
-        if 'Vertex Pipelines' in line:
-            report_error(path, 27, f"Branding: Vertex AI Pipelines: {line}")
-        if 'Vertex Hyperparameter Tuning' in line:
-            report_error(path, 27, f"Branding: Vertex AI Hyperparameter Tuning: {line}") 
-        if 'Vertex Metadata' or 'Vertex AI Metadata' in line:
-            report_error(path, 27, f"Branding: Vertex ML Metadata: {line}")
-        if 'Tensorflow' in line:
-            report_error(path, 27, f"Branding: TensorFlow: {line}")
-        if 'Tensorboard' in line:
-            report_error(path, 27, f"Branding: TensorBoard: {line}")
-        if 'Google Cloud Notebooks' in line:
-            report_error(path, 27, f"Branding: Vertex AI Workbench Notebooks: {line}")
+        for mistake, brand in branding:
+            if mistake in line:
+                report_error(path, 27, f"Branding {brand}: {line}")
 
 
 def check_sentence_case(path, heading):
