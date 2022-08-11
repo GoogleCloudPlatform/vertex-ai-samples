@@ -283,11 +283,15 @@ def check_text_cell(path, cell):
         if 'Vertex Pipelines' in line:
             report_error(path, 27, f"Branding: Vertex AI Pipelines: {line}")
         if 'Vertex Hyperparameter Tuning' in line:
-            report_error(path, 27, f"Branding: Vertex AI Hyperparameter Tuning: {line}")
+            report_error(path, 27, f"Branding: Vertex AI Hyperparameter Tuning: {line}") 
+        if 'Vertex Metadata' or 'Vertex AI Metadata' in line:
+            report_error(path, 27, f"Branding: Vertex ML Metadata: {line}")
         if 'Tensorflow' in line:
             report_error(path, 27, f"Branding: TensorFlow: {line}")
         if 'Tensorboard' in line:
             report_error(path, 27, f"Branding: TensorBoard: {line}")
+        if 'Google Cloud Notebooks' in line:
+            report_error(path, 27, f"Branding: Vertex AI Workbench Notebooks: {line}")
 
 
 def check_sentence_case(path, heading):
