@@ -28,8 +28,7 @@ The fifth stage in MLOps is deployment to production of the blessed model, which
 [Get started with Vertex AI Endpoints](get_started_with_vertex_endpoints.ipynb)
 
 ```
-The steps include:
-
+The steps performed include:
 - Creating an `Endpoint` resource.
 - List all `Endpoint` resources.
 - List `Endpoint` resources by query filter.
@@ -46,39 +45,10 @@ The steps include:
 - In pipeline: Deploy an existing `Model` resource to an existing `Endpoint` resource.
 ```
 
-[Get started with Vertex AI Private Endpoints](get_started_with_vertex_private_endpoints.ipynb)
+[Get started with configuring autoscaling for Vertex AI Endpoint deployment](get_started_with_autoscaling.ipynb)
 
 ```
 The steps performed include:
-
-- Creating a `Private Endpoint` resource.
-- Configure a VPC peering connection.
-- Configuring the serving binary of a `Model` resource for deployment to a `Private Endpoint` resource.
-- Deploying a `Model` resource to a `Private Endpoint` resource.
-- Send a prediction request to a `Private Endpoint`
-```
-
-[Get started with Vertex AI Endpoints and co-hosting models on shared VM](get_started_with_vertex_endpoint_and_shared_vm.ipynb)
-
-```
-The steps performed include:
-
-- Upload a pre-trained image classification model as a `Model` resource (model A).
-- Upload a pre-trained text sentence encoder model as a `Model` resource (model B).
-- Create a shared VM deployment resource pool.
-- List shared VM deployment resource pools.
-- Create two `Endpoint` resources.
-- Deploy first model (model A) to first `Endpoint` resource using shared VM deployment resource pool.
-- Deploy second model (model B) to second `Endpoint` resource using shared VM deployment resource pool.
-- Make a prediction request with first deployed model (model A).
-- Make a prediction request with second deployed model (model B).
-```
-
-[Get started with Auto-Scaling for Vertex AI Endpoints](get_started_with_autoscaling.ipynb)
-
-```
-The steps performed include:
-
 - Download a pretrained image classification model from TensorFlow Hub.
 - Upload the pretrained model as a `Model` resource.
 - Create an `Endpoint` resource.
@@ -88,4 +58,31 @@ The steps performed include:
 - Fine-tune scaling thresholds for CPU utilization.
 - Fine-tune scaling thresholds for GPU utilization.
 - Deploy mix of CPU and GPU model instances with auto-scaling to an `Endpoint` resource.
+```
+
+[Get started with Vertex AI Private Endpoints](get_started_with_vertex_private_endpoints.ipynb)
+
+```
+The steps performed include:
+- Creating a `Private Endpoint` resource.
+- Configure a VPC peering connection.
+- Configuring the serving binary of a `Model` resource for deployment to a `Private Endpoint` resource.
+- Deploying a `Model` resource to a `Private Endpoint` resource.
+- Send a prediction request to a `Private Endpoint`
+
+```
+
+[Get started with Vertex AI Endpoint and shared VM](get_started_with_vertex_endpoint_and_shared_vm.ipynb)
+
+```
+The steps performed include:
+- Upload a pre-trained image classification model as a `Model` resource (model A).
+- Upload a pre-trained text sentence encoder model as a `Model` resource (model B).
+- Create a shared VM deployment resource pool.
+- List shared VM deployment resource pools.
+- Create two `Endpoint` resources.
+- Deploy first model (model A) to first `Endpoint` resource using deployment resource pool.
+- Deploy second model (model B) to second `Endpoint` resource using deployment resource pool.
+- Make a prediction request with first deployed model (model A).
+- Make a prediction request with second deployed model (model B).
 ```
