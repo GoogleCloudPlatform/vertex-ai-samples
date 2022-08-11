@@ -162,11 +162,6 @@ def parse_notebook(path):
             if cell['cell_type'] != 'code':
                 report_error(path, 22, "Installation code section not found")
             else:
-                if cell['source'][0].startswith('! mkdir'):
-                    cell, nth = get_cell(path, cells, nth)
-                if 'requirements.txt' in cell['source'][0]:
-                    cell, nth = get_cell(path, cells, nth)
-                    
                 text = ''
                 for line in cell['source']:
                     text += line
@@ -311,7 +306,7 @@ def check_sentence_case(path, heading):
     for word in words[1:]:
         word = word.replace(':', '').replace('(', '').replace(')', '')
         if word in ['E2E', 'Vertex', 'AutoML', 'ML', 'AI', 'GCP', 'API', 'R', 'CMEK', 'TFX', 'TFDV', 'SDK',
-                    'VM', 'CPR', 'NVIDIA', 'ID', 'DASK']:
+                    'VM', 'CPR', 'NVIDIA', 'ID']:
             continue
         if word.isupper():
             report_error(path, 3, f"heading is not sentence case: {word}")
