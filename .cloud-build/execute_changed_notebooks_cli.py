@@ -69,6 +69,12 @@ parser.add_argument(
     required=True,
 )
 parser.add_argument(
+    "--variable_vpc_network",
+    type=str,
+    help="The full VPC network name. See https://cloud.google.com/compute/docs/networks-and-firewalls#networks. Format is projects/{project}/global/networks/{network}, where {project} is a project number, as in '12345', and {network} is network name. See <https://cloud.google.com/compute/docs/reference/rest/v1/networks/insert> for details. This is used to inject a variable value into the notebook before running.",
+    required=False,
+)
+parser.add_argument(
     "--staging_bucket",
     type=str,
     help="The GCP directory for staging temporary files.",
@@ -114,10 +120,11 @@ execute_changed_notebooks_helper.process_and_execute_notebooks(
     container_uri=args.container_uri,
     staging_bucket=args.staging_bucket,
     artifacts_bucket=args.artifacts_bucket,
+    should_parallelize=args.should_parallelize,
+    timeout=args.timeout,
     variable_project_id=args.variable_project_id,
     variable_region=args.variable_region,
     variable_service_account=args.variable_service_account,
+    variable_vpc_network=args.variable_vpc_network,
     private_pool_id=args.private_pool_id,
-    should_parallelize=args.should_parallelize,
-    timeout=args.timeout,
 )
