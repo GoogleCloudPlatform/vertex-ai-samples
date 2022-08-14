@@ -353,7 +353,7 @@ def process_and_execute_notebooks(
         seconds=max(timeout - WORKER_TIMEOUT_BUFFER_IN_SECONDS, 0)
     )
 
-    if len(notebooks) > 1:
+    if len(notebooks) >= 1:
         notebook_execution_results: List[NotebookExecutionResult] = []
 
         print(f"Found {len(notebooks)} modified notebooks: {notebooks}")
@@ -447,25 +447,5 @@ def process_and_execute_notebooks(
         # Raise error if any notebooks failed
         if not all([result.is_pass for result in results_sorted]):
             raise RuntimeError("Notebook failures detected. See logs for details")
-
-    elif len(notebooks) == 1:
-        notebook = notebooks[0]
-
-        # Pre-process notebook by substituting variable names
-        _process_notebook(
-            notebook_path=notebook,
-            variable_project_id=variable_project_id,
-            variable_region=variable_region,
-            variable_service_account=variable_service_account,
-            variable_vpc_network=variable_vpc_network,
-        )
-
-        execute_notebook_helper.execute_notebook(
-            notebook_source=notebook,
-            output_file_or_uri="/".join(
-                [artifacts_bucket, pathlib.Path(notebook).name]
-            ),
-            should_log_output=True,
-        )
     else:
         print("No notebooks modified in this pull request.")
