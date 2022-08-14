@@ -115,7 +115,7 @@ def _get_notebook_python_version(notebook_path: str) -> str:
   Get the python version for running the notebook if it is specified in
   the notebbok.
   """
-  python_version = "3.8"
+  python_version = "3"
 
   return python_version
 

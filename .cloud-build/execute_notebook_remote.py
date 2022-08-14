@@ -51,10 +51,8 @@ def execute_notebook_remote(
         "_PYTHON_IMAGE": container_uri,
         "_NOTEBOOK_GCS_URI": notebook_uri,
         "_NOTEBOOK_OUTPUT_GCS_URI": notebook_output_uri,
+        "_PYTHON_VERSION" : "python" + python_version
     }
-
-    if python_version is not None:
-      substitutions["_PYTHON_VERSION"] = "python" + python_version
 
     build = cloudbuild_v1.Build()
 
