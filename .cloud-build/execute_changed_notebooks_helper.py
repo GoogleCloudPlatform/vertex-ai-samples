@@ -113,7 +113,7 @@ def _process_notebook(
         nbformat.write(nb, new_file)
 
 
-def _get_notebook_python_version(notebook_path: str) -> str:
+def _get_notebook_python_version(notebook_source: str) -> str:
     """
     Get the python version for running the notebook if it is specified in
     the notebook.
