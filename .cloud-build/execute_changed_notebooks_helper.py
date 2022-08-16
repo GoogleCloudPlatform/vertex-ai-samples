@@ -17,13 +17,16 @@ import concurrent
 import dataclasses
 import datetime
 import functools
+import json
 import git
 import operator
 import os
 import pathlib
 import re
 import subprocess
+import utils
 from typing import List, Optional
+from utils import util
 
 import execute_notebook_helper
 import execute_notebook_remote
@@ -111,13 +114,36 @@ def _process_notebook(
 
 
 def _get_notebook_python_version(notebook_path: str) -> str:
-  """
-  Get the python version for running the notebook if it is specified in
-  the notebbok.
-  """
-  python_version = "3.9"
+    """
+    Get the python version for running the notebook if it is specified in
+    the notebook.
+    """
+    python_version = "3.8" # Set default python version
+    file_name = os.path.basename(os.path.normpath(notebook_source))
 
-  return python_version
+    # Download notebook if it's a GCS URI
+    if notebook_source.startswith("gs://"):
+        # Extract uri components
+        bucket_name, prefix = utils.extract_bucket_and_prefix_from_gcs_path(
+            notebook_source
+        )
+
+        # Download remote notebook to local file system
+        notebook_source = file_name
+        util.download_file(
+            bucket_name=bucket_name, blob_name=prefix, destination_file=notebook_source
+        )
+
+    file = open(file_name) # Open the ipynb file that is passed in
+    src = file.read() # Read the file in
+    j = json.loads(src) # Parse the JSON into an object
+    for cell in j['cells']: #Iterate over all the cells in the ipynb
+        if cell['cell_type'] == 'code':
+            code = str.join('', cell['source']) # Join all the code together in one string so we can search
+            if (match := re.search('#PYTHON_VERSION\ ?=\ ?([^\n]+)\n', code, re.IGNORECASE)):
+                python_version = match[1]
+
+    return python_version
 
 def _create_tag(filepath: str) -> str:
     tag = os.path.basename(os.path.normpath(filepath))
