@@ -118,7 +118,7 @@ def _get_notebook_python_version(notebook_path: str) -> str:
     Get the python version for running the notebook if it is specified in
     the notebook.
     """
-    python_version = "3.8" # Set default python version
+    python_version = "3.9" # Set default python version
     file_name = os.path.basename(os.path.normpath(notebook_source))
 
     # Download notebook if it's a GCS URI
@@ -138,10 +138,11 @@ def _get_notebook_python_version(notebook_path: str) -> str:
     src = file.read() # Read the file in
     j = json.loads(src) # Parse the JSON into an object
     for cell in j['cells']: #Iterate over all the cells in the ipynb
-        if cell['cell_type'] == 'code':
-            code = str.join('', cell['source']) # Join all the code together in one string so we can search
-            if (match := re.search('#PYTHON_VERSION\ ?=\ ?([^\n]+)\n', code, re.IGNORECASE)):
-                python_version = match[1]
+        if cell['cell_type'] == 'markdown':
+            markdown = str.join('', cell['source']) # Join all the markdown together in one string so we can search
+            if 'python version:' in markdown.lower():
+                python_version = markdown.split(':')[-1].strip()
+                break
 
     return python_version
 
