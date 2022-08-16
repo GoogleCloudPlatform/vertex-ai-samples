@@ -38,6 +38,7 @@ from utils import NotebookProcessors, util
 
 # A buffer so that workers finish before the orchestrating job
 WORKER_TIMEOUT_BUFFER_IN_SECONDS: int = 60 * 60
+PYTHON_VERSION = "3.9" # Set default python version
 
 
 def format_timedelta(delta: datetime.timedelta) -> str:
@@ -113,35 +114,37 @@ def _process_notebook(
         nbformat.write(nb, new_file)
 
 
-def _get_notebook_python_version(notebook_source: str) -> str:
+def _get_notebook_python_version(notebook_path: str) -> str:
     """
     Get the python version for running the notebook if it is specified in
     the notebook.
     """
-    python_version = "3.9" # Set default python version
-    file_name = os.path.basename(os.path.normpath(notebook_source))
+    python_version = PYTHON_VERSION
+    # file_name = os.path.basename(os.path.normpath(notebook_source))
 
-    # Download notebook if it's a GCS URI
-    if notebook_source.startswith("gs://"):
-        # Extract uri components
-        bucket_name, prefix = utils.extract_bucket_and_prefix_from_gcs_path(
-            notebook_source
-        )
+    # # Download notebook if it's a GCS URI
+    # if notebook_source.startswith("gs://"):
+    #     # Extract uri components
+    #     bucket_name, prefix = utils.extract_bucket_and_prefix_from_gcs_path(
+    #         notebook_source
+    #     )
 
-        # Download remote notebook to local file system
-        notebook_source = file_name
-        util.download_file(
-            bucket_name=bucket_name, blob_name=prefix, destination_file=notebook_source
-        )
+    #     # Download remote notebook to local file system
+    #     notebook_source = file_name
+    #     util.download_file(
+    #         bucket_name=bucket_name, blob_name=prefix, destination_file=notebook_source
+    #     )
 
-    file = open(file_name) # Open the ipynb file that is passed in
+    file = open(notebook_path) # Open the ipynb file that is passed in
     src = file.read() # Read the file in
     j = json.loads(src) # Parse the JSON into an object
     for cell in j['cells']: #Iterate over all the cells in the ipynb
         if cell['cell_type'] == 'markdown':
             markdown = str.join('', cell['source']) # Join all the markdown together in one string so we can search
             if 'python version:' in markdown.lower():
-                python_version = markdown.split(':')[-1].strip()
+                markdown_split = markdown.split(':')
+                if len(markdown_split) > 0:
+                  python_version = markdown_split[-1].strip()
                 break
 
     return python_version
@@ -203,6 +206,10 @@ def process_and_execute_notebook(
     time_start = datetime.datetime.now()
     operation = None
     try:
+        # Get the python version for ruuning the notebook if specified
+        notebook_exec_python_version = _get_notebook_python_version(notebook_path=notebook)
+        print(f"Running notebook with python {notebook_exec_python_version}")
+
         # Pre-process notebook by substituting variable names
         _process_notebook(
             notebook_path=notebook,
@@ -211,10 +218,6 @@ def process_and_execute_notebook(
             variable_service_account=variable_service_account,
             variable_vpc_network=variable_vpc_network,
         )
-
-        # Get the python version for ruuning the notebook if specified
-        notebook_exec_python_version = _get_notebook_python_version(notebook)
-        print(f"Running notebook with python {notebook_exec_python_version}")
 
         # Upload the pre-processed code to a GCS bucket
         code_archive_uri = util.archive_code_and_upload(staging_bucket=staging_bucket)
