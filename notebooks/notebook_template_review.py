@@ -6,7 +6,9 @@ import urllib.request
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--notebook-dir', dest='notebook_dir',
-                    required=True, type=str, help='Notebook directory')
+                    default=None, type=str, help='Notebook directory')
+parser.add_argument('--notebook', dest='notebook',
+                    default=None, type=str, help='Notebook to review')
 parser.add_argument('--errors', dest='errors',
                     default=False, type=bool, help='Report errors')
 parser.add_argument('--errors-csv', dest='errors_csv',
@@ -23,11 +25,11 @@ args = parser.parse_args()
 
 if args.errors_codes:
     args.errors_codes = args.errors_codes.split(',')
+    args.errors = True
 
-if not os.path.isdir(args.notebook_dir):
-    print("Error: not a directory:", args.notebook_dir)
-    exit(1)
-    
+if args.errors_csv:
+    args.errors = True
+
 def parse_dir(directory):
     entries = os.scandir(directory)
     for entry in entries:
@@ -36,10 +38,11 @@ def parse_dir(directory):
                 continue
             if entry.name == 'src' or entry.name == 'images':
                 continue
+            print("\n##", entry.name, "\n")
             parse_dir(entry.path)
         elif entry.name.endswith('.ipynb'):
             parse_notebook(entry.path)
-            
+
 def parse_notebook(path):
     with open(path, 'r') as f:
         try:
@@ -109,7 +112,8 @@ def parse_notebook(path):
             report_error(path, 12, "Objective section not found")
             costs = []
         else:
-            title, uses, steps, costs = parse_objective(path, cell)
+            desc, uses, steps, costs = parse_objective(path, cell)
+            add_index(path, title, desc, uses, steps)
             
         # (optional) Recommendation
         cell, nth = get_cell(path, cells, nth)
@@ -158,6 +162,11 @@ def parse_notebook(path):
             if cell['cell_type'] != 'code':
                 report_error(path, 22, "Installation code section not found")
             else:
+                if cell['source'][0].startswith('! mkdir'):
+                    cell, nth = get_cell(path, cells, nth)
+                if 'requirements.txt' in cell['source'][0]:
+                    cell, nth = get_cell(path, cells, nth)
+                    
                 text = ''
                 for line in cell['source']:
                     text += line
@@ -223,6 +232,22 @@ def parse_notebook(path):
                 report_error(path, 32, "Set project ID code section not found")
             elif not cell['source'][0].startswith('PROJECT_ID = "[your-project-id]"'):
                 report_error(path, 33, f"Set project ID not match template: {line}")
+            
+            cell, nth = get_cell(path, cells, nth)
+            if cell['cell_type'] != 'code' or 'or PROJECT_ID == "[your-project-id]":' not in cell['source'][0]:
+                report_error(path, 33, f"Set project ID not match template: {line}")  
+            
+            cell, nth = get_cell(path, cells, nth)
+            if cell['cell_type'] != 'code' or '! gcloud config set project' not in cell['source'][0]:
+                report_error(path, 33, f"Set project ID not match template: {line}")   
+            
+        '''
+        # Region
+        cell, nth = get_cell(path, cells, nth)
+        if cell['source'][0].startswith("### Region"): 
+            report_error(path, 34, "Region section not found")
+        '''
+
 
 def get_cell(path, cells, nth):
     while empty_cell(path, cells, nth):
@@ -233,15 +258,38 @@ def get_cell(path, cells, nth):
         check_text_cell(path, cell)
     return cell, nth + 1
 
-                
+
 def empty_cell(path, cells, nth):
     if len(cells[nth]['source']) == 0:
         report_error(path, 10, f'empty cell: cell #{nth}')
         return True
     else:
         return False
-    
+
 def check_text_cell(path, cell):
+    
+    branding = {
+        'Vertex SDK': 'Vertex AI SDK',
+        'Vertex Training': 'Vertex AI Training',
+        'Vertex Prediction': 'Vertex AI Prediction',
+        'Vertex Batch Prediction': 'Vertex AI Batch Prediction',
+        'Vertex XAI': 'Vertex Explainable AI',
+        'Vertex Experiments': 'Vertex AI Experiments',
+        'Vertex TensorBoard': 'Vertex AI TensorBoard',
+        'Vertex Pipelines': 'Vertex AI Pipelines',
+        'Vertex Hyperparameter Tuning': 'Vertex AI Hyperparameter Tuning',
+        'Vertex Metadata': 'Vertex ML Metadata',
+        'Vertex AI Metadata': 'Vertex ML Metadata',
+        'Vertex Vizier': 'Vertex AI Vizier',
+        'Vertex Dataset': 'Vertex AI Dataset',
+        'Vertex Model': 'Vertex AI Model',
+        'Vertex Endpoint': 'Vertex AI Endpoint',
+        'Vertex Private Endpoint': 'Vertex AI Private Endpoint',
+        'Tensorflow': 'TensorFlow',
+        'Tensorboard': 'TensorBoard',
+        'Google Cloud Notebooks': 'Vertex AI Workbench Notebooks'
+    }
+    
     for line in cell['source']:
         if 'TODO' in line:
             report_error(path, 14, f'TODO in cell: {line}')
@@ -250,28 +298,9 @@ def check_text_cell(path, cell):
         if 'will' in line.lower() or 'would' in line.lower():
             report_error(path, 16, f'Do not use future tense (e.g., will), replace with present tense: {line}')
             
-        if 'Vertex SDK' in line:
-            report_error(path, 27, f"Branding: Vertex AI SDK: {line}")
-        if 'Vertex Training' in line:
-            report_error(path, 27, f"Branding: Vertex AI Training: {line}")
-        if 'Vertex Prediction' in line:
-            report_error(path, 27, f"Branding: Vertex AI Prediction: {line}")
-        if 'Vertex Batch Prediction' in line:
-            report_error(path, 27, f"Branding: Vertex AI Batch Prediction {line}")
-        if 'Vertex XAI' in line:
-            report_error(path, 27, f"Branding: Vertex Explainable AI: {line}")
-        if 'Vertex Experiments' in line:
-            report_error(path, 27, f"Branding: Vertex AI Experiments: {line}")
-        if 'Vertex TensorBoard' in line:
-            report_error(path, 27, f"Branding: Vertex AI TensorBoard: {line}")
-        if 'Vertex Pipelines' in line:
-            report_error(path, 27, f"Branding: Vertex AI Pipelines: {line}")
-        if 'Vertex Hyperparameter Tuning' in line:
-            report_error(path, 27, f"Branding: Vertex AI Hyperparameter Tuning: {line}")
-        if 'Tensorflow' in line:
-            report_error(path, 27, f"Branding: TensorFlow: {line}")
-        if 'Tensorboard' in line:
-            report_error(path, 27, f"Branding: TensorBoard: {line}")
+        for mistake, brand in branding.items():
+            if mistake in line:
+                report_error(path, 27, f"Branding {brand}: {line}")
 
 
 def check_sentence_case(path, heading):
@@ -282,12 +311,12 @@ def check_sentence_case(path, heading):
     for word in words[1:]:
         word = word.replace(':', '').replace('(', '').replace(')', '')
         if word in ['E2E', 'Vertex', 'AutoML', 'ML', 'AI', 'GCP', 'API', 'R', 'CMEK', 'TFX', 'TFDV', 'SDK',
-                    'VM', 'CPR', 'NVIDIA', 'ID']:
+                    'VM', 'CPR', 'NVIDIA', 'ID', 'DASK']:
             continue
         if word.isupper():
             report_error(path, 3, f"heading is not sentence case: {word}")
-            
-            
+
+
 def report_error(notebook, code, msg):
     if args.errors:
         if args.errors_codes:
@@ -298,35 +327,51 @@ def report_error(notebook, code, msg):
             print(notebook, ',', code)
         else:
             print(f"{notebook}: ERROR ({code}): {msg}")
-            
+
 def parse_objective(path, cell):
-    title = ''
-    in_title = True
+    desc = ''
+    in_desc = True
     uses = ''
     in_uses = False
     steps = ''
     in_steps = False
     costs = []
     
-    for line in cell['source']:
+    for line in cell['source'][1:]:
         if line.startswith('This tutorial uses'):
-            in_title = False
+            in_desc = False
             in_steps = False
             in_uses = True
+            uses += line
+            continue
         elif line.startswith('The steps performed'):
-            in_title = False
+            in_desc = False
             in_uses = False
             in_steps = True
-            
-        if in_title:
-            title += line
-        elif in_uses:
-            uses += line
-        elif in_steps:
             steps += line
+            continue
             
-    if title == '':
-        report_error(path, 17, "Objective section missing title")
+        if in_desc:
+            desc += line
+        elif in_uses:
+            sline = line.strip()
+            if len(sline) == 0:
+                uses += '\n'
+            else:
+                ch = sline[0]
+                if ch in ['-', '*', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                    uses += line
+        elif in_steps:
+            sline = line.strip()
+            if len(sline) == 0:
+                steps += '\n'
+            else:
+                ch = sline[0]
+                if ch in ['-', '*', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                    steps += line
+            
+    if desc == '':
+        report_error(path, 17, "Objective section missing desc")
         
     if uses == '':
         report_error(path, 18, "Objective section missing uses services list")
@@ -341,7 +386,37 @@ def parse_objective(path, cell):
     if steps == '':
         report_error(path, 19, "Objective section missing steps list")
             
-    return title, uses, steps, costs
-            
+    return desc, uses, steps, costs
+
+def add_index(path, title, desc, uses, steps):
+    if not args.desc and not args.uses and not args.steps:
+        return
+    
+    title = title.split(':')[-1].strip()
+    title = title[0].upper() + title[1:]
+    
+    print(f"\n[{title}]({path})\n")
+    
+    if args.desc:
+        print(desc)
         
-parse_dir(args.notebook_dir)
+    if args.uses:
+        print(uses)
+        
+    if args.steps:
+        print(steps)
+
+
+if args.notebook_dir:
+    if not os.path.isdir(args.notebook_dir):
+        print("Error: not a directory:", args.notebook_dir)
+        exit(1)
+    parse_dir(args.notebook_dir)
+elif args.notebook:
+    if not os.path.isfile(args.notebook):
+        print("Error: not a notebook:", args.notebook)
+        exit(1)
+    parse_notebook(args.notebook)
+else:
+        print("Error: must specify a directory or notebook")
+        exit(1)
