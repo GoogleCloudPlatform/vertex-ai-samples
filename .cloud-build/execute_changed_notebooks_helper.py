@@ -67,7 +67,7 @@ class NotebookExecutionResult:
     output_uri: str
     build_id: str
     error_message: Optional[str]
-    
+
     @property
     def output_uri_web(self) -> Optional[str]:
         if self.output_uri.startswith("gs://"):
@@ -81,6 +81,7 @@ def _process_notebook(
     variable_project_id: str,
     variable_region: str,
     variable_service_account: str,
+    variable_vpc_network: Optional[str],
 ):
     # Read notebook
     with open(notebook_path) as f:
@@ -93,6 +94,7 @@ def _process_notebook(
             "PROJECT_ID": variable_project_id,
             "REGION": variable_region,
             "SERVICE_ACCOUNT": variable_service_account,
+            "VPC_NETWORK": variable_vpc_network,
         },
     )
 
@@ -128,14 +130,22 @@ def process_and_execute_notebook(
     variable_project_id: str,
     variable_region: str,
     variable_service_account: str,
+    variable_vpc_network: Optional[str],
     private_pool_id: Optional[str],
-    deadline: datetime,
+    deadline: datetime.datetime,
     notebook: str,
     should_get_tail_logs: bool = False,
 ) -> NotebookExecutionResult:
     rate_limit.wait()  # wait before creating the task
 
     print(f"Running notebook: {notebook}")
+
+    # Handle empty strings
+    if not variable_vpc_network:
+        variable_vpc_network = None
+
+    if not private_pool_id:
+        private_pool_id = None
 
     # Create paths
     notebook_output_uri = "/".join([artifacts_bucket, pathlib.Path(notebook).name])
@@ -163,6 +173,7 @@ def process_and_execute_notebook(
             variable_project_id=variable_project_id,
             variable_region=variable_region,
             variable_service_account=variable_service_account,
+            variable_vpc_network=variable_vpc_network,
         )
 
         # Upload the pre-processed code to a GCS bucket
@@ -266,8 +277,8 @@ def get_changed_notebooks(
             notebooks = []
     else:
         print(f"Looking for all notebooks.")
-        notebooks = subprocess.check_output(["git", "ls-files"] + test_paths)
-        notebooks = notebooks.decode("utf-8").split("\n")
+        notebooks_str = subprocess.check_output(["git", "ls-files"] + test_paths)
+        notebooks = notebooks_str.decode("utf-8").split("\n")
 
     notebooks = [notebook for notebook in notebooks if notebook.endswith(".ipynb")]
     notebooks = [notebook for notebook in notebooks if len(notebook) > 0]
@@ -286,12 +297,13 @@ def process_and_execute_notebooks(
     container_uri: str,
     staging_bucket: str,
     artifacts_bucket: str,
+    should_parallelize: bool,
+    timeout: int,
     variable_project_id: str,
     variable_region: str,
     variable_service_account: str,
-    private_pool_id: Optional[str],
-    should_parallelize: bool,
-    timeout: int,
+    variable_vpc_network: Optional[str] = None,
+    private_pool_id: Optional[str] = None,
 ):
     """
     Run the notebooks that exist under the folders defined in the test_paths_file.
@@ -349,6 +361,7 @@ def process_and_execute_notebooks(
                             variable_project_id,
                             variable_region,
                             variable_service_account,
+                            variable_vpc_network,
                             private_pool_id,
                             deadline,
                         ),
@@ -364,6 +377,7 @@ def process_and_execute_notebooks(
                     variable_project_id=variable_project_id,
                     variable_region=variable_region,
                     variable_service_account=variable_service_account,
+                    variable_vpc_network=variable_vpc_network,
                     private_pool_id=private_pool_id,
                     deadline=deadline,
                     notebook=notebook,
@@ -389,11 +403,18 @@ def process_and_execute_notebooks(
                         format_timedelta(result.duration),
                         result.log_url,
                         result.output_uri,
-                        result.output_uri_web
+                        result.output_uri_web,
                     ]
                     for result in results_sorted
                 ],
-                headers=["build_tag", "status", "duration", "log_url", "output_uri", "output_uri_web"],
+                headers=[
+                    "build_tag",
+                    "status",
+                    "duration",
+                    "log_url",
+                    "output_uri",
+                    "output_uri_web",
+                ],
             )
         )
 
@@ -422,6 +443,7 @@ def process_and_execute_notebooks(
             variable_project_id=variable_project_id,
             variable_region=variable_region,
             variable_service_account=variable_service_account,
+            variable_vpc_network=variable_vpc_network,
         )
 
         execute_notebook_helper.execute_notebook(
