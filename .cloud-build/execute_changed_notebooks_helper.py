@@ -120,34 +120,24 @@ def _get_notebook_python_version(notebook_path: str) -> str:
     the notebook.
     """
     python_version = PYTHON_VERSION
-    # file_name = os.path.basename(os.path.normpath(notebook_source))
-
-    # # Download notebook if it's a GCS URI
-    # if notebook_source.startswith("gs://"):
-    #     # Extract uri components
-    #     bucket_name, prefix = utils.extract_bucket_and_prefix_from_gcs_path(
-    #         notebook_source
-    #     )
-
-    #     # Download remote notebook to local file system
-    #     notebook_source = file_name
-    #     util.download_file(
-    #         bucket_name=bucket_name, blob_name=prefix, destination_file=notebook_source
-    #     )
 
     file = open(notebook_path) # Open the ipynb file that is passed in
     src = file.read() # Read the file in
     j = json.loads(src) # Parse the JSON into an object
+
     for cell in j['cells']: #Iterate over all the cells in the ipynb
         if cell['cell_type'] == 'markdown':
-            markdown = str.join('', cell['source']) # Join all the markdown together in one string so we can search
-            if 'python version:' in markdown.lower():
-                markdown_split = markdown.split(':')
-                if len(markdown_split) > 0:
-                  python_version = markdown_split[-1].strip()
+            markdown = str.join('', cell['source'])
+
+            # Look for the python version specification pattern
+            re_match = re.search('python\ ?version[:,=]\ ?\d(.\d)?', markdown, flags=re.IGNORECASE)
+            if re_match:
+                # get the version number
+                python_version = re.search('\d(.\d)?', re_match[0], flags=re.IGNORECASE)[0]
                 break
 
     return python_version
+
 
 def _create_tag(filepath: str) -> str:
     tag = os.path.basename(os.path.normpath(filepath))
