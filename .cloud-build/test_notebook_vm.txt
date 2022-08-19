@@ -2,3 +2,4 @@ notebooks/official/vizier/gapic-vizier-multi-objective-optimization.ipynb
 notebooks/official/pipelines/lightweight_functions_component_io_kfp.ipynb
 notebooks/official/ml_metadata/sdk-metric-parameter-tracking-for-locally-trained-models.ipynb
 notebooks/official/pipelines/metrics_viz_run_compare_kfp.ipynb
+notebooks/official/matching_engine/sdk_matching_engine_for_indexing.ipynb
