@@ -29,3 +29,4 @@
 /automl/automl_tabular_on_vertex_pipelines.ipynb @helinwang
 /custom/custom_training_tensorboard_profiler.ipynb @gericdong
 /workbench/spark/spark_sample_notebook.ipynb @bradmiro
+/workbench/exploratory_data_analysis/explore_data_in_bigquery.ipynb @alokpattani
