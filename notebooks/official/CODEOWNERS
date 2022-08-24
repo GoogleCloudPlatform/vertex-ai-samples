@@ -10,7 +10,7 @@
 /tabnet/tabnet_vertex_tutorial.ipynb @longtle
 
 /migration @andrewferlitsch
-/explainabl_ai   
+/explainabl_ai
 /pipelines @andrewferlitsch
 /ml_metadata @andrewferlitsch
 /model_monitoring @andrewferlitsch
@@ -27,6 +27,7 @@
 /pipelines/google_cloud_pipelines_dataproc_tabular @inardini
 /automl/automl_forecasting_bqml_arima_plus_comparison.ipynb @TheMichaelHu
 /automl/automl_tabular_on_vertex_pipelines.ipynb @helinwang
-/custom/custom_training_tensorboard_profiler.ipynb @gericdong
-/workbench/spark/spark_sample_notebook.ipynb @bradmiro
-/workbench/exploratory_data_analysis/explore_data_in_bigquery_with_workbench.ipynb @alokpattani
+/custom/custom_training_tensorboard_profiler.ipynb @itseric
+/workbench/spark/spark_sample_notebook.ipynb @bmiro
+/model-registry/bqml-vertexai-model-registry.ipynb @soheilazangeneh
+
