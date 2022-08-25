@@ -26,6 +26,9 @@ from utils import util
 
 # This script is used to execute a notebook and write out the output notebook.
 
+# This is used to force papermill to use this kernel to run the notebook instead of any defined inside the notebook itself
+DEFAULT_KERNEL_NAME = "python3"
+
 
 def execute_notebook(
     notebook_source: str,
@@ -50,14 +53,11 @@ def execute_notebook(
 
     execution_exception = None
 
-
     print("\n=== DOWNLOAD EXECUTED NOTEBOOK ===\n")
-    print(
-                f"Please debug the executed notebook by downloading the executed notebook:"
-            )
+    print(f"Please debug the executed notebook by downloading the executed notebook:")
 
     print("Option 1. Using gsutil. Run the following command in your terminal.")
-    print(f"\tgsutil cp \"{output_file_or_uri}\" .")
+    print(f'\tgsutil cp "{output_file_or_uri}" .')
 
     print("Option 2. Using this link.")
     print(f"\thttps://storage.googleapis.com/{output_file_or_uri[5:]}")
@@ -72,6 +72,7 @@ def execute_notebook(
             output_path=notebook_source,
             progress_bar=should_log_output,
             request_save_on_cell_execute=should_log_output,
+            kernel_name=DEFAULT_KERNEL_NAME,
             log_output=should_log_output,
             stdout_file=sys.stdout if should_log_output else None,
             stderr_file=sys.stderr if should_log_output else None,
