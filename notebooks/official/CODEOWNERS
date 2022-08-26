@@ -30,3 +30,4 @@
 /custom/custom_training_tensorboard_profiler.ipynb @itseric
 /workbench/spark/spark_sample_notebook.ipynb @bmiro
 /model-registry/bqml-vertexai-model-registry.ipynb @soheilazangeneh
+/workbench/exploratory_data_analysis/explore_data_in_bigquery_with_workbench.ipynb @alokpattani
