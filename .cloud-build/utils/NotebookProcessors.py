@@ -13,8 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from nbconvert.preprocessors import Preprocessor
 from typing import Dict
+
+from nbconvert.preprocessors import Preprocessor
+
 from . import UpdateNotebookVariables as update_notebook_variables
 
 
