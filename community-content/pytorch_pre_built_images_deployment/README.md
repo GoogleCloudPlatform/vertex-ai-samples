@@ -1,6 +1,16 @@
 # PyTorch Deployment on Google Cloud: Text Classification
 
-**Deploying PyTorch models using Vertex Prediction pre-built PyTorch images is currently an Experimental feature. Pre-GA products and features might have limited support, and changes to pre-GA products and features might not be compatible with other pre-GA versions. The Experimental release is covered by the Pre-GA Offerings Terms of your Google Cloud Platform [Terms of Service](https://cloud.google.com/terms).**
+**This is an Experimental release**, covered by the Pre-GA Offerings Terms of your Google Cloud Platform [Terms of Service](https://cloud.google.com/terms).
+
+Experiments are focused on validating a prototype and are not guaranteed to be released. They are not intended for production use or covered by any SLA, support obligation, or deprecation policy and might be subject to backward-incompatible changes.
+
+**Kindly drop us a note before you run any scale tests.**
+
+**Do not hesitate to contact cloudml-feedback@google.com if you have any questions or run into any issues.**
+
+The projects need to be added to the allowlist in order to deploy PyTorch models using Vertex AI Prediction pre-built PyTorch images. If you are interested in the feature, please send an email to cloudml-feedback@google.com to provide your project numbers and project ids.
+
+## Overview
 
 In the PyTorch on Google Cloud series of blog posts, we aim to share how to deploy PyTorch models at scale on [Vertex AI](https://cloud.google.com/vertex-ai).
 
