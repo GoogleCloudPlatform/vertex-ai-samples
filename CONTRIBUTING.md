@@ -48,8 +48,8 @@ then you will need to manually address them before submitting your PR.
 nbqa black "$notebook"
 nbqa pyupgrade "$notebook"
 nbqa isort "$notebook"
-python3 -m tensorflow_docs.tools.nbfmt --remove_outputs "$notebook"
 nbqa flake8 "$notebook" --extend-ignore=W391,E501,F821,E402,F404,W503,E203,E722,W293,W291
+python3 -m tensorflow_docs.tools.nbfmt --remove_outputs "$notebook"
 ```
 
 ## Code Reviews
