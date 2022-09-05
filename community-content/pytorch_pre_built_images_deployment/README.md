@@ -8,7 +8,7 @@ Experiments are focused on validating a prototype and are not guaranteed to be r
 
 **Do not hesitate to contact vertexai-prediction-preview-feedback@google.com if you have any questions or run into any issues.**
 
-The projects need to be added to the allowlist in order to deploy PyTorch models using Vertex AI Prediction pre-built PyTorch images. If you are interested in the feature, please send an email to vertexai-prediction-preview-feedback@google.com to provide your project numbers and project ids.
+The projects need to be added to the allowlist in order to deploy PyTorch models using Vertex AI Prediction pre-built PyTorch images. If you are interested in the feature, please send an email to vertexai-prediction-preview-feedback@google.com to provide your project numbers OR project ids.
 
 ## Overview
 
