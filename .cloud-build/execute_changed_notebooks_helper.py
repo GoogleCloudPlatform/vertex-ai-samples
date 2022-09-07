@@ -130,10 +130,10 @@ def _get_notebook_python_version(notebook_path: str) -> str:
             markdown = str.join('', cell['source'])
 
             # Look for the python version specification pattern
-            re_match = re.search('python\ ?version[:,=]\ ?\d(.\d)?', markdown, flags=re.IGNORECASE)
+            re_match = re.search('python version = (\d\.\d)', markdown, flags=re.IGNORECASE)
             if re_match:
                 # get the version number
-                python_version = re.search('\d(.\d)?', re_match[0], flags=re.IGNORECASE)[0]
+                python_version = re_match.group(1)
                 break
 
     return python_version
