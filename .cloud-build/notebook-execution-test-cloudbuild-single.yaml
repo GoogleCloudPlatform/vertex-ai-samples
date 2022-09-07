@@ -23,8 +23,8 @@ steps:
     args:
     - -c
     - . workspace/env/bin/activate &&
-      ${_PYTHON_VERSION} -m pip -q install -U pip &&
-      ${_PYTHON_VERSION} -m pip -q install -U -r .cloud-build/requirements.txt
+      python -m pip -q install -U pip &&
+      python -m pip -q install -U -r .cloud-build/requirements.txt
   # Install Python dependencies and run testing script
   - name: ${_PYTHON_IMAGE}
     entrypoint: /bin/sh
@@ -32,7 +32,7 @@ steps:
     - -c
     - |
       . workspace/env/bin/activate &&
-      ${_PYTHON_VERSION} .cloud-build/execute_notebook_cli.py --notebook_source "${_NOTEBOOK_GCS_URI}" --output_file_or_uri "${_NOTEBOOK_OUTPUT_GCS_URI}"
+      python .cloud-build/execute_notebook_cli.py --notebook_source "${_NOTEBOOK_GCS_URI}" --output_file_or_uri "${_NOTEBOOK_OUTPUT_GCS_URI}"
     env:
     - 'IS_TESTING=1'
 timeout: 86400s
