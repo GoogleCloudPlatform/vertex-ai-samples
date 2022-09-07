@@ -196,7 +196,7 @@ def process_and_execute_notebook(
     time_start = datetime.datetime.now()
     operation = None
     try:
-        # Get the python version for ruuning the notebook if specified
+        # Get the python version for running the notebook if specified
         notebook_exec_python_version = _get_notebook_python_version(notebook_path=notebook)
         print(f"Running notebook with python {notebook_exec_python_version}")
 
