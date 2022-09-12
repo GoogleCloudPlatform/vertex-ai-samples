@@ -70,7 +70,10 @@ class PredictorUnitTests(absltest.TestCase):
     def setUp(self):
         super().setUp()
         self.config = CPRConfig()
-        self.config.load()
+        try:
+            self.config.load()
+        except FileNotFoundError:
+            logging.info("No saved config file found, using default values.")
         self.predictor = predictor.TimmPredictor()
 
     def test_load_from_saved_state_dict_ok(self):
@@ -170,7 +173,10 @@ class ServerEndToEndTests(absltest.TestCase):
     def setUp(self):
         super().setUp()
         self.config = CPRConfig()
-        self.config.load()
+        try:
+            self.config.load()
+        except FileNotFoundError:
+            logging.info("No saved config file found, using default values.")
         self.local_model = cpr.LocalModel(
             serving_container_spec=aiplatform.gapic.ModelContainerSpec(
                 image_uri=self.config.image
