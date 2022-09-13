@@ -33,3 +33,5 @@
 /workbench/spark/spark_ml.ipynb @bradmiro
 /model-registry/bqml-vertexai-model-registry.ipynb @soheilazangeneh
 /workbench/exploratory_data_analysis/explore_data_in_bigquery_with_workbench.ipynb @alokpattani
+/model_evaluation/automl_tabular_classification_model_evaluation.ipynb @soheilazangeneh
+/model_evaluation/automl_tabular_regression_model_evaluation.ipynb @soheilazangeneh
