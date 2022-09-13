@@ -56,7 +56,7 @@ def parse_notebook(path):
         # cell 1 is copyright
         nth = 0
         cell, nth = get_cell(path, cells, nth)
-        if not cell['source'][0].startswith('# Copyright'):
+        if not 'Copyright' in cell['source'][0]:
             report_error(path, 0, "missing copyright cell")
             
         # check for notices
