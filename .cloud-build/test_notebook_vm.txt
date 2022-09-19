@@ -3,5 +3,4 @@ notebooks/official/pipelines/lightweight_functions_component_io_kfp.ipynb
 notebooks/official/ml_metadata/sdk-metric-parameter-tracking-for-locally-trained-models.ipynb
 notebooks/official/custom/custom-tabular-bq-managed-dataset.ipynb
 notebooks/official/matching_engine/sdk_matching_engine_for_indexing.ipynb
-notebooks/community/model_monitoring/batch_prediction_model_monitoring.ipynb
-.cloud-build/tests/python_version_test.ipynb 
+.cloud-build/tests/python_version_test.ipynb
