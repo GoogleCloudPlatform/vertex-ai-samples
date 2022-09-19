@@ -70,6 +70,7 @@ class NotebookExecutionResult:
     log_url: str
     output_uri: str
     build_id: str
+    logs_bucket: str
     error_message: Optional[str]
 
     @property
@@ -189,6 +190,7 @@ def process_and_execute_notebook(
         output_uri=notebook_output_uri,
         log_url="",
         build_id="",
+        logs_bucket="",
         error_message=None,
     )
 
@@ -232,6 +234,7 @@ def process_and_execute_notebook(
         operation_metadata = BuildOperationMetadata(mapping=operation.metadata)
         result.build_id = operation_metadata.build.id
         result.log_url = operation_metadata.build.log_url
+        result.logs_bucket = operation_metadata.build.logs_bucket
 
         # Block and wait for the result
         operation_result = operation.result()
@@ -438,6 +441,7 @@ def process_and_execute_notebooks(
                         result.log_url,
                         result.output_uri,
                         result.output_uri_web,
+                        result.logs_bucket
                     ]
                     for result in results_sorted
                 ],
@@ -448,9 +452,23 @@ def process_and_execute_notebooks(
                     "log_url",
                     "output_uri",
                     "output_uri_web",
+                    "logs_bucket"
                 ],
             )
         )
+
+        if len(notebooks) == 1:
+          build_id = results_sorted[0].build_id
+          logs_bucket_name = (results_sorted[0].logs_bucket).removeprefix("gs://")
+          log_file_name = f"log-{build_id}.txt"
+
+          log_contents = util.download_blob_into_memory(
+            bucket_name=logs_bucket_name,
+            blob_name=log_file_name,
+            download_as_text=True
+            )
+
+          print(log_contents)
 
         print("\n=== END RESULTS===\n")
 
