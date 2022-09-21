@@ -47,12 +47,22 @@ done
 
 echo "Test mode: $is_test"
 
+# Read in user-provided notebooks
+notebooks=()
+for arg in "$@"; do
+    if [[ $arg == *.ipynb ]]; then
+        notebooks+=("$arg")
+    fi
+done
+
 # Only check notebooks in test folders modified in this pull request.
 # Note: Use process substitution to persist the data in the array
-notebooks=()
-while read -r file || [ -n "$line" ]; do
-    notebooks+=("$file")
-done < <(git diff --name-only main... | grep '\.ipynb$')
+if [ ${#notebooks[@]} -eq 0 ]; then
+    echo "Checking for changed notebooked using git"
+    while read -r file || [ -n "$line" ]; do
+        notebooks+=("$file")
+    done < <(git diff --name-only main... | grep '\.ipynb$')
+fi
 
 problematic_notebooks=()
 if [ ${#notebooks[@]} -gt 0 ]; then
