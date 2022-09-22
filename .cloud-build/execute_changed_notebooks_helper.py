@@ -458,6 +458,10 @@ def process_and_execute_notebooks(
         )
 
         if len(notebooks) == 1:
+          print("="*100)
+          print("The notebook execution build log:\n")
+          print("="*100)
+
           build_id = results_sorted[0].build_id
           logs_bucket_name = (results_sorted[0].logs_bucket).removeprefix("gs://")
           log_file_name = f"log-{build_id}.txt"
@@ -468,7 +472,14 @@ def process_and_execute_notebooks(
             download_as_text=True
             )
 
-          print(log_contents)
+          # Remove extra steps from the log
+          match = re.search("starting Step #4", log_contents, flags=re.IGNORECASE)
+
+          if match is not None:
+            match_index = match.span()[0]
+            print(log_contents[match_index:])
+          else:
+            print(log_contents)
 
         print("\n=== END RESULTS===\n")
 
