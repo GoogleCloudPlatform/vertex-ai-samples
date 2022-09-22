@@ -122,11 +122,13 @@ def _get_notebook_python_version(notebook_path: str) -> str:
     """
     python_version = PYTHON_VERSION
 
-    file = open(notebook_path) # Open the ipynb file that is passed in
-    src = file.read() # Read the file in
-    nb_json = json.loads(src) # Parse the JSON into an object
+    # Load the notebook
+    file = open(notebook_path)
+    src = file.read()
+    nb_json = json.loads(src)
 
-    for cell in nb_json['cells']: #Iterate over all the cells in the ipynb
+    #Iterate over the cells in the ipynb
+    for cell in nb_json['cells']:
         if cell['cell_type'] == 'markdown':
             markdown = str.join('', cell['source'])
 
