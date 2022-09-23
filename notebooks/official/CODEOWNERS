@@ -5,15 +5,18 @@
 * @GoogleCloudPlatform/vertex-ai-samples-contributors  @GoogleCloudPlatform/caiis-tw
 
 # matching_engine folder
-/matching_engine @shenzhimo2
+/matching_engine @shenzhimo2 @ivanmkc
 
 /tabnet/tabnet_vertex_tutorial.ipynb @longtle
 
-/migration @aferlitsch
-/explainabl_ai @aferlitsch
-/pipelines @aferlitsch
+/migration @andrewferlitsch
+/explainabl_ai
+/pipelines @andrewferlitsch
+/ml_metadata @andrewferlitsch
+/model_monitoring @andrewferlitsch
 /tensorboard @zbl94
 
+/bigquery_ml/bqml-online-prediction.ipynb @polong-lin
 /model_monitoring/model_monitoring.ipynb @mco-gh
 /ml_metadata/sdk-metric-parameter-tracking-for-custom-jobs.ipynb @jialuzh
 /ml_metadata/sdk-metric-parameter-tracking-for-locally-trained-models.ipynb @jialuzh
@@ -26,3 +29,9 @@
 /automl/automl_forecasting_bqml_arima_plus_comparison.ipynb @TheMichaelHu
 /automl/automl_tabular_on_vertex_pipelines.ipynb @helinwang
 /custom/custom_training_tensorboard_profiler.ipynb @itseric
+/workbench/spark/spark_sample_notebook.ipynb @bradmiro
+/workbench/spark/spark_ml.ipynb @bradmiro
+/model-registry/bqml-vertexai-model-registry.ipynb @soheilazangeneh
+/workbench/exploratory_data_analysis/explore_data_in_bigquery_with_workbench.ipynb @alokpattani
+/model_evaluation/automl_tabular_classification_model_evaluation.ipynb @soheilazangeneh
+/model_evaluation/automl_tabular_regression_model_evaluation.ipynb @soheilazangeneh
