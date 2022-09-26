@@ -17,13 +17,16 @@ import concurrent
 import dataclasses
 import datetime
 import functools
+import json
 import git
 import operator
 import os
 import pathlib
 import re
 import subprocess
+import utils
 from typing import List, Optional
+from utils import util
 
 import execute_notebook_helper
 import execute_notebook_remote
@@ -35,6 +38,7 @@ from utils import NotebookProcessors, util
 
 # A buffer so that workers finish before the orchestrating job
 WORKER_TIMEOUT_BUFFER_IN_SECONDS: int = 60 * 60
+PYTHON_VERSION = "3.9" # Set default python version
 
 
 def format_timedelta(delta: datetime.timedelta) -> str:
@@ -66,6 +70,7 @@ class NotebookExecutionResult:
     log_url: str
     output_uri: str
     build_id: str
+    logs_bucket: str
     error_message: Optional[str]
 
     @property
@@ -108,6 +113,33 @@ def _process_notebook(
 
     with open(notebook_path, mode="w", encoding="utf-8") as new_file:
         nbformat.write(nb, new_file)
+
+
+def _get_notebook_python_version(notebook_path: str) -> str:
+    """
+    Get the python version for running the notebook if it is specified in
+    the notebook.
+    """
+    python_version = PYTHON_VERSION
+
+    # Load the notebook
+    file = open(notebook_path)
+    src = file.read()
+    nb_json = json.loads(src)
+
+    #Iterate over the cells in the ipynb
+    for cell in nb_json['cells']:
+        if cell['cell_type'] == 'markdown':
+            markdown = str.join('', cell['source'])
+
+            # Look for the python version specification pattern
+            re_match = re.search('python version = (\d\.\d)', markdown, flags=re.IGNORECASE)
+            if re_match:
+                # get the version number
+                python_version = re_match.group(1)
+                break
+
+    return python_version
 
 
 def _create_tag(filepath: str) -> str:
@@ -160,6 +192,7 @@ def process_and_execute_notebook(
         output_uri=notebook_output_uri,
         log_url="",
         build_id="",
+        logs_bucket="",
         error_message=None,
     )
 
@@ -167,6 +200,10 @@ def process_and_execute_notebook(
     time_start = datetime.datetime.now()
     operation = None
     try:
+        # Get the python version for running the notebook if specified
+        notebook_exec_python_version = _get_notebook_python_version(notebook_path=notebook)
+        print(f"Running notebook with python {notebook_exec_python_version}")
+
         # Pre-process notebook by substituting variable names
         _process_notebook(
             notebook_path=notebook,
@@ -193,11 +230,13 @@ def process_and_execute_notebook(
             private_pool_id=private_pool_id,
             private_pool_region=variable_region,
             timeout_in_seconds=timeout_in_seconds,
+            python_version=notebook_exec_python_version
         )
 
         operation_metadata = BuildOperationMetadata(mapping=operation.metadata)
         result.build_id = operation_metadata.build.id
         result.log_url = operation_metadata.build.log_url
+        result.logs_bucket = operation_metadata.build.logs_bucket
 
         # Block and wait for the result
         operation_result = operation.result()
@@ -339,7 +378,7 @@ def process_and_execute_notebooks(
         seconds=max(timeout - WORKER_TIMEOUT_BUFFER_IN_SECONDS, 0)
     )
 
-    if len(notebooks) > 1:
+    if len(notebooks) >= 1:
         notebook_execution_results: List[NotebookExecutionResult] = []
 
         print(f"Found {len(notebooks)} modified notebooks: {notebooks}")
@@ -404,6 +443,7 @@ def process_and_execute_notebooks(
                         result.log_url,
                         result.output_uri,
                         result.output_uri_web,
+                        result.logs_bucket
                     ]
                     for result in results_sorted
                 ],
@@ -414,9 +454,34 @@ def process_and_execute_notebooks(
                     "log_url",
                     "output_uri",
                     "output_uri_web",
+                    "logs_bucket"
                 ],
             )
         )
+
+        if len(notebooks) == 1:
+          print("="*100)
+          print("The notebook execution build log:\n")
+          print("="*100)
+
+          build_id = results_sorted[0].build_id
+          logs_bucket_name = (results_sorted[0].logs_bucket).removeprefix("gs://")
+          log_file_name = f"log-{build_id}.txt"
+
+          log_contents = util.download_blob_into_memory(
+            bucket_name=logs_bucket_name,
+            blob_name=log_file_name,
+            download_as_text=True
+            )
+
+          # Remove extra steps from the log
+          match = re.search("starting Step #4", log_contents, flags=re.IGNORECASE)
+
+          if match is not None:
+            match_index = match.span()[0]
+            print(log_contents[match_index:])
+          else:
+            print(log_contents)
 
         print("\n=== END RESULTS===\n")
 
@@ -433,25 +498,5 @@ def process_and_execute_notebooks(
         # Raise error if any notebooks failed
         if not all([result.is_pass for result in results_sorted]):
             raise RuntimeError("Notebook failures detected. See logs for details")
-
-    elif len(notebooks) == 1:
-        notebook = notebooks[0]
-
-        # Pre-process notebook by substituting variable names
-        _process_notebook(
-            notebook_path=notebook,
-            variable_project_id=variable_project_id,
-            variable_region=variable_region,
-            variable_service_account=variable_service_account,
-            variable_vpc_network=variable_vpc_network,
-        )
-
-        execute_notebook_helper.execute_notebook(
-            notebook_source=notebook,
-            output_file_or_uri="/".join(
-                [artifacts_bucket, pathlib.Path(notebook).name]
-            ),
-            should_log_output=True,
-        )
     else:
         print("No notebooks modified in this pull request.")
