@@ -1,1 +1,1 @@
-notebooks/official/pipelines/metrics_viz_run_compare_kfp.ipynb
+notebooks/official/custom/custom-tabular-bq-managed-dataset.ipynb
