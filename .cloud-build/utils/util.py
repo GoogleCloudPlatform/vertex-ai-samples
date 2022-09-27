@@ -3,7 +3,7 @@ import subprocess
 import tarfile
 import uuid
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Union
 
 from google.auth import credentials as auth_credentials
 from google.cloud import storage
@@ -58,3 +58,34 @@ def archive_code_and_upload(staging_bucket: str):
     print(f"Uploaded source code archive to {source_archived_file_gcs}")
 
     return source_archived_file_gcs
+
+
+def download_blob_into_memory(
+  bucket_name: str,
+  blob_name: str,
+  download_as_text: Optional[bool]=False
+) -> Union[bytes, str]:
+    """
+    Downloads a blob into memory as byte or as text if
+    download_as_text is set to True.
+    """
+
+    storage_client = storage.Client()
+
+    bucket = storage_client.bucket(bucket_name)
+
+    # Construct a client side representation of a blob.
+    blob = bucket.blob(blob_name)
+
+    # Download the blob content
+    if download_as_text:
+      contents = blob.download_as_text()
+    else:
+      contents = blob.download_as_bytes()
+
+    print(
+        f"Downloaded storage object {blob_name} from bucket {bucket_name}."
+    )
+
+    return contents
+
