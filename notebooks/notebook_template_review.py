@@ -3,16 +3,19 @@ import argparse
 import json
 import os
 import urllib.request
+import csv
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--notebook-dir', dest='notebook_dir',
                     default=None, type=str, help='Notebook directory')
 parser.add_argument('--notebook', dest='notebook',
                     default=None, type=str, help='Notebook to review')
-parser.add_argument('--errors', dest='errors',
-                    default=False, type=bool, help='Report errors')
-parser.add_argument('--errors-csv', dest='errors_csv',
-                    default=False, type=bool, help='Report errors as CSV')
+parser.add_argument('--notebook-file', dest='notebook_file',
+                    default=None, type=str, help='File with list of notebooks to review')
+parser.add_argument('--errors', dest='errors', action='store_true', 
+                    default=False, help='Report errors')
+parser.add_argument('--errors-csv', dest='errors_csv', action='store_true', 
+                    default=False, help='Report errors as CSV')
 parser.add_argument('--errors-codes', dest='errors_codes',
                     default=None, type=str, help='Report only specified errors')
 parser.add_argument('--desc', dest='desc',
@@ -67,9 +70,14 @@ def parse_notebook(path):
         # cell 2 is title and links
         if not cell['source'][0].startswith('# '):
             report_error(path, 1, "title cell must start with H1 heading")
+            title = ''
         else:
             title = cell['source'][0][2:].strip()
             check_sentence_case(path, title)
+            
+            # H1 title only
+            if len(cell['source']) == 1:
+                cell, nth = get_cell(path, cells, nth)
            
         # check links.
         source = ''
@@ -287,7 +295,10 @@ def check_text_cell(path, cell):
         'Vertex Private Endpoint': 'Vertex AI Private Endpoint',
         'Tensorflow': 'TensorFlow',
         'Tensorboard': 'TensorBoard',
-        'Google Cloud Notebooks': 'Vertex AI Workbench Notebooks'
+        'Google Cloud Notebooks': 'Vertex AI Workbench Notebooks',
+        'Bigquery': 'BigQuery',
+        'Pytorch': 'PyTorch',
+        'Sklearn': 'scikit-learn'
     }
     
     for line in cell['source']:
@@ -311,7 +322,7 @@ def check_sentence_case(path, heading):
     for word in words[1:]:
         word = word.replace(':', '').replace('(', '').replace(')', '')
         if word in ['E2E', 'Vertex', 'AutoML', 'ML', 'AI', 'GCP', 'API', 'R', 'CMEK', 'TFX', 'TFDV', 'SDK',
-                    'VM', 'CPR', 'NVIDIA', 'ID', 'DASK']:
+                    'VM', 'CPR', 'NVIDIA', 'ID', 'DASK', 'ARIMA_PLUS', 'KFP']:
             continue
         if word.isupper():
             report_error(path, 3, f"heading is not sentence case: {word}")
@@ -417,6 +428,24 @@ elif args.notebook:
         print("Error: not a notebook:", args.notebook)
         exit(1)
     parse_notebook(args.notebook)
+elif args.notebook_file:
+    if not os.path.isfile(args.notebook_file):
+        print("Error: file does not exist", args.notebook_file)
+    else:
+        with open(args.notebook_file, 'r') as csvfile:
+            reader = csv.reader(csvfile)
+            heading = True
+            for row in reader:
+                if heading:
+                    heading = False
+                else:
+                    tag = row[0]
+                    notebook = row[1]
+                    parse_notebook(notebook)
+
+        
+
+
 else:
-        print("Error: must specify a directory or notebook")
-        exit(1)
+    print("Error: must specify a directory or notebook")
+    exit(1)
