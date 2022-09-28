@@ -3,6 +3,7 @@ import argparse
 import json
 import os
 import urllib.request
+import csv
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--notebook-dir', dest='notebook_dir',
@@ -73,6 +74,10 @@ def parse_notebook(path):
         else:
             title = cell['source'][0][2:].strip()
             check_sentence_case(path, title)
+            
+            # H1 title only
+            if len(cell['source']) == 1:
+                cell, nth = get_cell(path, cells, nth)
            
         # check links.
         source = ''
@@ -317,7 +322,7 @@ def check_sentence_case(path, heading):
     for word in words[1:]:
         word = word.replace(':', '').replace('(', '').replace(')', '')
         if word in ['E2E', 'Vertex', 'AutoML', 'ML', 'AI', 'GCP', 'API', 'R', 'CMEK', 'TFX', 'TFDV', 'SDK',
-                    'VM', 'CPR', 'NVIDIA', 'ID', 'DASK']:
+                    'VM', 'CPR', 'NVIDIA', 'ID', 'DASK', 'ARIMA_PLUS', 'KFP']:
             continue
         if word.isupper():
             report_error(path, 3, f"heading is not sentence case: {word}")
@@ -427,14 +432,18 @@ elif args.notebook_file:
     if not os.path.isfile(args.notebook_file):
         print("Error: file does not exist", args.notebook_file)
     else:
-        with open(args.notebook_file, 'r') as f:
-            notebooks = f.readlines()
-        for notebook in notebooks:
-            notebook = notebook.strip()
-            if not os.path.isfile(notebook):
-                print("Error: notebook does not exist", notebook)
-            else:
-                parse_notebook(notebook)
+        with open(args.notebook_file, 'r') as csvfile:
+            reader = csv.reader(csvfile)
+            heading = True
+            for row in reader:
+                if heading:
+                    heading = False
+                else:
+                    tag = row[0]
+                    notebook = row[1]
+                    parse_notebook(notebook)
+
+        
 
 
 else:
