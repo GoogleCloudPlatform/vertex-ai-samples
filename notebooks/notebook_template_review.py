@@ -84,19 +84,19 @@ def parse_notebook(path):
         for line in cell['source']:
             source += line
             if '<a href="https://github.com' in line:
-                link = line.strip()[9:-2]
+                link = line.strip()[9:-2].replace('" target="_blank', '')
                 try:
                     code = urllib.request.urlopen(link).getcode()
                 except Exception as e:
                     report_error(path, 7, f"bad GitHub link: {link}")
             if '<a href="https://colab.research.google.com/' in line:
-                link = 'https://github.com/' + line.strip()[50:-2]
+                link = 'https://github.com/' + line.strip()[50:-2].replace('" target="_blank', '')
                 try:
                     code = urllib.request.urlopen(link).getcode()
                 except Exception as e:
                     report_error(path, 8, f"bad Colab link: {link}")
             if '<a href="https://console.cloud.google.com/vertex-ai/workbench/' in line:
-                link = line.strip()[91:-2]
+                link = line.strip()[91:-2].replace('" target="_blank', '')
                 try:
                     code = urllib.request.urlopen(link).getcode()
                 except Exception as e:
