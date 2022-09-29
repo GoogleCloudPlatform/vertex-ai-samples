@@ -1,0 +1,32 @@
+tag,notebook
+AutoML,official/automl/automl-text-classification.ipynb
+AutoML,official/automl/sdk_automl_tabular_forecasting_batch.ipynb
+Tabular Data,official/automl/automl_forecasting_bqml_arima_plus_comparison.ipynb
+Tabular Data,official/automl/automl_tabular_on_vertex_pipelines.ipynb
+Custom Training,official/custom/sdk-custom-image-classification-batch.ipynb
+Custom Training,official/custom/sdk-custom-image-classification-online.ipynb
+Vertex Explainable AI,official/explainable_ai/sdk_automl_tabular_binary_classification_batch_explain.ipynb
+Vertex Explainable AI,official/explainable_ai/sdk_automl_tabular_classification_online_explain.ipynb
+Vertex Explainable AI,official/explainable_ai/sdk_custom_image_classification_batch_explain.ipynb
+Vertex Explainable AI,official/explainable_ai/sdk_custom_image_classification_online_explain.ipynb
+Vertex Explainable AI,official/explainable_ai/sdk_custom_tabular_regression_batch_explain.ipynb
+Vertex Explainable AI,official/explainable_ai/sdk_custom_tabular_regression_online_explain.ipynb
+Vertex AI Experiments,official/experiments/comparing_pipeline_runs.ipynb
+Vertex AI Experiments,official/experiments/build_model_experimentation_lineage_with_prebuild_code.ipynb
+Vertex AI Experiments,official/experiments/comparing_local_trained_models.ipynb
+Vertex AI Feature Store,official/feature_store/sdk-feature-store.ipynb
+Matching Engine,official/matching_engine/sdk_matching_engine_for_indexing.ipynb
+BigQuery ML and Vertex AI Model Registry,official/model-registry/bqml-vertexai-model-registry.ipynb
+Vertex ML Metadata,official/ml_metadata/sdk-metric-parameter-tracking-for-custom-jobs.ipynb
+Model Monitoring,official/model_monitoring/model_monitoring.ipynb
+Vertex AI Pipelines,official/pipelines/lightweight_functions_component_io_kfp.ipynb
+Vertex AI Pipelines,official/pipelines/google_cloud_pipeline_components_automl_images.ipynb
+Vertex AI Pipelines,official/pipelines/automl_tabular_classification_beans.ipynb
+Vertex AI Pipelines,official/pipelines/google_cloud_pipeline_components_automl_tabular.ipynb
+Vertex AI Pipelines,official/pipelines/google_cloud_pipeline_components_automl_text.ipynb
+Vertex AI Pipelines,official/pipelines/custom_model_training_and_batch_prediction.ipynb
+Vertex AI Pipelines,official/pipelines/google_cloud_pipeline_components_model_train_upload_deploy.ipynb
+Vertex AI Pipelines,official/pipelines/control_flow_kfp.ipynb
+Vertex AI Pipelines,official/pipelines/metrics_viz_run_compare_kfp.ipynb
+Vertex AI Pipelines,official/pipelines/pipelines_intro_kfp.ipynb
+Vertex AI Vizier,official/vizier/gapic-vizier-multi-objective-optimization.ipynb
