@@ -18,12 +18,16 @@ parser.add_argument('--errors-csv', dest='errors_csv', action='store_true',
                     default=False, help='Report errors as CSV')
 parser.add_argument('--errors-codes', dest='errors_codes',
                     default=None, type=str, help='Report only specified errors')
-parser.add_argument('--desc', dest='desc',
-                    default=False, type=bool, help='Output description')
-parser.add_argument('--uses', dest='uses',
-                    default=False, type=bool, help='Output uses (resources)')
-parser.add_argument('--steps', dest='steps',
-                    default=False, type=bool, help='Ouput steps')
+parser.add_argument('--title', dest='title', action='store_true',
+                    default=False, help='Output description')
+parser.add_argument('--desc', dest='desc', action='store_true', 
+                    default=False, help='Output description')
+parser.add_argument('--uses', dest='uses', action='store_true', 
+                    default=False, help='Output uses (resources)')
+parser.add_argument('--steps', dest='steps', action='store_true', 
+                    default=False, help='Ouput steps')
+parser.add_argument('--web', dest='web', action='store_true', 
+                    default=False, help='Output format in HTML')
 args = parser.parse_args()
 
 if args.errors_codes:
@@ -81,30 +85,37 @@ def parse_notebook(path):
            
         # check links.
         source = ''
+        git_link = None
+        colab_link = None
+        workbench_link = None
         for line in cell['source']:
             source += line
             if '<a href="https://github.com' in line:
-                link = line.strip()[9:-2].replace('" target="_blank', '')
+                git_link = line.strip()[9:-2].replace('" target="_blank', '')
                 try:
-                    code = urllib.request.urlopen(link).getcode()
+                    code = urllib.request.urlopen(git_link).getcode()
                 except Exception as e:
                     report_error(path, 7, f"bad GitHub link: {link}")
+                    
             if '<a href="https://colab.research.google.com/' in line:
-                link = 'https://github.com/' + line.strip()[50:-2].replace('" target="_blank', '')
+                colab_link = 'https://github.com/' + line.strip()[50:-2].replace('" target="_blank', '')
                 try:
-                    code = urllib.request.urlopen(link).getcode()
+                    code = urllib.request.urlopen(colab_link).getcode()
                 except Exception as e:
                     report_error(path, 8, f"bad Colab link: {link}")
+                    
             if '<a href="https://console.cloud.google.com/vertex-ai/workbench/' in line:
-                link = line.strip()[91:-2].replace('" target="_blank', '')
+                workbench_link = line.strip()[91:-2].replace('" target="_blank', '')
                 try:
-                    code = urllib.request.urlopen(link).getcode()
+                    code = urllib.request.urlopen(workbench_link).getcode()
                 except Exception as e:
                     report_error(path, 9, f"bad Workbench link: {link}")
 
-        if 'View on GitHub' not in source:
+        if 'View on GitHub' not in source or not git_link:
             report_error(path, 4, 'Missing link for GitHub')
-        if 'Open in Vertex AI Workbench' not in source:
+        if 'Run in Colab' not in source or not colab_link:
+            report_error(path, 4, 'Missing link for Colab')    # needs new error number
+        if 'Open in Vertex AI Workbench' not in source or not workbench_link:
             report_error(path, 5, 'Missing link for Workbench')
         if 'master' in source:
             report_error(path, 6, 'Outdated branch (master) used in link')
@@ -121,7 +132,7 @@ def parse_notebook(path):
             costs = []
         else:
             desc, uses, steps, costs = parse_objective(path, cell)
-            add_index(path, title, desc, uses, steps)
+            add_index(path, tag, title, desc, uses, steps, git_link, colab_link, workbench_link)
             
         # (optional) Recommendation
         cell, nth = get_cell(path, cells, nth)
@@ -399,7 +410,27 @@ def parse_objective(path, cell):
             
     return desc, uses, steps, costs
 
-def add_index(path, title, desc, uses, steps):
+def add_index(path, tag, title, desc, uses, steps, git_link, colab_link, workbench_link):
+    if args.web:
+        title = title.split(':')[-1]
+        print('    <tr>')
+        print('        <td>')
+        print(f'            {tag}\n')
+        print('        </td>')
+        print('        <td>')
+        print(f'            {title}\n')
+        print('        </td>')
+        print('        <td>')
+        if colab_link:
+            print(f'            <a src="{colab_link}">Colab</a>')
+        if git_link:
+            print(f'            <a src="{git_link}">GitHub</a>')
+        if workbench_link:
+            print(f'            <a src="{workbench_link}">Vertex AI Workbench</a>')
+        print('        </td>')
+        print('    </tr>\n')
+        
+    '''
     if not args.desc and not args.uses and not args.steps:
         return
     
@@ -416,6 +447,13 @@ def add_index(path, title, desc, uses, steps):
         
     if args.steps:
         print(steps)
+    '''
+
+if args.web:
+    print('<table>')
+    print('    <th>Vertex AI Feature</th>')
+    print('    <th>Description</th>')
+    print('    <th>Open in</th>')
 
 
 if args.notebook_dir:
@@ -442,10 +480,9 @@ elif args.notebook_file:
                     tag = row[0]
                     notebook = row[1]
                     parse_notebook(notebook)
-
-        
-
-
 else:
     print("Error: must specify a directory or notebook")
     exit(1)
+
+if args.web:
+    print('</table>\n')
