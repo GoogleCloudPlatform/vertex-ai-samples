@@ -36,3 +36,4 @@
 /model_evaluation/automl_tabular_classification_model_evaluation.ipynb @soheilazangeneh
 /model_evaluation/automl_tabular_regression_model_evaluation.ipynb @soheilazangeneh
 /tabular_workflows/tabnet_on_vertex_pipelines.ipynb @sakagarwal
+/tabular_workflows/wide_and_deep_on_vertex_pipelines.ipynb @sakagarwal
