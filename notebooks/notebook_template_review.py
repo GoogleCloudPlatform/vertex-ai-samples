@@ -28,6 +28,8 @@ parser.add_argument('--steps', dest='steps', action='store_true',
                     default=False, help='Ouput steps')
 parser.add_argument('--web', dest='web', action='store_true', 
                     default=False, help='Output format in HTML')
+parser.add_argument('--repo', dest='repo', action='store_true', 
+                    default=False, help='Output format in Markdown')
 args = parser.parse_args()
 
 if args.errors_codes:
@@ -423,8 +425,9 @@ def parse_objective(path, cell):
     return desc, uses, steps, costs
 
 def add_index(path, tag, title, desc, uses, steps, git_link, colab_link, workbench_link):
+    title = title.split(':')[-1].strip()
+    title = title[0].upper() + title[1:]
     if args.web:
-        title = title.split(':')[-1]
         print('    <tr>')
         print('        <td>')
         print(f'            {tag}\n')
@@ -441,25 +444,17 @@ def add_index(path, tag, title, desc, uses, steps, git_link, colab_link, workben
             print(f'            <a src="{workbench_link}">Vertex AI Workbench</a>')
         print('        </td>')
         print('    </tr>\n')
-        
-    '''
-    if not args.desc and not args.uses and not args.steps:
-        return
+    elif args.repo:
+        print(f"\n[{title}]({path})\n")
     
-    title = title.split(':')[-1].strip()
-    title = title[0].upper() + title[1:]
-    
-    print(f"\n[{title}]({path})\n")
-    
-    if args.desc:
-        print(desc)
-        
-    if args.uses:
-        print(uses)
-        
-    if args.steps:
-        print(steps)
-    '''
+        if args.desc:
+            print(desc)
+
+        if args.uses:
+            print(uses)
+
+        if args.steps:
+            print(steps)
 
 if args.web:
     print('<table>')
