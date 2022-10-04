@@ -111,21 +111,30 @@ def parse_notebook(path):
                 try:
                     code = urllib.request.urlopen(git_link).getcode()
                 except Exception as e:
-                    report_error(path, ERROR_LINK_GIT_BAD, f"bad GitHub link: {git_link}")
+                    # if new notebook
+                    derived_link = os.path.join('https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/', path)
+                    if git_link != derived_link:
+                        report_error(path, ERROR_LINK_GIT_BAD, f"bad GitHub link: {git_link}")
                     
             if '<a href="https://colab.research.google.com/' in line:
                 colab_link = 'https://github.com/' + line.strip()[50:-2].replace('" target="_blank', '')
                 try:
                     code = urllib.request.urlopen(colab_link).getcode()
                 except Exception as e:
-                    report_error(path, ERROR_LINK_COLAB_BAD, f"bad Colab link: {colab_link}")
+                    # if new notebook
+                    derived_link = os.path.join('https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks', path)
+                    if colab_link != derived_link:
+                        report_error(path, ERROR_LINK_COLAB_BAD, f"bad Colab link: {colab_link}")
                     
+
             if '<a href="https://console.cloud.google.com/vertex-ai/workbench/' in line:
                 workbench_link = line.strip()[91:-2].replace('" target="_blank', '')
                 try:
                     code = urllib.request.urlopen(workbench_link).getcode()
                 except Exception as e:
-                    report_error(path, ERROR_LINK_WORKBENCH_BAD, f"bad Workbench link: {workbench_link}")
+                    derived_link = os.path.join('https://console.cloud.google.com/vertex-ai/workbench/deploy-notebook?download_url=https://raw.githubusercontent.com/GoogleCloudPlatform/vertex-ai-samples/main/notebooks/', path)
+                    if colab_link != workbench_link:
+                        report_error(path, ERROR_LINK_WORKBENCH_BAD, f"bad Workbench link: {workbench_link}")
 
         if 'View on GitHub' not in source or not git_link:
             report_error(path, ERROR_LINK_GIT_MISSING, 'Missing link for GitHub')
