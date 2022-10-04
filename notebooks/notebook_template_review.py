@@ -28,6 +28,8 @@ parser.add_argument('--steps', dest='steps', action='store_true',
                     default=False, help='Ouput steps')
 parser.add_argument('--web', dest='web', action='store_true', 
                     default=False, help='Output format in HTML')
+parser.add_argument('--repo', dest='repo', action='store_true', 
+                    default=False, help='Output format in Markdown')
 args = parser.parse_args()
 
 if args.errors_codes:
@@ -386,6 +388,9 @@ def parse_objective(path, cell):
             continue
             
         if in_desc:
+            if len(desc) > 0 and line.strip() == '':
+                in_desc = False
+                continue
             desc += line
         elif in_uses:
             sline = line.strip()
@@ -406,6 +411,13 @@ def parse_objective(path, cell):
             
     if desc == '':
         report_error(path, 17, "Objective section missing desc")
+    else:
+        desc = desc.lstrip()
+        sentences = desc.split('.')
+        if len(sentences) > 1:
+            desc = sentences[0] + '.\n'
+        if desc.startswith('In this tutorial, you learn') or desc.startswith('In this notebook, you learn'):
+            desc = desc[22].upper() + desc[23:]
         
     if uses == '':
         report_error(path, 18, "Objective section missing uses services list")
@@ -423,14 +435,19 @@ def parse_objective(path, cell):
     return desc, uses, steps, costs
 
 def add_index(path, tag, title, desc, uses, steps, git_link, colab_link, workbench_link):
+    title = title.split(':')[-1].strip()
+    title = title[0].upper() + title[1:]
     if args.web:
-        title = title.split(':')[-1]
         print('    <tr>')
         print('        <td>')
-        print(f'            {tag}\n')
+        tags = tag.split(',')
+        for tag in tags:
+            print(f'            {tag.strip()}<br/>\n')
         print('        </td>')
         print('        <td>')
-        print(f'            {title}\n')
+        print(f'            {title}<br/>\n')
+        if args.desc:
+            print(f'            {desc}\n')
         print('        </td>')
         print('        <td>')
         if colab_link:
@@ -441,25 +458,17 @@ def add_index(path, tag, title, desc, uses, steps, git_link, colab_link, workben
             print(f'            <a src="{workbench_link}">Vertex AI Workbench</a>')
         print('        </td>')
         print('    </tr>\n')
-        
-    '''
-    if not args.desc and not args.uses and not args.steps:
-        return
+    elif args.repo:
+        print(f"\n[{title}]({path})\n")
     
-    title = title.split(':')[-1].strip()
-    title = title[0].upper() + title[1:]
-    
-    print(f"\n[{title}]({path})\n")
-    
-    if args.desc:
-        print(desc)
-        
-    if args.uses:
-        print(uses)
-        
-    if args.steps:
-        print(steps)
-    '''
+        if args.desc:
+            print(desc)
+
+        if args.uses:
+            print(uses)
+
+        if args.steps:
+            print(steps)
 
 if args.web:
     print('<table>')
@@ -493,6 +502,10 @@ elif args.notebook_file:
                 else:
                     tag = row[0]
                     notebook = row[1]
+                    try:
+                        linkback = row[2]
+                    except:
+                        linkback = None
                     parse_notebook(notebook)
 else:
     print("Error: must specify a directory or notebook")
