@@ -26,14 +26,9 @@ Vertex AI Pipelines,official/pipelines/metrics_viz_run_compare_kfp.ipynb,
 Vertex AI Pipelines,official/pipelines/pipelines_intro_kfp.ipynb,
 Vertex AI Vizier,official/vizier/gapic-vizier-multi-objective-optimization.ipynb,vertex-ai/docs/vizier/using-vizier
 "Vertex Explainable AI, Tabular data",official/explainable_ai/sdk_automl_tabular_binary_classification_batch_explain.ipynb,vertex-ai/docs/explainable-ai/overview
-"Vertex Explainable AI, Tabular data",official/explainable_ai/sdk_automl_tabular_classification_online_explain.ipynb,vertex-ai/docs/explainable-ai/o
-verview
-"Vertex Explainable AI, Image data",official/explainable_ai/sdk_custom_image_classification_batch_explain.ipynb,vertex-ai/docs/explainable-ai/o
-verview
-"Vertex Explainable AI, Image data",official/explainable_ai/sdk_custom_image_classification_online_explain.ipynb,vertex-ai/docs/explainable-ai/o
-verview
-"Vertex Explainable AI, Tabular data",official/explainable_ai/sdk_custom_tabular_regression_batch_explain.ipynb,vertex-ai/docs/explainable-ai/o
-verview
-"Vertex Explainable AI, Tabular data",official/explainable_ai/sdk_custom_tabular_regression_online_explain.ipynb,vertex-ai/docs/explainable-ai/o
-verview
+"Vertex Explainable AI, Tabular data",official/explainable_ai/sdk_automl_tabular_classification_online_explain.ipynb,vertex-ai/docs/explainable-ai/overview
+"Vertex Explainable AI, Image data",official/explainable_ai/sdk_custom_image_classification_batch_explain.ipynb,vertex-ai/docs/explainable-ai/overview
+"Vertex Explainable AI, Image data",official/explainable_ai/sdk_custom_image_classification_online_explain.ipynb,vertex-ai/docs/explainable-ai/overview
+"Vertex Explainable AI, Tabular data",official/explainable_ai/sdk_custom_tabular_regression_batch_explain.ipynb,vertex-ai/docs/explainable-ai/overview
+"Vertex Explainable AI, Tabular data",official/explainable_ai/sdk_custom_tabular_regression_online_explain.ipynb,vertex-ai/docs/explainable-ai/overview
 Vertex ML Metadata,official/ml_metadata/sdk-metric-parameter-tracking-for-custom-jobs.ipynb,
