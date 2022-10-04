@@ -388,6 +388,9 @@ def parse_objective(path, cell):
             continue
             
         if in_desc:
+            if len(desc) > 0 and line.strip() == '':
+                in_desc = False
+                continue
             desc += line
         elif in_uses:
             sline = line.strip()
@@ -408,6 +411,13 @@ def parse_objective(path, cell):
             
     if desc == '':
         report_error(path, 17, "Objective section missing desc")
+    else:
+        desc = desc.lstrip()
+        sentences = desc.split('.')
+        if len(sentences) > 1:
+            desc = sentences[0] + '.\n'
+        if desc.startswith('In this tutorial, you learn') or desc.startswith('In this notebook, you learn'):
+            desc = desc[22].upper() + desc[23:]
         
     if uses == '':
         report_error(path, 18, "Objective section missing uses services list")
@@ -430,10 +440,14 @@ def add_index(path, tag, title, desc, uses, steps, git_link, colab_link, workben
     if args.web:
         print('    <tr>')
         print('        <td>')
-        print(f'            {tag}\n')
+        tags = tag.split(',')
+        for tag in tags:
+            print(f'            {tag.strip()}<br/>\n')
         print('        </td>')
         print('        <td>')
-        print(f'            {title}\n')
+        print(f'            {title}<br/>\n')
+        if args.desc:
+            print(f'            {desc}\n')
         print('        </td>')
         print('        <td>')
         if colab_link:
@@ -488,6 +502,10 @@ elif args.notebook_file:
                 else:
                     tag = row[0]
                     notebook = row[1]
+                    try:
+                        linkback = row[2]
+                    except:
+                        linkback = None
                     parse_notebook(notebook)
 else:
     print("Error: must specify a directory or notebook")
