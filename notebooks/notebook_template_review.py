@@ -111,21 +111,30 @@ def parse_notebook(path):
                 try:
                     code = urllib.request.urlopen(git_link).getcode()
                 except Exception as e:
-                    report_error(path, ERROR_LINK_GIT_BAD, f"bad GitHub link: {git_link}")
+                    # if new notebook
+                    derived_link = os.path.join('https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/', path)
+                    if git_link != derived_link:
+                        report_error(path, ERROR_LINK_GIT_BAD, f"bad GitHub link: {git_link}")
                     
             if '<a href="https://colab.research.google.com/' in line:
                 colab_link = 'https://github.com/' + line.strip()[50:-2].replace('" target="_blank', '')
                 try:
                     code = urllib.request.urlopen(colab_link).getcode()
                 except Exception as e:
-                    report_error(path, ERROR_LINK_COLAB_BAD, f"bad Colab link: {colab_link}")
+                    # if new notebook
+                    derived_link = os.path.join('https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks', path)
+                    if colab_link != derived_link:
+                        report_error(path, ERROR_LINK_COLAB_BAD, f"bad Colab link: {colab_link}")
                     
+
             if '<a href="https://console.cloud.google.com/vertex-ai/workbench/' in line:
                 workbench_link = line.strip()[91:-2].replace('" target="_blank', '')
                 try:
                     code = urllib.request.urlopen(workbench_link).getcode()
                 except Exception as e:
-                    report_error(path, ERROR_LINK_WORKBENCH_BAD, f"bad Workbench link: {workbench_link}")
+                    derived_link = os.path.join('https://console.cloud.google.com/vertex-ai/workbench/deploy-notebook?download_url=https://raw.githubusercontent.com/GoogleCloudPlatform/vertex-ai-samples/main/notebooks/', path)
+                    if colab_link != workbench_link:
+                        report_error(path, ERROR_LINK_WORKBENCH_BAD, f"bad Workbench link: {workbench_link}")
 
         if 'View on GitHub' not in source or not git_link:
             report_error(path, ERROR_LINK_GIT_MISSING, 'Missing link for GitHub')
@@ -438,6 +447,8 @@ def add_index(path, tag, title, desc, uses, steps, git_link, colab_link, workben
     title = title.split(':')[-1].strip()
     title = title[0].upper() + title[1:]
     if args.web:
+        title = title.replace('`', '')
+        
         print('    <tr>')
         print('        <td>')
         tags = tag.split(',')
@@ -447,18 +458,36 @@ def add_index(path, tag, title, desc, uses, steps, git_link, colab_link, workben
         print('        <td>')
         print(f'            {title}<br/>\n')
         if args.desc:
-            print(f'            {desc}\n')
+            desc = desc.replace('`', '')
+            print(f'            {desc}<br/>\n')
+        if linkback:
+            text = ''
+            for tag in tags:
+                text += tag.strip() + ' '
+                
+            print(f'            Learn more about <a src="https://cloud.google.com/{linkback}">{text}</a><br/>\n')
         print('        </td>')
         print('        <td>')
         if colab_link:
-            print(f'            <a src="{colab_link}">Colab</a>')
+            print(f'            <a src="{colab_link}">Colab</a><br/>\n')
         if git_link:
-            print(f'            <a src="{git_link}">GitHub</a>')
+            print(f'            <a src="{git_link}">GitHub</a><br/>\n')
         if workbench_link:
-            print(f'            <a src="{workbench_link}">Vertex AI Workbench</a>')
+            print(f'            <a src="{workbench_link}">Vertex AI Workbench</a><br/>\n')
         print('        </td>')
         print('    </tr>\n')
     elif args.repo:
+        tags = tag.split(',')
+        try:
+            last_tag
+        except:
+            last_tag = ''
+        if tags != last_tag:
+            last_tag = tags
+            flat_list = ''
+            for item in tags:
+                flat_list += item.replace("'", '') + ' '
+            print(f"\n### {flat_list}\n")
         print(f"\n[{title}]({path})\n")
     
         if args.desc:
@@ -475,8 +504,7 @@ if args.web:
     print('    <th>Vertex AI Feature</th>')
     print('    <th>Description</th>')
     print('    <th>Open in</th>')
-
-
+    
 if args.notebook_dir:
     if not os.path.isdir(args.notebook_dir):
         print("Error: not a directory:", args.notebook_dir)
@@ -493,6 +521,7 @@ elif args.notebook_file:
     if not os.path.isfile(args.notebook_file):
         print("Error: file does not exist", args.notebook_file)
     else:
+        last_tag = ''
         with open(args.notebook_file, 'r') as csvfile:
             reader = csv.reader(csvfile)
             heading = True
