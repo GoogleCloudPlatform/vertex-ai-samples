@@ -438,6 +438,8 @@ def add_index(path, tag, title, desc, uses, steps, git_link, colab_link, workben
     title = title.split(':')[-1].strip()
     title = title[0].upper() + title[1:]
     if args.web:
+        title = title.replace('`', '')
+        
         print('    <tr>')
         print('        <td>')
         tags = tag.split(',')
@@ -447,15 +449,22 @@ def add_index(path, tag, title, desc, uses, steps, git_link, colab_link, workben
         print('        <td>')
         print(f'            {title}<br/>\n')
         if args.desc:
-            print(f'            {desc}\n')
+            desc = desc.replace('`', '')
+            print(f'            {desc}<br/>\n')
+        if linkback:
+            text = ''
+            for tag in tags:
+                text += tag.strip() + ' '
+                
+            print(f'            Learn more about <a src="https://cloud.google.com/{linkback}">{text}</a><br/>\n')
         print('        </td>')
         print('        <td>')
         if colab_link:
-            print(f'            <a src="{colab_link}">Colab</a>')
+            print(f'            <a src="{colab_link}">Colab</a><br/>\n')
         if git_link:
-            print(f'            <a src="{git_link}">GitHub</a>')
+            print(f'            <a src="{git_link}">GitHub</a><br/>\n')
         if workbench_link:
-            print(f'            <a src="{workbench_link}">Vertex AI Workbench</a>')
+            print(f'            <a src="{workbench_link}">Vertex AI Workbench</a><br/>\n')
         print('        </td>')
         print('    </tr>\n')
     elif args.repo:
