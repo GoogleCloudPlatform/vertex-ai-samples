@@ -444,6 +444,8 @@ def parse_objective(path, cell):
     return desc, uses, steps, costs
 
 def add_index(path, tag, title, desc, uses, steps, git_link, colab_link, workbench_link):
+    global last_tag
+    
     title = title.split(':')[-1].strip()
     title = title[0].upper() + title[1:]
     if args.web:
@@ -478,10 +480,6 @@ def add_index(path, tag, title, desc, uses, steps, git_link, colab_link, workben
         print('    </tr>\n')
     elif args.repo:
         tags = tag.split(',')
-        try:
-            last_tag
-        except:
-            last_tag = ''
         if tags != last_tag:
             last_tag = tags
             flat_list = ''
@@ -504,7 +502,7 @@ if args.web:
     print('    <th>Vertex AI Feature</th>')
     print('    <th>Description</th>')
     print('    <th>Open in</th>')
-    
+
 if args.notebook_dir:
     if not os.path.isdir(args.notebook_dir):
         print("Error: not a directory:", args.notebook_dir)
