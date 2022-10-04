@@ -477,6 +477,17 @@ def add_index(path, tag, title, desc, uses, steps, git_link, colab_link, workben
         print('        </td>')
         print('    </tr>\n')
     elif args.repo:
+        tags = tag.split(',')
+        try:
+            last_tag
+        except:
+            last_tag = ''
+        if tags != last_tag:
+            last_tag = tags
+            flat_list = ''
+            for item in tags:
+                flat_list += item.replace("'", '') + ' '
+            print(f"\n### {flat_list}\n")
         print(f"\n[{title}]({path})\n")
     
         if args.desc:
@@ -493,8 +504,7 @@ if args.web:
     print('    <th>Vertex AI Feature</th>')
     print('    <th>Description</th>')
     print('    <th>Open in</th>')
-
-
+    
 if args.notebook_dir:
     if not os.path.isdir(args.notebook_dir):
         print("Error: not a directory:", args.notebook_dir)
@@ -511,6 +521,7 @@ elif args.notebook_file:
     if not os.path.isfile(args.notebook_file):
         print("Error: file does not exist", args.notebook_file)
     else:
+        last_tag = ''
         with open(args.notebook_file, 'r') as csvfile:
             reader = csv.reader(csvfile)
             heading = True
