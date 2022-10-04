@@ -480,7 +480,7 @@ def add_index(path, tag, title, desc, uses, steps, git_link, colab_link, workben
         print('    </tr>\n')
     elif args.repo:
         tags = tag.split(',')
-        if tags != last_tag:
+        if tags != last_tag and tag != '':
             last_tag = tags
             flat_list = ''
             for item in tags:
@@ -503,6 +503,8 @@ if args.web:
     print('    <th>Description</th>')
     print('    <th>Open in</th>')
 
+last_tag = ''
+
 if args.notebook_dir:
     if not os.path.isdir(args.notebook_dir):
         print("Error: not a directory:", args.notebook_dir)
@@ -519,7 +521,6 @@ elif args.notebook_file:
     if not os.path.isfile(args.notebook_file):
         print("Error: file does not exist", args.notebook_file)
     else:
-        last_tag = ''
         with open(args.notebook_file, 'r') as csvfile:
             reader = csv.reader(csvfile)
             heading = True
