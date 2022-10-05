@@ -41,6 +41,19 @@ The steps performed include:
 
 * Batch Prediction Service: Does a queued (batch) prediction for the entire set of instances in the background and stores the results in a Cloud Storage bucket when ready.
 
+[AutoML training text entity extraction model for online prediction](official/automl/sdk_automl_text_entity_extraction_online.ipynb)
+
+Learn how to create an AutoML text entity extraction model and deploy for online prediction from a Python script using the Vertex SDK.
+
+The steps performed include:
+
+- Create a Vertex `Dataset` resource.
+- Train the model.
+- View the model evaluation.
+- Deploy the `Model` resource to a serving `Endpoint` resource.
+- Make a prediction.
+- Undeploy the `Model`.
+
 [AutoML tabular forecasting model for batch prediction](official/automl/sdk_automl_tabular_forecasting_batch.ipynb)
 
 Learn how to create an `AutoML` tabular forecasting model from a Python script, and then do a batch prediction using the Vertex AI SDK.
@@ -84,6 +97,15 @@ The steps performed include:
 
 * Batch Prediction Service: Does a queued (batch) prediction for the entire set of instances in the background and stores the results in a Cloud Storage bucket when ready.
 
+[AutoML Tabular Pipeline](official/automl/automl_tabular_on_vertex_pipelines.ipynb)
+
+Learn how to create two regression models using [Vertex Pipelines](https://cloud.
+
+The steps performed are:
+
+- Create a training pipeline that reduces the search space from the default to save time.
+- Create a training pipeline that reuses the architecture search results from the previous pipeline to save time.
+
 [AutoML training text sentiment analysis model for online prediction](official/automl/sdk_automl_text_sentiment_analysis_online.ipynb)
 
 Learn how to create an AutoML text sentiment analysis model and deploy for online prediction from a Python script using the Vertex SDK.
@@ -119,6 +141,35 @@ Learn how to create an AutoML tabular regression model and deploy for online pre
 The steps performed include:
 
 - Create a Vertex `Dataset` resource.
+- Train the model.
+- View the model evaluation.
+- Deploy the `Model` resource to a serving `Endpoint` resource.
+- Make a prediction.
+- Undeploy the `Model`.
+
+[AutoML training video object tracking model for batch prediction](official/automl/sdk_automl_video_object_tracking_batch.ipynb)
+
+Learn how to create an AutoML video object tracking model from a Python script, and then do a batch prediction using the Vertex SDK.
+
+The steps performed include:
+
+- Create a Vertex `Dataset` resource.
+- Train the model.
+- View the model evaluation.
+- Make a batch prediction.
+
+
+* Prediction Service: Does an on-demand prediction for the entire set of instances (i.e., one or more data items) and returns the results in real-time.
+
+* Batch Prediction Service: Does a queued (batch) prediction for the entire set of instances in the background and stores the results in a Cloud Storage bucket when ready.
+
+[AutoML training tabular regression model for batch prediction using BigQuery](official/automl/sdk_automl_tabular_regression_batch_bq.ipynb)
+
+Learn how to create an AutoML tabular regression model and deploy it for batch prediction using the Vertex AI SDK for Python.
+
+The steps performed include:
+
+- Create a Vertex AI `Dataset` resource.
 - Train the model.
 - View the model evaluation.
 - Deploy the `Model` resource to a serving `Endpoint` resource.
