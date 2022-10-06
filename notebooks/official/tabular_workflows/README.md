@@ -1,5 +1,5 @@
 
-[TabNet Pipeline](official/tabular_workflows/tabnet_on_vertex_pipelines.ipynb)
+[TabNet Pipeline](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tabular_workflows/tabnet_on_vertex_pipelines.ipynb)
 
 Learn how to create two classification models using Vertex AI TabNet Tabular Workflows.
 
@@ -10,7 +10,7 @@ The steps performed include:
 
 
 
-[Wide & Deep Pipeline](official/tabular_workflows/wide_and_deep_on_vertex_pipelines.ipynb)
+[Wide & Deep Pipeline](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tabular_workflows/wide_and_deep_on_vertex_pipelines.ipynb)
 
 Learn how to create two classification models using Vertex AI Wide & Deep Tabular Workflows.
 
