@@ -59,7 +59,7 @@ def parse_dir(directory):
         if entry.is_dir():
             if entry.name[0] == '.':
                 continue
-            if entry.name == 'src' or entry.name == 'images':
+            if entry.name == 'src' or entry.name == 'images' or entry.name == 'sample_data':
                 continue
             print("\n##", entry.name, "\n")
             parse_dir(entry.path)
@@ -355,8 +355,8 @@ def check_sentence_case(path, heading):
         
     for word in words[1:]:
         word = word.replace(':', '').replace('(', '').replace(')', '')
-        if word in ['E2E', 'Vertex', 'AutoML', 'ML', 'AI', 'GCP', 'API', 'R', 'CMEK', 'TFX', 'TFDV', 'SDK',
-                    'VM', 'CPR', 'NVIDIA', 'ID', 'DASK', 'ARIMA_PLUS', 'KFP', 'I/O']:
+        if word in ['E2E', 'Vertex', 'AutoML', 'ML', 'AI', 'GCP', 'API', 'R', 'CMEK', 'TF', 'TFX', 'TFDV', 'SDK',
+                    'VM', 'CPR', 'NVIDIA', 'ID', 'DASK', 'ARIMA_PLUS', 'KFP', 'I/O', 'GPU']:
             continue
         if word.isupper():
             report_error(path, ERROR_HEADING_CASE, f"heading is not sentence case: {word}")
@@ -446,6 +446,9 @@ def parse_objective(path, cell):
 def add_index(path, tag, title, desc, uses, steps, git_link, colab_link, workbench_link):
     global last_tag
     
+    if not args.web and not args.repo:
+        return
+    
     title = title.split(':')[-1].strip()
     title = title[0].upper() + title[1:]
     if args.web:
@@ -486,7 +489,7 @@ def add_index(path, tag, title, desc, uses, steps, git_link, colab_link, workben
             for item in tags:
                 flat_list += item.replace("'", '') + ' '
             print(f"\n### {flat_list}\n")
-        print(f"\n[{title}]({path})\n")
+        print(f"\n[{title}]({git_link})\n")
     
         if args.desc:
             print(desc)
