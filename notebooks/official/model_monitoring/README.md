@@ -1,5 +1,5 @@
 
-[Vertex AI Model Monitoring with Explainable AI Feature Attributions](official/model_monitoring/model_monitoring.ipynb)
+[Vertex AI Model Monitoring with Explainable AI Feature Attributions](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/model_monitoring/model_monitoring.ipynb)
 
 Learn to use the `Vertex AI Model Monitoring` service to detect drift and anomalies in prediction requests from a deployed `Vertex AI Model` resource.
 

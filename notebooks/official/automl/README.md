@@ -43,7 +43,7 @@ The steps performed include:
 
 [AutoML training text entity extraction model for online prediction](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/sdk_automl_text_entity_extraction_online.ipynb)
 
-In this tutorial, you how to create an AutoML text entity extraction model and deploy for online prediction from a Python script using the Vertex SDK.
+Learn how to create an AutoML text entity extraction model and deploy for online prediction from a Python script using the Vertex SDK.
 
 The steps performed include:
 

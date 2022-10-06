@@ -1,5 +1,5 @@
 
-[Vertex AI Explainations with TabNet models](official/tabnet/ai-explanations-tabnet-algorithm.ipynb)
+[Vertex AI Explainations with TabNet models](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tabnet/ai-explanations-tabnet-algorithm.ipynb)
 
 Learn how to provide a sample plotting tool to visualize the output of TabNet, which is helpful in explaining the algorithm.
 
@@ -9,7 +9,7 @@ The steps performed are:
 * Visualize and understand the feature importance based on the masks output.
 * Clean up the resource created by this tutorial.
 
-[Vertex AI TabNet](official/tabnet/tabnet_vertex_tutorial.ipynb)
+[Vertex AI TabNet](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tabnet/tabnet_vertex_tutorial.ipynb)
 
 Learn how to run TabNet model on Vertex AI.
 

@@ -1,5 +1,5 @@
 
-[Deploy BiqQuery ML Model on Vertex AI Model Registry and make predictions](official/model-registry/bqml-vertexai-model-registry.ipynb)
+[Deploy BiqQuery ML Model on Vertex AI Model Registry and make predictions](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/model-registry/bqml-vertexai-model-registry.ipynb)
 
 Learn how to use `Vertex AI Model Registry` with `BigQuery ML` and make batch predictions:
 
