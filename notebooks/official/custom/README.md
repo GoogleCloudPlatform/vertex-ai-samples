@@ -1,5 +1,5 @@
 
-[Custom training and batch prediction](official/custom/sdk-custom-image-classification-batch.ipynb)
+[Custom training and batch prediction](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/custom/sdk-custom-image-classification-batch.ipynb)
 
 Learn to use `Vertex AI Training` to create a custom trained model and use `Vertex AI Batch Prediction` to do a batch prediction on the trained model.
 
@@ -9,7 +9,7 @@ The steps performed include:
 - Upload the trained model artifacts as a `Model` resource.
 - Make a batch prediction.
 
-[Profile model training performance using Profiler](official/custom/custom_training_tensorboard_profiler.ipynb)
+[Profile model training performance using Profiler](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/custom/custom_training_tensorboard_profiler.ipynb)
 
 Learn how to enable Vertex AI TensorBoard Profiler for custom training jobs.
 
@@ -21,7 +21,7 @@ The steps performed include:
 - View the TensorBoard Profiler dashboard
 
 
-[Training a TensorFlow model on BigQuery data](official/custom/custom-tabular-bq-managed-dataset.ipynb)
+[Training a TensorFlow model on BigQuery data](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/custom/custom-tabular-bq-managed-dataset.ipynb)
 
 Learn how to create a custom-trained model from a Python script in a Docker container using the Vertex AI SDK for Python, and then get a prediction from the deployed model by sending data.
 
@@ -33,7 +33,7 @@ The steps performed include:
 - Make a prediction.
 - Undeploy the `Model` resource.
 
-[Custom training and online prediction](official/custom/sdk-custom-image-classification-online.ipynb)
+[Custom training and online prediction](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/custom/sdk-custom-image-classification-online.ipynb)
 
 Learn to use `Vertex AI Training` to create a custom-trained model from a Python script in a Docker container, and learn to use `Vertex AI Prediction` to do a prediction on the deployed model by sending data.
 
@@ -46,7 +46,7 @@ The steps performed include:
 - Make a prediction.
 - Undeploy the `Model` resource.
 
-[Deploying Iris-detection model using FastAPI and Vertex AI custom container serving](official/custom/SDK_Custom_Container_Prediction.ipynb)
+[Deploying Iris-detection model using FastAPI and Vertex AI custom container serving](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/custom/SDK_Custom_Container_Prediction.ipynb)
 
 Learn how to create, deploy and serve a custom classification model on Vertex AI.
 
