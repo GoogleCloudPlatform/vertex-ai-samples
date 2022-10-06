@@ -1,5 +1,5 @@
 
-[Using Vertex AI Feature Store with pandas DataFrame](official/feature_store/sdk-feature-store-pandas.ipynb)
+[Using Vertex AI Feature Store with pandas DataFrame](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/feature_store/sdk-feature-store-pandas.ipynb)
 
 Learn how to use `Vertex AI Feature Store` with pandas DataFrame.
 
@@ -13,7 +13,7 @@ The steps performed include:
 - Online serving with updated feature values.
 - Point-in-time correctness to fetch feature values for training.
 
-[Online and Batch predictions using Vertex AI Feature Store](official/feature_store/sdk-feature-store.ipynb)
+[Online and Batch predictions using Vertex AI Feature Store](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/feature_store/sdk-feature-store.ipynb)
 
 Learn how to use `Vertex AI Feature Store` to import feature data, and to access the feature data for both online serving and offline tasks, such as training.
 

@@ -1,5 +1,5 @@
 
-[Create Vertex AI Matching Engine index](official/matching_engine/sdk_matching_engine_for_indexing.ipynb)
+[Create Vertex AI Matching Engine index](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/matching_engine/sdk_matching_engine_for_indexing.ipynb)
 
 Learn how to create Approximate Nearest Neighbor (ANN) Index, query against indexes, and validate the performance of the index.
 
@@ -12,7 +12,7 @@ The steps performed include:
 * Compute recall
 
 
-[Introduction to builtin Swivel embedding algorithm](official/matching_engine/intro-swivel.ipynb)
+[Introduction to builtin Swivel embedding algorithm](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/matching_engine/intro-swivel.ipynb)
 
 Learn how to train custom embeddings using Vertex AI Pipelines and deploy the model for serving.
 
@@ -25,7 +25,7 @@ The steps performed include:
 5. **Predict**: Calling the deployed endpoint using online prediction.
 6. **Cleaning up**: Deleting resources created by this tutorial.
 
-[Introduction to builtin Two-towers embedding algorithm](official/matching_engine/two-tower-model-introduction.ipynb)
+[Introduction to builtin Two-towers embedding algorithm](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/matching_engine/two-tower-model-introduction.ipynb)
 
 Learn how to run the two-tower model.
 
