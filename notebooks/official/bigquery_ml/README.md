@@ -1,5 +1,5 @@
 
-[Online prediction with BigQuery ML](official/bigquery_ml/bqml-online-prediction.ipynb)
+[Online prediction with BigQuery ML](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/bigquery_ml/bqml-online-prediction.ipynb)
 
 Learn how to train and deploy a churn prediction model for real-time inference, with the data in BigQuery and model trained using BigQuery ML, registered to Vertex AI Model Registry, and deployed to an endpoint on Vertex AI for online predictions.
 
