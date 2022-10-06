@@ -2,6 +2,7 @@
 import argparse
 import json
 import os
+import sys
 import urllib.request
 import csv
 
@@ -52,6 +53,10 @@ ERROR_LINK_WORKBENCH_MISSING = 6
 ERROR_LINK_GIT_BAD = 7
 ERROR_LINK_COLAB_BAD = 8
 ERROR_LINK_WORKBENCH_BAD = 9
+
+# globals
+num_errors = 0
+last_tag = ''
 
 def parse_dir(directory):
     entries = os.scandir(directory)
@@ -316,23 +321,42 @@ def check_text_cell(path, cell):
         'Vertex Prediction': 'Vertex AI Prediction',
         'Vertex Batch Prediction': 'Vertex AI Batch Prediction',
         'Vertex XAI': 'Vertex Explainable AI',
+        'Vertex Explainability': 'Vertex Explainable AI',
+        'Vertex AI Explainability': 'Vertex Explainable AI',
+        'Vertex Pipelines': 'Vertex AI Pipelines',
         'Vertex Experiments': 'Vertex AI Experiments',
         'Vertex TensorBoard': 'Vertex AI TensorBoard',
-        'Vertex Pipelines': 'Vertex AI Pipelines',
         'Vertex Hyperparameter Tuning': 'Vertex AI Hyperparameter Tuning',
         'Vertex Metadata': 'Vertex ML Metadata',
         'Vertex AI Metadata': 'Vertex ML Metadata',
+        'Vertex AI ML Metadata': 'Vertex ML Metadata',
         'Vertex Vizier': 'Vertex AI Vizier',
+        'Vertex Feature Store': 'Vertex AI Feature Store',
+        'Vertex Forecasting': 'Vertex AI Forecasting',
+        'Vertex Matching Engine': 'Vertex AI Matching Engine',
+        'Vertex TabNet': 'Vertex AI TabNet',
+        'Tabnet': 'TabNet',
+        'Vertex Two Towers': 'Vertex AI Two-Towers',
+        'Vertex Two-Towers': 'Vertex AI Two-Towers',
         'Vertex Dataset': 'Vertex AI Dataset',
         'Vertex Model': 'Vertex AI Model',
         'Vertex Endpoint': 'Vertex AI Endpoint',
         'Vertex Private Endpoint': 'Vertex AI Private Endpoint',
+        'Automl': 'AutoML',
+        'AutoML Tables': 'AutoML Tabular',
+        'AutoML Vision': 'AutoML Image',
+        'AutoML Language': 'AutoML Text',
         'Tensorflow': 'TensorFlow',
         'Tensorboard': 'TensorBoard',
         'Google Cloud Notebooks': 'Vertex AI Workbench Notebooks',
+        'BQ': 'BigQuery',
         'Bigquery': 'BigQuery',
+        'BQML': 'BigQuery ML',
+        'GCS': 'Cloud Storage',
+        'Google Cloud Storage': 'Cloud Storage',
         'Pytorch': 'PyTorch',
-        'Sklearn': 'scikit-learn'
+        'Sklearn': 'scikit-learn',
+        'sklearn': 'scikit-learn'
     }
     
     for line in cell['source']:
@@ -356,13 +380,17 @@ def check_sentence_case(path, heading):
     for word in words[1:]:
         word = word.replace(':', '').replace('(', '').replace(')', '')
         if word in ['E2E', 'Vertex', 'AutoML', 'ML', 'AI', 'GCP', 'API', 'R', 'CMEK', 'TF', 'TFX', 'TFDV', 'SDK',
-                    'VM', 'CPR', 'NVIDIA', 'ID', 'DASK', 'ARIMA_PLUS', 'KFP', 'I/O', 'GPU']:
+                    'VM', 'CPR', 'NVIDIA', 'ID', 'DASK', 'ARIMA_PLUS', 'KFP', 'I/O', 'GPU', 'Google', 'TensorFlow', 
+                    'PyTorch'
+                   ]:
             continue
         if word.isupper():
             report_error(path, ERROR_HEADING_CASE, f"heading is not sentence case: {word}")
 
 
 def report_error(notebook, code, msg):
+    global num_errors
+    
     if args.errors:
         if args.errors_codes:
             if str(code) not in args.errors_codes:
@@ -371,7 +399,8 @@ def report_error(notebook, code, msg):
         if args.errors_csv:
             print(notebook, ',', code)
         else:
-            print(f"{notebook}: ERROR ({code}): {msg}")
+            print(f"{notebook}: ERROR ({code}): {msg}", file=sys.stderr)
+            num_errors += 1
 
 def parse_objective(path, cell):
     desc = ''
@@ -506,8 +535,6 @@ if args.web:
     print('    <th>Description</th>')
     print('    <th>Open in</th>')
 
-last_tag = ''
-
 if args.notebook_dir:
     if not os.path.isdir(args.notebook_dir):
         print("Error: not a directory:", args.notebook_dir)
@@ -544,3 +571,5 @@ else:
 
 if args.web:
     print('</table>\n')
+    
+exit(num_errors)
