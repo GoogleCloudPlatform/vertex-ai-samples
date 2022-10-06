@@ -1,5 +1,5 @@
 
-[BQML and AutoML - Experimenting with Vertex AI](official/structured_data/rapid_prototyping_bqml_automl.ipynb)
+[BQML and AutoML - Experimenting with Vertex AI](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/master/notebooks/official/structured_data/rapid_prototyping_bqml_automl.ipynb)
 
 Learn how to use `Vertex AI Predictions` for rapid prototyping a model.
 

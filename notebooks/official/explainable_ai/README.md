@@ -1,7 +1,7 @@
 
 [Custom training tabular regression model for batch prediction with explainabilty](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/explainable_ai/sdk_custom_tabular_regression_batch_explain.ipynb)
 
-In this tutorial, you how learn to use `Vertex AI Training and Explainable AI` to create a custom image classification model with explanations, and then you learn to use `Vertex AI Batch Prediction` to make a batch prediction request with explanations.
+Learn how to use `Vertex AI Training and Explainable AI` to create a custom image classification model with explanations, and then you learn to use `Vertex AI Batch Prediction` to make a batch prediction request with explanations.
 
 The steps performed include:
 
@@ -29,7 +29,7 @@ The steps performed include:
 
 [AutoML training tabular classification model for online explanation](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/explainable_ai/sdk_automl_tabular_classification_online_explain.ipynb)
 
-In this tutorial, you how to learn to use `AutoML` to create a tabular binary classification model from a Python script, and then learn to use `Vertex AI Online Prediction` to make online predictions with explanations.
+Learn how to use `AutoML` to create a tabular binary classification model from a Python script, and then learn to use `Vertex AI Online Prediction` to make online predictions with explanations.
 
 The steps performed include:
 
