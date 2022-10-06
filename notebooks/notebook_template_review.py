@@ -54,6 +54,12 @@ ERROR_LINK_GIT_BAD = 7
 ERROR_LINK_COLAB_BAD = 8
 ERROR_LINK_WORKBENCH_BAD = 9
 
+# Overview cells
+ERROR_OVERVIEW_NOTFOUND = 10
+ERROR_OBJECTIVE_NOTFOUND = 11
+
+ERROR_PLACEHOLDER = 100
+
 # globals
 num_errors = 0
 last_tag = ''
@@ -151,12 +157,12 @@ def parse_notebook(path):
         # Overview
         cell, nth = get_cell(path, cells, nth)
         if not cell['source'][0].startswith("## Overview"):
-            report_error(path, 11, "Overview section not found")
+            report_error(path, ERROR_OVERVIEW_NOTFOUND, "Overview section not found")
             
         # Objective
         cell, nth = get_cell(path, cells, nth)
         if not cell['source'][0].startswith("### Objective"):
-            report_error(path, 12, "Objective section not found")
+            report_error(path, ERROR_OBJECTIVE_NOTFOUND, "Objective section not found")
             costs = []
         else:
             desc, uses, steps, costs = parse_objective(path, cell)
@@ -308,7 +314,7 @@ def get_cell(path, cells, nth):
 
 def empty_cell(path, cells, nth):
     if len(cells[nth]['source']) == 0:
-        report_error(path, 10, f'empty cell: cell #{nth}')
+        report_error(path, ERROR_PLACEHOLDER + 1, f'empty cell: cell #{nth}')
         return True
     else:
         return False
