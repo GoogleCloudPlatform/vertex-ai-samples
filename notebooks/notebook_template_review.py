@@ -2,6 +2,7 @@
 import argparse
 import json
 import os
+import sys
 import urllib.request
 import csv
 
@@ -53,13 +54,17 @@ ERROR_LINK_GIT_BAD = 7
 ERROR_LINK_COLAB_BAD = 8
 ERROR_LINK_WORKBENCH_BAD = 9
 
+# globals
+num_errors = 0
+last_tag = ''
+
 def parse_dir(directory):
     entries = os.scandir(directory)
     for entry in entries:
         if entry.is_dir():
             if entry.name[0] == '.':
                 continue
-            if entry.name == 'src' or entry.name == 'images':
+            if entry.name == 'src' or entry.name == 'images' or entry.name == 'sample_data':
                 continue
             print("\n##", entry.name, "\n")
             parse_dir(entry.path)
@@ -111,21 +116,30 @@ def parse_notebook(path):
                 try:
                     code = urllib.request.urlopen(git_link).getcode()
                 except Exception as e:
-                    report_error(path, ERROR_LINK_GIT_BAD, f"bad GitHub link: {git_link}")
+                    # if new notebook
+                    derived_link = os.path.join('https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/', path)
+                    if git_link != derived_link:
+                        report_error(path, ERROR_LINK_GIT_BAD, f"bad GitHub link: {git_link}")
                     
             if '<a href="https://colab.research.google.com/' in line:
                 colab_link = 'https://github.com/' + line.strip()[50:-2].replace('" target="_blank', '')
                 try:
                     code = urllib.request.urlopen(colab_link).getcode()
                 except Exception as e:
-                    report_error(path, ERROR_LINK_COLAB_BAD, f"bad Colab link: {colab_link}")
+                    # if new notebook
+                    derived_link = os.path.join('https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks', path)
+                    if colab_link != derived_link:
+                        report_error(path, ERROR_LINK_COLAB_BAD, f"bad Colab link: {colab_link}")
                     
+
             if '<a href="https://console.cloud.google.com/vertex-ai/workbench/' in line:
                 workbench_link = line.strip()[91:-2].replace('" target="_blank', '')
                 try:
                     code = urllib.request.urlopen(workbench_link).getcode()
                 except Exception as e:
-                    report_error(path, ERROR_LINK_WORKBENCH_BAD, f"bad Workbench link: {workbench_link}")
+                    derived_link = os.path.join('https://console.cloud.google.com/vertex-ai/workbench/deploy-notebook?download_url=https://raw.githubusercontent.com/GoogleCloudPlatform/vertex-ai-samples/main/notebooks/', path)
+                    if colab_link != workbench_link:
+                        report_error(path, ERROR_LINK_WORKBENCH_BAD, f"bad Workbench link: {workbench_link}")
 
         if 'View on GitHub' not in source or not git_link:
             report_error(path, ERROR_LINK_GIT_MISSING, 'Missing link for GitHub')
@@ -307,23 +321,42 @@ def check_text_cell(path, cell):
         'Vertex Prediction': 'Vertex AI Prediction',
         'Vertex Batch Prediction': 'Vertex AI Batch Prediction',
         'Vertex XAI': 'Vertex Explainable AI',
+        'Vertex Explainability': 'Vertex Explainable AI',
+        'Vertex AI Explainability': 'Vertex Explainable AI',
+        'Vertex Pipelines': 'Vertex AI Pipelines',
         'Vertex Experiments': 'Vertex AI Experiments',
         'Vertex TensorBoard': 'Vertex AI TensorBoard',
-        'Vertex Pipelines': 'Vertex AI Pipelines',
         'Vertex Hyperparameter Tuning': 'Vertex AI Hyperparameter Tuning',
         'Vertex Metadata': 'Vertex ML Metadata',
         'Vertex AI Metadata': 'Vertex ML Metadata',
+        'Vertex AI ML Metadata': 'Vertex ML Metadata',
         'Vertex Vizier': 'Vertex AI Vizier',
+        'Vertex Feature Store': 'Vertex AI Feature Store',
+        'Vertex Forecasting': 'Vertex AI Forecasting',
+        'Vertex Matching Engine': 'Vertex AI Matching Engine',
+        'Vertex TabNet': 'Vertex AI TabNet',
+        'Tabnet': 'TabNet',
+        'Vertex Two Towers': 'Vertex AI Two-Towers',
+        'Vertex Two-Towers': 'Vertex AI Two-Towers',
         'Vertex Dataset': 'Vertex AI Dataset',
         'Vertex Model': 'Vertex AI Model',
         'Vertex Endpoint': 'Vertex AI Endpoint',
         'Vertex Private Endpoint': 'Vertex AI Private Endpoint',
+        'Automl': 'AutoML',
+        'AutoML Tables': 'AutoML Tabular',
+        'AutoML Vision': 'AutoML Image',
+        'AutoML Language': 'AutoML Text',
         'Tensorflow': 'TensorFlow',
         'Tensorboard': 'TensorBoard',
         'Google Cloud Notebooks': 'Vertex AI Workbench Notebooks',
+        'BQ': 'BigQuery',
         'Bigquery': 'BigQuery',
+        'BQML': 'BigQuery ML',
+        'GCS': 'Cloud Storage',
+        'Google Cloud Storage': 'Cloud Storage',
         'Pytorch': 'PyTorch',
-        'Sklearn': 'scikit-learn'
+        'Sklearn': 'scikit-learn',
+        'sklearn': 'scikit-learn'
     }
     
     for line in cell['source']:
@@ -346,14 +379,18 @@ def check_sentence_case(path, heading):
         
     for word in words[1:]:
         word = word.replace(':', '').replace('(', '').replace(')', '')
-        if word in ['E2E', 'Vertex', 'AutoML', 'ML', 'AI', 'GCP', 'API', 'R', 'CMEK', 'TFX', 'TFDV', 'SDK',
-                    'VM', 'CPR', 'NVIDIA', 'ID', 'DASK', 'ARIMA_PLUS', 'KFP', 'I/O']:
+        if word in ['E2E', 'Vertex', 'AutoML', 'ML', 'AI', 'GCP', 'API', 'R', 'CMEK', 'TF', 'TFX', 'TFDV', 'SDK',
+                    'VM', 'CPR', 'NVIDIA', 'ID', 'DASK', 'ARIMA_PLUS', 'KFP', 'I/O', 'GPU', 'Google', 'TensorFlow', 
+                    'PyTorch'
+                   ]:
             continue
         if word.isupper():
             report_error(path, ERROR_HEADING_CASE, f"heading is not sentence case: {word}")
 
 
 def report_error(notebook, code, msg):
+    global num_errors
+    
     if args.errors:
         if args.errors_codes:
             if str(code) not in args.errors_codes:
@@ -362,7 +399,8 @@ def report_error(notebook, code, msg):
         if args.errors_csv:
             print(notebook, ',', code)
         else:
-            print(f"{notebook}: ERROR ({code}): {msg}")
+            print(f"{notebook}: ERROR ({code}): {msg}", file=sys.stderr)
+            num_errors += 1
 
 def parse_objective(path, cell):
     desc = ''
@@ -388,6 +426,9 @@ def parse_objective(path, cell):
             continue
             
         if in_desc:
+            if len(desc) > 0 and line.strip() == '':
+                in_desc = False
+                continue
             desc += line
         elif in_uses:
             sline = line.strip()
@@ -408,6 +449,13 @@ def parse_objective(path, cell):
             
     if desc == '':
         report_error(path, 17, "Objective section missing desc")
+    else:
+        desc = desc.lstrip()
+        sentences = desc.split('.')
+        if len(sentences) > 1:
+            desc = sentences[0] + '.\n'
+        if desc.startswith('In this tutorial, you learn') or desc.startswith('In this notebook, you learn'):
+            desc = desc[22].upper() + desc[23:]
         
     if uses == '':
         report_error(path, 18, "Objective section missing uses services list")
@@ -425,27 +473,52 @@ def parse_objective(path, cell):
     return desc, uses, steps, costs
 
 def add_index(path, tag, title, desc, uses, steps, git_link, colab_link, workbench_link):
+    global last_tag
+    
+    if not args.web and not args.repo:
+        return
+    
     title = title.split(':')[-1].strip()
     title = title[0].upper() + title[1:]
     if args.web:
+        title = title.replace('`', '')
+        
         print('    <tr>')
         print('        <td>')
-        print(f'            {tag}\n')
+        tags = tag.split(',')
+        for tag in tags:
+            print(f'            {tag.strip()}<br/>\n')
         print('        </td>')
         print('        <td>')
-        print(f'            {title}\n')
+        print(f'            {title}<br/>\n')
+        if args.desc:
+            desc = desc.replace('`', '')
+            print(f'            {desc}<br/>\n')
+        if linkback:
+            text = ''
+            for tag in tags:
+                text += tag.strip() + ' '
+                
+            print(f'            Learn more about <a src="https://cloud.google.com/{linkback}">{text}</a><br/>\n')
         print('        </td>')
         print('        <td>')
         if colab_link:
-            print(f'            <a src="{colab_link}">Colab</a>')
+            print(f'            <a src="{colab_link}">Colab</a><br/>\n')
         if git_link:
-            print(f'            <a src="{git_link}">GitHub</a>')
+            print(f'            <a src="{git_link}">GitHub</a><br/>\n')
         if workbench_link:
-            print(f'            <a src="{workbench_link}">Vertex AI Workbench</a>')
+            print(f'            <a src="{workbench_link}">Vertex AI Workbench</a><br/>\n')
         print('        </td>')
         print('    </tr>\n')
     elif args.repo:
-        print(f"\n[{title}]({path})\n")
+        tags = tag.split(',')
+        if tags != last_tag and tag != '':
+            last_tag = tags
+            flat_list = ''
+            for item in tags:
+                flat_list += item.replace("'", '') + ' '
+            print(f"\n### {flat_list}\n")
+        print(f"\n[{title}]({git_link})\n")
     
         if args.desc:
             print(desc)
@@ -461,7 +534,6 @@ if args.web:
     print('    <th>Vertex AI Feature</th>')
     print('    <th>Description</th>')
     print('    <th>Open in</th>')
-
 
 if args.notebook_dir:
     if not os.path.isdir(args.notebook_dir):
@@ -488,6 +560,10 @@ elif args.notebook_file:
                 else:
                     tag = row[0]
                     notebook = row[1]
+                    try:
+                        linkback = row[2]
+                    except:
+                        linkback = None
                     parse_notebook(notebook)
 else:
     print("Error: must specify a directory or notebook")
@@ -495,3 +571,5 @@ else:
 
 if args.web:
     print('</table>\n')
+    
+exit(num_errors)
