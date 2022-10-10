@@ -103,8 +103,46 @@ ERROR_COSTS_MISSING = 14
 # Installation cell
 #   Installation cell required
 #   Wrong heading for installation cell
+#   Installation code cell not found
+#   pip3 required
+#   option -q required
+#   option {USER_FLAG} required
+#   installation code cell not match template
+#   all packages must be installed as a single pip3
 ERROR_INSTALLATION_NOTFOUND = 15
 ERROR_INSTALLATION_HEADING = 16
+ERROR_INSTALLATION_CODE_NOTFOUND = 17
+ERROR_INSTALLATION_PIP3 = 18
+ERROR_INSTALLATION_QUIET = 19
+ERROR_INSTALLATION_USER_FLAG = 20
+ERROR_INSTALLATION_CODE_TEMPLATE = 21
+ERROR_INSTALLATION_SINGLE_PIP3 = 22
+
+# Restart kernel cell
+#    Restart code cell required
+#    Restart code cell not found
+ERROR_RESTART_NOTFOUND = 23
+ERROR_RESTART_CODE_NOTFOUND = 24
+
+# Before you begin cell
+#    Before you begin cell required
+#    Before you begin cell incomplete
+ERROR_BEFOREBEGIN_NOTFOUND = 25
+ERROR_BEFOREBEGIN_INCOMPLETE = 26
+
+# Set Project ID
+#    Set project ID cell required
+#    Set project ID code cell not found
+#    Set project ID not match template
+ERROR_PROJECTID_NOTFOUND = 27
+ERROR_PROJECTID_CODE_NOTFOUND = 28
+ERROR_PROJECTID_TEMPLATE = 29
+
+# Technical Writer Rules
+ERROR_TWRULE_TODO = 51
+ERROR_TWRULE_FIRSTPERSON = 52
+ERROR_TWRULE_FUTURETENSE = 53
+ERROR_TWRULE_BRANDING = 54
 
 ERROR_PLACEHOLDER = 100
 ERROR_EMPTY_CALL = ERROR_PLACEHOLDER + 1
@@ -113,7 +151,8 @@ ERROR_EMPTY_CALL = ERROR_PLACEHOLDER + 1
 num_errors = 0
 last_tag = ''
 
-def parse_dir(directory: str):
+
+def parse_dir(directory: str) -> None:
     """
         Recursively walk the specified directory, reviewing each notebook (.ipynb) encountered.
         
@@ -131,7 +170,13 @@ def parse_dir(directory: str):
         elif entry.name.endswith('.ipynb'):
             parse_notebook(entry.path)
 
-def parse_notebook(path: str):
+
+def parse_notebook(path: str) -> None:
+    """
+        Review the specified notebook.
+        
+        path: The path to the notebook.
+    """
     with open(path, 'r') as f:
         try:
             content = json.load(f)
@@ -267,7 +312,7 @@ def parse_notebook(path: str):
         else:
             cell, nth = get_cell(path, cells, nth)
             if cell['cell_type'] != 'code':
-                report_error(path, 22, "Installation code section not found")
+                report_error(path, ERROR_INSTALLATION_NOTFOUND, "Installation section not found")
             else:
                 if cell['source'][0].startswith('! mkdir'):
                     cell, nth = get_cell(path, cells, nth)
@@ -279,15 +324,15 @@ def parse_notebook(path: str):
                     text += line
                     if 'pip ' in line:
                         if 'pip3' not in line:
-                            report_error(path, 23, "Installation code section: use pip3")
+                            report_error(path, ERROR_INSTALLATION_PIP3, "Installation code section: use pip3")
                         if line.endswith('\\\n'):
                             continue
                         if '-q' not in line and '--quiet' not in line :
-                            report_error(path, 23, "Installation code section: use -q with pip3")
+                            report_error(path, ERROR_INSTALLATION_QUIET, "Installation code section: use -q with pip3")
                         if 'USER_FLAG' not in line and 'sh(' not in line:
-                            report_error(path, 23, "Installation code section: use {USER_FLAG} with pip3")
+                            report_error(path, ERROR_INSTALLATION_USER_FLAG, "Installation code section: use {USER_FLAG} with pip3")
                 if 'if IS_WORKBENCH_NOTEBOOK:' not in text:
-                    report_error(path, 24, "Installation code section out of date (see template)")
+                    report_error(path, ERROR_INSTALLATION_CODE_TEMPLATE, "Installation code section out of date (see template)")
             
         # Restart kernel
         while True:
@@ -295,18 +340,18 @@ def parse_notebook(path: str):
             cell, nth = get_cell(path, cells, nth)
             for line in cell['source']:
                 if 'pip' in line:
-                    report_error(path, 25, f"All pip installations must be in a single code cell: {line}")
+                    report_error(path, ERROR_INSTALLATION_SINGLE_PIP3, f"All pip installations must be in a single code cell: {line}")
                     cont = True
                     break
             if not cont:
                 break
            
         if not cell['source'][0].startswith("### Restart the kernel"):
-            report_error(path, 26, "Restart the kernel section not found")
+            report_error(path, ERROR_RESTART_NOTFOUND, "Restart the kernel section not found")
         else:
             cell, nth = get_cell(path, cells, nth) # code cell
             if cell['cell_type'] != 'code':
-                report_error(path, 28, "Restart the kernel code section not found")
+                report_error(path, ERROR_RESTART_CODE_NOTFOUND, "Restart the kernel code section not found")
                 
         # (optional) Check package versions
         cell, nth = get_cell(path, cells, nth)
@@ -316,13 +361,13 @@ def parse_notebook(path: str):
             
         # Before you begin
         if not cell['source'][0].startswith("## Before you begin"):
-            report_error(path, 29, "Before you begin section not found")
+            report_error(path, ERROR_BEFOREBEGIN_NOTFOUND, "Before you begin section not found")
         else:
             # maybe one or two cells
             if len(cell['source']) < 2:
                 cell, nth = get_cell(path, cells, nth)
                 if not cell['source'][0].startswith("### Set up your Google Cloud project"):
-                    report_error(path, 30, "Before you begin section incomplete")
+                    report_error(path, ERROR_BEFOREBEGIN_INCOMPLETE, "Before you begin section incomplete")
               
         # (optional) enable APIs
         cell, nth = get_cell(path, cells, nth)
@@ -332,21 +377,21 @@ def parse_notebook(path: str):
             
         # Set project ID
         if not cell['source'][0].startswith('#### Set your project ID'):
-            report_error(path, 31, "Set project ID section not found")
+            report_error(path, ERROR_PROJECTID_NOTFOUND, "Set project ID section not found")
         else: 
             cell, nth = get_cell(path, cells, nth)
             if cell['cell_type'] != 'code':
-                report_error(path, 32, "Set project ID code section not found")
+                report_error(path, ERROR_PROJECTID_CODE_NOTFOUND, "Set project ID code section not found")
             elif not cell['source'][0].startswith('PROJECT_ID = "[your-project-id]"'):
                 report_error(path, 33, f"Set project ID not match template: {line}")
             
             cell, nth = get_cell(path, cells, nth)
             if cell['cell_type'] != 'code' or 'or PROJECT_ID == "[your-project-id]":' not in cell['source'][0]:
-                report_error(path, 33, f"Set project ID not match template: {line}")  
+                report_error(path, ERROR_PROJECTID_TEMPLATE, f"Set project ID not match template: {line}")  
             
             cell, nth = get_cell(path, cells, nth)
             if cell['cell_type'] != 'code' or '! gcloud config set project' not in cell['source'][0]:
-                report_error(path, 33, f"Set project ID not match template: {line}")   
+                report_error(path, ERROR_PROJECTID_TEMPLATE, f"Set project ID not match template: {line}")   
             
         '''
         # Region
@@ -356,7 +401,21 @@ def parse_notebook(path: str):
         '''
 
 
-def get_cell(path, cells, nth):
+def get_cell(path: str, 
+             cells: list, 
+             nth: int) -> (list, int):
+    """
+        Get the next notebook cell.
+        
+        path: used only for reporting an error
+        cells: The content cells (JSON) for the notebook
+        nth: The index of the last cell that was parsed (reviewed).
+        
+        Returns:
+        
+        cell: content of the next cell
+        nth + 1: index of subsequent cell
+    """
     while empty_cell(path, cells, nth):
         nth += 1
         
@@ -366,14 +425,38 @@ def get_cell(path, cells, nth):
     return cell, nth + 1
 
 
-def empty_cell(path, cells, nth):
+def empty_cell(path: str, 
+               cells: list, 
+               nth: int) -> bool:
+    """
+        Check for empty cells
+        
+        path: used only for reporting an error
+        cells: The content cells (JSON) for the notebook
+        nth: The index of the last cell that was parsed (reviewed).
+        
+        Returns:
+        
+        bool: whether cell is empty or not
+    """
     if len(cells[nth]['source']) == 0:
         report_error(path, ERROR_EMPTY_CELL, f'empty cell: cell #{nth}')
         return True
     else:
         return False
 
-def check_text_cell(path, cell):
+    
+def check_text_cell(path: str,
+                    cell: list) -> None:
+    """
+        Check text cells for technical writing requirements
+            1. Product branding names
+            2. No future tense
+            3. No 1st person
+        
+        path: used only for reporting an error
+        cell: The text cell to review.
+    """
     
     branding = {
         'Vertex SDK': 'Vertex AI SDK',
@@ -420,16 +503,16 @@ def check_text_cell(path, cell):
     }
     
     for line in cell['source']:
-        if 'TODO' in line:
-            report_error(path, 14, f'TODO in cell: {line}')
+        if 'TODO' in line or 'WIP' in line:
+            report_error(path, ERROR_TWRULE_TODO, f'TODO in cell: {line}')
         if 'we ' in line.lower() or "let's" in line.lower() in line.lower():
-            report_error(path, 15, f'Do not use first person (e.g., we), replace with 2nd person (you): {line}')
+            report_error(path, ERROR_TWRULE_FIRSTPERSON, f'Do not use first person (e.g., we), replace with 2nd person (you): {line}')
         if 'will' in line.lower() or 'would' in line.lower():
-            report_error(path, 16, f'Do not use future tense (e.g., will), replace with present tense: {line}')
+            report_error(path, ERROR_TWRULE_FUTURETENSE, f'Do not use future tense (e.g., will), replace with present tense: {line}')
             
         for mistake, brand in branding.items():
             if mistake in line:
-                report_error(path, 27, f"Branding {brand}: {line}")
+                report_error(path, ERROR_TWRULE_BRANDING, f"Branding {brand}: {line}")
 
 
 def check_sentence_case(path, heading):
@@ -631,5 +714,5 @@ else:
 
 if args.web:
     print('</table>\n')
-
+    
 exit(num_errors)
