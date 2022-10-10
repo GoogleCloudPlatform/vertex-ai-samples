@@ -96,9 +96,12 @@ ERROR_LINK_WORKBENCH_BAD = 9
 #     Check for required Vertex and optional BQ and Dataflow
 ERROR_OVERVIEW_NOTFOUND = 10
 ERROR_OBJECTIVE_NOTFOUND = 11
-ERROR_DATASET_NOTFOUND = 12
-ERROR_COSTS_NOTFOUND = 13
-ERROR_COSTS_MISSING = 14
+ERROR_OBJECTIVE_MISSING_DESC = 12
+ERROR_OBJECTIVE_MISSING_USES = 13
+ERROR_OBJECTIVE_MISSING_STEPS = 14
+ERROR_DATASET_NOTFOUND = 15
+ERROR_COSTS_NOTFOUND = 16
+ERROR_COSTS_MISSING = 17
 
 # Installation cell
 #   Installation cell required
@@ -109,14 +112,14 @@ ERROR_COSTS_MISSING = 14
 #   option {USER_FLAG} required
 #   installation code cell not match template
 #   all packages must be installed as a single pip3
-ERROR_INSTALLATION_NOTFOUND = 15
-ERROR_INSTALLATION_HEADING = 16
-ERROR_INSTALLATION_CODE_NOTFOUND = 17
-ERROR_INSTALLATION_PIP3 = 18
-ERROR_INSTALLATION_QUIET = 19
-ERROR_INSTALLATION_USER_FLAG = 20
-ERROR_INSTALLATION_CODE_TEMPLATE = 21
-ERROR_INSTALLATION_SINGLE_PIP3 = 22
+ERROR_INSTALLATION_NOTFOUND = 18
+ERROR_INSTALLATION_HEADING = 19
+ERROR_INSTALLATION_CODE_NOTFOUND = 20
+ERROR_INSTALLATION_PIP3 = 21
+ERROR_INSTALLATION_QUIET = 22
+ERROR_INSTALLATION_USER_FLAG = 23
+ERROR_INSTALLATION_CODE_TEMPLATE = 24
+ERROR_INSTALLATION_SINGLE_PIP3 = 25
 
 # Restart kernel cell
 #    Restart code cell required
@@ -184,74 +187,21 @@ def parse_notebook(path: str) -> None:
             print("Corrupted notebook:", path)
             return
         
+        nth = 0
         cells = content['cells']
         
         # cell 1 is copyright
-        nth = 0
-        cell, nth = get_cell(path, cells, nth)
-        if not 'Copyright' in cell['source'][0]:
-            report_error(path, ERROR_COPYRIGHT, "missing copyright cell")
+        cell, nth = parse_copyright(path, cells, nth)
             
         # check for notices
-        cell, nth = get_cell(path, cells, nth)
-        if cell['source'][0].startswith('This notebook'):
-            cell, nth = get_cell(path, cells, nth)
-            
-        # cell 2 is title and links
-        if not cell['source'][0].startswith('# '):
-            report_error(path, ERROR_TITLE_HEADING, "title cell must start with H1 heading")
-            title = ''
-        else:
-            title = cell['source'][0][2:].strip()
-            check_sentence_case(path, title)
-            
-            # H1 title only
-            if len(cell['source']) == 1:
-                cell, nth = get_cell(path, cells, nth)
-           
+        cell, nth = parse_notices(path, cells, nth)
+        
+        # check for title
+        cell, nth, title = parse_title(path, cells, nth)
+
         # check links.
-        source = ''
-        git_link = None
-        colab_link = None
-        workbench_link = None
-        for line in cell['source']:
-            source += line
-            if '<a href="https://github.com' in line:
-                git_link = line.strip()[9:-2].replace('" target="_blank', '')
-                try:
-                    code = urllib.request.urlopen(git_link).getcode()
-                except Exception as e:
-                    # if new notebook
-                    derived_link = os.path.join('https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/', path)
-                    if git_link != derived_link:
-                        report_error(path, ERROR_LINK_GIT_BAD, f"bad GitHub link: {git_link}")
-                    
-            if '<a href="https://colab.research.google.com/' in line:
-                colab_link = 'https://github.com/' + line.strip()[50:-2].replace('" target="_blank', '')
-                try:
-                    code = urllib.request.urlopen(colab_link).getcode()
-                except Exception as e:
-                    # if new notebook
-                    derived_link = os.path.join('https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks', path)
-                    if colab_link != derived_link:
-                        report_error(path, ERROR_LINK_COLAB_BAD, f"bad Colab link: {colab_link}")
-                    
-
-            if '<a href="https://console.cloud.google.com/vertex-ai/workbench/' in line:
-                workbench_link = line.strip()[91:-2].replace('" target="_blank', '')
-                try:
-                    code = urllib.request.urlopen(workbench_link).getcode()
-                except Exception as e:
-                    derived_link = os.path.join('https://console.cloud.google.com/vertex-ai/workbench/deploy-notebook?download_url=https://raw.githubusercontent.com/GoogleCloudPlatform/vertex-ai-samples/main/notebooks/', path)
-                    if colab_link != workbench_link:
-                        report_error(path, ERROR_LINK_WORKBENCH_BAD, f"bad Workbench link: {workbench_link}")
-
-        if 'View on GitHub' not in source or not git_link:
-            report_error(path, ERROR_LINK_GIT_MISSING, 'Missing link for GitHub')
-        if 'Run in Colab' not in source or not colab_link:
-            report_error(path, ERROR_LINK_COLAB_MISSING, 'Missing link for Colab')    
-        if 'Open in Vertex AI Workbench' not in source or not workbench_link:
-            report_error(path, ERROR_LINK_WORKBENCH_MISSING, 'Missing link for Workbench')
+        cell, nth, git_link, colab_link, workbench_link = parse_links(path, cells, nth)
+        
             
         # Overview
         cell, nth = get_cell(path, cells, nth)
@@ -401,6 +351,91 @@ def parse_notebook(path: str) -> None:
         '''
 
 
+def parse_copyright(path: str,
+                    cells: list,
+                    nth: int) -> (list, int):
+    cell, nth = get_cell(path, cells, nth)
+    if not 'Copyright' in cell['source'][0]:
+        report_error(path, ERROR_COPYRIGHT, "missing copyright cell")
+    return cell, nth
+
+
+def parse_notices(path: str,
+                  cells: list,
+                  nth: int) -> (list, int):
+    cell, nth = get_cell(path, cells, nth)
+    if cell['source'][0].startswith('This notebook'):
+         nth += 1
+    return cell, nth
+
+
+def parse_title(path: str,
+                cells: list,
+                nth: int) -> (list, int, str):
+    cell = cells[nth-1]
+    if not cell['source'][0].startswith('# '):
+        report_error(path, ERROR_TITLE_HEADING, "title cell must start with H1 heading")
+        title = ''
+    else:
+        title = cell['source'][0][2:].strip()
+        check_sentence_case(path, title)
+            
+        # H1 title only
+        if len(cell['source']) == 1:
+            cell, nth = get_cell(path, cells, nth)
+            
+    return cell, nth, title
+
+
+def parse_links(path: str,
+                cells: list,
+                nth: int) -> (list, int, str, str, str):
+    cell = cells[nth-1]
+    source = ''
+    git_link = None
+    colab_link = None
+    workbench_link = None
+    for line in cell['source']:
+        source += line
+        if '<a href="https://github.com' in line:
+            git_link = line.strip()[9:-2].replace('" target="_blank', '')
+            try:
+                code = urllib.request.urlopen(git_link).getcode()
+            except Exception as e:
+                # if new notebook
+                derived_link = os.path.join('https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/', path)
+                if git_link != derived_link:
+                    report_error(path, ERROR_LINK_GIT_BAD, f"bad GitHub link: {git_link}")
+                    
+        if '<a href="https://colab.research.google.com/' in line:
+            colab_link = 'https://github.com/' + line.strip()[50:-2].replace('" target="_blank', '')
+            try:
+                code = urllib.request.urlopen(colab_link).getcode()
+            except Exception as e:
+                # if new notebook
+                derived_link = os.path.join('https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks', path)
+                if colab_link != derived_link:
+                    report_error(path, ERROR_LINK_COLAB_BAD, f"bad Colab link: {colab_link}")
+                    
+
+        if '<a href="https://console.cloud.google.com/vertex-ai/workbench/' in line:
+            workbench_link = line.strip()[91:-2].replace('" target="_blank', '')
+            try:
+                code = urllib.request.urlopen(workbench_link).getcode()
+            except Exception as e:
+                derived_link = os.path.join('https://console.cloud.google.com/vertex-ai/workbench/deploy-notebook?download_url=https://raw.githubusercontent.com/GoogleCloudPlatform/vertex-ai-samples/main/notebooks/', path)
+                if colab_link != workbench_link:
+                    report_error(path, ERROR_LINK_WORKBENCH_BAD, f"bad Workbench link: {workbench_link}")
+
+    if 'View on GitHub' not in source or not git_link:
+        report_error(path, ERROR_LINK_GIT_MISSING, 'Missing link for GitHub')
+    if 'Run in Colab' not in source or not colab_link:
+        report_error(path, ERROR_LINK_COLAB_MISSING, 'Missing link for Colab')    
+    if 'Open in Vertex AI Workbench' not in source or not workbench_link:
+        report_error(path, ERROR_LINK_WORKBENCH_MISSING, 'Missing link for Workbench')
+    return cell, nth, git_link, colab_link, workbench_link
+
+        
 def get_cell(path: str, 
              cells: list, 
              nth: int) -> (list, int):
@@ -515,23 +550,44 @@ def check_text_cell(path: str,
                 report_error(path, ERROR_TWRULE_BRANDING, f"Branding {brand}: {line}")
 
 
-def check_sentence_case(path, heading):
+def check_sentence_case(path: str, 
+                        heading: str) -> None:
+    """
+    Check that headings are in sentence case
+    
+    path: used only for reporting an error
+    heading: the heading to check
+    """
+    
+    ACRONYMS = ['E2E', 'Vertex', 'AutoML', 'ML', 'AI', 'GCP', 'API', 'R', 'CMEK', 
+                'TF', 'TFX', 'TFDV', 'SDK', 'VM', 'CPR', 'NVIDIA', 'ID', 'DASK', 
+                'ARIMA_PLUS', 'KFP', 'I/O', 'GPU', 'Google', 'TensorFlow', 'PyTorch'
+                ]
+    
     words = heading.split(' ')
     if not words[0][0].isupper():
         report_error(path, ERROR_HEADING_CAP, f"heading must start with capitalized word: {words[0]}")
         
     for word in words[1:]:
         word = word.replace(':', '').replace('(', '').replace(')', '')
-        if word in ['E2E', 'Vertex', 'AutoML', 'ML', 'AI', 'GCP', 'API', 'R', 'CMEK', 'TF', 'TFX', 'TFDV', 'SDK',
-                    'VM', 'CPR', 'NVIDIA', 'ID', 'DASK', 'ARIMA_PLUS', 'KFP', 'I/O', 'GPU', 'Google', 'TensorFlow', 
-                    'PyTorch'
-                   ]:
+        if word in ACRONYMS:
             continue
         if word.isupper():
             report_error(path, ERROR_HEADING_CASE, f"heading is not sentence case: {word}")
 
 
-def report_error(notebook, code, msg):
+def report_error(notebook: str, 
+                 code: str,
+                 errmsg: str) -> None:
+    """
+    Report an error.
+        If args.errors_codes set, then only report these errors. Otherwise, all errors.
+    
+    notebook: The notebook path.
+    code: The error code number.
+    errmsg: The error message
+    """
+    
     global num_errors
     
     if args.errors:
@@ -542,10 +598,19 @@ def report_error(notebook, code, msg):
         if args.errors_csv:
             print(notebook, ',', code)
         else:
-            print(f"{notebook}: ERROR ({code}): {msg}", file=sys.stderr)
+            print(f"{notebook}: ERROR ({code}): {errmsg}", file=sys.stderr)
             num_errors += 1
 
-def parse_objective(path, cell):
+
+def parse_objective(path: str, 
+                    cell: list) -> (str, str, str, str):
+    """
+    Parse the objective cell.
+        Find the description, uses and steps.
+    
+    path: The path to the notebook.
+    cell: The text cell.
+    """
     desc = ''
     in_desc = True
     uses = ''
@@ -591,7 +656,7 @@ def parse_objective(path, cell):
                     steps += line
             
     if desc == '':
-        report_error(path, 17, "Objective section missing desc")
+        report_error(path, ERROR_OBJECTIVE_MISSING_DESC, "Objective section missing desc")
     else:
         desc = desc.lstrip()
         sentences = desc.split('.')
@@ -601,7 +666,7 @@ def parse_objective(path, cell):
             desc = desc[22].upper() + desc[23:]
         
     if uses == '':
-        report_error(path, 18, "Objective section missing uses services list")
+        report_error(path, ERROR_OBJECTIVE_MISSING_USES, "Objective section missing uses services list")
     else:
         if 'BigQuery' in uses:
             costs.append('BQ')
@@ -611,9 +676,10 @@ def parse_objective(path, cell):
             costs.append('Dataflow')
             
     if steps == '':
-        report_error(path, 19, "Objective section missing steps list")
+        report_error(path, ERROR_OBJECTIVE_MISSING_STEPS, "Objective section missing steps list")
             
     return desc, uses, steps, costs
+
 
 def add_index(path, tag, title, desc, uses, steps, git_link, colab_link, workbench_link):
     global last_tag
