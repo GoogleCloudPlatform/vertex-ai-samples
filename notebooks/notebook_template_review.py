@@ -191,38 +191,30 @@ def parse_notebook(path: str) -> None:
         cells = content['cells']
         
         # cell 1 is copyright
-        cell, nth = parse_copyright(path, cells, nth)
+        nth = parse_copyright(path, cells, nth)
             
         # check for notices
-        cell, nth = parse_notices(path, cells, nth)
+        nth = parse_notices(path, cells, nth)
         
         # check for title
-        cell, nth, title = parse_title(path, cells, nth)
+        nth, title = parse_title(path, cells, nth)
 
         # check links.
-        cell, nth, git_link, colab_link, workbench_link = parse_links(path, cells, nth)
+        nth, git_link, colab_link, workbench_link = parse_links(path, cells, nth)
         
-            
         # Overview
-        cell, nth = get_cell(path, cells, nth)
-        if not cell['source'][0].startswith("## Overview"):
-            report_error(path, ERROR_OVERVIEW_NOTFOUND, "Overview section not found")
+        nth = parse_overview(path, cells, nth)
             
         # Objective
-        cell, nth = get_cell(path, cells, nth)
-        if not cell['source'][0].startswith("### Objective"):
-            report_error(path, ERROR_OBJECTIVE_NOTFOUND, "Objective section not found")
-            costs = []
-        else:
-            desc, uses, steps, costs = parse_objective(path, cell)
+        nth, desc, uses, steps, costs = parse_objective(path, cells, nth)
+        if desc != '':
             add_index(path, tag, title, desc, uses, steps, git_link, colab_link, workbench_link)
             
         # (optional) Recommendation
-        cell, nth = get_cell(path, cells, nth)
-        if cell['source'][0].startswith("### Recommendations"):
-            cell, nth = get_cell(path, cells, nth)
-            
+        nth = parse_recommendations(path, cells, nth)
+
         # Dataset
+        cell, nth = get_cell(path, cells, nth)
         if not cell['source'][0].startswith("### Dataset") and not cell['source'][0].startswith("### Model") and not cell['source'][0].startswith("### Embedding"):
             report_error(path, ERROR_DATASET_NOTFOUND, "Dataset/Model section not found")
             
@@ -353,26 +345,53 @@ def parse_notebook(path: str) -> None:
 
 def parse_copyright(path: str,
                     cells: list,
-                    nth: int) -> (list, int):
+                    nth: int) -> int:
+    """
+    Parse the copyright cell
+    
+    path: used only for reporting an error
+    cells: The content cells (JSON) for the notebook
+    nth: The index of the last cell that was parsed (reviewed).
+    
+    Returns: cell index
+    """
     cell, nth = get_cell(path, cells, nth)
     if not 'Copyright' in cell['source'][0]:
         report_error(path, ERROR_COPYRIGHT, "missing copyright cell")
-    return cell, nth
+    return nth
 
 
 def parse_notices(path: str,
                   cells: list,
-                  nth: int) -> (list, int):
+                  nth: int) -> int:
+    """
+    Parse the (optional) notices cell
+    
+    path: used only for reporting an error
+    cells: The content cells (JSON) for the notebook
+    nth: The index of the last cell that was parsed (reviewed).
+    
+    Returns: cell index
+    """
     cell, nth = get_cell(path, cells, nth)
     if cell['source'][0].startswith('This notebook'):
-         nth += 1
-    return cell, nth
+         return nth
+    return nth - 1
 
 
 def parse_title(path: str,
                 cells: list,
-                nth: int) -> (list, int, str):
-    cell = cells[nth-1]
+                nth: int) -> (int, str):
+    """
+    Parse the title in the links cell
+    
+    path: used only for reporting an error
+    cells: The content cells (JSON) for the notebook
+    nth: The index of the last cell that was parsed (reviewed).
+    
+    Returns: cell index, and title
+    """
+    cell, nth = get_cell(path, cells, nth)
     if not cell['source'][0].startswith('# '):
         report_error(path, ERROR_TITLE_HEADING, "title cell must start with H1 heading")
         title = ''
@@ -384,12 +403,22 @@ def parse_title(path: str,
         if len(cell['source']) == 1:
             cell, nth = get_cell(path, cells, nth)
             
-    return cell, nth, title
+    return nth, title
 
 
 def parse_links(path: str,
                 cells: list,
-                nth: int) -> (list, int, str, str, str):
+                nth: int) -> (int, str, str, str):
+    """
+    Parse the links in the links cell
+    
+    path: used only for reporting an error
+    cells: The content cells (JSON) for the notebook
+    nth: The index of the last cell that was parsed (reviewed).
+    
+    Returns: cell index, and git, colab and workbench links
+    """
+
     cell = cells[nth-1]
     source = ''
     git_link = None
@@ -433,9 +462,139 @@ def parse_links(path: str,
         report_error(path, ERROR_LINK_COLAB_MISSING, 'Missing link for Colab')    
     if 'Open in Vertex AI Workbench' not in source or not workbench_link:
         report_error(path, ERROR_LINK_WORKBENCH_MISSING, 'Missing link for Workbench')
-    return cell, nth, git_link, colab_link, workbench_link
+    return nth, git_link, colab_link, workbench_link
 
+
+def parse_overview(path: str, 
+                   cells: list, 
+                   nth: int) -> int:
+    
+    """
+    Parse the overview cell
+    
+    path: used only for reporting an error
+    cells: The content cells (JSON) for the notebook
+    nth: The index of the last cell that was parsed (reviewed).
+    
+    Returns: cell index
+    """
+    cell, nth = get_cell(path, cells, nth)
+    if not cell['source'][0].startswith("## Overview"):
+        report_error(path, ERROR_OVERVIEW_NOTFOUND, "Overview section not found")
         
+    return nth
+
+
+def parse_objective(path: str, 
+                    cells: list,
+                    nth: int) -> (int, str, str, str, list):
+    """
+    Parse the objective cell.
+        Find the description, uses and steps.
+    
+    path: The path to the notebook.
+    cells: The content cells (JSON) for the notebook
+    nth: The index of the last cell that was parsed (reviewed).
+    
+    Returns cell index, desc, uses, steps and costs
+    """
+    desc = ''
+    uses = ''
+    steps = ''
+    costs = []
+    
+    cell, nth = get_cell(path, cells, nth)
+    if not cell['source'][0].startswith("### Objective"):
+        report_error(path, ERROR_OBJECTIVE_NOTFOUND, "Objective section not found")
+        return nth, desc, uses, steps, costs
+    
+    in_desc = True
+    in_uses = False
+    in_steps = False
+    
+    for line in cell['source'][1:]:
+        if line.startswith('This tutorial uses'):
+            in_desc = False
+            in_steps = False
+            in_uses = True
+            uses += line
+            continue
+        elif line.startswith('The steps performed'):
+            in_desc = False
+            in_uses = False
+            in_steps = True
+            steps += line
+            continue
+            
+        if in_desc:
+            if len(desc) > 0 and line.strip() == '':
+                in_desc = False
+                continue
+            desc += line
+        elif in_uses:
+            sline = line.strip()
+            if len(sline) == 0:
+                uses += '\n'
+            else:
+                ch = sline[0]
+                if ch in ['-', '*', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                    uses += line
+        elif in_steps:
+            sline = line.strip()
+            if len(sline) == 0:
+                steps += '\n'
+            else:
+                ch = sline[0]
+                if ch in ['-', '*', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                    steps += line
+            
+    if desc == '':
+        report_error(path, ERROR_OBJECTIVE_MISSING_DESC, "Objective section missing desc")
+    else:
+        desc = desc.lstrip()
+        sentences = desc.split('.')
+        if len(sentences) > 1:
+            desc = sentences[0] + '.\n'
+        if desc.startswith('In this tutorial, you learn') or desc.startswith('In this notebook, you learn'):
+            desc = desc[22].upper() + desc[23:]
+        
+    if uses == '':
+        report_error(path, ERROR_OBJECTIVE_MISSING_USES, "Objective section missing uses services list")
+    else:
+        if 'BigQuery' in uses:
+            costs.append('BQ')
+        if 'Vertex' in uses:
+            costs.append('Vertex')
+        if 'Dataflow' in uses:
+            costs.append('Dataflow')
+            
+    if steps == '':
+        report_error(path, ERROR_OBJECTIVE_MISSING_STEPS, "Objective section missing steps list")
+            
+    return nth, desc, uses, steps, costs
+
+
+def parse_recommendations(path: str, 
+                          cells: list, 
+                          nth: int) -> int:
+    
+    """
+    Parse the overview cell
+    
+    path: used only for reporting an error
+    cells: The content cells (JSON) for the notebook
+    nth: The index of the last cell that was parsed (reviewed).
+    
+    Returns: cell index
+    """
+    # (optional) Recommendation
+    cell, nth = get_cell(path, cells, nth)
+    if cell['source'][0].startswith("### Recommendations"):
+        return nth
+    
+    return nth - 1
+
+
 def get_cell(path: str, 
              cells: list, 
              nth: int) -> (list, int):
@@ -602,83 +761,7 @@ def report_error(notebook: str,
             num_errors += 1
 
 
-def parse_objective(path: str, 
-                    cell: list) -> (str, str, str, str):
-    """
-    Parse the objective cell.
-        Find the description, uses and steps.
-    
-    path: The path to the notebook.
-    cell: The text cell.
-    """
-    desc = ''
-    in_desc = True
-    uses = ''
-    in_uses = False
-    steps = ''
-    in_steps = False
-    costs = []
-    
-    for line in cell['source'][1:]:
-        if line.startswith('This tutorial uses'):
-            in_desc = False
-            in_steps = False
-            in_uses = True
-            uses += line
-            continue
-        elif line.startswith('The steps performed'):
-            in_desc = False
-            in_uses = False
-            in_steps = True
-            steps += line
-            continue
-            
-        if in_desc:
-            if len(desc) > 0 and line.strip() == '':
-                in_desc = False
-                continue
-            desc += line
-        elif in_uses:
-            sline = line.strip()
-            if len(sline) == 0:
-                uses += '\n'
-            else:
-                ch = sline[0]
-                if ch in ['-', '*', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
-                    uses += line
-        elif in_steps:
-            sline = line.strip()
-            if len(sline) == 0:
-                steps += '\n'
-            else:
-                ch = sline[0]
-                if ch in ['-', '*', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
-                    steps += line
-            
-    if desc == '':
-        report_error(path, ERROR_OBJECTIVE_MISSING_DESC, "Objective section missing desc")
-    else:
-        desc = desc.lstrip()
-        sentences = desc.split('.')
-        if len(sentences) > 1:
-            desc = sentences[0] + '.\n'
-        if desc.startswith('In this tutorial, you learn') or desc.startswith('In this notebook, you learn'):
-            desc = desc[22].upper() + desc[23:]
-        
-    if uses == '':
-        report_error(path, ERROR_OBJECTIVE_MISSING_USES, "Objective section missing uses services list")
-    else:
-        if 'BigQuery' in uses:
-            costs.append('BQ')
-        if 'Vertex' in uses:
-            costs.append('Vertex')
-        if 'Dataflow' in uses:
-            costs.append('Dataflow')
-            
-    if steps == '':
-        report_error(path, ERROR_OBJECTIVE_MISSING_STEPS, "Objective section missing steps list")
-            
-    return desc, uses, steps, costs
+
 
 
 def add_index(path, tag, title, desc, uses, steps, git_link, colab_link, workbench_link):
