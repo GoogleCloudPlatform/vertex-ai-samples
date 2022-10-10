@@ -1,3 +1,33 @@
+"""
+    AutoReview: Script to automatically review Vertex AI notebooks for conformance to notebook template requirements:
+    
+    python3 notebook_template_review.py [options]
+        # options for selecting notebooks
+        --notebook: review the specified notebook
+        --notebook-dir: recursively traverse the directory and review each notebook enocuntered
+        --notebook-file: A CSV file with list of notebooks to review.
+        
+        # options for error handling
+        --errors: Report detected errors.
+        --errors-codes: A list of error codes to report errors. Otherwise, all errors are reported.
+        --errors-csv: Report errors in CSV format
+        
+        # index generatation
+        --repo: Generate index in markdown format
+        --web: Generate index in HTML format
+        --title: Add title to index
+        --desc: Add description to index
+        --steps: Add steps to index
+        --uses: Add "resources" used to index
+        
+    Format of CSV file for notebooks to review:
+    
+        tags,notebook-path,backlink
+        
+        tags: Double quoted ist of tags: e.g., "AutoML, Tabular Data"
+        notebook-path: path of notebook, relative to https://github.com/GoogleCloudPlatform/vertex-ai-samples/notebooks
+        backlink: webdoc page with more details, relative to https://cloud.google.com/
+"""
 
 import argparse
 import json
@@ -41,9 +71,13 @@ if args.errors_csv:
     args.errors = True
 
 # Copyright cell
+#   Google copyright cell required
 ERROR_COPYRIGHT = 0
 
 # Links cell
+#   H1 heading required
+#   git, colab and workbench link required
+#   links must be valid links
 ERROR_TITLE_HEADING = 1
 ERROR_HEADING_CASE = 2
 ERROR_HEADING_CAP = 3
@@ -54,11 +88,37 @@ ERROR_LINK_GIT_BAD = 7
 ERROR_LINK_COLAB_BAD = 8
 ERROR_LINK_WORKBENCH_BAD = 9
 
+# Overview cells
+#   Overview cell required
+#   Objective cell required
+#   Dataset cell required
+#   Costs cell required
+#     Check for required Vertex and optional BQ and Dataflow
+ERROR_OVERVIEW_NOTFOUND = 10
+ERROR_OBJECTIVE_NOTFOUND = 11
+ERROR_DATASET_NOTFOUND = 12
+ERROR_COSTS_NOTFOUND = 13
+ERROR_COSTS_MISSING = 14
+
+# Installation cell
+#   Installation cell required
+#   Wrong heading for installation cell
+ERROR_INSTALLATION_NOTFOUND = 15
+ERROR_INSTALLATION_HEADING = 16
+
+ERROR_PLACEHOLDER = 100
+ERROR_EMPTY_CALL = ERROR_PLACEHOLDER + 1
+
 # globals
 num_errors = 0
 last_tag = ''
 
-def parse_dir(directory):
+def parse_dir(directory: str):
+    """
+        Recursively walk the specified directory, reviewing each notebook (.ipynb) encountered.
+        
+        directory: The directory path.
+    """
     entries = os.scandir(directory)
     for entry in entries:
         if entry.is_dir():
@@ -71,7 +131,7 @@ def parse_dir(directory):
         elif entry.name.endswith('.ipynb'):
             parse_notebook(entry.path)
 
-def parse_notebook(path):
+def parse_notebook(path: str):
     with open(path, 'r') as f:
         try:
             content = json.load(f)
@@ -151,12 +211,12 @@ def parse_notebook(path):
         # Overview
         cell, nth = get_cell(path, cells, nth)
         if not cell['source'][0].startswith("## Overview"):
-            report_error(path, 11, "Overview section not found")
+            report_error(path, ERROR_OVERVIEW_NOTFOUND, "Overview section not found")
             
         # Objective
         cell, nth = get_cell(path, cells, nth)
         if not cell['source'][0].startswith("### Objective"):
-            report_error(path, 12, "Objective section not found")
+            report_error(path, ERROR_OBJECTIVE_NOTFOUND, "Objective section not found")
             costs = []
         else:
             desc, uses, steps, costs = parse_objective(path, cell)
@@ -169,22 +229,22 @@ def parse_notebook(path):
             
         # Dataset
         if not cell['source'][0].startswith("### Dataset") and not cell['source'][0].startswith("### Model") and not cell['source'][0].startswith("### Embedding"):
-            report_error(path, 13, "Dataset/Model section not found")
+            report_error(path, ERROR_DATASET_NOTFOUND, "Dataset/Model section not found")
             
         # Costs
         cell, nth = get_cell(path, cells, nth)
         if not cell['source'][0].startswith("### Costs"):
-            report_error(path, 14, "Costs section not found")
+            report_error(path, ERROR_COSTS_NOTFOUND, "Costs section not found")
         else:
             text = ''
             for line in cell['source']:
                 text += line
             if 'BQ' in costs and 'BigQuery' not in text:
-                report_error(path, 20, 'Costs section missing reference to BiqQuery')
+                report_error(path, ERROR_COSTS_MISSING, 'Costs section missing reference to BiqQuery')
             if 'Vertex' in costs and 'Vertex' not in text:
-                report_error(path, 20, 'Costs section missing reference to Vertex')
+                report_error(path, ERROR_COSTS_MISSING, 'Costs section missing reference to Vertex')
             if 'Dataflow' in costs and 'Dataflow' not in text:    
-                report_error(path, 20, 'Costs section missing reference to Dataflow')
+                report_error(path, ERROR_COSTS_MISSING, 'Costs section missing reference to Dataflow')
                 
         # (optional) Setup local environment
         cell, nth = get_cell(path, cells, nth)
@@ -201,9 +261,9 @@ def parse_notebook(path):
         # Installation
         if not cell['source'][0].startswith("## Install"):
             if cell['source'][0].startswith("### Install"):
-                report_error(path, 27, "Installation section needs to be H2 heading")
+                report_error(path, ERROR_INSTALLATION_HEADING, "Installation section needs to be H2 heading")
             else:
-                report_error(path, 21, "Installation section not found")
+                report_error(path, ERROR_INSTALLATION_NOTFOUND, "Installation section not found")
         else:
             cell, nth = get_cell(path, cells, nth)
             if cell['cell_type'] != 'code':
@@ -222,7 +282,7 @@ def parse_notebook(path):
                             report_error(path, 23, "Installation code section: use pip3")
                         if line.endswith('\\\n'):
                             continue
-                        if '-q' not in line:
+                        if '-q' not in line and '--quiet' not in line :
                             report_error(path, 23, "Installation code section: use -q with pip3")
                         if 'USER_FLAG' not in line and 'sh(' not in line:
                             report_error(path, 23, "Installation code section: use {USER_FLAG} with pip3")
@@ -308,7 +368,7 @@ def get_cell(path, cells, nth):
 
 def empty_cell(path, cells, nth):
     if len(cells[nth]['source']) == 0:
-        report_error(path, 10, f'empty cell: cell #{nth}')
+        report_error(path, ERROR_EMPTY_CELL, f'empty cell: cell #{nth}')
         return True
     else:
         return False
@@ -571,5 +631,5 @@ else:
 
 if args.web:
     print('</table>\n')
-    
+
 exit(num_errors)
