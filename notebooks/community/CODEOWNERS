@@ -7,7 +7,7 @@
 /gapic @andrewferlitsch
 /gapic/custom/showcase_custom_image_classification_online_explain_example_based_api.ipynb @inardini
 /ml_ops @andrewferlitsch
-/model_monitoring/* @mco-gh
+/model_monitoring/* @andrewferlitsch
 /structured_data/rapid_prototyping_* @rafael-carvalho
 
 /managed_notebooks/
