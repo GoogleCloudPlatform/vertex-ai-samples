@@ -31,10 +31,13 @@ IS_COLAB = "google.colab" in sys.modules
 USER_FLAG = ""
 if IS_WORKBENCH_NOTEBOOK:
     USER_FLAG = "--user"
-
+    
+# not used
+'''
 print("Installing packages")
 os.system(f"pip3 install --upgrade --quiet {USER_FLAG} google-cloud-aiplatform {args.extra_packages}")
 print("Done installation")
+'''
 
 # Authenticate
 if IS_COLAB:
@@ -62,13 +65,10 @@ if args.email_required:
         EMAIL_ADDR = input("Enter Email Address: ")
 
 # region
-if IS_WORKBENCH_NOTEBOOK:
-    shell_output = subprocess.check_output("gcloud config list --format 'value(ai.region)'", shell=True)
-    REGION = shell_output[0:-1].decode('utf-8')
-    print("REGION: ", REGION)
-else:
-    REGION = input("Enter REGION: ")
-    
+shell_output = subprocess.check_output("gcloud config list --format 'value(ai.region)'", shell=True)
+REGION = shell_output[0:-1].decode('utf-8')
+print("REGION: ", REGION)
+
 # multi-region
 MULTI_REGION = REGION.split('-')[0]
 
@@ -98,7 +98,7 @@ if IS_WORKBENCH_NOTEBOOK:
     PROJECT_NUMBER = SERVICE_ACCOUNT.split('-')[0]
 else:
     shell_output = subprocess.check_output(f"gcloud projects describe {PROJECT_ID}", shell=True)
-    PROJECT_NUMBER = shell_output[:-1].decode('utf-8').split('\n')[1].strip().replace("'", "")
+    PROJECT_NUMBER = shell_output[:-1].decode('utf-8').split('\n')[8].strip().replace("'", "")
     SERVICE_ACCOUNT = f"{PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
     
 print("SERVICE_ACCOUNT", SERVICE_ACCOUNT)
