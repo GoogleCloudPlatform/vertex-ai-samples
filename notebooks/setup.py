@@ -10,6 +10,8 @@ parser.add_argument('--bucket', dest='bucket_required', action='store_true',
                     default=False, help='Bucket required')
 parser.add_argument('--email', dest='email_required', action='store_true', 
                     default=False, help='Email required')
+parser.add_argument('--sa', dest='sa_required', action='store_true', 
+                    default=False, help='Service account required')
 parser.add_argument('--packages', dest='extra_packages',
                     default='', type=str, help='additional required packages')
 args = parser.parse_args()
@@ -31,7 +33,7 @@ IS_COLAB = "google.colab" in sys.modules
 USER_FLAG = ""
 if IS_WORKBENCH_NOTEBOOK:
     USER_FLAG = "--user"
-    
+
 # not used
 '''
 print("Installing packages")
@@ -57,12 +59,11 @@ else:
 
 # email
 if args.email_required:
-    if IS_WORKBENCH_NOTEBOOK:
-        shell_output = subprocess.check_output("gcloud config list --format 'value(core.account)' 2>/dev/null", shell=True)
-        EMAIL_ADDR = shell_output[0:-1].decode('utf-8')
-        print("EMAIL_ADDR: ", EMAIL_ADDR)
-    else:
+shell_output = subprocess.check_output("gcloud config list --format 'value(core.account)' 2>/dev/null", shell=True)
+EMAIL_ADDR = shell_output[0:-1].decode('utf-8')
+if EMAIL_ADDR == '':
         EMAIL_ADDR = input("Enter Email Address: ")
+print("EMAIL_ADDR: ", EMAIL_ADDR)
 
 # region
 shell_output = subprocess.check_output("gcloud config list --format 'value(ai.region)'", shell=True)
@@ -93,16 +94,21 @@ if args.bucket_required:
     
     
 # Project Number
-
-if IS_WORKBENCH_NOTEBOOK:
-    shell_output = subprocess.check_output("gcloud auth list 2>/dev/null", shell=True)
-    SERVICE_ACCOUNT = shell_output[:-1].decode('utf-8').split('\n')[2].strip()
-    PROJECT_NUMBER = SERVICE_ACCOUNT.split('-')[0]
-else:
-    shell_output = subprocess.check_output(f"gcloud projects describe {PROJECT_ID}", shell=True)
-    PROJECT_NUMBER = shell_output[:-1].decode('utf-8').split('\n')[8].strip().replace("'", "")
-    SERVICE_ACCOUNT = f"{PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+if args.sa_required:
+    if IS_WORKBENCH_NOTEBOOK:
+        shell_output = subprocess.check_output("gcloud auth list 2>/dev/null", shell=True)
+        SERVICE_ACCOUNT = shell_output[:-1].decode('utf-8').split('\n')[2].strip()
+        PROJECT_NUMBER = SERVICE_ACCOUNT.split('-')[0]
+    else:
+        shell_output = subprocess.check_output(f"gcloud projects describe {PROJECT_ID}", shell=True)
+        try:
+            PROJECT_NUMBER = shell_output[:-1].decode('utf-8').split('\n')[7].split(':')[-1].strip().replace("'", "")
+            SERVICE_ACCOUNT = f"{PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+        except:
+            PROJECT_NUMBER = input("Enter project number: ")
+            SERVICE_ACCOUNT = f"{PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
     
-print("SERVICE_ACCOUNT", SERVICE_ACCOUNT)
-print("PROJECT_NUMBER", PROJECT_NUMBER)
+    print("SERVICE_ACCOUNT", SERVICE_ACCOUNT)
+    print("PROJECT_NUMBER", PROJECT_NUMBER)
 
+# endregion
