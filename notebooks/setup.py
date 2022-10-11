@@ -59,11 +59,11 @@ else:
 
 # email
 if args.email_required:
-shell_output = subprocess.check_output("gcloud config list --format 'value(core.account)' 2>/dev/null", shell=True)
-EMAIL_ADDR = shell_output[0:-1].decode('utf-8')
-if EMAIL_ADDR == '':
-        EMAIL_ADDR = input("Enter Email Address: ")
-print("EMAIL_ADDR: ", EMAIL_ADDR)
+    shell_output = subprocess.check_output("gcloud config list --format 'value(core.account)' 2>/dev/null", shell=True)
+    EMAIL_ADDR = shell_output[0:-1].decode('utf-8')
+    if EMAIL_ADDR == '':
+            EMAIL_ADDR = input("Enter Email Address: ")
+    print("EMAIL_ADDR: ", EMAIL_ADDR)
 
 # region
 shell_output = subprocess.check_output("gcloud config list --format 'value(ai.region)'", shell=True)
@@ -110,5 +110,3 @@ if args.sa_required:
     
     print("SERVICE_ACCOUNT", SERVICE_ACCOUNT)
     print("PROJECT_NUMBER", PROJECT_NUMBER)
-
-# endregion
