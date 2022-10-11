@@ -67,6 +67,8 @@ if args.email_required:
 # region
 shell_output = subprocess.check_output("gcloud config list --format 'value(ai.region)'", shell=True)
 REGION = shell_output[0:-1].decode('utf-8')
+if REGION == '':
+    REGION = input("Enter REGION: ")
 print("REGION: ", REGION)
 
 # multi-region
