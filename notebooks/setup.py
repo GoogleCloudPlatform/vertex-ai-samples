@@ -110,4 +110,3 @@ if args.sa_required:
     
     print("SERVICE_ACCOUNT", SERVICE_ACCOUNT)
     print("PROJECT_NUMBER", PROJECT_NUMBER)
-
