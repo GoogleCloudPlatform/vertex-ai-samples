@@ -67,6 +67,8 @@ if args.email_required:
 # region
 shell_output = subprocess.check_output("gcloud config list --format 'value(ai.region)'", shell=True)
 REGION = shell_output[0:-1].decode('utf-8')
+if REGION == '':
+    REGION = input("Enter REGION: ")
 print("REGION: ", REGION)
 
 # multi-region
@@ -98,7 +100,7 @@ if IS_WORKBENCH_NOTEBOOK:
     PROJECT_NUMBER = SERVICE_ACCOUNT.split('-')[0]
 else:
     shell_output = subprocess.check_output(f"gcloud projects describe {PROJECT_ID}", shell=True)
-    PROJECT_NUMBER = shell_output[:-1].decode('utf-8').split('\n')[8].strip().replace("'", "")
+    PROJECT_NUMBER = shell_output[:-1].decode('utf-8').split('\n')[1].strip().replace("'", "")
     SERVICE_ACCOUNT = f"{PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
     
 print("SERVICE_ACCOUNT", SERVICE_ACCOUNT)
