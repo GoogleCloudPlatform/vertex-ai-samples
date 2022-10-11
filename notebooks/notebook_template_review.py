@@ -152,6 +152,7 @@ class ErrorCodes(Enum):
 
     ERROR_EMPTY_CALL = 101
 
+
 # globals
 num_errors = 0
 last_tag = ''
@@ -220,6 +221,7 @@ def parse_notebook(path: str) -> None:
             
         # Costs
         nth = parse_costs(path, cells, nth, costs)
+
                 
         # (optional) Setup local environment
         nth = parse_setuplocal(path, cells, nth)
@@ -232,12 +234,14 @@ def parse_notebook(path: str) -> None:
         
         # Restart kernel
         nth = parse_restart(path, cells, nth)
+
                 
         # (optional) Check package versions
         nth = parse_versions(path, cells, nth)
             
         # Before you begin
         nth = parse_beforebegin(path, cells, nth)
+
               
         # (optional) enable APIs
         th = parse_enableapis(path, cells, nth)
@@ -302,6 +306,7 @@ def parse_title(path: str,
     else:
         title = cell['source'][0][2:].strip()
         check_sentence_case(path, title)
+
             
         # H1 title only
         if len(cell['source']) == 1:
@@ -518,7 +523,6 @@ def parse_dataset(path: str,
         report_error(path, ErrorCodes.ERROR_DATASET_NOTFOUND, "Dataset/Model section not found")
         
     return nth
-
 
 def parse_costs(path: str, 
                 cells: list, 
