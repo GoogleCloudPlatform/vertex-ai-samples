@@ -22,6 +22,7 @@
 /ml_metadata/sdk-metric-parameter-tracking-for-locally-trained-models.ipynb @jialuzh
 /ml_metadata/vertex-pipelines-ml-metadata.ipynb @sararob
 /vizier/gapic-vizier-multi-objective-optimization.ipynb @halio-g
+/training/xgboost_data_parallel_training_on_cpu_using_dask.ipynb @halio-g
 /feature_store/gapic-feature-store.ipynb @diemtvu
 /managed_notebooks @GoogleCloudPlatform/notebooks-team
 /pipelines/google_cloud_pipeline_components_bqml_text.ipynb @inardini
