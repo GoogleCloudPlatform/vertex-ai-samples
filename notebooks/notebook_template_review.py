@@ -72,7 +72,7 @@ if args.errors_csv:
     args.errors = True
 
 
-class ErrorCodes(Enum):
+class ErrorCode(Enum):
     # Copyright cell
     #   Google copyright cell required
     ERROR_COPYRIGHT = 0,
@@ -152,7 +152,6 @@ class ErrorCodes(Enum):
 
     ERROR_EMPTY_CALL = 101
 
-
 # globals
 num_errors = 0
 last_tag = ''
@@ -190,145 +189,140 @@ def parse_notebook(path: str) -> None:
             print("Corrupted notebook:", path)
             return
         
-        nth = 0
+        cell_index = 0
         cells = content['cells']
         
         # cell 1 is copyright
-        nth = parse_copyright(path, cells, nth)
+        cell_index = parse_copyright(path, cells, cell_index)
             
         # check for notices
-        nth = parse_notices(path, cells, nth)
+        cell_index = parse_notices(path, cells, cell_index)
         
         # check for title
-        nth, title = parse_title(path, cells, nth)
+        cell_index, title = parse_title(path, cells, cell_index)
 
         # check links.
-        nth, git_link, colab_link, workbench_link = parse_links(path, cells, nth)
+        cell_index, git_link, colab_link, workbench_link = parse_links(path, cells, cell_index)
         
         # Overview
-        nth = parse_overview(path, cells, nth)
+        cell_index = parse_overview(path, cells, cell_index)
             
         # Objective
-        nth, desc, uses, steps, costs = parse_objective(path, cells, nth)
+        cell_index, desc, uses, steps, costs = parse_objective(path, cells, cell_index)
         if desc != '':
             add_index(path, tag, title, desc, uses, steps, git_link, colab_link, workbench_link)
             
         # (optional) Recommendation
-        nth = parse_recommendations(path, cells, nth)
+        cell_index = parse_recommendations(path, cells, cell_index)
 
         # Dataset
-        nth = parse_dataset(path, cells, nth)
+        cell_index = parse_dataset(path, cells, cell_index)
             
         # Costs
-        nth = parse_costs(path, cells, nth, costs)
-
+        cell_index = parse_costs(path, cells, cell_index, costs)
                 
         # (optional) Setup local environment
-        nth = parse_setuplocal(path, cells, nth)
+        cell_index = parse_setuplocal(path, cells, cell_index)
                 
         # (optional) Helper functions
-        nth = parse_helpers(path, cells, nth)
+        cell_index = parse_helpers(path, cells, cell_index)
                 
         # Installation
-        nth = parse_installation(path, cells, nth)
+        cell_index = parse_installation(path, cells, cell_index)
         
         # Restart kernel
-        nth = parse_restart(path, cells, nth)
-
+        cell_index = parse_restart(path, cells, cell_index)
                 
         # (optional) Check package versions
-        nth = parse_versions(path, cells, nth)
+        cell_index = parse_versions(path, cells, cell_index)
             
         # Before you begin
-        nth = parse_beforebegin(path, cells, nth)
-
+        cell_index = parse_beforebegin(path, cells, cell_index)
               
         # (optional) enable APIs
-        th = parse_enableapis(path, cells, nth)
+        cell_index = parse_enableapis(path, cells, cell_index)
             
         # Set project ID
-        nth = parse_setproject(path, cells, nth)
-
+        cell_index = parse_setproject(path, cells, cell_index)
 
 
 def parse_copyright(path: str,
                     cells: list,
-                    nth: int) -> int:
+                    cell_index: int) -> int:
     """
     Parse the copyright cell
     
     path: used only for reporting an error
     cells: The content cells (JSON) for the notebook
-    nth: The index of the last cell that was parsed (reviewed).
+    cell_index: The index of the last cell that was parsed (reviewed).
     
     Returns: cell index
     """
-    cell, nth = get_cell(path, cells, nth)
+    cell, cell_index = get_cell(path, cells, cell_index)
     if not 'Copyright' in cell['source'][0]:
-        report_error(path, ErrorCodes.ERROR_COPYRIGHT, "missing copyright cell")
-    return nth
+        report_error(path, ErrorCode.ERROR_COPYRIGHT, "missing copyright cell")
+    return cell_index
 
 
 def parse_notices(path: str,
                   cells: list,
-                  nth: int) -> int:
+                  cell_index: int) -> int:
     """
     Parse the (optional) notices cell
     
     path: used only for reporting an error
     cells: The content cells (JSON) for the notebook
-    nth: The index of the last cell that was parsed (reviewed).
+    cell_index: The index of the last cell that was parsed (reviewed).
     
     Returns: cell index
     """
-    cell, nth = get_cell(path, cells, nth)
+    cell, cell_index = get_cell(path, cells, cell_index)
     if cell['source'][0].startswith('This notebook'):
-         return nth
-    return nth - 1
+         return cell_index
+    return cell_index - 1
 
 
 def parse_title(path: str,
                 cells: list,
-                nth: int) -> (int, str):
+                cell_index: int) -> (int, str):
     """
     Parse the title in the links cell
     
     path: used only for reporting an error
     cells: The content cells (JSON) for the notebook
-    nth: The index of the last cell that was parsed (reviewed).
+    cell_index: The index of the last cell that was parsed (reviewed).
     
     Returns: cell index, and title
     """
-    cell, nth = get_cell(path, cells, nth)
+    cell, cell_index = get_cell(path, cells, cell_index)
     if not cell['source'][0].startswith('# '):
-        report_error(path, ErrorCodes.ERROR_TITLE_HEADING, "title cell must start with H1 heading")
+        report_error(path, ErrorCode.ERROR_TITLE_HEADING, "title cell must start with H1 heading")
         title = ''
     else:
         title = cell['source'][0][2:].strip()
         check_sentence_case(path, title)
-
             
         # H1 title only
         if len(cell['source']) == 1:
-            cell, nth = get_cell(path, cells, nth)
+            cell, cell_index = get_cell(path, cells, cell_index)
             
-    return nth, title
+    return cell_index, title
 
 
 def parse_links(path: str,
                 cells: list,
-                nth: int) -> (int, str, str, str):
+                cell_index: int) -> (int, str, str, str):
     """
     Parse the links in the links cell
     
     path: used only for reporting an error
     cells: The content cells (JSON) for the notebook
-    nth: The index of the last cell that was parsed (reviewed).
+    cell_index: The index of the last cell that was parsed (reviewed).
     
     Returns: cell index, and git, colab and workbench links
     """
 
-    cell = cells[nth-1]
+    cell = cells[cell_index-1]
     source = ''
     git_link = None
     colab_link = None
@@ -343,7 +337,7 @@ def parse_links(path: str,
                 # if new notebook
                 derived_link = os.path.join('https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/', path)
                 if git_link != derived_link:
-                    report_error(path, ErrorCodes.ERROR_LINK_GIT_BAD, f"bad GitHub link: {git_link}")
+                    report_error(path, ErrorCode.ERROR_LINK_GIT_BAD, f"bad GitHub link: {git_link}")
                     
         if '<a href="https://colab.research.google.com/' in line:
             colab_link = 'https://github.com/' + line.strip()[50:-2].replace('" target="_blank', '')
@@ -353,7 +347,7 @@ def parse_links(path: str,
                 # if new notebook
                 derived_link = os.path.join('https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks', path)
                 if colab_link != derived_link:
-                    report_error(path, ErrorCodes.ERROR_LINK_COLAB_BAD, f"bad Colab link: {colab_link}")
+                    report_error(path, ErrorCode.ERROR_LINK_COLAB_BAD, f"bad Colab link: {colab_link}")
                     
 
         if '<a href="https://console.cloud.google.com/vertex-ai/workbench/' in line:
@@ -363,47 +357,47 @@ def parse_links(path: str,
             except Exception as e:
                 derived_link = os.path.join('https://console.cloud.google.com/vertex-ai/workbench/deploy-notebook?download_url=https://raw.githubusercontent.com/GoogleCloudPlatform/vertex-ai-samples/main/notebooks/', path)
                 if colab_link != workbench_link:
-                    report_error(path, ErrorCodes.ERROR_LINK_WORKBENCH_BAD, f"bad Workbench link: {workbench_link}")
+                    report_error(path, ErrorCode.ERROR_LINK_WORKBENCH_BAD, f"bad Workbench link: {workbench_link}")
 
     if 'View on GitHub' not in source or not git_link:
-        report_error(path, ErrorCodes.ERROR_LINK_GIT_MISSING, 'Missing link for GitHub')
+        report_error(path, ErrorCode.ERROR_LINK_GIT_MISSING, 'Missing link for GitHub')
     if 'Run in Colab' not in source or not colab_link:
-        report_error(path, ErrorCodes.ERROR_LINK_COLAB_MISSING, 'Missing link for Colab')    
+        report_error(path, ErrorCode.ERROR_LINK_COLAB_MISSING, 'Missing link for Colab')    
     if 'Open in Vertex AI Workbench' not in source or not workbench_link:
-        report_error(path, ErrorCodes.ERROR_LINK_WORKBENCH_MISSING, 'Missing link for Workbench')
-    return nth, git_link, colab_link, workbench_link
+        report_error(path, ErrorCode.ERROR_LINK_WORKBENCH_MISSING, 'Missing link for Workbench')
+    return cell_index, git_link, colab_link, workbench_link
 
 
 def parse_overview(path: str, 
                    cells: list, 
-                   nth: int) -> int:
+                   cell_index: int) -> int:
     
     """
     Parse the overview cell
     
     path: used only for reporting an error
     cells: The content cells (JSON) for the notebook
-    nth: The index of the last cell that was parsed (reviewed).
+    cell_index: The index of the last cell that was parsed (reviewed).
     
     Returns: cell index
     """
-    cell, nth = get_cell(path, cells, nth)
+    cell, cell_index = get_cell(path, cells, cell_index)
     if not cell['source'][0].startswith("## Overview"):
-        report_error(path, ErrorCodes.ERROR_OVERVIEW_NOTFOUND, "Overview section not found")
+        report_error(path, ErrorCode.ERROR_OVERVIEW_NOTFOUND, "Overview section not found")
         
-    return nth
+    return cell_index
 
 
 def parse_objective(path: str, 
                     cells: list,
-                    nth: int) -> (int, str, str, str, list):
+                    cell_index: int) -> (int, str, str, str, list):
     """
     Parse the objective cell.
         Find the description, uses and steps.
     
     path: The path to the notebook.
     cells: The content cells (JSON) for the notebook
-    nth: The index of the last cell that was parsed (reviewed).
+    cell_index: The index of the last cell that was parsed (reviewed).
     
     Returns cell index, desc, uses, steps and costs
     """
@@ -412,10 +406,10 @@ def parse_objective(path: str,
     steps = ''
     costs = []
     
-    cell, nth = get_cell(path, cells, nth)
+    cell, cell_index = get_cell(path, cells, cell_index)
     if not cell['source'][0].startswith("### Objective"):
-        report_error(path, ErrorCodes.ERROR_OBJECTIVE_NOTFOUND, "Objective section not found")
-        return nth, desc, uses, steps, costs
+        report_error(path, ErrorCode.ERROR_OBJECTIVE_NOTFOUND, "Objective section not found")
+        return cell_index, desc, uses, steps, costs
     
     in_desc = True
     in_uses = False
@@ -458,7 +452,7 @@ def parse_objective(path: str,
                     steps += line
             
     if desc == '':
-        report_error(path, ErrorCodes.ERROR_OBJECTIVE_MISSING_DESC, "Objective section missing desc")
+        report_error(path, ErrorCode.ERROR_OBJECTIVE_MISSING_DESC, "Objective section missing desc")
     else:
         desc = desc.lstrip()
         sentences = desc.split('.')
@@ -468,7 +462,7 @@ def parse_objective(path: str,
             desc = desc[22].upper() + desc[23:]
         
     if uses == '':
-        report_error(path, ErrorCodes.ERROR_OBJECTIVE_MISSING_USES, "Objective section missing uses services list")
+        report_error(path, ErrorCode.ERROR_OBJECTIVE_MISSING_USES, "Objective section missing uses services list")
     else:
         if 'BigQuery' in uses:
             costs.append('BQ')
@@ -478,55 +472,56 @@ def parse_objective(path: str,
             costs.append('Dataflow')
             
     if steps == '':
-        report_error(path, ErrorCodes.ERROR_OBJECTIVE_MISSING_STEPS, "Objective section missing steps list")
+        report_error(path, ErrorCode.ERROR_OBJECTIVE_MISSING_STEPS, "Objective section missing steps list")
             
-    return nth, desc, uses, steps, costs
+    return cell_index, desc, uses, steps, costs
 
 
 def parse_recommendations(path: str, 
                           cells: list, 
-                          nth: int) -> int:
+                          cell_index: int) -> int:
     
     """
     Parse the recommendations cell
     
     path: used only for reporting an error
     cells: The content cells (JSON) for the notebook
-    nth: The index of the last cell that was parsed (reviewed).
+    cell_index: The index of the last cell that was parsed (reviewed).
     
     Returns: cell index
     """
     # (optional) Recommendation
-    cell, nth = get_cell(path, cells, nth)
+    cell, cell_index = get_cell(path, cells, cell_index)
     if cell['source'][0].startswith("### Recommendations"):
-        return nth
+        return cell_index
     
-    return nth - 1
+    return cell_index - 1
 
 
 def parse_dataset(path: str, 
                   cells: list, 
-                  nth: int) -> int:
+                  cell_index: int) -> int:
     
     """
     Parse the dataset cell
     
     path: used only for reporting an error
     cells: The content cells (JSON) for the notebook
-    nth: The index of the last cell that was parsed (reviewed).
+    cell_index: The index of the last cell that was parsed (reviewed).
     
     Returns: cell index
     """
     # Dataset
-    cell, nth = get_cell(path, cells, nth)
+    cell, cell_index = get_cell(path, cells, cell_index)
     if not cell['source'][0].startswith("### Dataset") and not cell['source'][0].startswith("### Model") and not cell['source'][0].startswith("### Embedding"):
-        report_error(path, ErrorCodes.ERROR_DATASET_NOTFOUND, "Dataset/Model section not found")
+        report_error(path, ErrorCode.ERROR_DATASET_NOTFOUND, "Dataset/Model section not found")
         
-    return nth
+    return cell_index
+
 
 def parse_costs(path: str, 
                 cells: list, 
-                nth: int,
+                cell_index: int,
                 costs: list) -> int:
     
     """
@@ -534,248 +529,248 @@ def parse_costs(path: str,
     
     path: used only for reporting an error
     cells: The content cells (JSON) for the notebook
-    nth: The index of the last cell that was parsed (reviewed).
+    cell_index: The index of the last cell that was parsed (reviewed).
     costs: List of resources used
     
     Returns: cell index
     """
     # Costs
-    cell, nth = get_cell(path, cells, nth)
+    cell, cell_index = get_cell(path, cells, cell_index)
     if not cell['source'][0].startswith("### Costs"):
-        report_error(path, ErrorCodes.ERROR_COSTS_NOTFOUND, "Costs section not found")
+        report_error(path, ErrorCode.ERROR_COSTS_NOTFOUND, "Costs section not found")
     else:
         text = ''
         for line in cell['source']:
             text += line
         if 'BQ' in costs and 'BigQuery' not in text:
-            report_error(path, ErrorCodes.ERROR_COSTS_MISSING, 'Costs section missing reference to BiqQuery')
+            report_error(path, ErrorCode.ERROR_COSTS_MISSING, 'Costs section missing reference to BiqQuery')
         if 'Vertex' in costs and 'Vertex' not in text:
-            report_error(path, ErrorCodes.ERROR_COSTS_MISSING, 'Costs section missing reference to Vertex')
+            report_error(path, ErrorCode.ERROR_COSTS_MISSING, 'Costs section missing reference to Vertex')
         if 'Dataflow' in costs and 'Dataflow' not in text:    
-            report_error(path, ErrorCodes.ERROR_COSTS_MISSING, 'Costs section missing reference to Dataflow')
+            report_error(path, ErrorCode.ERROR_COSTS_MISSING, 'Costs section missing reference to Dataflow')
             
-    return nth
+    return cell_index
 
 
 def parse_setuplocal(path: str, 
                      cells: list, 
-                     nth: int) -> int:
+                     cell_index: int) -> int:
     
     """
     Parse the (optional) setup local environment cell
     
     path: used only for reporting an error
     cells: The content cells (JSON) for the notebook
-    nth: The index of the last cell that was parsed (reviewed).
+    cell_index: The index of the last cell that was parsed (reviewed).
     
     Returns: cell index
     """
-    cell, nth = get_cell(path, cells, nth)
+    cell, cell_index = get_cell(path, cells, cell_index)
     if not cell['source'][0].startswith('### Set up your local development environment'):
-        return nth - 1
-    cell, nth = get_cell(path, cells, nth)
+        return cell_index - 1
+    cell, cell_index = get_cell(path, cells, cell_index)
     if not cell['source'][0].startswith('**Otherwise**, make sure your environment meets'):
-        return nth - 1
-    return nth
+        return cell_index - 1
+    return cell_index
 
 
 def parse_helpers(path: str, 
                   cells: list, 
-                  nth: int) -> int:
+                  cell_index: int) -> int:
     
     """
     Parse the (optional) helpers text/code cell
     
     path: used only for reporting an error
     cells: The content cells (JSON) for the notebook
-    nth: The index of the last cell that was parsed (reviewed).
+    cell_index: The index of the last cell that was parsed (reviewed).
     
     Returns: cell index
     """
-    cell, nth = get_cell(path, cells, nth)
+    cell, cell_index = get_cell(path, cells, cell_index)
     if 'helper' in cell['source'][0]:
-        return nth + 1 # text and code
+        return cell_index + 1  # text and code
                   
-    return nth - 1
+    return cell_index - 1
 
 
 def parse_installation(path: str, 
                        cells: list, 
-                       nth: int) -> int:
+                       cell_index: int) -> int:
     
     """
     Parse the installation cells
     
     path: used only for reporting an error
     cells: The content cells (JSON) for the notebook
-    nth: The index of the last cell that was parsed (reviewed).
+    cell_index: The index of the last cell that was parsed (reviewed).
     
     Returns: cell index
     """
-    cell, nth = get_cell(path, cells, nth)
+    cell, cell_index = get_cell(path, cells, cell_index)
     if not cell['source'][0].startswith("## Install"):
         if cell['source'][0].startswith("### Install"):
-            report_error(path, ErrorCodes.ERROR_INSTALLATION_HEADING, "Installation section needs to be H2 heading")
+            report_error(path, ErrorCode.ERROR_INSTALLATION_HEADING, "Installation section needs to be H2 heading")
         else:
-            report_error(path, ErrorCodes.ERROR_INSTALLATION_NOTFOUND, "Installation section not found")
+            report_error(path, ErrorCode.ERROR_INSTALLATION_NOTFOUND, "Installation section not found")
     else:
-        cell, nth = get_cell(path, cells, nth)
+        cell, cell_index = get_cell(path, cells, cell_index)
         if cell['cell_type'] != 'code':
-            report_error(path, ErrorCodes.ERROR_INSTALLATION_NOTFOUND, "Installation section not found")
+            report_error(path, ErrorCode.ERROR_INSTALLATION_NOTFOUND, "Installation section not found")
         else:
             if cell['source'][0].startswith('! mkdir'):
-                cell, nth = get_cell(path, cells, nth)
+                cell, cell_index = get_cell(path, cells, cell_index)
             if 'requirements.txt' in cell['source'][0]:
-                cell, nth = get_cell(path, cells, nth)
+                cell, cell_index = get_cell(path, cells, cell_index)
                     
             text = ''
             for line in cell['source']:
                 text += line
                 if 'pip ' in line:
                     if 'pip3' not in line:
-                        report_error(path, ErrorCodes.ERROR_INSTALLATION_PIP3, "Installation code section: use pip3")
+                        report_error(path, ErrorCode.ERROR_INSTALLATION_PIP3, "Installation code section: use pip3")
                     if line.endswith('\\\n'):
                         continue
                     if '-q' not in line and '--quiet' not in line :
-                        report_error(path, ErrorCodes.ERROR_INSTALLATION_QUIET, "Installation code section: use -q with pip3")
+                        report_error(path, ErrorCode.ERROR_INSTALLATION_QUIET, "Installation code section: use -q with pip3")
                     if 'USER_FLAG' not in line and 'sh(' not in line:
-                        report_error(path, ErrorCodes.ERROR_INSTALLATION_USER_FLAG, "Installation code section: use {USER_FLAG} with pip3")
+                        report_error(path, ErrorCode.ERROR_INSTALLATION_USER_FLAG, "Installation code section: use {USER_FLAG} with pip3")
             if 'if IS_WORKBENCH_NOTEBOOK:' not in text:
-                report_error(path, ErrorCodes.ERROR_INSTALLATION_CODE_TEMPLATE, "Installation code section out of date (see template)")
+                report_error(path, ErrorCode.ERROR_INSTALLATION_CODE_TEMPLATE, "Installation code section out of date (see template)")
                 
-    return nth
+    return cell_index
 
 
 def parse_restart(path: str, 
                   cells: list, 
-                  nth: int) -> int:
+                  cell_index: int) -> int:
     
     """
     Parse the restart cells
     
     path: used only for reporting an error
     cells: The content cells (JSON) for the notebook
-    nth: The index of the last cell that was parsed (reviewed).
+    cell_index: The index of the last cell that was parsed (reviewed).
     
     Returns: cell index
     """
     # Restart kernel
     while True:
         cont = False
-        cell, nth = get_cell(path, cells, nth)
+        cell, cell_index = get_cell(path, cells, cell_index)
         for line in cell['source']:
             if 'pip' in line:
-                report_error(path, ErrorCodes.ERROR_INSTALLATION_SINGLE_PIP3, f"All pip installations must be in a single code cell: {line}")
+                report_error(path, ErrorCode.ERROR_INSTALLATION_SINGLE_PIP3, f"All pip installations must be in a single code cell: {line}")
                 cont = True
                 break
         if not cont:
             break
            
     if not cell['source'][0].startswith("### Restart the kernel"):
-        report_error(path, ErrorCodes.ERROR_RESTART_NOTFOUND, "Restart the kernel section not found")
+        report_error(path, ErrorCode.ERROR_RESTART_NOTFOUND, "Restart the kernel section not found")
     else:
-        cell, nth = get_cell(path, cells, nth) # code cell
+        cell, cell_index = get_cell(path, cells, cell_index) # code cell
         if cell['cell_type'] != 'code':
-            report_error(path, ErrorCodes.ERROR_RESTART_CODE_NOTFOUND, "Restart the kernel code section not found")
+            report_error(path, ErrorCode.ERROR_RESTART_CODE_NOTFOUND, "Restart the kernel code section not found")
             
-    return nth
+    return cell_index
 
 
 def parse_versions(path: str, 
                    cells: list, 
-                   nth: int) -> int:
+                   cell_index: int) -> int:
     
     """
     Parse the (optional) package versions code/text cell
     
     path: used only for reporting an error
     cells: The content cells (JSON) for the notebook
-    nth: The index of the last cell that was parsed (reviewed).
+    cell_index: The index of the last cell that was parsed (reviewed).
     
     Returns: cell index
     """
-    cell, nth = get_cell(path, cells, nth)
+    cell, cell_index = get_cell(path, cells, cell_index)
     if cell['source'][0].startswith('#### Check package versions'):
-        return nth + 1
-    return nth - 1
+        return cell_index + 1
+    return cell_index - 1
 
 
 def parse_beforebegin(path: str, 
                       cells: list, 
-                      nth: int) -> int:
+                      cell_index: int) -> int:
     
     """
     Parse the before you begin cell
     
     path: used only for reporting an error
     cells: The content cells (JSON) for the notebook
-    nth: The index of the last cell that was parsed (reviewed).
+    cell_index: The index of the last cell that was parsed (reviewed).
     
     Returns: cell index
     """
-    cell, nth = get_cell(path, cells, nth)
+    cell, cell_index = get_cell(path, cells, cell_index)
     if not cell['source'][0].startswith("## Before you begin"):
-        report_error(path, ErrorCodes.ERROR_BEFOREBEGIN_NOTFOUND, "Before you begin section not found")
+        report_error(path, ErrorCode.ERROR_BEFOREBEGIN_NOTFOUND, "Before you begin section not found")
     else:
         # maybe one or two cells
         if len(cell['source']) < 2:
-            cell, nth = get_cell(path, cells, nth)
+            cell, cell_index = get_cell(path, cells, cell_index)
             if not cell['source'][0].startswith("### Set up your Google Cloud project"):
-                report_error(path, ErrorCodes.ERROR_BEFOREBEGIN_INCOMPLETE, "Before you begin section incomplete")
-    return nth
+                report_error(path, ErrorCode.ERROR_BEFOREBEGIN_INCOMPLETE, "Before you begin section incomplete")
+    return cell_index
 
 
 def parse_enableapis(path: str, 
                      cells: list, 
-                     nth: int) -> int:
+                     cell_index: int) -> int:
     """
     Parse the (optional) enable apis code/text cell
     
     path: used only for reporting an error
     cells: The content cells (JSON) for the notebook
-    nth: The index of the last cell that was parsed (reviewed).
+    cell_index: The index of the last cell that was parsed (reviewed).
     
     Returns: cell index
     """
-    cell, nth = get_cell(path, cells, nth)
+    cell, cell_index = get_cell(path, cells, cell_index)
     if cell['source'][0].startswith("### Enable APIs"):
-        return nth + 1
+        return cell_index + 1
                      
-    return nth - 1
+    return cell_index - 1
 
 
 def parse_setproject(path: str, 
-                      cells: list, 
-                      nth: int) -> int:
+                     cells: list, 
+                     cell_index: int) -> int:
     
     """
     Parse the set project cells
     
     path: used only for reporting an error
     cells: The content cells (JSON) for the notebook
-    nth: The index of the last cell that was parsed (reviewed).
+    cell_index: The index of the last cell that was parsed (reviewed).
     
     Returns: cell index
     """
-    cell, nth = get_cell(path, cells, nth)
+    cell, cell_index = get_cell(path, cells, cell_index)
     if not cell['source'][0].startswith('#### Set your project ID'):
-        report_error(path, ErrorCodes.ERROR_PROJECTID_NOTFOUND, "Set project ID section not found")
+        report_error(path, ErrorCode.ERROR_PROJECTID_NOTFOUND, "Set project ID section not found")
     else: 
-        cell, nth = get_cell(path, cells, nth)
+        cell, cell_index = get_cell(path, cells, cell_index)
         if cell['cell_type'] != 'code':
-            report_error(path, ErrorCodes.ERROR_PROJECTID_CODE_NOTFOUND, "Set project ID code section not found")
+            report_error(path, ErrorCode.ERROR_PROJECTID_CODE_NOTFOUND, "Set project ID code section not found")
         elif not cell['source'][0].startswith('PROJECT_ID = "[your-project-id]"'):
-            report_error(path, ErrorCodes.ERROR_PROJECTID_TEMPLATE, f"Set project ID not match template")
+            report_error(path, ErrorCode.ERROR_PROJECTID_TEMPLATE, f"Set project ID not match template")
             
-        cell, nth = get_cell(path, cells, nth)
+        cell, cell_index = get_cell(path, cells, cell_index)
         if cell['cell_type'] != 'code' or 'or PROJECT_ID == "[your-project-id]":' not in cell['source'][0]:
-            report_error(path, ErrorCodes.ERROR_PROJECTID_TEMPLATE, f"Set project ID not match template")  
+            report_error(path, ErrorCode.ERROR_PROJECTID_TEMPLATE, f"Set project ID not match template")  
             
-        cell, nth = get_cell(path, cells, nth)
+        cell, cell_index = get_cell(path, cells, cell_index)
         if cell['cell_type'] != 'code' or '! gcloud config set project' not in cell['source'][0]:
-            report_error(path, ErrorCodes.ERROR_PROJECTID_TEMPLATE, f"Set project ID not match template")
+            report_error(path, ErrorCode.ERROR_PROJECTID_TEMPLATE, f"Set project ID not match template")
             
-    return nth
+    return cell_index
 
 
 def check_text_cell(path: str,
@@ -842,15 +837,15 @@ def check_text_cell(path: str,
             continue
             
         if 'TODO' in line or 'WIP' in line:
-            report_error(path, ErrorCodes.ERROR_TWRULE_TODO, f'TODO in cell: {line}')
+            report_error(path, ErrorCode.ERROR_TWRULE_TODO, f'TODO in cell: {line}')
         if 'we ' in line.lower() or "let's" in line.lower() in line.lower():
-            report_error(path, ErrorCodes.ERROR_TWRULE_FIRSTPERSON, f'Do not use first person (e.g., we), replace with 2nd person (you): {line}')
+            report_error(path, ErrorCode.ERROR_TWRULE_FIRSTPERSON, f'Do not use first person (e.g., we), replace with 2nd person (you): {line}')
         if 'will' in line.lower() or 'would' in line.lower():
-            report_error(path, ErrorCodes.ERROR_TWRULE_FUTURETENSE, f'Do not use future tense (e.g., will), replace with present tense: {line}')
+            report_error(path, ErrorCode.ERROR_TWRULE_FUTURETENSE, f'Do not use future tense (e.g., will), replace with present tense: {line}')
             
         for mistake, brand in branding.items():
             if mistake in line:
-                report_error(path, ErrorCodes.ERROR_TWRULE_BRANDING, f"Branding {mistake} -> {brand}: {line}")
+                report_error(path, ErrorCode.ERROR_TWRULE_BRANDING, f"Branding {mistake} -> {brand}: {line}")
 
 
 def check_sentence_case(path: str, 
@@ -869,63 +864,63 @@ def check_sentence_case(path: str,
     
     words = heading.split(' ')
     if not words[0][0].isupper():
-        report_error(path, ErrorCodes.ERROR_HEADING_CAP, f"heading must start with capitalized word: {words[0]}")
+        report_error(path, ErrorCode.ERROR_HEADING_CAP, f"heading must start with capitalized word: {words[0]}")
         
     for word in words[1:]:
         word = word.replace(':', '').replace('(', '').replace(')', '')
         if word in ACRONYMS:
             continue
         if word.isupper():
-            report_error(path, ErrorCodes.ERROR_HEADING_CASE, f"heading is not sentence case: {word}")
+            report_error(path, ErrorCode.ERROR_HEADING_CASE, f"heading is not sentence case: {word}")
 
 
 def get_cell(path: str, 
              cells: list, 
-             nth: int) -> (list, int):
+             cell_index: int) -> (list, int):
     """
         Get the next notebook cell.
         
         path: used only for reporting an error
         cells: The content cells (JSON) for the notebook
-        nth: The index of the last cell that was parsed (reviewed).
+        cell_index: The index of the last cell that was parsed (reviewed).
         
         Returns:
         
         cell: content of the next cell
-        nth + 1: index of subsequent cell
+        cell_index + 1: index of subsequent cell
     """
-    while empty_cell(path, cells, nth):
-        nth += 1
+    while empty_cell(path, cells, cell_index):
+        cell_index += 1
         
-    cell = cells[nth]
+    cell = cells[cell_index]
     if cell['cell_type'] == 'markdown':
         check_text_cell(path, cell)
-    return cell, nth + 1
+    return cell, cell_index + 1
 
 
 def empty_cell(path: str, 
                cells: list, 
-               nth: int) -> bool:
+               cell_index: int) -> bool:
     """
         Check for empty cells
         
         path: used only for reporting an error
         cells: The content cells (JSON) for the notebook
-        nth: The index of the last cell that was parsed (reviewed).
+        cell_index: The index of the last cell that was parsed (reviewed).
         
         Returns:
         
         bool: whether cell is empty or not
     """
-    if len(cells[nth]['source']) == 0:
-        report_error(path, ErrorCodes.ERROR_EMPTY_CELL, f'empty cell: cell #{nth}')
+    if len(cells[cell_index]['source']) == 0:
+        report_error(path, ErrorCode.ERROR_EMPTY_CELL, f'empty cell: cell #{cell_index}')
         return True
     else:
         return False
 
 
 def report_error(notebook: str, 
-                 code: ErrorCodes,
+                 code: ErrorCode,
                  errmsg: str) -> None:
     """
     Report an error.
