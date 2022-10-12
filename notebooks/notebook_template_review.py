@@ -36,6 +36,8 @@ import sys
 import urllib.request
 import csv
 from enum import Enum
+from abc import ABC, abstractmethod
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--notebook-dir', dest='notebook_dir',
@@ -189,37 +191,42 @@ def parse_notebook(path: str) -> None:
             print("Corrupted notebook:", path)
             return
         
-        cell_index = 0
         cells = content['cells']
         
-        # cell 1 is copyright
-        cell_index = parse_copyright(path, cells, cell_index)
-            
-        # check for notices
-        cell_index = parse_notices(path, cells, cell_index)
+        NotebookRule.init()
         
-        # check for title
-        cell_index, title = parse_title(path, cells, cell_index)
-
-        # check links.
-        cell_index, git_link, colab_link, workbench_link = parse_links(path, cells, cell_index)
+        CopyrightRule().validate(path, cells)
+            
+        NoticesRule().validate(path, cells)
         
-        # Overview
-        cell_index = parse_overview(path, cells, cell_index)
-            
-        # Objective
-        cell_index, desc, uses, steps, costs = parse_objective(path, cells, cell_index)
-        if desc != '':
-            add_index(path, tag, title, desc, uses, steps, git_link, colab_link, workbench_link)
-            
-        # (optional) Recommendation
-        cell_index = parse_recommendations(path, cells, cell_index)
+        TitleRule().validate(path, cells)
 
-        # Dataset
-        cell_index = parse_dataset(path, cells, cell_index)
+        LinksRule().validate(path, cells)
+        
+        OverviewRule().validate(path, cells)
+       
+        ObjectiveRule().validate(path, cells)
+        if NotebookRule.desc != '':
+            add_index(path, 
+                      tag, 
+                      NotebookRule.title, 
+                      NotebookRule.desc, 
+                      NotebookRule.uses, 
+                      NotebookRule.steps, 
+                      NotebookRule.git_link, 
+                      NotebookRule.colab_link, 
+                      NotebookRule.workbench_link
+            )
+            
+        RecommendationsRule().validate(path, cells)
+        
+        DatasetRule().validate(path, cells)
+            
+        cell_index = NotebookRule.cell_index
+
             
         # Costs
-        cell_index = parse_costs(path, cells, cell_index, costs)
+        cell_index = parse_costs(path, cells, cell_index, NotebookRule.costs)
                 
         # (optional) Setup local environment
         cell_index = parse_setuplocal(path, cells, cell_index)
@@ -246,277 +253,283 @@ def parse_notebook(path: str) -> None:
         cell_index = parse_setproject(path, cells, cell_index)
 
 
-def parse_copyright(path: str,
-                    cells: list,
-                    cell_index: int) -> int:
-    """
-    Parse the copyright cell
-    
-    path: used only for reporting an error
-    cells: The content cells (JSON) for the notebook
-    cell_index: The index of the last cell that was parsed (reviewed).
-    
-    Returns: cell index
-    """
-    cell, cell_index = get_cell(path, cells, cell_index)
-    if not 'Copyright' in cell['source'][0]:
-        report_error(path, ErrorCode.ERROR_COPYRIGHT, "missing copyright cell")
-    return cell_index
 
-
-def parse_notices(path: str,
-                  cells: list,
-                  cell_index: int) -> int:
+class NotebookRule(ABC):
     """
-    Parse the (optional) notices cell
-    
-    path: used only for reporting an error
-    cells: The content cells (JSON) for the notebook
-    cell_index: The index of the last cell that was parsed (reviewed).
-    
-    Returns: cell index
+    Abstract class for defining notebook conformance rules
     """
-    cell, cell_index = get_cell(path, cells, cell_index)
-    if cell['source'][0].startswith('This notebook'):
-         return cell_index
-    return cell_index - 1
-
-
-def parse_title(path: str,
-                cells: list,
-                cell_index: int) -> (int, str):
-    """
-    Parse the title in the links cell
-    
-    path: used only for reporting an error
-    cells: The content cells (JSON) for the notebook
-    cell_index: The index of the last cell that was parsed (reviewed).
-    
-    Returns: cell index, and title
-    """
-    cell, cell_index = get_cell(path, cells, cell_index)
-    if not cell['source'][0].startswith('# '):
-        report_error(path, ErrorCode.ERROR_TITLE_HEADING, "title cell must start with H1 heading")
-        title = ''
-    else:
-        title = cell['source'][0][2:].strip()
-        check_sentence_case(path, title)
-            
-        # H1 title only
-        if len(cell['source']) == 1:
-            cell, cell_index = get_cell(path, cells, cell_index)
-            
-    return cell_index, title
-
-
-def parse_links(path: str,
-                cells: list,
-                cell_index: int) -> (int, str, str, str):
-    """
-    Parse the links in the links cell
-    
-    path: used only for reporting an error
-    cells: The content cells (JSON) for the notebook
-    cell_index: The index of the last cell that was parsed (reviewed).
-    
-    Returns: cell index, and git, colab and workbench links
-    """
-
-    cell = cells[cell_index-1]
-    source = ''
+    cell_index = 0
+    title = ''
     git_link = None
     colab_link = None
     workbench_link = None
-    for line in cell['source']:
-        source += line
-        if '<a href="https://github.com' in line:
-            git_link = line.strip()[9:-2].replace('" target="_blank', '')
-            try:
-                code = urllib.request.urlopen(git_link).getcode()
-            except Exception as e:
-                # if new notebook
-                derived_link = os.path.join('https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/', path)
-                if git_link != derived_link:
-                    report_error(path, ErrorCode.ERROR_LINK_GIT_BAD, f"bad GitHub link: {git_link}")
-                    
-        if '<a href="https://colab.research.google.com/' in line:
-            colab_link = 'https://github.com/' + line.strip()[50:-2].replace('" target="_blank', '')
-            try:
-                code = urllib.request.urlopen(colab_link).getcode()
-            except Exception as e:
-                # if new notebook
-                derived_link = os.path.join('https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks', path)
-                if colab_link != derived_link:
-                    report_error(path, ErrorCode.ERROR_LINK_COLAB_BAD, f"bad Colab link: {colab_link}")
-                    
-
-        if '<a href="https://console.cloud.google.com/vertex-ai/workbench/' in line:
-            workbench_link = line.strip()[91:-2].replace('" target="_blank', '')
-            try:
-                code = urllib.request.urlopen(workbench_link).getcode()
-            except Exception as e:
-                derived_link = os.path.join('https://console.cloud.google.com/vertex-ai/workbench/deploy-notebook?download_url=https://raw.githubusercontent.com/GoogleCloudPlatform/vertex-ai-samples/main/notebooks/', path)
-                if colab_link != workbench_link:
-                    report_error(path, ErrorCode.ERROR_LINK_WORKBENCH_BAD, f"bad Workbench link: {workbench_link}")
-
-    if 'View on GitHub' not in source or not git_link:
-        report_error(path, ErrorCode.ERROR_LINK_GIT_MISSING, 'Missing link for GitHub')
-    if 'Run in Colab' not in source or not colab_link:
-        report_error(path, ErrorCode.ERROR_LINK_COLAB_MISSING, 'Missing link for Colab')    
-    if 'Open in Vertex AI Workbench' not in source or not workbench_link:
-        report_error(path, ErrorCode.ERROR_LINK_WORKBENCH_MISSING, 'Missing link for Workbench')
-    return cell_index, git_link, colab_link, workbench_link
-
-
-def parse_overview(path: str, 
-                   cells: list, 
-                   cell_index: int) -> int:
-    
-    """
-    Parse the overview cell
-    
-    path: used only for reporting an error
-    cells: The content cells (JSON) for the notebook
-    cell_index: The index of the last cell that was parsed (reviewed).
-    
-    Returns: cell index
-    """
-    cell, cell_index = get_cell(path, cells, cell_index)
-    if not cell['source'][0].startswith("## Overview"):
-        report_error(path, ErrorCode.ERROR_OVERVIEW_NOTFOUND, "Overview section not found")
-        
-    return cell_index
-
-
-def parse_objective(path: str, 
-                    cells: list,
-                    cell_index: int) -> (int, str, str, str, list):
-    """
-    Parse the objective cell.
-        Find the description, uses and steps.
-    
-    path: The path to the notebook.
-    cells: The content cells (JSON) for the notebook
-    cell_index: The index of the last cell that was parsed (reviewed).
-    
-    Returns cell index, desc, uses, steps and costs
-    """
     desc = ''
     uses = ''
     steps = ''
-    costs = []
+    costs = ''
     
-    cell, cell_index = get_cell(path, cells, cell_index)
-    if not cell['source'][0].startswith("### Objective"):
-        report_error(path, ErrorCode.ERROR_OBJECTIVE_NOTFOUND, "Objective section not found")
-        return cell_index, desc, uses, steps, costs
+    @staticmethod
+    def init():
+        NotebookRule.cell_index = 0
+        NotebookRule.title = ''
+        NotebookRule.git_link = None
+        NotebookRule.colab_link = None
+        NotebookRule.workbench_link = None
+        NotebookRule.desc = ''
+        NotebookRule.uses = ''
+        NotebookRule.steps = ''
+        NotebookRule.costs = ''
     
-    in_desc = True
-    in_uses = False
-    in_steps = False
-    
-    for line in cell['source'][1:]:
-        if line.startswith('This tutorial uses'):
-            in_desc = False
-            in_steps = False
-            in_uses = True
-            uses += line
-            continue
-        elif line.startswith('The steps performed'):
-            in_desc = False
-            in_uses = False
-            in_steps = True
-            steps += line
-            continue
+    @abstractmethod
+    def validate(self, path: str, cells: list) -> None:
+        pass
+
+
+class CopyrightRule(NotebookRule):
+    def validate(self, path: str, cells: list) -> None:
+        """
+        Parse the copyright cell
+
+        path: used only for reporting an error
+        cells: The content cells (JSON) for the notebook
+        """
+        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        if not 'Copyright' in cell['source'][0]:
+            report_error(path, ErrorCode.ERROR_COPYRIGHT, "missing copyright cell")
             
-        if in_desc:
-            if len(desc) > 0 and line.strip() == '':
+        NotebookRule.cell_index = cell_index
+
+
+class NoticesRule(NotebookRule):
+    def validate(self, path: str, cells: list) -> None:
+        """
+        Parse the (optional) notices cell
+
+        path: used only for reporting an error
+        cells: The content cells (JSON) for the notebook
+        """
+        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        if cell['source'][0].startswith('This notebook'):
+             NotebookRule.cell_index = cell_index
+        else:
+            NotebookRule.cell_index = cell_index - 1
+
+
+class TitleRule(NotebookRule):
+    def validate(self, path: str, cells: list) -> None: 
+        """
+        Parse the title in the links cell
+
+        path: used only for reporting an error
+        cells: The content cells (JSON) for the notebook
+        """
+        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        if not cell['source'][0].startswith('# '):
+            report_error(path, ErrorCode.ERROR_TITLE_HEADING, "title cell must start with H1 heading")
+            NotebookRule.title = ''
+        else:
+            NotebookRule.title = cell['source'][0][2:].strip()
+            check_sentence_case(path, NotebookRule.title)
+
+            # H1 title only
+            if len(cell['source']) == 1:
+                cell, cell_index = get_cell(path, cells, cell_index)
+
+        NotebookRule.cell_index = cell_index
+
+
+class LinksRule(NotebookRule):
+    def validate(self, path: str, cells: list) -> None: 
+        """
+        Parse the links in the links cell
+
+        path: used only for reporting an error
+        cells: The content cells (JSON) for the notebook
+        """
+
+        cell = cells[NotebookRule.cell_index-1]
+        source = ''
+        git_link = None
+        colab_link = None
+        workbench_link = None
+        for line in cell['source']:
+            source += line
+            if '<a href="https://github.com' in line:
+                git_link = line.strip()[9:-2].replace('" target="_blank', '')
+                try:
+                    code = urllib.request.urlopen(git_link).getcode()
+                except Exception as e:
+                    # if new notebook
+                    derived_link = os.path.join('https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/', path)
+                    if git_link != derived_link:
+                        report_error(path, ErrorCode.ERROR_LINK_GIT_BAD, f"bad GitHub link: {git_link}")
+
+            if '<a href="https://colab.research.google.com/' in line:
+                colab_link = 'https://github.com/' + line.strip()[50:-2].replace('" target="_blank', '')
+                try:
+                    code = urllib.request.urlopen(colab_link).getcode()
+                except Exception as e:
+                    # if new notebook
+                    derived_link = os.path.join('https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks', path)
+                    if colab_link != derived_link:
+                        report_error(path, ErrorCode.ERROR_LINK_COLAB_BAD, f"bad Colab link: {colab_link}")
+
+
+            if '<a href="https://console.cloud.google.com/vertex-ai/workbench/' in line:
+                workbench_link = line.strip()[91:-2].replace('" target="_blank', '')
+                try:
+                    code = urllib.request.urlopen(workbench_link).getcode()
+                except Exception as e:
+                    derived_link = os.path.join('https://console.cloud.google.com/vertex-ai/workbench/deploy-notebook?download_url=https://raw.githubusercontent.com/GoogleCloudPlatform/vertex-ai-samples/main/notebooks/', path)
+                    if colab_link != workbench_link:
+                        report_error(path, ErrorCode.ERROR_LINK_WORKBENCH_BAD, f"bad Workbench link: {workbench_link}")
+
+        if 'View on GitHub' not in source or not git_link:
+            report_error(path, ErrorCode.ERROR_LINK_GIT_MISSING, 'Missing link for GitHub')
+        if 'Run in Colab' not in source or not colab_link:
+            report_error(path, ErrorCode.ERROR_LINK_COLAB_MISSING, 'Missing link for Colab')    
+        if 'Open in Vertex AI Workbench' not in source or not workbench_link:
+            report_error(path, ErrorCode.ERROR_LINK_WORKBENCH_MISSING, 'Missing link for Workbench')
+        
+        NotebookRule.git_link = git_link
+        NotebookRule.colab_link = colab_link
+        NotebookRule.workbench_link = workbench_link
+
+
+class OverviewRule(NotebookRule):
+    def validate(self, path: str, cells: list) -> None: 
+        """
+        Parse the overview cell
+
+        path: used only for reporting an error
+        cells: The content cells (JSON) for the notebook
+        """
+        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        if not cell['source'][0].startswith("## Overview"):
+            report_error(path, ErrorCode.ERROR_OVERVIEW_NOTFOUND, "Overview section not found")
+
+        NotebookRule.cell_index = cell_index
+
+
+class ObjectiveRule(NotebookRule):
+    def validate(self, path: str, cells: list) -> None: 
+        """
+        Parse the objective cell.
+            Find the description, uses and steps.
+
+        path: The path to the notebook.
+        cells: The content cells (JSON) for the notebook
+        """
+        desc = ''
+        uses = ''
+        steps = ''
+        costs = []
+
+        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        if not cell['source'][0].startswith("### Objective"):
+            report_error(path, ErrorCode.ERROR_OBJECTIVE_NOTFOUND, "Objective section not found")
+            return cell_index, desc, uses, steps, costs
+
+        in_desc = True
+        in_uses = False
+        in_steps = False
+    
+        for line in cell['source'][1:]:
+            if line.startswith('This tutorial uses'):
                 in_desc = False
+                in_steps = False
+                in_uses = True
+                uses += line
                 continue
-            desc += line
-        elif in_uses:
-            sline = line.strip()
-            if len(sline) == 0:
-                uses += '\n'
-            else:
-                ch = sline[0]
-                if ch in ['-', '*', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
-                    uses += line
-        elif in_steps:
-            sline = line.strip()
-            if len(sline) == 0:
-                steps += '\n'
-            else:
-                ch = sline[0]
-                if ch in ['-', '*', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
-                    steps += line
+            elif line.startswith('The steps performed'):
+                in_desc = False
+                in_uses = False
+                in_steps = True
+                steps += line
+                continue
+
+            if in_desc:
+                if len(desc) > 0 and line.strip() == '':
+                    in_desc = False
+                    continue
+                desc += line
+            elif in_uses:
+                sline = line.strip()
+                if len(sline) == 0:
+                    uses += '\n'
+                else:
+                    ch = sline[0]
+                    if ch in ['-', '*', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                        uses += line
+            elif in_steps:
+                sline = line.strip()
+                if len(sline) == 0:
+                    steps += '\n'
+                else:
+                    ch = sline[0]
+                    if ch in ['-', '*', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                        steps += line
             
-    if desc == '':
-        report_error(path, ErrorCode.ERROR_OBJECTIVE_MISSING_DESC, "Objective section missing desc")
-    else:
-        desc = desc.lstrip()
-        sentences = desc.split('.')
-        if len(sentences) > 1:
-            desc = sentences[0] + '.\n'
-        if desc.startswith('In this tutorial, you learn') or desc.startswith('In this notebook, you learn'):
-            desc = desc[22].upper() + desc[23:]
-        
-    if uses == '':
-        report_error(path, ErrorCode.ERROR_OBJECTIVE_MISSING_USES, "Objective section missing uses services list")
-    else:
-        if 'BigQuery' in uses:
-            costs.append('BQ')
-        if 'Vertex' in uses:
-            costs.append('Vertex')
-        if 'Dataflow' in uses:
-            costs.append('Dataflow')
+        if desc == '':
+            report_error(path, ErrorCode.ERROR_OBJECTIVE_MISSING_DESC, "Objective section missing desc")
+        else:
+            desc = desc.lstrip()
+            sentences = desc.split('.')
+            if len(sentences) > 1:
+                desc = sentences[0] + '.\n'
+            if desc.startswith('In this tutorial, you learn') or desc.startswith('In this notebook, you learn'):
+                desc = desc[22].upper() + desc[23:]
+
+        if uses == '':
+            report_error(path, ErrorCode.ERROR_OBJECTIVE_MISSING_USES, "Objective section missing uses services list")
+        else:
+            if 'BigQuery' in uses:
+                costs.append('BQ')
+            if 'Vertex' in uses:
+                costs.append('Vertex')
+            if 'Dataflow' in uses:
+                costs.append('Dataflow')
+
+        if steps == '':
+            report_error(path, ErrorCode.ERROR_OBJECTIVE_MISSING_STEPS, "Objective section missing steps list")
             
-    if steps == '':
-        report_error(path, ErrorCode.ERROR_OBJECTIVE_MISSING_STEPS, "Objective section missing steps list")
-            
-    return cell_index, desc, uses, steps, costs
+        NotebookRule.cell_index = cell_index
+        NotebookRule.desc = desc
+        NotebookRule.uses = uses
+        NotebookRule.steps = steps
+        NotebookRule.costs = costs
 
 
-def parse_recommendations(path: str, 
-                          cells: list, 
-                          cell_index: int) -> int:
-    
-    """
-    Parse the recommendations cell
-    
-    path: used only for reporting an error
-    cells: The content cells (JSON) for the notebook
-    cell_index: The index of the last cell that was parsed (reviewed).
-    
-    Returns: cell index
-    """
-    # (optional) Recommendation
-    cell, cell_index = get_cell(path, cells, cell_index)
-    if cell['source'][0].startswith("### Recommendations"):
-        return cell_index
-    
-    return cell_index - 1
+class RecommendationsRule(NotebookRule):
+    def validate(self, path: str, cells: list) -> None: 
+        """
+        Parse the (optional) recommendations cell
+
+        path: used only for reporting an error
+        cells: The content cells (JSON) for the notebook
+        """
+        # (optional) Recommendation
+        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        if cell['source'][0].startswith("### Recommendations"):
+            NotebookRule.cell_index = cell_index
+        else:
+            NotebookRule.cell_index = cell_index - 1
 
 
-def parse_dataset(path: str, 
-                  cells: list, 
-                  cell_index: int) -> int:
-    
-    """
-    Parse the dataset cell
-    
-    path: used only for reporting an error
-    cells: The content cells (JSON) for the notebook
-    cell_index: The index of the last cell that was parsed (reviewed).
-    
-    Returns: cell index
-    """
-    # Dataset
-    cell, cell_index = get_cell(path, cells, cell_index)
-    if not cell['source'][0].startswith("### Dataset") and not cell['source'][0].startswith("### Model") and not cell['source'][0].startswith("### Embedding"):
-        report_error(path, ErrorCode.ERROR_DATASET_NOTFOUND, "Dataset/Model section not found")
-        
-    return cell_index
+class DatasetRule(NotebookRule):
+    def validate(self, path: str, cells: list) -> None: 
+        """
+        Parse the dataset cell
+
+        path: used only for reporting an error
+        cells: The content cells (JSON) for the notebook
+        """
+        # Dataset
+        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        if not cell['source'][0].startswith("### Dataset") and not cell['source'][0].startswith("### Model") and not cell['source'][0].startswith("### Embedding"):
+            report_error(path, ErrorCode.ERROR_DATASET_NOTFOUND, "Dataset/Model section not found")
+
+        NotebookRule.cell_index = cell_index
 
 
 def parse_costs(path: str, 
