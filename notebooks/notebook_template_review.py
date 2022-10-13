@@ -219,39 +219,26 @@ def parse_notebook(path: str) -> None:
             )
             
         RecommendationsRule().validate(path, cells)
-        
+
         DatasetRule().validate(path, cells)
-            
-        cell_index = NotebookRule.cell_index
 
-            
-        # Costs
-        cell_index = parse_costs(path, cells, cell_index, NotebookRule.costs)
-                
-        # (optional) Setup local environment
-        cell_index = parse_setuplocal(path, cells, cell_index)
-                
-        # (optional) Helper functions
-        cell_index = parse_helpers(path, cells, cell_index)
-                
-        # Installation
-        cell_index = parse_installation(path, cells, cell_index)
+        CostsRule().validate(path, cells)
+
+        SetupLocalRule().validate(path, cells)
+
+        HelpersRule().validate(path, cells)
+
+        InstallationRule().validate(path, cells)
+
+        RestartRule().validate(path, cells)
         
-        # Restart kernel
-        cell_index = parse_restart(path, cells, cell_index)
-                
-        # (optional) Check package versions
-        cell_index = parse_versions(path, cells, cell_index)
-            
-        # Before you begin
-        cell_index = parse_beforebegin(path, cells, cell_index)
-              
-        # (optional) enable APIs
-        cell_index = parse_enableapis(path, cells, cell_index)
-            
-        # Set project ID
-        cell_index = parse_setproject(path, cells, cell_index)
-
+        VersionsRule().validate(path, cells)
+        
+        BeforeBeginRule().validate(path, cells)
+        
+        EnableAPIsRule().validate(path, cells)
+        
+        SetupProjectRule().validate(path, cells)
 
 
 class NotebookRule(ABC):
@@ -266,7 +253,7 @@ class NotebookRule(ABC):
     desc = ''
     uses = ''
     steps = ''
-    costs = ''
+    costs = []
     
     @staticmethod
     def init():
@@ -532,258 +519,217 @@ class DatasetRule(NotebookRule):
         NotebookRule.cell_index = cell_index
 
 
-def parse_costs(path: str, 
-                cells: list, 
-                cell_index: int,
-                costs: list) -> int:
-    
-    """
-    Parse the costs cell
-    
-    path: used only for reporting an error
-    cells: The content cells (JSON) for the notebook
-    cell_index: The index of the last cell that was parsed (reviewed).
-    costs: List of resources used
-    
-    Returns: cell index
-    """
-    # Costs
-    cell, cell_index = get_cell(path, cells, cell_index)
-    if not cell['source'][0].startswith("### Costs"):
-        report_error(path, ErrorCode.ERROR_COSTS_NOTFOUND, "Costs section not found")
-    else:
-        text = ''
-        for line in cell['source']:
-            text += line
-        if 'BQ' in costs and 'BigQuery' not in text:
-            report_error(path, ErrorCode.ERROR_COSTS_MISSING, 'Costs section missing reference to BiqQuery')
-        if 'Vertex' in costs and 'Vertex' not in text:
-            report_error(path, ErrorCode.ERROR_COSTS_MISSING, 'Costs section missing reference to Vertex')
-        if 'Dataflow' in costs and 'Dataflow' not in text:    
-            report_error(path, ErrorCode.ERROR_COSTS_MISSING, 'Costs section missing reference to Dataflow')
-            
-    return cell_index
+class CostsRule(NotebookRule):
+    def validate(self, path: str, cells: list) -> None: 
+        """
+        Parse the costs cell
 
-
-def parse_setuplocal(path: str, 
-                     cells: list, 
-                     cell_index: int) -> int:
-    
-    """
-    Parse the (optional) setup local environment cell
-    
-    path: used only for reporting an error
-    cells: The content cells (JSON) for the notebook
-    cell_index: The index of the last cell that was parsed (reviewed).
-    
-    Returns: cell index
-    """
-    cell, cell_index = get_cell(path, cells, cell_index)
-    if not cell['source'][0].startswith('### Set up your local development environment'):
-        return cell_index - 1
-    cell, cell_index = get_cell(path, cells, cell_index)
-    if not cell['source'][0].startswith('**Otherwise**, make sure your environment meets'):
-        return cell_index - 1
-    return cell_index
-
-
-def parse_helpers(path: str, 
-                  cells: list, 
-                  cell_index: int) -> int:
-    
-    """
-    Parse the (optional) helpers text/code cell
-    
-    path: used only for reporting an error
-    cells: The content cells (JSON) for the notebook
-    cell_index: The index of the last cell that was parsed (reviewed).
-    
-    Returns: cell index
-    """
-    cell, cell_index = get_cell(path, cells, cell_index)
-    if 'helper' in cell['source'][0]:
-        return cell_index + 1  # text and code
-                  
-    return cell_index - 1
-
-
-def parse_installation(path: str, 
-                       cells: list, 
-                       cell_index: int) -> int:
-    
-    """
-    Parse the installation cells
-    
-    path: used only for reporting an error
-    cells: The content cells (JSON) for the notebook
-    cell_index: The index of the last cell that was parsed (reviewed).
-    
-    Returns: cell index
-    """
-    cell, cell_index = get_cell(path, cells, cell_index)
-    if not cell['source'][0].startswith("## Install"):
-        if cell['source'][0].startswith("### Install"):
-            report_error(path, ErrorCode.ERROR_INSTALLATION_HEADING, "Installation section needs to be H2 heading")
+        path: used only for reporting an error
+        cells: The content cells (JSON) for the notebook
+        """
+        # Costs
+        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        if not cell['source'][0].startswith("### Costs"):
+            report_error(path, ErrorCode.ERROR_COSTS_NOTFOUND, "Costs section not found")
         else:
-            report_error(path, ErrorCode.ERROR_INSTALLATION_NOTFOUND, "Installation section not found")
-    else:
-        cell, cell_index = get_cell(path, cells, cell_index)
-        if cell['cell_type'] != 'code':
-            report_error(path, ErrorCode.ERROR_INSTALLATION_NOTFOUND, "Installation section not found")
-        else:
-            if cell['source'][0].startswith('! mkdir'):
-                cell, cell_index = get_cell(path, cells, cell_index)
-            if 'requirements.txt' in cell['source'][0]:
-                cell, cell_index = get_cell(path, cells, cell_index)
-                    
             text = ''
             for line in cell['source']:
                 text += line
-                if 'pip ' in line:
-                    if 'pip3' not in line:
-                        report_error(path, ErrorCode.ERROR_INSTALLATION_PIP3, "Installation code section: use pip3")
-                    if line.endswith('\\\n'):
-                        continue
-                    if '-q' not in line and '--quiet' not in line :
-                        report_error(path, ErrorCode.ERROR_INSTALLATION_QUIET, "Installation code section: use -q with pip3")
-                    if 'USER_FLAG' not in line and 'sh(' not in line:
-                        report_error(path, ErrorCode.ERROR_INSTALLATION_USER_FLAG, "Installation code section: use {USER_FLAG} with pip3")
-            if 'if IS_WORKBENCH_NOTEBOOK:' not in text:
-                report_error(path, ErrorCode.ERROR_INSTALLATION_CODE_TEMPLATE, "Installation code section out of date (see template)")
-                
-    return cell_index
+            if 'BQ' in NotebookRule.costs and 'BigQuery' not in text:
+                report_error(path, ErrorCode.ERROR_COSTS_MISSING, 'Costs section missing reference to BiqQuery')
+            if 'Vertex' in NotebookRule.costs and 'Vertex' not in text:
+                report_error(path, ErrorCode.ERROR_COSTS_MISSING, 'Costs section missing reference to Vertex')
+            if 'Dataflow' in NotebookRule.costs and 'Dataflow' not in text:    
+                report_error(path, ErrorCode.ERROR_COSTS_MISSING, 'Costs section missing reference to Dataflow')
+
+        NotebookRule.cell_index = cell_index
 
 
-def parse_restart(path: str, 
-                  cells: list, 
-                  cell_index: int) -> int:
-    
-    """
-    Parse the restart cells
-    
-    path: used only for reporting an error
-    cells: The content cells (JSON) for the notebook
-    cell_index: The index of the last cell that was parsed (reviewed).
-    
-    Returns: cell index
-    """
-    # Restart kernel
-    while True:
-        cont = False
+class SetupLocalRule(NotebookRule):
+    def validate(self, path: str, cells: list) -> None:
+        """
+        Parse the (optional) setup local environment cell
+
+        path: used only for reporting an error
+        cells: The content cells (JSON) for the notebook
+        """
+        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        if not cell['source'][0].startswith('### Set up your local development environment'):
+            NotebookRule.cell_index = cell_index - 1
+            return
+        
         cell, cell_index = get_cell(path, cells, cell_index)
-        for line in cell['source']:
-            if 'pip' in line:
-                report_error(path, ErrorCode.ERROR_INSTALLATION_SINGLE_PIP3, f"All pip installations must be in a single code cell: {line}")
-                cont = True
-                break
-        if not cont:
-            break
-           
-    if not cell['source'][0].startswith("### Restart the kernel"):
-        report_error(path, ErrorCode.ERROR_RESTART_NOTFOUND, "Restart the kernel section not found")
-    else:
-        cell, cell_index = get_cell(path, cells, cell_index) # code cell
-        if cell['cell_type'] != 'code':
-            report_error(path, ErrorCode.ERROR_RESTART_CODE_NOTFOUND, "Restart the kernel code section not found")
-            
-    return cell_index
+        if not cell['source'][0].startswith('**Otherwise**, make sure your environment meets'):
+            NotebookRule.cell_index = cell_index - 1
+        else:
+            NotebookRule.cell_index = cell_index
 
 
-def parse_versions(path: str, 
-                   cells: list, 
-                   cell_index: int) -> int:
-    
-    """
-    Parse the (optional) package versions code/text cell
-    
-    path: used only for reporting an error
-    cells: The content cells (JSON) for the notebook
-    cell_index: The index of the last cell that was parsed (reviewed).
-    
-    Returns: cell index
-    """
-    cell, cell_index = get_cell(path, cells, cell_index)
-    if cell['source'][0].startswith('#### Check package versions'):
-        return cell_index + 1
-    return cell_index - 1
+class HelpersRule(NotebookRule):
+    def validate(self, path: str, cells: list) -> None:
+        """
+        Parse the (optional) helpers text/code cell
+
+        path: used only for reporting an error
+        cells: The content cells (JSON) for the notebook
+        """
+        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        if 'helper' in cell['source'][0]:
+            NotebookRule.cell_index = cell_index + 1  # text and code
+        else:
+            NotebookRule.cell_index = cell_index - 1
 
 
-def parse_beforebegin(path: str, 
-                      cells: list, 
-                      cell_index: int) -> int:
-    
-    """
-    Parse the before you begin cell
-    
-    path: used only for reporting an error
-    cells: The content cells (JSON) for the notebook
-    cell_index: The index of the last cell that was parsed (reviewed).
-    
-    Returns: cell index
-    """
-    cell, cell_index = get_cell(path, cells, cell_index)
-    if not cell['source'][0].startswith("## Before you begin"):
-        report_error(path, ErrorCode.ERROR_BEFOREBEGIN_NOTFOUND, "Before you begin section not found")
-    else:
-        # maybe one or two cells
-        if len(cell['source']) < 2:
+class InstallationRule(NotebookRule):
+    def validate(self, path: str, cells: list) -> None:
+        """
+        Parse the installation cells
+
+        path: used only for reporting an error
+        cells: The content cells (JSON) for the notebook
+        """
+        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        if not cell['source'][0].startswith("## Install"):
+            if cell['source'][0].startswith("### Install"):
+                report_error(path, ErrorCode.ERROR_INSTALLATION_HEADING, "Installation section needs to be H2 heading")
+            else:
+                report_error(path, ErrorCode.ERROR_INSTALLATION_NOTFOUND, "Installation section not found")
+        else:
             cell, cell_index = get_cell(path, cells, cell_index)
-            if not cell['source'][0].startswith("### Set up your Google Cloud project"):
-                report_error(path, ErrorCode.ERROR_BEFOREBEGIN_INCOMPLETE, "Before you begin section incomplete")
-    return cell_index
+            if cell['cell_type'] != 'code':
+                report_error(path, ErrorCode.ERROR_INSTALLATION_NOTFOUND, "Installation section not found")
+            else:
+                if cell['source'][0].startswith('! mkdir'):
+                    cell, cell_index = get_cell(path, cells, cell_index)
+                if 'requirements.txt' in cell['source'][0]:
+                    cell, cell_index = get_cell(path, cells, cell_index)
+
+                text = ''
+                for line in cell['source']:
+                    text += line
+                    if 'pip ' in line:
+                        if 'pip3' not in line:
+                            report_error(path, ErrorCode.ERROR_INSTALLATION_PIP3, "Installation code section: use pip3")
+                        if line.endswith('\\\n'):
+                            continue
+                        if '-q' not in line and '--quiet' not in line :
+                            report_error(path, ErrorCode.ERROR_INSTALLATION_QUIET, "Installation code section: use -q with pip3")
+                        if 'USER_FLAG' not in line and 'sh(' not in line:
+                            report_error(path, ErrorCode.ERROR_INSTALLATION_USER_FLAG, "Installation code section: use {USER_FLAG} with pip3")
+                if 'if IS_WORKBENCH_NOTEBOOK:' not in text:
+                    report_error(path, ErrorCode.ERROR_INSTALLATION_CODE_TEMPLATE, "Installation code section out of date (see template)")
+
+        NotebookRule.cell_index = cell_index
 
 
-def parse_enableapis(path: str, 
-                     cells: list, 
-                     cell_index: int) -> int:
-    """
-    Parse the (optional) enable apis code/text cell
-    
-    path: used only for reporting an error
-    cells: The content cells (JSON) for the notebook
-    cell_index: The index of the last cell that was parsed (reviewed).
-    
-    Returns: cell index
-    """
-    cell, cell_index = get_cell(path, cells, cell_index)
-    if cell['source'][0].startswith("### Enable APIs"):
-        return cell_index + 1
-                     
-    return cell_index - 1
+class RestartRule(NotebookRule):
+    def validate(self, path: str, cells: list) -> None:
+        """
+        Parse the restart cells
+
+        path: used only for reporting an error
+        cells: The content cells (JSON) for the notebook
+        """
+        # Restart kernel
+        cell_index = NotebookRule.cell_index
+        while True:
+            cont = False
+            cell, cell_index = get_cell(path, cells, cell_index)
+            for line in cell['source']:
+                if 'pip' in line:
+                    report_error(path, ErrorCode.ERROR_INSTALLATION_SINGLE_PIP3, f"All pip installations must be in a single code cell: {line}")
+                    cont = True
+                    break
+            if not cont:
+                break
+
+        if not cell['source'][0].startswith("### Restart the kernel"):
+            report_error(path, ErrorCode.ERROR_RESTART_NOTFOUND, "Restart the kernel section not found")
+        else:
+            cell, cell_index = get_cell(path, cells, cell_index) # code cell
+            if cell['cell_type'] != 'code':
+                report_error(path, ErrorCode.ERROR_RESTART_CODE_NOTFOUND, "Restart the kernel code section not found")
+
+        NotebookRule.cell_index = cell_index
 
 
-def parse_setproject(path: str, 
-                     cells: list, 
-                     cell_index: int) -> int:
-    
-    """
-    Parse the set project cells
-    
-    path: used only for reporting an error
-    cells: The content cells (JSON) for the notebook
-    cell_index: The index of the last cell that was parsed (reviewed).
-    
-    Returns: cell index
-    """
-    cell, cell_index = get_cell(path, cells, cell_index)
-    if not cell['source'][0].startswith('#### Set your project ID'):
-        report_error(path, ErrorCode.ERROR_PROJECTID_NOTFOUND, "Set project ID section not found")
-    else: 
-        cell, cell_index = get_cell(path, cells, cell_index)
-        if cell['cell_type'] != 'code':
-            report_error(path, ErrorCode.ERROR_PROJECTID_CODE_NOTFOUND, "Set project ID code section not found")
-        elif not cell['source'][0].startswith('PROJECT_ID = "[your-project-id]"'):
-            report_error(path, ErrorCode.ERROR_PROJECTID_TEMPLATE, f"Set project ID not match template")
-            
-        cell, cell_index = get_cell(path, cells, cell_index)
-        if cell['cell_type'] != 'code' or 'or PROJECT_ID == "[your-project-id]":' not in cell['source'][0]:
-            report_error(path, ErrorCode.ERROR_PROJECTID_TEMPLATE, f"Set project ID not match template")  
-            
-        cell, cell_index = get_cell(path, cells, cell_index)
-        if cell['cell_type'] != 'code' or '! gcloud config set project' not in cell['source'][0]:
-            report_error(path, ErrorCode.ERROR_PROJECTID_TEMPLATE, f"Set project ID not match template")
-            
-    return cell_index
+class VersionsRule(NotebookRule):
+    def validate(self, path: str, cells: list) -> None:
+        """
+        Parse the (optional) package versions code/text cell
+
+        path: used only for reporting an error
+        cells: The content cells (JSON) for the notebook
+        """
+        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        if cell['source'][0].startswith('#### Check package versions'):
+            NotebookRule.cell_index = cell_index + 1
+        else:
+            NotebookRule.cell_index = cell_index - 1
+
+
+class BeforeBeginRule(NotebookRule):
+    def validate(self, path: str, cells: list) -> None:
+        """
+        Parse the before you begin cell
+
+        path: used only for reporting an error
+        cells: The content cells (JSON) for the notebook
+        """
+        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        if not cell['source'][0].startswith("## Before you begin"):
+            report_error(path, ErrorCode.ERROR_BEFOREBEGIN_NOTFOUND, "Before you begin section not found")
+        else:
+            # maybe one or two cells
+            if len(cell['source']) < 2:
+                cell, cell_index = get_cell(path, cells, cell_index)
+                if not cell['source'][0].startswith("### Set up your Google Cloud project"):
+                    report_error(path, ErrorCode.ERROR_BEFOREBEGIN_INCOMPLETE, "Before you begin section incomplete")
+        NotebookRule.cell_index = cell_index
+
+
+class EnableAPIsRule(NotebookRule):
+    def validate(self, path: str, cells: list) -> None:
+        """
+        Parse the (optional) enable apis code/text cell
+
+        path: used only for reporting an error
+        cells: The content cells (JSON) for the notebook
+        """
+        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        if cell['source'][0].startswith("### Enable APIs"):
+            NotebookRule.cell_index = cell_index + 1
+        else:
+            NotebookRule.cell_index = cell_index - 1
+
+
+class SetupProjectRule(NotebookRule):
+    def validate(self, path: str, cells: list) -> None:
+        """
+        Parse the set project cells
+
+        path: used only for reporting an error
+        cells: The content cells (JSON) for the notebook
+        """
+        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        if not cell['source'][0].startswith('#### Set your project ID'):
+            report_error(path, ErrorCode.ERROR_PROJECTID_NOTFOUND, "Set project ID section not found")
+        else: 
+            cell, cell_index = get_cell(path, cells, cell_index)
+            if cell['cell_type'] != 'code':
+                report_error(path, ErrorCode.ERROR_PROJECTID_CODE_NOTFOUND, "Set project ID code section not found")
+            elif not cell['source'][0].startswith('PROJECT_ID = "[your-project-id]"'):
+                report_error(path, ErrorCode.ERROR_PROJECTID_TEMPLATE, f"Set project ID not match template")
+
+            cell, cell_index = get_cell(path, cells, cell_index)
+            if cell['cell_type'] != 'code' or 'or PROJECT_ID == "[your-project-id]":' not in cell['source'][0]:
+                report_error(path, ErrorCode.ERROR_PROJECTID_TEMPLATE, f"Set project ID not match template")  
+
+            cell, cell_index = get_cell(path, cells, cell_index)
+            if cell['cell_type'] != 'code' or '! gcloud config set project' not in cell['source'][0]:
+                report_error(path, ErrorCode.ERROR_PROJECTID_TEMPLATE, f"Set project ID not match template")
+
+        NotebookRule.cell_index = cell_index
 
 
 def check_text_cell(path: str,
