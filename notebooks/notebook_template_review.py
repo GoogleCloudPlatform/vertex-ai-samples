@@ -462,7 +462,7 @@ class ObjectiveRule(NotebookRule):
         in_desc = True
         in_uses = False
         in_steps = False
-    
+
         for line in cell['source'][1:]:
             if line.startswith('This tutorial uses'):
                 in_desc = False
@@ -538,7 +538,6 @@ class RecommendationsRule(NotebookRule):
         if not cell['source'][0].startswith("### Recommendations"):
             NotebookRule.cell_index -= 1
 
-
 class DatasetRule(NotebookRule):
     def validate(self) -> None: 
         """
@@ -548,6 +547,11 @@ class DatasetRule(NotebookRule):
         cell = self.get_cell()
         if not cell['source'][0].startswith("### Dataset") and not cell['source'][0].startswith("### Model") and not cell['source'][0].startswith("### Embedding"):
             self.report_error(ErrorCode.ERROR_DATASET_NOTFOUND, "Dataset/Model section not found")
+
+class CostsRule(NotebookRule):
+    def validate(self, path: str, cells: list) -> None: 
+        """
+        Parse the costs cell
 
 
 class CostsRule(NotebookRule):
@@ -635,10 +639,14 @@ class InstallationRule(NotebookRule):
                     self.report_error(ErrorCode.ERROR_INSTALLATION_CODE_TEMPLATE, "Installation code section out of date (see template)")
 
 
+
 class RestartRule(NotebookRule):
-    def validate(self) -> None:
+    def validate(self, path: str, cells: list) -> None:
         """
         Parse the restart cells
+
+        path: used only for reporting an error
+        cells: The content cells (JSON) for the notebook
         """
         # Restart kernel
         cell_index = NotebookRule.cell_index
