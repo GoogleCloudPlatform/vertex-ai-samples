@@ -154,6 +154,7 @@ class ErrorCode(Enum):
 
     ERROR_EMPTY_CALL = 101
 
+
 # globals
 num_errors = 0
 last_tag = ''
@@ -193,19 +194,41 @@ def parse_notebook(path: str) -> None:
         
         cells = content['cells']
         
-        NotebookRule.init()
+        NotebookRule.init(path, content['cells'])
         
-        CopyrightRule().validate(path, cells)
+        CopyrightRule().validate()
             
-        NoticesRule().validate(path, cells)
+        NoticesRule().validate()
         
-        TitleRule().validate(path, cells)
+        TitleRule().validate()
 
-        LinksRule().validate(path, cells)
+        LinksRule().validate()
         
-        OverviewRule().validate(path, cells)
+        OverviewRule().validate()
        
-        ObjectiveRule().validate(path, cells)
+        ObjectiveRule().validate()
+            
+        RecommendationsRule().validate()
+
+        DatasetRule().validate()
+
+        CostsRule().validate()
+
+        SetupLocalRule().validate()
+
+        HelpersRule().validate()
+
+        InstallationRule().validate()
+
+        RestartRule().validate()
+        
+        VersionsRule().validate()
+        
+        BeforeBeginRule().validate()
+        
+        EnableAPIsRule().validate()
+        
+        SetupProjectRule().validate()
         if NotebookRule.desc != '':
             add_index(path, 
                       tag, 
@@ -217,47 +240,35 @@ def parse_notebook(path: str) -> None:
                       NotebookRule.colab_link, 
                       NotebookRule.workbench_link
             )
-            
-        RecommendationsRule().validate(path, cells)
-
-        DatasetRule().validate(path, cells)
-
-        CostsRule().validate(path, cells)
-
-        SetupLocalRule().validate(path, cells)
-
-        HelpersRule().validate(path, cells)
-
-        InstallationRule().validate(path, cells)
-
-        RestartRule().validate(path, cells)
-        
-        VersionsRule().validate(path, cells)
-        
-        BeforeBeginRule().validate(path, cells)
-        
-        EnableAPIsRule().validate(path, cells)
-        
-        SetupProjectRule().validate(path, cells)
 
 
 class NotebookRule(ABC):
     """
     Abstract class for defining notebook conformance rules
     """
-    cell_index = 0
-    title = ''
-    git_link = None
-    colab_link = None
-    workbench_link = None
-    desc = ''
-    uses = ''
-    steps = ''
-    costs = []
+    path = None     # The relative path to the notebook
+    cell_index = 0  # The index of the last cell that was parsed (reviewed).
+    title = ''      # The H1 title for the notebook
+    git_link = None  # The GitHub link
+    colab_link = None  # The Colab link
+    workbench_link = None  # The Workbench link
+    desc = ''  # The description in the objective section
+    uses = ''  # The resources used in the objective section
+    steps = ''  # The steps in the objective section
+    costs = []  # The paid services used as derived from the resources used subsection
     
     @staticmethod
-    def init():
+    def init(path: str,
+             cells: list) -> None:
+        """
+        Initialize the static variables in the abstract class, specific to a notebook instance
+        
+        path: The relative path to the notebook
+        cells: The content cells (JSON) for the notebook
+        """
         NotebookRule.cell_index = 0
+        NotebookRule.path = path
+        NotebookRule.cells = cells
         NotebookRule.title = ''
         NotebookRule.git_link = None
         NotebookRule.colab_link = None
@@ -268,73 +279,112 @@ class NotebookRule(ABC):
         NotebookRule.costs = ''
     
     @abstractmethod
-    def validate(self, path: str, cells: list) -> None:
+    def validate(self, cells: list) -> None:
         pass
+    
+    def get_cell(self) -> list:
+        """
+            Get the next notebook cell.
+
+            Returns:
+
+            cell: content of the next cell
+        """
+        while self.empty_cell():
+            NotebookRule.cell_index += 1
+
+        cell = NotebookRule.cells[NotebookRule.cell_index]
+        if cell['cell_type'] == 'markdown':
+            TextTWRule().validate()
+
+        NotebookRule.cell_index += 1
+        return cell
+    
+    def empty_cell(self) -> bool:
+        """
+            Check for empty cells
+
+            Returns:
+
+            bool: whether cell is empty or not
+        """
+        if len(NotebookRule.cells[NotebookRule.cell_index]['source']) == 0:
+            self.report_error(ErrorCode.ERROR_EMPTY_CELL, f'empty cell: cell #{NotebookRule.cell_index}')
+            return True
+        else:
+            return False
+        
+    def report_error(self,
+                     code: ErrorCode,
+                     errmsg: str) -> None:
+        """
+        Report an error.
+            If args.errors_codes set, then only report these errors. Otherwise, all errors.
+
+        code: The error code number.
+        errmsg: The error message
+        """
+
+        global num_errors
+
+        if args.errors:
+            code = code.value[0]
+            if args.errors_codes:
+                if str(code) not in args.errors_codes:
+                    return
+
+            if args.errors_csv:
+                print(NotebookRule.path, ',', code)
+            else:
+                print(f"{NotebookRule.path}: ERROR ({code}): {errmsg}", file=sys.stderr)
+                num_errors += 1
 
 
 class CopyrightRule(NotebookRule):
-    def validate(self, path: str, cells: list) -> None:
+    def validate(self) -> None:
         """
         Parse the copyright cell
-
-        path: used only for reporting an error
-        cells: The content cells (JSON) for the notebook
         """
-        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        cell = self.get_cell()
         if not 'Copyright' in cell['source'][0]:
-            report_error(path, ErrorCode.ERROR_COPYRIGHT, "missing copyright cell")
-            
-        NotebookRule.cell_index = cell_index
+            self.report_error(ErrorCode.ERROR_COPYRIGHT, "missing copyright cell")
 
 
 class NoticesRule(NotebookRule):
-    def validate(self, path: str, cells: list) -> None:
+    def validate(self) -> None:
         """
         Parse the (optional) notices cell
-
-        path: used only for reporting an error
-        cells: The content cells (JSON) for the notebook
         """
-        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
-        if cell['source'][0].startswith('This notebook'):
-             NotebookRule.cell_index = cell_index
-        else:
-            NotebookRule.cell_index = cell_index - 1
+        cell = self.get_cell()
+        if not cell['source'][0].startswith('This notebook'):
+             NotebookRule.cell_index -= 1
 
 
 class TitleRule(NotebookRule):
-    def validate(self, path: str, cells: list) -> None: 
+    def validate(self) -> None: 
         """
         Parse the title in the links cell
-
-        path: used only for reporting an error
-        cells: The content cells (JSON) for the notebook
         """
-        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        cell = self.get_cell()
         if not cell['source'][0].startswith('# '):
-            report_error(path, ErrorCode.ERROR_TITLE_HEADING, "title cell must start with H1 heading")
+            self.report_error(ErrorCode.ERROR_TITLE_HEADING, "title cell must start with H1 heading")
             NotebookRule.title = ''
         else:
             NotebookRule.title = cell['source'][0][2:].strip()
-            check_sentence_case(path, NotebookRule.title)
+            SentenceCaseTWRule().validate(NotebookRule.title)
 
             # H1 title only
             if len(cell['source']) == 1:
-                cell, cell_index = get_cell(path, cells, cell_index)
-
-        NotebookRule.cell_index = cell_index
+                cell = self.get_cell()
 
 
 class LinksRule(NotebookRule):
-    def validate(self, path: str, cells: list) -> None: 
+    def validate(self) -> None: 
         """
         Parse the links in the links cell
-
-        path: used only for reporting an error
-        cells: The content cells (JSON) for the notebook
         """
 
-        cell = cells[NotebookRule.cell_index-1]
+        cell = NotebookRule.cells[NotebookRule.cell_index - 1]
         source = ''
         git_link = None
         colab_link = None
@@ -347,19 +397,19 @@ class LinksRule(NotebookRule):
                     code = urllib.request.urlopen(git_link).getcode()
                 except Exception as e:
                     # if new notebook
-                    derived_link = os.path.join('https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/', path)
+                    derived_link = os.path.join('https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/', NotebookRule.path)
                     if git_link != derived_link:
-                        report_error(path, ErrorCode.ERROR_LINK_GIT_BAD, f"bad GitHub link: {git_link}")
+                        self.report_error(ErrorCode.ERROR_LINK_GIT_BAD, f"bad GitHub link: {git_link}")
 
             if '<a href="https://colab.research.google.com/' in line:
-                colab_link = 'https://github.com/' + line.strip()[50:-2].replace('" target="_blank', '')
+                colab_link = 'https://colab.research.google.com/github/' + line.strip()[50:-2].replace('" target="_blank', '')
                 try:
                     code = urllib.request.urlopen(colab_link).getcode()
                 except Exception as e:
                     # if new notebook
-                    derived_link = os.path.join('https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks', path)
+                    derived_link = os.path.join('https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks', NotebookRule.path)
                     if colab_link != derived_link:
-                        report_error(path, ErrorCode.ERROR_LINK_COLAB_BAD, f"bad Colab link: {colab_link}")
+                        self.report_error(ErrorCode.ERROR_LINK_COLAB_BAD, f"bad Colab link: {colab_link}")
 
 
             if '<a href="https://console.cloud.google.com/vertex-ai/workbench/' in line:
@@ -367,16 +417,16 @@ class LinksRule(NotebookRule):
                 try:
                     code = urllib.request.urlopen(workbench_link).getcode()
                 except Exception as e:
-                    derived_link = os.path.join('https://console.cloud.google.com/vertex-ai/workbench/deploy-notebook?download_url=https://raw.githubusercontent.com/GoogleCloudPlatform/vertex-ai-samples/main/notebooks/', path)
+                    derived_link = os.path.join('https://console.cloud.google.com/vertex-ai/workbench/deploy-notebook?download_url=https://raw.githubusercontent.com/GoogleCloudPlatform/vertex-ai-samples/main/notebooks/', NotebookRule.path)
                     if colab_link != workbench_link:
-                        report_error(path, ErrorCode.ERROR_LINK_WORKBENCH_BAD, f"bad Workbench link: {workbench_link}")
+                        self.report_error(ErrorCode.ERROR_LINK_WORKBENCH_BAD, f"bad Workbench link: {workbench_link}")
 
         if 'View on GitHub' not in source or not git_link:
-            report_error(path, ErrorCode.ERROR_LINK_GIT_MISSING, 'Missing link for GitHub')
+            self.report_error(ErrorCode.ERROR_LINK_GIT_MISSING, 'Missing link for GitHub')
         if 'Run in Colab' not in source or not colab_link:
-            report_error(path, ErrorCode.ERROR_LINK_COLAB_MISSING, 'Missing link for Colab')    
+            self.report_error(ErrorCode.ERROR_LINK_COLAB_MISSING, 'Missing link for Colab')    
         if 'Open in Vertex AI Workbench' not in source or not workbench_link:
-            report_error(path, ErrorCode.ERROR_LINK_WORKBENCH_MISSING, 'Missing link for Workbench')
+            self.report_error(ErrorCode.ERROR_LINK_WORKBENCH_MISSING, 'Missing link for Workbench')
         
         NotebookRule.git_link = git_link
         NotebookRule.colab_link = colab_link
@@ -384,38 +434,30 @@ class LinksRule(NotebookRule):
 
 
 class OverviewRule(NotebookRule):
-    def validate(self, path: str, cells: list) -> None: 
+    def validate(self) -> None: 
         """
         Parse the overview cell
-
-        path: used only for reporting an error
-        cells: The content cells (JSON) for the notebook
         """
-        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        cell = self.get_cell()
         if not cell['source'][0].startswith("## Overview"):
-            report_error(path, ErrorCode.ERROR_OVERVIEW_NOTFOUND, "Overview section not found")
-
-        NotebookRule.cell_index = cell_index
+            self.report_error(ErrorCode.ERROR_OVERVIEW_NOTFOUND, "Overview section not found")
 
 
 class ObjectiveRule(NotebookRule):
-    def validate(self, path: str, cells: list) -> None: 
+    def validate(self) -> None: 
         """
         Parse the objective cell.
             Find the description, uses and steps.
-
-        path: The path to the notebook.
-        cells: The content cells (JSON) for the notebook
         """
         desc = ''
         uses = ''
         steps = ''
         costs = []
 
-        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        cell = self.get_cell()
         if not cell['source'][0].startswith("### Objective"):
-            report_error(path, ErrorCode.ERROR_OBJECTIVE_NOTFOUND, "Objective section not found")
-            return cell_index, desc, uses, steps, costs
+            self.report_error(ErrorCode.ERROR_OBJECTIVE_NOTFOUND, "Objective section not found")
+            return
 
         in_desc = True
         in_uses = False
@@ -458,7 +500,7 @@ class ObjectiveRule(NotebookRule):
                         steps += line
             
         if desc == '':
-            report_error(path, ErrorCode.ERROR_OBJECTIVE_MISSING_DESC, "Objective section missing desc")
+            self.report_error(ErrorCode.ERROR_OBJECTIVE_MISSING_DESC, "Objective section missing desc")
         else:
             desc = desc.lstrip()
             sentences = desc.split('.')
@@ -468,7 +510,7 @@ class ObjectiveRule(NotebookRule):
                 desc = desc[22].upper() + desc[23:]
 
         if uses == '':
-            report_error(path, ErrorCode.ERROR_OBJECTIVE_MISSING_USES, "Objective section missing uses services list")
+            self.report_error(ErrorCode.ERROR_OBJECTIVE_MISSING_USES, "Objective section missing uses services list")
         else:
             if 'BigQuery' in uses:
                 costs.append('BQ')
@@ -478,9 +520,8 @@ class ObjectiveRule(NotebookRule):
                 costs.append('Dataflow')
 
         if steps == '':
-            report_error(path, ErrorCode.ERROR_OBJECTIVE_MISSING_STEPS, "Objective section missing steps list")
+            self.report_error(ErrorCode.ERROR_OBJECTIVE_MISSING_STEPS, "Objective section missing steps list")
             
-        NotebookRule.cell_index = cell_index
         NotebookRule.desc = desc
         NotebookRule.uses = uses
         NotebookRule.steps = steps
@@ -488,421 +529,302 @@ class ObjectiveRule(NotebookRule):
 
 
 class RecommendationsRule(NotebookRule):
-    def validate(self, path: str, cells: list) -> None: 
+    def validate(self) -> None: 
         """
         Parse the (optional) recommendations cell
-
-        path: used only for reporting an error
-        cells: The content cells (JSON) for the notebook
         """
         # (optional) Recommendation
-        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
-        if cell['source'][0].startswith("### Recommendations"):
-            NotebookRule.cell_index = cell_index
-        else:
-            NotebookRule.cell_index = cell_index - 1
+        cell = self.get_cell()
+        if not cell['source'][0].startswith("### Recommendations"):
+            NotebookRule.cell_index -= 1
 
 
 class DatasetRule(NotebookRule):
-    def validate(self, path: str, cells: list) -> None: 
+    def validate(self) -> None: 
         """
         Parse the dataset cell
-
-        path: used only for reporting an error
-        cells: The content cells (JSON) for the notebook
         """
         # Dataset
-        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        cell = self.get_cell()
         if not cell['source'][0].startswith("### Dataset") and not cell['source'][0].startswith("### Model") and not cell['source'][0].startswith("### Embedding"):
-            report_error(path, ErrorCode.ERROR_DATASET_NOTFOUND, "Dataset/Model section not found")
-
-        NotebookRule.cell_index = cell_index
+            self.report_error(ErrorCode.ERROR_DATASET_NOTFOUND, "Dataset/Model section not found")
 
 
 class CostsRule(NotebookRule):
-    def validate(self, path: str, cells: list) -> None: 
+    def validate(self) -> None: 
         """
         Parse the costs cell
-
-        path: used only for reporting an error
-        cells: The content cells (JSON) for the notebook
         """
         # Costs
-        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        cell = self.get_cell()
         if not cell['source'][0].startswith("### Costs"):
-            report_error(path, ErrorCode.ERROR_COSTS_NOTFOUND, "Costs section not found")
+            self.report_error(ErrorCode.ERROR_COSTS_NOTFOUND, "Costs section not found")
         else:
             text = ''
             for line in cell['source']:
                 text += line
             if 'BQ' in NotebookRule.costs and 'BigQuery' not in text:
-                report_error(path, ErrorCode.ERROR_COSTS_MISSING, 'Costs section missing reference to BiqQuery')
+                self.report_error(ErrorCode.ERROR_COSTS_MISSING, 'Costs section missing reference to BiqQuery')
             if 'Vertex' in NotebookRule.costs and 'Vertex' not in text:
-                report_error(path, ErrorCode.ERROR_COSTS_MISSING, 'Costs section missing reference to Vertex')
+                self.report_error(ErrorCode.ERROR_COSTS_MISSING, 'Costs section missing reference to Vertex')
             if 'Dataflow' in NotebookRule.costs and 'Dataflow' not in text:    
-                report_error(path, ErrorCode.ERROR_COSTS_MISSING, 'Costs section missing reference to Dataflow')
-
-        NotebookRule.cell_index = cell_index
+                self.report_error(ErrorCode.ERROR_COSTS_MISSING, 'Costs section missing reference to Dataflow')
 
 
 class SetupLocalRule(NotebookRule):
-    def validate(self, path: str, cells: list) -> None:
+    def validate(self) -> None:
         """
         Parse the (optional) setup local environment cell
-
-        path: used only for reporting an error
-        cells: The content cells (JSON) for the notebook
         """
-        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        cell = self.get_cell()
         if not cell['source'][0].startswith('### Set up your local development environment'):
-            NotebookRule.cell_index = cell_index - 1
+            NotebookRule.cell_index -= 1
             return
         
-        cell, cell_index = get_cell(path, cells, cell_index)
+        cell = self.get_cell()
         if not cell['source'][0].startswith('**Otherwise**, make sure your environment meets'):
-            NotebookRule.cell_index = cell_index - 1
-        else:
-            NotebookRule.cell_index = cell_index
+            NotebookRule.cell_index -= 1
 
 
 class HelpersRule(NotebookRule):
-    def validate(self, path: str, cells: list) -> None:
+    def validate(self) -> None:
         """
         Parse the (optional) helpers text/code cell
-
-        path: used only for reporting an error
-        cells: The content cells (JSON) for the notebook
         """
-        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        cell = self.get_cell()
         if 'helper' in cell['source'][0]:
-            NotebookRule.cell_index = cell_index + 1  # text and code
+            NotebookRule.cell_index += 1  # text and code
         else:
-            NotebookRule.cell_index = cell_index - 1
+            NotebookRule.cell_index -= 1
 
 
 class InstallationRule(NotebookRule):
-    def validate(self, path: str, cells: list) -> None:
+    def validate(self) -> None:
         """
         Parse the installation cells
-
-        path: used only for reporting an error
-        cells: The content cells (JSON) for the notebook
         """
-        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        cell = self.get_cell()
         if not cell['source'][0].startswith("## Install"):
             if cell['source'][0].startswith("### Install"):
-                report_error(path, ErrorCode.ERROR_INSTALLATION_HEADING, "Installation section needs to be H2 heading")
+                self.report_error(ErrorCode.ERROR_INSTALLATION_HEADING, "Installation section needs to be H2 heading")
             else:
-                report_error(path, ErrorCode.ERROR_INSTALLATION_NOTFOUND, "Installation section not found")
+                self.report_error(ErrorCode.ERROR_INSTALLATION_NOTFOUND, "Installation section not found")
         else:
-            cell, cell_index = get_cell(path, cells, cell_index)
+            cell = self.get_cell()
             if cell['cell_type'] != 'code':
-                report_error(path, ErrorCode.ERROR_INSTALLATION_NOTFOUND, "Installation section not found")
+                self.report_error(ErrorCode.ERROR_INSTALLATION_NOTFOUND, "Installation section not found")
             else:
                 if cell['source'][0].startswith('! mkdir'):
-                    cell, cell_index = get_cell(path, cells, cell_index)
+                    cell = self.get_cell()
                 if 'requirements.txt' in cell['source'][0]:
-                    cell, cell_index = get_cell(path, cells, cell_index)
+                    cell = self.get_cell()
 
                 text = ''
                 for line in cell['source']:
                     text += line
                     if 'pip ' in line:
                         if 'pip3' not in line:
-                            report_error(path, ErrorCode.ERROR_INSTALLATION_PIP3, "Installation code section: use pip3")
+                            self.report_error(ErrorCode.ERROR_INSTALLATION_PIP3, "Installation code section: use pip3")
                         if line.endswith('\\\n'):
                             continue
                         if '-q' not in line and '--quiet' not in line :
-                            report_error(path, ErrorCode.ERROR_INSTALLATION_QUIET, "Installation code section: use -q with pip3")
+                            self.report_error(ErrorCode.ERROR_INSTALLATION_QUIET, "Installation code section: use -q with pip3")
                         if 'USER_FLAG' not in line and 'sh(' not in line:
-                            report_error(path, ErrorCode.ERROR_INSTALLATION_USER_FLAG, "Installation code section: use {USER_FLAG} with pip3")
+                            self.report_error(ErrorCode.ERROR_INSTALLATION_USER_FLAG, "Installation code section: use {USER_FLAG} with pip3")
                 if 'if IS_WORKBENCH_NOTEBOOK:' not in text:
-                    report_error(path, ErrorCode.ERROR_INSTALLATION_CODE_TEMPLATE, "Installation code section out of date (see template)")
-
-        NotebookRule.cell_index = cell_index
+                    self.report_error(ErrorCode.ERROR_INSTALLATION_CODE_TEMPLATE, "Installation code section out of date (see template)")
 
 
 class RestartRule(NotebookRule):
-    def validate(self, path: str, cells: list) -> None:
+    def validate(self) -> None:
         """
         Parse the restart cells
-
-        path: used only for reporting an error
-        cells: The content cells (JSON) for the notebook
         """
         # Restart kernel
         cell_index = NotebookRule.cell_index
         while True:
             cont = False
-            cell, cell_index = get_cell(path, cells, cell_index)
+            cell = self.get_cell()
             for line in cell['source']:
                 if 'pip' in line:
-                    report_error(path, ErrorCode.ERROR_INSTALLATION_SINGLE_PIP3, f"All pip installations must be in a single code cell: {line}")
+                    self.report_error(ErrorCode.ERROR_INSTALLATION_SINGLE_PIP3, f"All pip installations must be in a single code cell: {line}")
                     cont = True
                     break
             if not cont:
                 break
 
         if not cell['source'][0].startswith("### Restart the kernel"):
-            report_error(path, ErrorCode.ERROR_RESTART_NOTFOUND, "Restart the kernel section not found")
+            self.report_error(ErrorCode.ERROR_RESTART_NOTFOUND, "Restart the kernel section not found")
         else:
-            cell, cell_index = get_cell(path, cells, cell_index) # code cell
+            cell = self.get_cell()  # code cell
             if cell['cell_type'] != 'code':
-                report_error(path, ErrorCode.ERROR_RESTART_CODE_NOTFOUND, "Restart the kernel code section not found")
-
-        NotebookRule.cell_index = cell_index
+                self.report_error(ErrorCode.ERROR_RESTART_CODE_NOTFOUND, "Restart the kernel code section not found")
 
 
 class VersionsRule(NotebookRule):
-    def validate(self, path: str, cells: list) -> None:
+    def validate(self) -> None:
         """
         Parse the (optional) package versions code/text cell
-
-        path: used only for reporting an error
-        cells: The content cells (JSON) for the notebook
         """
-        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        cell = self.get_cell()
         if cell['source'][0].startswith('#### Check package versions'):
-            NotebookRule.cell_index = cell_index + 1
+            NotebookRule.cell_index += 1
         else:
-            NotebookRule.cell_index = cell_index - 1
+            NotebookRule.cell_index -= 1
 
 
 class BeforeBeginRule(NotebookRule):
-    def validate(self, path: str, cells: list) -> None:
+    def validate(self) -> None:
         """
         Parse the before you begin cell
-
-        path: used only for reporting an error
-        cells: The content cells (JSON) for the notebook
         """
-        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        cell = self.get_cell()
         if not cell['source'][0].startswith("## Before you begin"):
-            report_error(path, ErrorCode.ERROR_BEFOREBEGIN_NOTFOUND, "Before you begin section not found")
+            self.report_error(ErrorCode.ERROR_BEFOREBEGIN_NOTFOUND, "Before you begin section not found")
         else:
             # maybe one or two cells
             if len(cell['source']) < 2:
-                cell, cell_index = get_cell(path, cells, cell_index)
+                cell = self.get_cell()
                 if not cell['source'][0].startswith("### Set up your Google Cloud project"):
-                    report_error(path, ErrorCode.ERROR_BEFOREBEGIN_INCOMPLETE, "Before you begin section incomplete")
-        NotebookRule.cell_index = cell_index
+                    self.report_error(ErrorCode.ERROR_BEFOREBEGIN_INCOMPLETE, "Before you begin section incomplete")
 
 
 class EnableAPIsRule(NotebookRule):
-    def validate(self, path: str, cells: list) -> None:
+    def validate(self) -> None:
         """
         Parse the (optional) enable apis code/text cell
-
-        path: used only for reporting an error
-        cells: The content cells (JSON) for the notebook
         """
-        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        cell = self.get_cell()
         if cell['source'][0].startswith("### Enable APIs"):
-            NotebookRule.cell_index = cell_index + 1
+            NotebookRule.cell_index += 1
         else:
-            NotebookRule.cell_index = cell_index - 1
+            NotebookRule.cell_index -= 1
 
 
 class SetupProjectRule(NotebookRule):
-    def validate(self, path: str, cells: list) -> None:
+    def validate(self) -> None:
         """
         Parse the set project cells
-
-        path: used only for reporting an error
-        cells: The content cells (JSON) for the notebook
         """
-        cell, cell_index = get_cell(path, cells, NotebookRule.cell_index)
+        cell = self.get_cell()
         if not cell['source'][0].startswith('#### Set your project ID'):
-            report_error(path, ErrorCode.ERROR_PROJECTID_NOTFOUND, "Set project ID section not found")
+            self.report_error(ErrorCode.ERROR_PROJECTID_NOTFOUND, "Set project ID section not found")
         else: 
-            cell, cell_index = get_cell(path, cells, cell_index)
+            cell = self.get_cell()
             if cell['cell_type'] != 'code':
-                report_error(path, ErrorCode.ERROR_PROJECTID_CODE_NOTFOUND, "Set project ID code section not found")
+                self.report_error(ErrorCode.ERROR_PROJECTID_CODE_NOTFOUND, "Set project ID code section not found")
             elif not cell['source'][0].startswith('PROJECT_ID = "[your-project-id]"'):
-                report_error(path, ErrorCode.ERROR_PROJECTID_TEMPLATE, f"Set project ID not match template")
+                self.report_error(ErrorCode.ERROR_PROJECTID_TEMPLATE, "Set project ID not match template")
 
-            cell, cell_index = get_cell(path, cells, cell_index)
+            cell = self.get_cell()
             if cell['cell_type'] != 'code' or 'or PROJECT_ID == "[your-project-id]":' not in cell['source'][0]:
-                report_error(path, ErrorCode.ERROR_PROJECTID_TEMPLATE, f"Set project ID not match template")  
+                self.report_error(ErrorCode.ERROR_PROJECTID_TEMPLATE, "Set project ID not match template")  
 
-            cell, cell_index = get_cell(path, cells, cell_index)
+            cell = self.get_cell()
             if cell['cell_type'] != 'code' or '! gcloud config set project' not in cell['source'][0]:
-                report_error(path, ErrorCode.ERROR_PROJECTID_TEMPLATE, f"Set project ID not match template")
-
-        NotebookRule.cell_index = cell_index
+                self.report_error(ErrorCode.ERROR_PROJECTID_TEMPLATE, "Set project ID not match template")
 
 
-def check_text_cell(path: str,
-                    cell: list) -> None:
-    """
-        Check text cells for technical writing requirements
-            1. Product branding names
-            2. No future tense
-            3. No 1st person
+class TextTWRule(NotebookRule):
+    def validate(self) -> None:
+        """
+            Check text cells for technical writing requirements
+                1. Product branding names
+                2. No future tense
+                3. No 1st person
+
+            path: used only for reporting an error
+            cell: The text cell to review.
+        """
+    
+        branding = {
+            'Vertex SDK': 'Vertex AI SDK',
+            'Vertex Training': 'Vertex AI Training',
+            'Vertex Prediction': 'Vertex AI Prediction',
+            'Vertex Batch Prediction': 'Vertex AI Batch Prediction',
+            'Vertex XAI': 'Vertex Explainable AI',
+            'Vertex Explainability': 'Vertex Explainable AI',
+            'Vertex AI Explainability': 'Vertex Explainable AI',
+            'Vertex Pipelines': 'Vertex AI Pipelines',
+            'Vertex Experiments': 'Vertex AI Experiments',
+            'Vertex TensorBoard': 'Vertex AI TensorBoard',
+            'Vertex Hyperparameter Tuning': 'Vertex AI Hyperparameter Tuning',
+            'Vertex Metadata': 'Vertex ML Metadata',
+            'Vertex AI Metadata': 'Vertex ML Metadata',
+            'Vertex AI ML Metadata': 'Vertex ML Metadata',
+            'Vertex Vizier': 'Vertex AI Vizier',
+            'Vertex Feature Store': 'Vertex AI Feature Store',
+            'Vertex Forecasting': 'Vertex AI Forecasting',
+            'Vertex Matching Engine': 'Vertex AI Matching Engine',
+            'Vertex TabNet': 'Vertex AI TabNet',
+            'Tabnet': 'TabNet',
+            'Vertex Two Towers': 'Vertex AI Two-Towers',
+            'Vertex Two-Towers': 'Vertex AI Two-Towers',
+            'Vertex Dataset': 'Vertex AI Dataset',
+            'Vertex Model': 'Vertex AI Model',
+            'Vertex Endpoint': 'Vertex AI Endpoint',
+            'Vertex Private Endpoint': 'Vertex AI Private Endpoint',
+            'Automl': 'AutoML',
+            'AutoML Tables': 'AutoML Tabular',
+            'AutoML Vision': 'AutoML Image',
+            'AutoML Language': 'AutoML Text',
+            'Tensorflow': 'TensorFlow',
+            'Tensorboard': 'TensorBoard',
+            'Google Cloud Notebooks': 'Vertex AI Workbench Notebooks',
+            'BQ ': 'BigQuery',
+            'BQ.': 'BigQuery',
+            'Bigquery': 'BigQuery',
+            'BQML': 'BigQuery ML',
+            'GCS ': 'Cloud Storage',
+            'GCS.': 'Cloud Storage',
+            'Google Cloud Storage': 'Cloud Storage',
+            'Pytorch': 'PyTorch',
+            'Sklearn': 'scikit-learn',
+            'sklearn': 'scikit-learn'
+        }
+        cell = NotebookRule.cells[NotebookRule.cell_index]
         
+        for line in cell['source']:
+            # HTML code
+            if '<a ' in line:
+                continue
+
+            if 'TODO' in line or 'WIP' in line:
+                self.report_error(ErrorCode.ERROR_TWRULE_TODO, f'TODO in cell: {line}')
+            if 'we ' in line.lower() or "let's" in line.lower() in line.lower():
+                self.report_error(ErrorCode.ERROR_TWRULE_FIRSTPERSON, f'Do not use first person (e.g., we), replace with 2nd person (you): {line}')
+            if 'will' in line.lower() or 'would' in line.lower():
+                self.report_error(ErrorCode.ERROR_TWRULE_FUTURETENSE, f'Do not use future tense (e.g., will), replace with present tense: {line}')
+
+            for mistake, brand in branding.items():
+                if mistake in line:
+                    self.report_error(ErrorCode.ERROR_TWRULE_BRANDING, f"Branding {mistake} -> {brand}: {line}")
+
+class SentenceCaseTWRule(NotebookRule):
+    def validate(self,
+                 heading: str) -> None:
+        """
+        Check that headings are in sentence case
+
         path: used only for reporting an error
-        cell: The text cell to review.
-    """
-    
-    branding = {
-        'Vertex SDK': 'Vertex AI SDK',
-        'Vertex Training': 'Vertex AI Training',
-        'Vertex Prediction': 'Vertex AI Prediction',
-        'Vertex Batch Prediction': 'Vertex AI Batch Prediction',
-        'Vertex XAI': 'Vertex Explainable AI',
-        'Vertex Explainability': 'Vertex Explainable AI',
-        'Vertex AI Explainability': 'Vertex Explainable AI',
-        'Vertex Pipelines': 'Vertex AI Pipelines',
-        'Vertex Experiments': 'Vertex AI Experiments',
-        'Vertex TensorBoard': 'Vertex AI TensorBoard',
-        'Vertex Hyperparameter Tuning': 'Vertex AI Hyperparameter Tuning',
-        'Vertex Metadata': 'Vertex ML Metadata',
-        'Vertex AI Metadata': 'Vertex ML Metadata',
-        'Vertex AI ML Metadata': 'Vertex ML Metadata',
-        'Vertex Vizier': 'Vertex AI Vizier',
-        'Vertex Feature Store': 'Vertex AI Feature Store',
-        'Vertex Forecasting': 'Vertex AI Forecasting',
-        'Vertex Matching Engine': 'Vertex AI Matching Engine',
-        'Vertex TabNet': 'Vertex AI TabNet',
-        'Tabnet': 'TabNet',
-        'Vertex Two Towers': 'Vertex AI Two-Towers',
-        'Vertex Two-Towers': 'Vertex AI Two-Towers',
-        'Vertex Dataset': 'Vertex AI Dataset',
-        'Vertex Model': 'Vertex AI Model',
-        'Vertex Endpoint': 'Vertex AI Endpoint',
-        'Vertex Private Endpoint': 'Vertex AI Private Endpoint',
-        'Automl': 'AutoML',
-        'AutoML Tables': 'AutoML Tabular',
-        'AutoML Vision': 'AutoML Image',
-        'AutoML Language': 'AutoML Text',
-        'Tensorflow': 'TensorFlow',
-        'Tensorboard': 'TensorBoard',
-        'Google Cloud Notebooks': 'Vertex AI Workbench Notebooks',
-        'BQ ': 'BigQuery',
-        'BQ.': 'BigQuery',
-        'Bigquery': 'BigQuery',
-        'BQML': 'BigQuery ML',
-        'GCS ': 'Cloud Storage',
-        'GCS.': 'Cloud Storage',
-        'Google Cloud Storage': 'Cloud Storage',
-        'Pytorch': 'PyTorch',
-        'Sklearn': 'scikit-learn',
-        'sklearn': 'scikit-learn'
-    }
-    
-    for line in cell['source']:
-        # HTML code
-        if '<a ' in line:
-            continue
-            
-        if 'TODO' in line or 'WIP' in line:
-            report_error(path, ErrorCode.ERROR_TWRULE_TODO, f'TODO in cell: {line}')
-        if 'we ' in line.lower() or "let's" in line.lower() in line.lower():
-            report_error(path, ErrorCode.ERROR_TWRULE_FIRSTPERSON, f'Do not use first person (e.g., we), replace with 2nd person (you): {line}')
-        if 'will' in line.lower() or 'would' in line.lower():
-            report_error(path, ErrorCode.ERROR_TWRULE_FUTURETENSE, f'Do not use future tense (e.g., will), replace with present tense: {line}')
-            
-        for mistake, brand in branding.items():
-            if mistake in line:
-                report_error(path, ErrorCode.ERROR_TWRULE_BRANDING, f"Branding {mistake} -> {brand}: {line}")
+        heading: the heading to check
+        """
 
+        ACRONYMS = ['E2E', 'Vertex', 'AutoML', 'ML', 'AI', 'GCP', 'API', 'R', 'CMEK', 
+                    'TF', 'TFX', 'TFDV', 'SDK', 'VM', 'CPR', 'NVIDIA', 'ID', 'DASK', 
+                    'ARIMA_PLUS', 'KFP', 'I/O', 'GPU', 'Google', 'TensorFlow', 'PyTorch'
+                    ]
 
-def check_sentence_case(path: str, 
-                        heading: str) -> None:
-    """
-    Check that headings are in sentence case
-    
-    path: used only for reporting an error
-    heading: the heading to check
-    """
-    
-    ACRONYMS = ['E2E', 'Vertex', 'AutoML', 'ML', 'AI', 'GCP', 'API', 'R', 'CMEK', 
-                'TF', 'TFX', 'TFDV', 'SDK', 'VM', 'CPR', 'NVIDIA', 'ID', 'DASK', 
-                'ARIMA_PLUS', 'KFP', 'I/O', 'GPU', 'Google', 'TensorFlow', 'PyTorch'
-                ]
-    
-    words = heading.split(' ')
-    if not words[0][0].isupper():
-        report_error(path, ErrorCode.ERROR_HEADING_CAP, f"heading must start with capitalized word: {words[0]}")
-        
-    for word in words[1:]:
-        word = word.replace(':', '').replace('(', '').replace(')', '')
-        if word in ACRONYMS:
-            continue
-        if word.isupper():
-            report_error(path, ErrorCode.ERROR_HEADING_CASE, f"heading is not sentence case: {word}")
+        words = heading.split(' ')
+        if not words[0][0].isupper():
+            self.report_error(ErrorCode.ERROR_HEADING_CAP, f"heading must start with capitalized word: {words[0]}")
 
-
-def get_cell(path: str, 
-             cells: list, 
-             cell_index: int) -> (list, int):
-    """
-        Get the next notebook cell.
-        
-        path: used only for reporting an error
-        cells: The content cells (JSON) for the notebook
-        cell_index: The index of the last cell that was parsed (reviewed).
-        
-        Returns:
-        
-        cell: content of the next cell
-        cell_index + 1: index of subsequent cell
-    """
-    while empty_cell(path, cells, cell_index):
-        cell_index += 1
-        
-    cell = cells[cell_index]
-    if cell['cell_type'] == 'markdown':
-        check_text_cell(path, cell)
-    return cell, cell_index + 1
-
-
-def empty_cell(path: str, 
-               cells: list, 
-               cell_index: int) -> bool:
-    """
-        Check for empty cells
-        
-        path: used only for reporting an error
-        cells: The content cells (JSON) for the notebook
-        cell_index: The index of the last cell that was parsed (reviewed).
-        
-        Returns:
-        
-        bool: whether cell is empty or not
-    """
-    if len(cells[cell_index]['source']) == 0:
-        report_error(path, ErrorCode.ERROR_EMPTY_CELL, f'empty cell: cell #{cell_index}')
-        return True
-    else:
-        return False
-
-
-def report_error(notebook: str, 
-                 code: ErrorCode,
-                 errmsg: str) -> None:
-    """
-    Report an error.
-        If args.errors_codes set, then only report these errors. Otherwise, all errors.
-    
-    notebook: The notebook path.
-    code: The error code number.
-    errmsg: The error message
-    """
-    
-    global num_errors
-    
-    if args.errors:
-        code = code.value[0]
-        if args.errors_codes:
-            if str(code) not in args.errors_codes:
-                return
-            
-        if args.errors_csv:
-            print(notebook, ',', code)
-        else:
-            print(f"{notebook}: ERROR ({code}): {errmsg}", file=sys.stderr)
-            num_errors += 1
+        for word in words[1:]:
+            word = word.replace(':', '').replace('(', '').replace(')', '')
+            if word in ACRONYMS:
+                continue
+            if word.isupper():
+                self.report_error(ErrorCode.ERROR_HEADING_CASE, f"heading is not sentence case: {word}")
 
 
 def add_index(path: str, 
