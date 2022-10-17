@@ -17,7 +17,7 @@
 /tensorboard @zbl94
 
 /bigquery_ml/bqml-online-prediction.ipynb @polong-lin
-/model_monitoring/model_monitoring.ipynb @mco-gh
+/model_monitoring/model_monitoring.ipynb @andrewferlitsch
 /ml_metadata/sdk-metric-parameter-tracking-for-custom-jobs.ipynb @jialuzh
 /ml_metadata/sdk-metric-parameter-tracking-for-locally-trained-models.ipynb @jialuzh
 /ml_metadata/vertex-pipelines-ml-metadata.ipynb @sararob
