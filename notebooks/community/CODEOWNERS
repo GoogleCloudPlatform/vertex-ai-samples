@@ -7,7 +7,7 @@
 /gapic @andrewferlitsch
 /gapic/custom/showcase_custom_image_classification_online_explain_example_based_api.ipynb @inardini
 /ml_ops @andrewferlitsch
-/model_monitoring/* @mco-gh
+/model_monitoring/* @andrewferlitsch
 /structured_data/rapid_prototyping_* @rafael-carvalho
 
 /managed_notebooks/
@@ -32,3 +32,4 @@
 /notebooks/community/ml_ops/stage2/get_started_vertex_hpt_r_kernel.ipynb @fhirschmann
 /notebooks/community/ml_ops/stage2/get_started_vertex_training_r_using_r_kernel.ipynb @fhirschmann
 /notebooks/community/vertex-ai-samples/notebooks/community/model_registry/vertex_ai_model_registry_bqml_custom_model_versioning.ipynb @inardini
+/notebooks/community/vertex-ai-samples/notebooks/community/model_registry/vertex_ai_model_registry_automl_model_versioning.ipynb @inardini
