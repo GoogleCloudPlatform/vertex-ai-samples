@@ -198,52 +198,53 @@ def parse_notebook(path: str,
         
         cells = content['cells']
         
-        NotebookRule.init(path, content['cells'])
+        NotebookRule.path = path
         
-        CopyrightRule().validate()
-            
-        NoticesRule().validate()
+        cells = CopyrightRule().validate(cells)
         
-        TitleRule().validate()
+        cells = NoticesRule().validate(cells)
+        
+        cells, title = TitleRule().validate(cells)
 
-        LinksRule().validate()
+        cells, git_link, colab_link, workbench_link = LinksRule().validate(cells)
         
-        OverviewRule().validate()
+        cells = OverviewRule().validate(cells)
        
-        ObjectiveRule().validate()
+        cells, desc, uses, steps, costs = ObjectiveRule().validate(cells)
             
-        RecommendationsRule().validate()
+        cells = RecommendationsRule().validate(cells)
 
-        DatasetRule().validate()
+        cells = DatasetRule().validate(cells)
 
-        CostsRule().validate()
+        cells = CostsRule().validate(cells, costs)
 
-        SetupLocalRule().validate()
+        cells = SetupLocalRule().validate(cells)
 
-        HelpersRule().validate()
+        cells = HelpersRule().validate(cells)
 
-        InstallationRule().validate()
+        cells = InstallationRule().validate(cells)
 
-        RestartRule().validate()
+        cells = RestartRule().validate(cells)
+
+        cells = VersionsRule().validate(cells)
+
+        cells = BeforeBeginRule().validate(cells)
+
+        cells = EnableAPIsRule().validate(cells)
         
-        VersionsRule().validate()
-        
-        BeforeBeginRule().validate()
-        
-        EnableAPIsRule().validate()
-        
-        SetupProjectRule().validate()
-        if NotebookRule.desc != '':
+        cells = SetupProjectRule().validate(cells)
+  
+        if desc != '':
             add_index(path, 
                       tag, 
                       linkback,
-                      NotebookRule.title, 
-                      NotebookRule.desc, 
-                      NotebookRule.uses, 
-                      NotebookRule.steps, 
-                      NotebookRule.git_link, 
-                      NotebookRule.colab_link, 
-                      NotebookRule.workbench_link
+                      title, 
+                      desc, 
+                      uses, 
+                      steps, 
+                      git_link, 
+                      colab_link, 
+                      workbench_link
             )
 
 
@@ -252,72 +253,10 @@ class NotebookRule(ABC):
     Abstract class for defining notebook conformance rules
     """
     path = None     # The relative path to the notebook
-    cell_index = 0  # The index of the last cell that was parsed (reviewed).
-    title = ''      # The H1 title for the notebook
-    git_link = None  # The GitHub link
-    colab_link = None  # The Colab link
-    workbench_link = None  # The Workbench link
-    desc = ''  # The description in the objective section
-    uses = ''  # The resources used in the objective section
-    steps = ''  # The steps in the objective section
-    costs = []  # The paid services used as derived from the resources used subsection
-    
-    @staticmethod
-    def init(path: str,
-             cells: list) -> None:
-        """
-        Initialize the static variables in the abstract class, specific to a notebook instance
-        
-        path: The relative path to the notebook
-        cells: The content cells (JSON) for the notebook
-        """
-        NotebookRule.cell_index = 0
-        NotebookRule.path = path
-        NotebookRule.cells = cells
-        NotebookRule.title = ''
-        NotebookRule.git_link = None
-        NotebookRule.colab_link = None
-        NotebookRule.workbench_link = None
-        NotebookRule.desc = ''
-        NotebookRule.uses = ''
-        NotebookRule.steps = ''
-        NotebookRule.costs = ''
-    
+
     @abstractmethod
-    def validate(self, cells: list) -> None:
+    def validate(self, cells: list) -> list:
         pass
-    
-    def get_cell(self) -> list:
-        """
-            Get the next notebook cell.
-
-            Returns:
-
-            cell: content of the next cell
-        """
-        while self.empty_cell():
-            NotebookRule.cell_index += 1
-
-        cell = NotebookRule.cells[NotebookRule.cell_index]
-        if cell['cell_type'] == 'markdown':
-            TextTWRule().validate()
-
-        NotebookRule.cell_index += 1
-        return cell
-    
-    def empty_cell(self) -> bool:
-        """
-            Check for empty cells
-
-            Returns:
-
-            bool: whether cell is empty or not
-        """
-        if len(NotebookRule.cells[NotebookRule.cell_index]['source']) == 0:
-            self.report_error(ErrorCode.ERROR_EMPTY_CELL, f'empty cell: cell #{NotebookRule.cell_index}')
-            return True
-        else:
-            return False
         
     def report_error(self,
                      code: ErrorCode,
@@ -346,50 +285,54 @@ class NotebookRule(ABC):
 
 
 class CopyrightRule(NotebookRule):
-    def validate(self) -> None:
+    def validate(self, cells: list) -> list:
         """
         Parse the copyright cell
         """
-        cell = self.get_cell()
+        cell = cells[0]
         if not 'Copyright' in cell['source'][0]:
             self.report_error(ErrorCode.ERROR_COPYRIGHT, "missing copyright cell")
+        cells.pop(0)
+        return cells
 
 
 class NoticesRule(NotebookRule):
-    def validate(self) -> None:
+    def validate(self, cells: list) -> list:
         """
         Parse the (optional) notices cell
         """
-        cell = self.get_cell()
-        if not cell['source'][0].startswith('This notebook'):
-             NotebookRule.cell_index -= 1
+        cell = cells[0]
+        if cell['source'][0].startswith('This notebook'):
+            cells.pop(0)
+        return cells
 
 
-class TitleRule(NotebookRule):
-    def validate(self) -> None: 
+class TitleRule(NotebookRule): 
+    def validate(self, cells: list) -> (list, str): 
         """
         Parse the title in the links cell
         """
-        cell = self.get_cell()
+        cell = cells[0]
         if not cell['source'][0].startswith('# '):
             self.report_error(ErrorCode.ERROR_TITLE_HEADING, "title cell must start with H1 heading")
-            NotebookRule.title = ''
+            title = ''
         else:
-            NotebookRule.title = cell['source'][0][2:].strip()
-            SentenceCaseTWRule().validate(NotebookRule.title)
+            title = cell['source'][0][2:].strip()
+            SentenceCaseTWRule().validate(title)
 
             # H1 title only
             if len(cell['source']) == 1:
-                cell = self.get_cell()
+                cells.pop(0)
+        return cells, title
 
 
 class LinksRule(NotebookRule):
-    def validate(self) -> None: 
+    def validate(self, cells: list) -> (list, str, str, str): 
         """
         Parse the links in the links cell
         """
 
-        cell = NotebookRule.cells[NotebookRule.cell_index - 1]
+        cell = cells[0]
         source = ''
         git_link = None
         colab_link = None
@@ -398,33 +341,27 @@ class LinksRule(NotebookRule):
             source += line
             if '<a href="https://github.com' in line:
                 git_link = line.strip()[9:-2].replace('" target="_blank', '')
-                try:
-                    code = urllib.request.urlopen(git_link).getcode()
-                except Exception as e:
-                    # if new notebook
-                    derived_link = os.path.join('https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/', NotebookRule.path)
-                    if git_link != derived_link:
-                        self.report_error(ErrorCode.ERROR_LINK_GIT_BAD, f"bad GitHub link: {git_link}")
+                
+                # if new notebook
+                derived_link = os.path.join('https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/', NotebookRule.path)
+                if git_link != derived_link:
+                    self.report_error(ErrorCode.ERROR_LINK_GIT_BAD, f"bad GitHub link: {git_link}")
 
             if '<a href="https://colab.research.google.com/' in line:
                 colab_link = 'https://colab.research.google.com/github/' + line.strip()[50:-2].replace('" target="_blank', '')
-                try:
-                    code = urllib.request.urlopen(colab_link).getcode()
-                except Exception as e:
-                    # if new notebook
-                    derived_link = os.path.join('https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks', NotebookRule.path)
-                    if colab_link != derived_link:
-                        self.report_error(ErrorCode.ERROR_LINK_COLAB_BAD, f"bad Colab link: {colab_link}")
+ 
+                # if new notebook
+                derived_link = os.path.join('https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks', NotebookRule.path)
+                if colab_link != derived_link:
+                    self.report_error(ErrorCode.ERROR_LINK_COLAB_BAD, f"bad Colab link: {colab_link}")
 
 
             if '<a href="https://console.cloud.google.com/vertex-ai/workbench/' in line:
-                workbench_link = line.strip()[91:-2].replace('" target="_blank', '')
-                try:
-                    code = urllib.request.urlopen(workbench_link).getcode()
-                except Exception as e:
-                    derived_link = os.path.join('https://console.cloud.google.com/vertex-ai/workbench/deploy-notebook?download_url=https://raw.githubusercontent.com/GoogleCloudPlatform/vertex-ai-samples/main/notebooks/', NotebookRule.path)
-                    if colab_link != workbench_link:
-                        self.report_error(ErrorCode.ERROR_LINK_WORKBENCH_BAD, f"bad Workbench link: {workbench_link}")
+                workbench_link = line.strip()[9:-2].replace('" target="_blank', '')
+
+                derived_link = os.path.join('https://console.cloud.google.com/vertex-ai/workbench/deploy-notebook?download_url=https://raw.githubusercontent.com/GoogleCloudPlatform/vertex-ai-samples/main/notebooks/', NotebookRule.path)
+                if workbench_link != derived_link:
+                    self.report_error(ErrorCode.ERROR_LINK_WORKBENCH_BAD, f"bad Workbench link: {workbench_link}")
 
         if 'View on GitHub' not in source or not git_link:
             self.report_error(ErrorCode.ERROR_LINK_GIT_MISSING, 'Missing link for GitHub')
@@ -433,36 +370,40 @@ class LinksRule(NotebookRule):
         if 'Open in Vertex AI Workbench' not in source or not workbench_link:
             self.report_error(ErrorCode.ERROR_LINK_WORKBENCH_MISSING, 'Missing link for Workbench')
         
-        NotebookRule.git_link = git_link
-        NotebookRule.colab_link = colab_link
-        NotebookRule.workbench_link = workbench_link
+        cells.pop(0)
+        return cells, git_link, colab_link, workbench_link
 
 
 class OverviewRule(NotebookRule):
-    def validate(self) -> None: 
+    def validate(self, cells: list) -> list: 
         """
         Parse the overview cell
         """
-        cell = self.get_cell()
+        cell = cells[0]
         if not cell['source'][0].startswith("## Overview"):
             self.report_error(ErrorCode.ERROR_OVERVIEW_NOTFOUND, "Overview section not found")
+            
+        cells.pop(0)
+        return cells
 
 
 class ObjectiveRule(NotebookRule):
-    def validate(self) -> None: 
+    def validate(self, cells: list) -> (list, str, str, str, list): 
         """
         Parse the objective cell.
             Find the description, uses and steps.
         """
+        
         desc = ''
         uses = ''
         steps = ''
         costs = []
 
-        cell = self.get_cell()
+        cell = cells[0]
         if not cell['source'][0].startswith("### Objective"):
             self.report_error(ErrorCode.ERROR_OBJECTIVE_NOTFOUND, "Objective section not found")
-            return
+            cells.pop(0)
+            return cells, desc, uses, steps, costs
 
         in_desc = True
         in_uses = False
@@ -527,102 +468,110 @@ class ObjectiveRule(NotebookRule):
         if steps == '':
             self.report_error(ErrorCode.ERROR_OBJECTIVE_MISSING_STEPS, "Objective section missing steps list")
             
-        NotebookRule.desc = desc
-        NotebookRule.uses = uses
-        NotebookRule.steps = steps
-        NotebookRule.costs = costs
+        cells.pop(0)
+        return cells, desc, uses, steps, costs
 
 
 class RecommendationsRule(NotebookRule):
-    def validate(self) -> None: 
+    def validate(self, cells: list) -> list: 
         """
         Parse the (optional) recommendations cell
         """
         # (optional) Recommendation
-        cell = self.get_cell()
-        if not cell['source'][0].startswith("### Recommendations"):
-            NotebookRule.cell_index -= 1
+        cell = cells[0]
+        if cell['source'][0].startswith("### Recommendations"):
+            cells.pop(0)
+        return cells
 
 
 class DatasetRule(NotebookRule):
-    def validate(self) -> None: 
+    def validate(self, cells: list) -> list: 
         """
         Parse the dataset cell
         """
-        # Dataset
-        cell = self.get_cell()
+        cell = cells[0]
         if not cell['source'][0].startswith("### Dataset") and not cell['source'][0].startswith("### Model") and not cell['source'][0].startswith("### Embedding"):
             self.report_error(ErrorCode.ERROR_DATASET_NOTFOUND, "Dataset/Model section not found")
+        cells.pop(0)
+        return cells
 
 
 class CostsRule(NotebookRule):
-    def validate(self) -> None: 
+    def validate(self, cells: list, costs: list) -> list: 
         """
         Parse the costs cell
         """
-        # Costs
-        cell = self.get_cell()
+        cell = cells[0]
         if not cell['source'][0].startswith("### Costs"):
             self.report_error(ErrorCode.ERROR_COSTS_NOTFOUND, "Costs section not found")
         else:
             text = ''
             for line in cell['source']:
                 text += line
-            if 'BQ' in NotebookRule.costs and 'BigQuery' not in text:
+            if 'BQ' in costs and 'BigQuery' not in text:
                 self.report_error(ErrorCode.ERROR_COSTS_MISSING, 'Costs section missing reference to BiqQuery')
-            if 'Vertex' in NotebookRule.costs and 'Vertex' not in text:
+            if 'Vertex' in costs and 'Vertex' not in text:
                 self.report_error(ErrorCode.ERROR_COSTS_MISSING, 'Costs section missing reference to Vertex')
-            if 'Dataflow' in NotebookRule.costs and 'Dataflow' not in text:    
+            if 'Dataflow' in costs and 'Dataflow' not in text:    
                 self.report_error(ErrorCode.ERROR_COSTS_MISSING, 'Costs section missing reference to Dataflow')
+                
+        cells.pop(0)
+        return cells
 
 
 class SetupLocalRule(NotebookRule):
-    def validate(self) -> None:
+    def validate(self, cells: list) -> list:
         """
         Parse the (optional) setup local environment cell
         """
-        cell = self.get_cell()
+        cell = cells[0]
         if not cell['source'][0].startswith('### Set up your local development environment'):
-            NotebookRule.cell_index -= 1
-            return
+            return cells
         
-        cell = self.get_cell()
+        cells.pop(0)
+        cell = cells[0]
         if not cell['source'][0].startswith('**Otherwise**, make sure your environment meets'):
-            NotebookRule.cell_index -= 1
+            return cells
+        
+        cells.pop(0)
+        return cells
 
 
 class HelpersRule(NotebookRule):
-    def validate(self) -> None:
+    def validate(self, cells: list) -> list:
         """
         Parse the (optional) helpers text/code cell
         """
-        cell = self.get_cell()
+        cell = cells[0]
         if 'helper' in cell['source'][0]:
-            NotebookRule.cell_index += 1  # text and code
-        else:
-            NotebookRule.cell_index -= 1
+            cells.pop(0)
+            cells.pop(0) # text and code
+        return cells
 
 
 class InstallationRule(NotebookRule):
-    def validate(self) -> None:
+    def validate(self, cells: list) -> list:
         """
         Parse the installation cells
         """
-        cell = self.get_cell()
+        cell = cells[0]
         if not cell['source'][0].startswith("## Install"):
             if cell['source'][0].startswith("### Install"):
                 self.report_error(ErrorCode.ERROR_INSTALLATION_HEADING, "Installation section needs to be H2 heading")
             else:
                 self.report_error(ErrorCode.ERROR_INSTALLATION_NOTFOUND, "Installation section not found")
         else:
-            cell = self.get_cell()
+            cells.pop(0)
+            cell = cells[0]
             if cell['cell_type'] != 'code':
                 self.report_error(ErrorCode.ERROR_INSTALLATION_NOTFOUND, "Installation section not found")
             else:
                 if cell['source'][0].startswith('! mkdir'):
-                    cell = self.get_cell()
+                    cells.pop(0)
+                    cell = cells[0]
                 if 'requirements.txt' in cell['source'][0]:
-                    cell = self.get_cell()
+                    cells.pop(0)
+                    cell = cells[0]
 
                 text = ''
                 for line in cell['source']:
@@ -638,18 +587,20 @@ class InstallationRule(NotebookRule):
                             self.report_error(ErrorCode.ERROR_INSTALLATION_USER_FLAG, "Installation code section: use {USER_FLAG} with pip3")
                 if 'if IS_WORKBENCH_NOTEBOOK:' not in text:
                     self.report_error(ErrorCode.ERROR_INSTALLATION_CODE_TEMPLATE, "Installation code section out of date (see template)")
+                    
+            cells.pop(0)
+            return cells
 
 
 class RestartRule(NotebookRule):
-    def validate(self) -> None:
+    def validate(self, cells: list) -> list:
         """
         Parse the restart cells
         """
-        # Restart kernel
-        cell_index = NotebookRule.cell_index
+
         while True:
             cont = False
-            cell = self.get_cell()
+            cell = cells[0]
             for line in cell['source']:
                 if 'pip' in line:
                     self.report_error(ErrorCode.ERROR_INSTALLATION_SINGLE_PIP3, f"All pip installations must be in a single code cell: {line}")
@@ -657,81 +608,92 @@ class RestartRule(NotebookRule):
                     break
             if not cont:
                 break
+            cells.pop(0)
 
         if not cell['source'][0].startswith("### Restart the kernel"):
             self.report_error(ErrorCode.ERROR_RESTART_NOTFOUND, "Restart the kernel section not found")
         else:
-            cell = self.get_cell()  # code cell
+            cells.pop(0)
+            cell = cells[0]  # code cell
             if cell['cell_type'] != 'code':
                 self.report_error(ErrorCode.ERROR_RESTART_CODE_NOTFOUND, "Restart the kernel code section not found")
+            cells.pop(0)
+        return cells
 
 
 class VersionsRule(NotebookRule):
-    def validate(self) -> None:
+    def validate(self, cells: list) -> list:
         """
         Parse the (optional) package versions code/text cell
         """
-        cell = self.get_cell()
+        cell = cells[0]
         if cell['source'][0].startswith('#### Check package versions'):
-            NotebookRule.cell_index += 1
-        else:
-            NotebookRule.cell_index -= 1
-
+            cells.pop(0)
+            cells.pop(0) # text and code
+        return cells
 
 class BeforeBeginRule(NotebookRule):
-    def validate(self) -> None:
+    def validate(self, cells: list) -> list:
         """
         Parse the before you begin cell
         """
-        cell = self.get_cell()
+        cell = cells[0]
         if not cell['source'][0].startswith("## Before you begin"):
             self.report_error(ErrorCode.ERROR_BEFOREBEGIN_NOTFOUND, "Before you begin section not found")
         else:
             # maybe one or two cells
             if len(cell['source']) < 2:
-                cell = self.get_cell()
+                cells.pop(0)
+                cell = cells[0]
                 if not cell['source'][0].startswith("### Set up your Google Cloud project"):
                     self.report_error(ErrorCode.ERROR_BEFOREBEGIN_INCOMPLETE, "Before you begin section incomplete")
+                    
+        cells.pop(0)
+        return cells
 
 
 class EnableAPIsRule(NotebookRule):
-    def validate(self) -> None:
+    def validate(self, cells: list) -> list:
         """
         Parse the (optional) enable apis code/text cell
         """
-        cell = self.get_cell()
+        cell = cells[0]
         if cell['source'][0].startswith("### Enable APIs"):
-            NotebookRule.cell_index += 1
-        else:
-            NotebookRule.cell_index -= 1
+            cells.pop(0)
+            cells.pop(0) # text and code
+        return cells
 
 
 class SetupProjectRule(NotebookRule):
-    def validate(self) -> None:
+    def validate(self, cells) -> list:
         """
         Parse the set project cells
         """
-        cell = self.get_cell()
+        cell = cells[0]
         if not cell['source'][0].startswith('#### Set your project ID'):
             self.report_error(ErrorCode.ERROR_PROJECTID_NOTFOUND, "Set project ID section not found")
         else: 
-            cell = self.get_cell()
+            cells.pop(0)
+            cell = cells[0]
             if cell['cell_type'] != 'code':
                 self.report_error(ErrorCode.ERROR_PROJECTID_CODE_NOTFOUND, "Set project ID code section not found")
             elif not cell['source'][0].startswith('PROJECT_ID = "[your-project-id]"'):
                 self.report_error(ErrorCode.ERROR_PROJECTID_TEMPLATE, "Set project ID not match template")
 
-            cell = self.get_cell()
+            cells.pop(0)
+            cell = cells[0]
             if cell['cell_type'] != 'code' or 'or PROJECT_ID == "[your-project-id]":' not in cell['source'][0]:
                 self.report_error(ErrorCode.ERROR_PROJECTID_TEMPLATE, "Set project ID not match template")  
 
-            cell = self.get_cell()
+            cells.pop(0)
+            cell = cells[0]
             if cell['cell_type'] != 'code' or '! gcloud config set project' not in cell['source'][0]:
                 self.report_error(ErrorCode.ERROR_PROJECTID_TEMPLATE, "Set project ID not match template")
+            return cells
 
 
 class TextTWRule(NotebookRule):
-    def validate(self) -> None:
+    def validate(self, cells: list) -> None:
         """
             Check text cells for technical writing requirements
                 1. Product branding names
@@ -787,7 +749,7 @@ class TextTWRule(NotebookRule):
             'Sklearn': 'scikit-learn',
             'sklearn': 'scikit-learn'
         }
-        cell = NotebookRule.cells[NotebookRule.cell_index]
+        cell = cells[0]
         
         for line in cell['source']:
             # HTML code
