@@ -176,14 +176,18 @@ def parse_dir(directory: str) -> None:
             print("\n##", entry.name, "\n")
             parse_dir(entry.path)
         elif entry.name.endswith('.ipynb'):
-            parse_notebook(entry.path)
+            parse_notebook(entry.path, tag=directory.split('/')[-1], linkback=None)
 
 
-def parse_notebook(path: str) -> None:
+def parse_notebook(path: str,
+                   tag: str,
+                   linkback: str) -> None:
     """
         Review the specified notebook.
         
-        path: The path to the notebook.
+            path: The path to the notebook.
+            tag: The associated tag
+            linkback: A link back to the web docs
     """
     with open(path, 'r') as f:
         try:
@@ -232,6 +236,7 @@ def parse_notebook(path: str) -> None:
         if NotebookRule.desc != '':
             add_index(path, 
                       tag, 
+                      linkback,
                       NotebookRule.title, 
                       NotebookRule.desc, 
                       NotebookRule.uses, 
@@ -462,7 +467,7 @@ class ObjectiveRule(NotebookRule):
         in_desc = True
         in_uses = False
         in_steps = False
-
+    
         for line in cell['source'][1:]:
             if line.startswith('This tutorial uses'):
                 in_desc = False
@@ -538,6 +543,7 @@ class RecommendationsRule(NotebookRule):
         if not cell['source'][0].startswith("### Recommendations"):
             NotebookRule.cell_index -= 1
 
+
 class DatasetRule(NotebookRule):
     def validate(self) -> None: 
         """
@@ -547,11 +553,6 @@ class DatasetRule(NotebookRule):
         cell = self.get_cell()
         if not cell['source'][0].startswith("### Dataset") and not cell['source'][0].startswith("### Model") and not cell['source'][0].startswith("### Embedding"):
             self.report_error(ErrorCode.ERROR_DATASET_NOTFOUND, "Dataset/Model section not found")
-
-class CostsRule(NotebookRule):
-    def validate(self, path: str, cells: list) -> None: 
-        """
-        Parse the costs cell
 
 
 class CostsRule(NotebookRule):
@@ -639,14 +640,10 @@ class InstallationRule(NotebookRule):
                     self.report_error(ErrorCode.ERROR_INSTALLATION_CODE_TEMPLATE, "Installation code section out of date (see template)")
 
 
-
 class RestartRule(NotebookRule):
-    def validate(self, path: str, cells: list) -> None:
+    def validate(self) -> None:
         """
         Parse the restart cells
-
-        path: used only for reporting an error
-        cells: The content cells (JSON) for the notebook
         """
         # Restart kernel
         cell_index = NotebookRule.cell_index
@@ -837,14 +834,28 @@ class SentenceCaseTWRule(NotebookRule):
 
 def add_index(path: str, 
               tag: str, 
+              linkback: str,
               title : str, 
               desc: str, 
               uses: str, 
               steps: str, 
               git_link: str, 
               colab_link: str, 
-              workbench_link: str) -> None:
+              workbench_link: str
+             ) -> None:
     """
+    Add a discoverability index for this notebook
+    
+        path: The path to the notebook
+        tag: The tag (if any) for the notebook
+        title: The H1 title for the notebook
+        desc:
+        uses:
+        steps:
+        git_link:
+        colab_link:
+        workbench_link:
+        linkback:
     """
     global last_tag
     
@@ -912,14 +923,12 @@ if args.notebook_dir:
     if not os.path.isdir(args.notebook_dir):
         print("Error: not a directory:", args.notebook_dir)
         exit(1)
-    tag = ''
     parse_dir(args.notebook_dir)
 elif args.notebook:
     if not os.path.isfile(args.notebook):
         print("Error: not a notebook:", args.notebook)
         exit(1)
-    tag = ''
-    parse_notebook(args.notebook)
+    parse_notebook(args.notebook, tag='', linkback=None)
 elif args.notebook_file:
     if not os.path.isfile(args.notebook_file):
         print("Error: file does not exist", args.notebook_file)
@@ -937,7 +946,7 @@ elif args.notebook_file:
                         linkback = row[2]
                     except:
                         linkback = None
-                    parse_notebook(notebook)
+                    parse_notebook(notebook, tag=tag, linkback=linkback)
 else:
     print("Error: must specify a directory or notebook")
     exit(1)
