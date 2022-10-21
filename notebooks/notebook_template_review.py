@@ -525,6 +525,10 @@ class SetupLocalRule(NotebookRule):
         Parse the (optional) setup local environment cell
         """
         cell = cells[0]
+        if cell['source'][0].startswith('## Before you begin'):
+            cells.pop(0)
+            cell = cells[0]
+
         if not cell['source'][0].startswith('### Set up your local development environment'):
             return cells
         
@@ -555,41 +559,45 @@ class InstallationRule(NotebookRule):
         Parse the installation cells
         """
         cell = cells[0]
-        if not cell['source'][0].startswith("## Install"):
-            if cell['source'][0].startswith("### Install"):
-                self.report_error(ErrorCode.ERROR_INSTALLATION_HEADING, "Installation section needs to be H2 heading")
-            else:
-                self.report_error(ErrorCode.ERROR_INSTALLATION_NOTFOUND, "Installation section not found")
-        else:
-            cells.pop(0)
-            cell = cells[0]
-            if cell['cell_type'] != 'code':
-                self.report_error(ErrorCode.ERROR_INSTALLATION_NOTFOUND, "Installation section not found")
-            else:
-                if cell['source'][0].startswith('! mkdir'):
-                    cells.pop(0)
-                    cell = cells[0]
-                if 'requirements.txt' in cell['source'][0]:
-                    cells.pop(0)
-                    cell = cells[0]
-
-                text = ''
-                for line in cell['source']:
-                    text += line
-                    if 'pip ' in line:
-                        if 'pip3' not in line:
-                            self.report_error(ErrorCode.ERROR_INSTALLATION_PIP3, "Installation code section: use pip3")
-                        if line.endswith('\\\n'):
-                            continue
-                        if '-q' not in line and '--quiet' not in line :
-                            self.report_error(ErrorCode.ERROR_INSTALLATION_QUIET, "Installation code section: use -q with pip3")
-                        if 'USER_FLAG' not in line and 'sh(' not in line:
-                            self.report_error(ErrorCode.ERROR_INSTALLATION_USER_FLAG, "Installation code section: use {USER_FLAG} with pip3")
-                if 'if IS_WORKBENCH_NOTEBOOK:' not in text:
-                    self.report_error(ErrorCode.ERROR_INSTALLATION_CODE_TEMPLATE, "Installation code section out of date (see template)")
-                    
-            cells.pop(0)
+        
+        if 'Install' not in cell['source'][0]:
+            self.report_error(ErrorCode.ERROR_INSTALLATION_NOTFOUND, "Installation section not found")
             return cells
+
+        if not cell['source'][0].startswith("## Install"):
+            self.report_error(ErrorCode.ERROR_INSTALLATION_HEADING, "Installation section needs to be H2 heading")
+       
+            
+        cells.pop(0)
+        cell = cells[0]
+
+        if cell['cell_type'] != 'code':
+            self.report_error(ErrorCode.ERROR_INSTALLATION_NOTFOUND, "Installation section not found")
+        else:
+            if cell['source'][0].startswith('! mkdir'):
+                cells.pop(0)
+                cell = cells[0]
+            if 'requirements.txt' in cell['source'][0]:
+                cells.pop(0)
+                cell = cells[0]
+
+            text = ''
+            for line in cell['source']:
+                text += line
+                if 'pip ' in line:
+                    if 'pip3' not in line:
+                        self.report_error(ErrorCode.ERROR_INSTALLATION_PIP3, "Installation code section: use pip3")
+                    if line.endswith('\\\n'):
+                        continue
+                    if '-q' not in line and '--quiet' not in line :
+                        self.report_error(ErrorCode.ERROR_INSTALLATION_QUIET, "Installation code section: use -q with pip3")
+                    if 'USER_FLAG' not in line and 'sh(' not in line:
+                        self.report_error(ErrorCode.ERROR_INSTALLATION_USER_FLAG, "Installation code section: use {USER_FLAG} with pip3")
+            if 'if IS_WORKBENCH_NOTEBOOK:' not in text:
+                self.report_error(ErrorCode.ERROR_INSTALLATION_CODE_TEMPLATE, "Installation code section out of date (see template)")
+                    
+        cells.pop(0)
+        return cells
 
 
 class RestartRule(NotebookRule):
