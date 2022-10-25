@@ -4,7 +4,7 @@
 # 2. To lint specific notebooks:
 # docker run -v ${PWD}:/setup/app gcr.io/python-docs-samples-tests/notebook_linter:latest notebooks/1.ipynb notebooks/2.ipynb
 
-FROM python:3.10
+FROM python:3.11
 
 WORKDIR setup
 
