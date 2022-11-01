@@ -187,7 +187,8 @@ def parse_notebook(path: str,
                    tag: str,
                    linkback: str) -> int:
     """
-        Review the specified notebook.
+        Review the specified notebook for conforming to the notebook template
+        and notebook authoring requirements.
         
             path: The path to the notebook.
             tag: The associated tag
@@ -249,7 +250,7 @@ def parse_notebook(path: str,
         )
         
     return notebook.num_errors
-            
+
 class Notebook(object):
     '''
     Class for navigating thru a notebook
@@ -349,8 +350,12 @@ class NotebookRule(ABC):
     """
     @abstractmethod
     def validate(self, notebook: Notebook):
+        '''
+        Applies cell specific rules to validate whether the cell 
+        does or does not conform to the rules.
+        '''
         pass
-        
+
 
 
 class CopyrightRule(NotebookRule):
@@ -577,7 +582,7 @@ class CostsRule(NotebookRule):
                 notebook.report_error(ErrorCode.ERROR_COSTS_MISSING, 'Costs section missing reference to Vertex')
             if 'Dataflow' in notebook.costs and 'Dataflow' not in text:    
                 notebook.report_error(ErrorCode.ERROR_COSTS_MISSING, 'Costs section missing reference to Dataflow')
-                
+
 
 
 class SetupLocalRule(NotebookRule):
