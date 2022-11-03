@@ -159,4 +159,29 @@ The steps performed include:
 - Compile the KFP pipeline.
 - Execute the KFP pipeline using `Vertex AI Pipelines`
 
+[Train custom tabular ML models with many frameworks and import to Vertex AI using Vertex Pipelines](https://github.com/GoogleCloudPlatform/vertex-ai-samples/tree/main/notebooks/official/pipelines/Train_tabular_models_with_many_frameworks_and_import_to_Vertex_AI_using_Pipelines)
 
+Learn how to build a pipeline that does the following:
+
+*   Ingest data
+*   Transform data
+*   Clean up data
+*   Split data into train/test subsets
+*   Configure model
+*   Train model using multiple ML frameworks
+*   Import model into Vertex Model Registry
+*   [Optional] Deploy model to Vertex Endpoints for serving
+
+Included pipelines:
+
+*   Train ML model
+*   *   Tabular classification
+*   *   *   TensorFlow
+*   *   *   PyTorch
+*   *   *   XGBoost
+*   *   *   Scikit-learn
+*   *   Tabular regression
+*   *   *   TensorFlow
+*   *   *   PyTorch
+*   *   *   XGBoost
+*   *   *   Scikit-learn

@@ -40,3 +40,4 @@
 /tabular_workflows/wide_and_deep_on_vertex_pipelines.ipynb @sakagarwal
 /model_evaluation/custom_tabular_classification_model_evaluation.ipynb @soheilazangeneh
 /sdk/SDK_FBProphet_Forecasting_Online.ipynb @brianchunkang
+/pipelines/Train_tabular_models_with_many_frameworks_and_import_to_Vertex_AI_using_Pipelines @Ark-kun
