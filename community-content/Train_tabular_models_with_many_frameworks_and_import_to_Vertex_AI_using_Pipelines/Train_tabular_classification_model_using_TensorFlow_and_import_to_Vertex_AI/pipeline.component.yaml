@@ -1,0 +1,132 @@
+name: Train tabular classification model using TensorFlow pipeline
+metadata:
+  annotations:
+    author: Alexey Volkov <alexey.volkov@ark-kun.com>
+    canonical_location: https://raw.githubusercontent.com/Ark-kun/pipeline_components/master/samples/Google_Cloud_Vertex_AI/Train_tabular_classification_model_using_TensorFlow_and_import_to_Vertex_AI/pipeline.component.yaml
+    sdk: https://cloud-pipelines.net/pipeline-editor/
+implementation:
+  graph:
+    tasks:
+      Download from GCS:
+        componentRef:
+          digest: 4175c9ff143cb8cc75d05451c0a0ebdf5a0d6d020816e29f5e9cefbb7d56f241
+          url: https://raw.githubusercontent.com/Ark-kun/pipeline_components/27a5ea25e849c9e8c0cb6ed65518bc3ece259aaf/components/google-cloud/storage/download/workaround_for_buggy_KFPv2_compiler/component.yaml
+        arguments:
+          GCS path: gs://ml-pipeline-dataset/Chicago_taxi_trips/chicago_taxi_trips_2019-01-01_-_2019-02-01_limit=10000.csv
+        annotations:
+          editor.position: '{"x":40,"y":40,"width":180,"height":40}'
+      Select columns using Pandas on CSV data:
+        componentRef:
+          digest: 9b9500f461c1d04f1e48992de9138db14a6800f23649d73048673d5ea6dc56ad
+          url: https://raw.githubusercontent.com/Ark-kun/pipeline_components/8c78aae096806cff3bc331a40566f42f5c3e9d4b/components/pandas/Select_columns/in_CSV_format/component.yaml
+        arguments:
+          table:
+            taskOutput:
+              outputName: Data
+              taskId: Download from GCS
+          column_names: '["tips", "trip_seconds", "trip_miles", "pickup_community_area", "dropoff_community_area", "fare", "tolls", "extras"]'
+        annotations:
+          editor.position: '{"x":40,"y":140,"width":180,"height":54}'
+      Fill all missing values using Pandas on CSV data:
+        componentRef:
+          digest: a1b0c29a4615f2e3652aa5d31b9255fa15700e146627c755f8fc172f82e71af7
+          url: https://raw.githubusercontent.com/Ark-kun/pipeline_components/23405971f5f16a41b16c343129b893c52e4d1d48/components/pandas/Fill_all_missing_values/in_CSV_format/component.yaml
+        arguments:
+          table:
+            taskOutput:
+              outputName: transformed_table
+              taskId: Select columns using Pandas on CSV data
+              type: CSV
+          replacement_value: '0'
+        annotations:
+          editor.position: '{"x":40,"y":250,"width":180,"height":54}'
+      Binarize column using Pandas on CSV data:
+        componentRef:
+          digest: d699afd4d7cae862708717cc160f4394ed0c04e536e9515923ef1e8865f01d44
+          url: https://raw.githubusercontent.com/Ark-kun/pipeline_components/1e2558325f4c708aca75827c8acc13d230ee7e9f/components/pandas/Binarize_column/in_CSV_format/component.yaml
+        arguments:
+          table:
+            taskOutput:
+              outputName: transformed_table
+              taskId: Fill all missing values using Pandas on CSV data
+              type: CSV
+          column_name: tips
+          predicate: ' > 0'
+          new_column_name: class
+        annotations:
+          editor.position: '{"x":40,"y":370,"width":180,"height":54}'
+      Split rows into subsets:
+        componentRef:
+          digest: a609c3c9196484290f24a1174955f95b27f07a7b458aa5cb8cde28866cb2cb46
+          url: https://raw.githubusercontent.com/Ark-kun/pipeline_components/daae5a4abaa35e44501818b1534ed7827d7da073/components/dataset_manipulation/Split_rows_into_subsets/in_CSV/component.yaml
+        arguments:
+          table:
+            taskOutput:
+              outputName: transformed_table
+              taskId: Binarize column using Pandas on CSV data
+              type: CSV
+          fraction_1: '0.8'
+        annotations:
+          editor.position: '{"x":170,"y":500,"width":180,"height":40}'
+      Create fully connected tensorflow network:
+        componentRef:
+          digest: bfcafbc5ce711b1f69cabf1338212d10d50136a73db9f9f7c984de7b80b4bfb0
+          url: https://raw.githubusercontent.com/Ark-kun/pipeline_components/9ca0f9eecf5f896f65b8538bbd809747052617d1/components/tensorflow/Create_fully_connected_network/component.yaml
+        arguments:
+          input_size: '7'
+          hidden_layer_sizes: '[10]'
+          activation_name: elu
+          output_activation_name: sigmoid
+        annotations:
+          editor.position: '{"x":370,"y":500,"width":180,"height":54}'
+      Train model using Keras on CSV:
+        componentRef:
+          digest: 42ae60c889034dbad74815653e95b4f7d576b5f47f803173e8679c7b54984609
+          url: https://raw.githubusercontent.com/Ark-kun/pipeline_components/c504a4010348c50eaaf6d4337586ccc008f4dcef/components/tensorflow/Train_model_using_Keras/on_CSV/component.yaml
+        arguments:
+          training_data:
+            taskOutput:
+              outputName: split_1
+              taskId: Split rows into subsets
+              type: CSV
+          model:
+            taskOutput:
+              outputName: model
+              taskId: Create fully connected tensorflow network
+              type: TensorflowSavedModel
+          label_column_name: class
+          loss_function_name: binary_crossentropy
+          number_of_epochs: '10'
+        annotations:
+          editor.position: '{"x":40,"y":620,"width":180,"height":54}'
+      Upload Tensorflow model to Google Cloud Vertex AI:
+        componentRef:
+          digest: 2e45263ff640b1a688e359b6936e27a81b2407749a84f340af2aa5547e0cb92c
+          url: https://raw.githubusercontent.com/Ark-kun/pipeline_components/c6a8b67d1ada2cc17665c99ff6b410df588bee28/components/google-cloud/Vertex_AI/Models/Upload_Tensorflow_model/workaround_for_buggy_KFPv2_compiler/component.yaml
+        arguments:
+          model:
+            taskOutput:
+              outputName: trained_model
+              taskId: Train model using Keras on CSV
+              type: TensorflowSavedModel
+        annotations:
+          editor.position: '{"x":40,"y":750,"width":180,"height":54}'
+      Predict with TensorFlow model on CSV data:
+        componentRef:
+          digest: 921bb1563e93a78233b8acceab87055b9154ccf5595d056028cf0396ca224cd4
+          url: https://raw.githubusercontent.com/Ark-kun/pipeline_components/59c759ce6f543184e30db6817d2a703879bc0f39/components/tensorflow/Predict/on_CSV/component.yaml
+        arguments:
+          dataset:
+            taskOutput:
+              outputName: split_2
+              taskId: Split rows into subsets
+              type: CSV
+          model:
+            taskOutput:
+              outputName: trained_model
+              taskId: Train model using Keras on CSV
+              type: TensorflowSavedModel
+          label_column_name: class
+        annotations:
+          editor.position: '{"x":240,"y":750,"width":180,"height":54}'
+    outputValues: {}
