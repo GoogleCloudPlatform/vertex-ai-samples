@@ -1,0 +1,68 @@
+name: Train tabular regression linear model using Scikit learn pipeline
+metadata:
+  annotations:
+    author: Alexey Volkov <alexey.volkov@ark-kun.com>
+    canonical_location: https://raw.githubusercontent.com/Ark-kun/pipeline_components/master/samples/Google_Cloud_Vertex_AI/Train_tabular_regression_linear_model_using_Scikit_learn_and_import_to_Vertex_AI/pipeline.component.yaml
+    sdk: https://cloud-pipelines.net/pipeline-editor/
+implementation:
+  graph:
+    tasks:
+      Download from GCS:
+        componentRef:
+          digest: 4175c9ff143cb8cc75d05451c0a0ebdf5a0d6d020816e29f5e9cefbb7d56f241
+          url: https://raw.githubusercontent.com/Ark-kun/pipeline_components/27a5ea25e849c9e8c0cb6ed65518bc3ece259aaf/components/google-cloud/storage/download/workaround_for_buggy_KFPv2_compiler/component.yaml
+        arguments:
+          GCS path: gs://ml-pipeline-dataset/Chicago_taxi_trips/chicago_taxi_trips_2019-01-01_-_2019-02-01_limit=10000.csv
+        annotations:
+          editor.position: '{"x":40,"y":40,"width":180,"height":40}'
+      Select columns using Pandas on CSV data:
+        componentRef:
+          digest: 9b9500f461c1d04f1e48992de9138db14a6800f23649d73048673d5ea6dc56ad
+          url: https://raw.githubusercontent.com/Ark-kun/pipeline_components/8c78aae096806cff3bc331a40566f42f5c3e9d4b/components/pandas/Select_columns/in_CSV_format/component.yaml
+        arguments:
+          table:
+            taskOutput:
+              outputName: Data
+              taskId: Download from GCS
+          column_names: '["tips", "trip_seconds", "trip_miles", "pickup_community_area", "dropoff_community_area", "fare", "tolls", "extras"]'
+        annotations:
+          editor.position: '{"x":40,"y":140,"width":180,"height":54}'
+      Fill all missing values using Pandas on CSV data:
+        componentRef:
+          digest: a1b0c29a4615f2e3652aa5d31b9255fa15700e146627c755f8fc172f82e71af7
+          url: https://raw.githubusercontent.com/Ark-kun/pipeline_components/23405971f5f16a41b16c343129b893c52e4d1d48/components/pandas/Fill_all_missing_values/in_CSV_format/component.yaml
+        arguments:
+          table:
+            taskOutput:
+              outputName: transformed_table
+              taskId: Select columns using Pandas on CSV data
+              type: CSV
+          replacement_value: '0'
+        annotations:
+          editor.position: '{"x":40,"y":250,"width":180,"height":54}'
+      Train linear regression model using scikit learn from CSV:
+        componentRef:
+          digest: c7fe7912ab0d1fb45d201d452e9ce6be5544e7d8c6d229db7a4b931ff58560f3
+          url: https://raw.githubusercontent.com/Ark-kun/pipeline_components/f807e02b54d4886c65a05f40848fd51c72407f40/components/ML_frameworks/Scikit_learn/Train_linear_regression_model/from_CSV/component.yaml
+        arguments:
+          dataset:
+            taskOutput:
+              outputName: transformed_table
+              taskId: Fill all missing values using Pandas on CSV data
+              type: CSV
+          label_column_name: tips
+        annotations:
+          editor.position: '{"x":40,"y":360,"width":180,"height":54}'
+      Upload Scikit learn pickle model to Google Cloud Vertex AI:
+        componentRef:
+          digest: 81c91c8d7d21ec97e0872f669d68bd89edea87279d703685db54aa94743bebcd
+          url: https://raw.githubusercontent.com/Ark-kun/pipeline_components/c6a8b67d1ada2cc17665c99ff6b410df588bee28/components/google-cloud/Vertex_AI/Models/Upload_Scikit-learn_pickle_model/workaround_for_buggy_KFPv2_compiler/component.yaml
+        arguments:
+          model:
+            taskOutput:
+              outputName: model
+              taskId: Train linear regression model using scikit learn from CSV
+              type: ScikitLearnPickleModel
+        annotations:
+          editor.position: '{"x":40,"y":490,"width":180,"height":70}'
+    outputValues: {}
