@@ -37,6 +37,7 @@ import urllib.request
 import csv
 from enum import Enum
 from abc import ABC, abstractmethod
+from typing import List
 
 
 parser = argparse.ArgumentParser()
@@ -401,7 +402,7 @@ class TitleRule(NotebookRule):
             ret = notebook.report_error(ErrorCode.ERROR_TITLE_HEADING, "title cell must start with H1 heading")
         else:
             self.title = cell['source'][0][2:].strip()
-            SentenceCaseTWRule().validate(notebook, self.title)
+            SentenceCaseTWRule().validate(notebook, [self.title])
 
             # H1 title only
             if len(cell['source']) == 1:
@@ -790,67 +791,131 @@ class SetupProjectRule(NotebookRule):
                 ret = notebook.report_error(ErrorCode.ERROR_PROJECTID_TEMPLATE, "Set project ID not match template")
                 
         return ret
+    
 
+class TextRule(ABC):
+    """
+    Abstract class for defining text writing conformance rules
+    """
+    @abstractmethod
+    def validate(self, notebook: Notebook, text: List[str]) -> bool:
+        '''
+        Applies text writing specific rules to validate whether the text 
+        does or does not conform to the rules.
+        
+        Returns whether the test passed the validation rules
+        '''
+        return False
+    
 
-class TextTWRule(NotebookRule):
-    def validate(self, notebook: Notebook) -> bool:
+class BrandingRule(TextRule):
+    def validate(self, notebook: Notebook, text: List[str]) -> bool:
         """
-            Check text cells for technical writing requirements
+            Check the text for branding issues
                 1. Product branding names
                 2. No future tense
                 3. No 1st person
 
         """
         ret = True
-    
         branding = {
-            'Vertex SDK': 'Vertex AI SDK',
-            'Vertex Training': 'Vertex AI Training',
-            'Vertex Prediction': 'Vertex AI Prediction',
-            'Vertex Batch Prediction': 'Vertex AI Batch Prediction',
-            'Vertex XAI': 'Vertex Explainable AI',
-            'Vertex Explainability': 'Vertex Explainable AI',
-            'Vertex AI Explainability': 'Vertex Explainable AI',
-            'Vertex Pipelines': 'Vertex AI Pipelines',
-            'Vertex Experiments': 'Vertex AI Experiments',
-            'Vertex TensorBoard': 'Vertex AI TensorBoard',
-            'Vertex Hyperparameter Tuning': 'Vertex AI Hyperparameter Tuning',
-            'Vertex Metadata': 'Vertex ML Metadata',
-            'Vertex AI Metadata': 'Vertex ML Metadata',
-            'Vertex AI ML Metadata': 'Vertex ML Metadata',
-            'Vertex Vizier': 'Vertex AI Vizier',
-            'Vertex Feature Store': 'Vertex AI Feature Store',
-            'Vertex Forecasting': 'Vertex AI Forecasting',
-            'Vertex Matching Engine': 'Vertex AI Matching Engine',
-            'Vertex TabNet': 'Vertex AI TabNet',
-            'Tabnet': 'TabNet',
-            'Vertex Two Towers': 'Vertex AI Two-Towers',
-            'Vertex Two-Towers': 'Vertex AI Two-Towers',
-            'Vertex Dataset': 'Vertex AI Dataset',
-            'Vertex Model': 'Vertex AI Model',
-            'Vertex Endpoint': 'Vertex AI Endpoint',
-            'Vertex Private Endpoint': 'Vertex AI Private Endpoint',
-            'Automl': 'AutoML',
-            'AutoML Tables': 'AutoML Tabular',
-            'AutoML Vision': 'AutoML Image',
-            'AutoML Language': 'AutoML Text',
-            'Tensorflow': 'TensorFlow',
-            'Tensorboard': 'TensorBoard',
-            'Google Cloud Notebooks': 'Vertex AI Workbench Notebooks',
-            'BQ ': 'BigQuery',
-            'BQ.': 'BigQuery',
-            'Bigquery': 'BigQuery',
-            'BQML': 'BigQuery ML',
-            'GCS ': 'Cloud Storage',
-            'GCS.': 'Cloud Storage',
-            'Google Cloud Storage': 'Cloud Storage',
-            'Pytorch': 'PyTorch',
-            'Sklearn': 'scikit-learn',
-            'sklearn': 'scikit-learn'
+                'Vertex SDK': 'Vertex AI SDK',
+                'Vertex Training': 'Vertex AI Training',
+                'Vertex Prediction': 'Vertex AI Prediction',
+                'Vertex Batch Prediction': 'Vertex AI Batch Prediction',
+                'Vertex XAI': 'Vertex Explainable AI',
+                'Vertex Explainability': 'Vertex Explainable AI',
+                'Vertex AI Explainability': 'Vertex Explainable AI',
+                'Vertex Pipelines': 'Vertex AI Pipelines',
+                'Vertex Experiments': 'Vertex AI Experiments',
+                'Vertex TensorBoard': 'Vertex AI TensorBoard',
+                'Vertex Hyperparameter Tuning': 'Vertex AI Hyperparameter Tuning',
+                'Vertex Metadata': 'Vertex ML Metadata',
+                'Vertex AI Metadata': 'Vertex ML Metadata',
+                'Vertex AI ML Metadata': 'Vertex ML Metadata',
+                'Vertex Vizier': 'Vertex AI Vizier',
+                'Vertex Feature Store': 'Vertex AI Feature Store',
+                'Vertex Forecasting': 'Vertex AI Forecasting',
+                'Vertex Matching Engine': 'Vertex AI Matching Engine',
+                'Vertex TabNet': 'Vertex AI TabNet',
+                'Tabnet': 'TabNet',
+                'Vertex Two Towers': 'Vertex AI Two-Towers',
+                'Vertex Two-Towers': 'Vertex AI Two-Towers',
+                'Vertex Dataset': 'Vertex AI Dataset',
+                'Vertex Model': 'Vertex AI Model',
+                'Vertex Endpoint': 'Vertex AI Endpoint',
+                'Vertex Private Endpoint': 'Vertex AI Private Endpoint',
+                'Automl': 'AutoML',
+                'AutoML Tables': 'AutoML Tabular',
+                'AutoML Vision': 'AutoML Image',
+                'AutoML Language': 'AutoML Text',
+                'Tensorflow': 'TensorFlow',
+                'Tensorboard': 'TensorBoard',
+                'Google Cloud Notebooks': 'Vertex AI Workbench Notebooks',
+                'BQ ': 'BigQuery',
+                'BQ.': 'BigQuery',
+                'Bigquery': 'BigQuery',
+                'BQML': 'BigQuery ML',
+                'GCS ': 'Cloud Storage',
+                'GCS.': 'Cloud Storage',
+                'Google Cloud Storage': 'Cloud Storage',
+                'Pytorch': 'PyTorch',
+                'Sklearn': 'scikit-learn',
+                'sklearn': 'scikit-learn'
         }
-        cell = notebook.get()
-        
-        for line in cell['source']:
+
+        for line in text:
+            for mistake, brand in branding.items():
+                if mistake in line:
+                    ret = notebook.report_error(ErrorCode.ERROR_TWRULE_BRANDING, f"Branding {mistake} -> {brand}: {line}")
+
+        return ret
+    
+
+class SentenceCaseTWRule(TextRule):
+    def validate(self,
+                 notebook,
+                 text: List[str]) -> bool:
+        """
+        Check that headings are in sentence case
+
+        path: used only for reporting an error
+        text: the heading to check
+        """
+        ret = True
+
+        ACRONYMS = ['E2E', 'Vertex', 'AutoML', 'ML', 'AI', 'GCP', 'API', 'R', 'CMEK', 
+                    'TF', 'TFX', 'TFDV', 'SDK', 'VM', 'CPR', 'NVIDIA', 'ID', 'DASK', 
+                    'ARIMA_PLUS', 'KFP', 'I/O', 'GPU', 'Google', 'TensorFlow', 'PyTorch'
+                    ]
+
+        # Check the first line
+        words = text[0].replace('#', '').split(' ')
+        if not words[0][0].isupper():
+            ret = notebook.report_error(ErrorCode.ERROR_HEADING_CAP, f"heading must start with capitalized word: {words[0]}")
+
+        for word in words[1:]:
+            word = word.replace(':', '').replace('(', '').replace(')', '')
+            if word in ACRONYMS:
+                continue
+            if word.isupper():
+                ret = notebook.report_error(ErrorCode.ERROR_HEADING_CASE, f"heading is not sentence case: {word}")
+                
+        return ret
+
+
+
+class TextTWRule(TextRule):
+    def validate(self, notebook: Notebook, text: List[str]) -> bool:
+        """
+        Check for conformance to the following techwriter rules
+                1. No future tense
+                2. No 1st person
+
+        """
+        ret = True
+    
+        for line in text:
             # HTML code
             if '<a ' in line:
                 continue
@@ -862,40 +927,7 @@ class TextTWRule(NotebookRule):
             if 'will' in line.lower() or 'would' in line.lower():
                 ret = notebook.report_error(ErrorCode.ERROR_TWRULE_FUTURETENSE, f'Do not use future tense (e.g., will), replace with present tense: {line}')
 
-            for mistake, brand in branding.items():
-                if mistake in line:
-                    ret = notebook.report_error(ErrorCode.ERROR_TWRULE_BRANDING, f"Branding {mistake} -> {brand}: {line}")
                     
-        return ret
-
-class SentenceCaseTWRule(NotebookRule):
-    def validate(self,
-                 notebook,
-                 heading: str) -> bool:
-        """
-        Check that headings are in sentence case
-
-        path: used only for reporting an error
-        heading: the heading to check
-        """
-        ret = True
-
-        ACRONYMS = ['E2E', 'Vertex', 'AutoML', 'ML', 'AI', 'GCP', 'API', 'R', 'CMEK', 
-                    'TF', 'TFX', 'TFDV', 'SDK', 'VM', 'CPR', 'NVIDIA', 'ID', 'DASK', 
-                    'ARIMA_PLUS', 'KFP', 'I/O', 'GPU', 'Google', 'TensorFlow', 'PyTorch'
-                    ]
-
-        words = heading.split(' ')
-        if not words[0][0].isupper():
-            ret = notebook.report_error(ErrorCode.ERROR_HEADING_CAP, f"heading must start with capitalized word: {words[0]}")
-
-        for word in words[1:]:
-            word = word.replace(':', '').replace('(', '').replace(')', '')
-            if word in ACRONYMS:
-                continue
-            if word.isupper():
-                ret = notebook.report_error(ErrorCode.ERROR_HEADING_CASE, f"heading is not sentence case: {word}")
-                
         return ret
 
 
