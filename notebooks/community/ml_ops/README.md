@@ -14,5 +14,5 @@ The purpose of this set of notebooks and markdown files is to demonstrate Google
 4. [Evaluation](stage4)
 5. [Deployment](stage5)
 6. [Serving](stage6)
-7. Monitoring
+7. Monitoring(stage7)
 8. Continuous Training
