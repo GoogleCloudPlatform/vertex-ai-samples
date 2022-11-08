@@ -73,11 +73,11 @@ def generate_uuid(length: int = 8) -> str:
 
 
 class UniqueStringsPreprocessor(Preprocessor):
+    # A preprocessor that replaces strings that end with "-unique" with a uuid.
+
     @staticmethod
     def update_unique_strings(content: str):
-        # replace variables inside .ipynb files
-        # looking for this format inside notebooks:
-        # VARIABLE_NAME = '[description]'
+        # Replace strings that end with "-unique" with a uuid.
 
         return content.replace('-unique"', f'-{generate_uuid()}"')
 
