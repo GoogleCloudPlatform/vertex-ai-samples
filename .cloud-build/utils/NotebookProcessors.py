@@ -14,6 +14,8 @@
 # limitations under the License.
 
 from typing import Dict
+import random
+import string
 
 from nbconvert.preprocessors import Preprocessor
 
@@ -58,6 +60,33 @@ class UpdateVariablesPreprocessor(Preprocessor):
                 cell.source = self.update_variables(
                     content=cell.source,
                     replacement_map=self._replacement_map,
+                )
+
+            executable_cells.append(cell)
+        notebook.cells = executable_cells
+        return notebook, resources
+
+
+# Generate a uuid of a specifed length
+def generate_uuid(length: int = 8) -> str:
+    return "".join(random.choices(string.ascii_lowercase + string.digits, k=length))
+
+
+class UniqueStringsPreprocessor(Preprocessor):
+    # A preprocessor that replaces strings that end with "-unique" with a uuid.
+
+    @staticmethod
+    def update_unique_strings(content: str):
+        # Replace strings that end with "-unique" with a uuid.
+
+        return content.replace('-unique"', f'-{generate_uuid()}"')
+
+    def preprocess(self, notebook, resources=None):
+        executable_cells = []
+        for cell in notebook.cells:
+            if cell.cell_type == "code":
+                cell.source = self.update_unique_strings(
+                    content=cell.source,
                 )
 
             executable_cells.append(cell)
