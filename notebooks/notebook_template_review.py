@@ -65,8 +65,10 @@ parser.add_argument('--web', dest='web', action='store_true',
                     default=False, help='Output format in HTML')
 parser.add_argument('--repo', dest='repo', action='store_true', 
                     default=False, help='Output format in Markdown')
-parser.add_argument('--update', dest='update', action='store_true', 
-                    default=False, help='Output the updated notebook')
+parser.add_argument('--fix', dest='fix', action='store_true', 
+                    default=False, help='Fix the notebook non-conformance errors')
+parser.add_argument('--fix-codes', dest='fix_codes',
+                    default=None, type=str, help='Fix only specified errors')
 args = parser.parse_args()
 
 if args.errors_codes:
@@ -75,6 +77,10 @@ if args.errors_codes:
 
 if args.errors_csv:
     args.errors = True
+
+if args.fix_codes:
+    args.fix_codes = args.fix_codes.split(',')
+    args.fix = True
 
 
 class ErrorCode(Enum):
@@ -157,6 +163,10 @@ class ErrorCode(Enum):
 
     ERROR_EMPTY_CALL = 101
 
+class FixCode(Enum):
+    FIX_BAD_LINK = 0,
+    FIX_PLACEHOLDER = 1
+
 
 # globals
 last_tag = ''
@@ -181,14 +191,15 @@ def parse_dir(directory: str) -> int:
                 continue
             exit_code += parse_dir(entry.path)
         elif entry.name.endswith('.ipynb'):
-            exit_code += parse_notebook(entry.path, tag=directory.split('/')[-1], linkback=None)
+            exit_code += parse_notebook(entry.path, tag=directory.split('/')[-1], linkback=None, rules=rules)
             
     return exit_code
 
 
 def parse_notebook(path: str,
                    tag: str,
-                   linkback: str) -> int:
+                   linkback: str,
+                   rules: List) -> int:
     """
         Review the specified notebook for conforming to the notebook template
         and notebook authoring requirements.
@@ -200,13 +211,6 @@ def parse_notebook(path: str,
         Returns the number of errors
     """
     notebook = Notebook(path)
-    
-    # Cell Validation
-    rules = [ copyright, notices, title, links, overview, objective,
-              recommendations, dataset, costs, setuplocal, helpers,
-              installation, restart, versions, beforebegin, enableapis,
-              setupproject
-            ]
     
     for rule in rules:
         rule.validate(notebook)
@@ -226,7 +230,7 @@ def parse_notebook(path: str,
                   links.workbench_link
         )
         
-    if args.update:
+    if args.fix:
         notebook.writeback()
         
     return notebook.num_errors
@@ -331,15 +335,25 @@ class Notebook(object):
 
 
     def report_fix(self,
-                   code: ErrorCode,
+                   code: FixCode,
                    fixmsg: str):
         """
         Report an automatic fix
         
-        code: The error code number.
-        fixmsg: The autofix message
+            code: The fox code number.
+            fixmsg: The autofix message
+        Returns:
+            Whether code is to be fixed
         """
-        print(f"{self._path}: FIXED ({code}): {fixmsg}", file=sys.stderr)
+        if args.fix:
+            code = code.value[0]
+            if args.fix_codes:
+                if str(code) not in args.fix_codes:
+                    return False
+                
+            print(f"{self._path}: FIXED ({code}): {fixmsg}", file=sys.stderr)
+            return True
+        return False
         
                 
     def writeback(self):
@@ -363,7 +377,7 @@ class NotebookRule(ABC):
         
         Returns whether the cell passed the validation rules
         '''
-        return False
+        pass
 
 
 
@@ -433,10 +447,9 @@ class LinksRule(NotebookRule):
                 
                 derived_link = os.path.join('https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/', notebook.path)
                 if self.git_link != derived_link:
-                    if args.update:
+                    if notebook.report_fix(FixCode.FIX_BAD_LINK, f"fixed GitHub link: {derived_link}"):
                         fix_link = f"<a href={derived_link} target='_blank'>"
                         cell['source'][ix] = fix_link
-                        notebook.report_fix(ErrorCode.ERROR_LINK_GIT_BAD, f"fixed GitHub link: {derived_link}")
                     else:
                         ret = notebook.report_error(ErrorCode.ERROR_LINK_GIT_BAD, f"bad GitHub link: {self.git_link}")
                     
@@ -445,10 +458,9 @@ class LinksRule(NotebookRule):
  
                 derived_link = os.path.join('https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks', notebook.path)
                 if self.colab_link != derived_link:
-                    if args.update:
+                    if notebook.report_fix(FixCode.FIX_BAD_LINK, f"fixed Colab link: {derived_link}"):
                         fix_link = f"<a href={derived_link} target='_blank'>"
                         cell['source'][ix] = fix_link
-                        notebook.report_fix(ErrorCode.ERROR_LINK_COLAB_BAD, f"fixed Colab link: {derived_link}")
                     else:
                         ret = notebook.report_error(ErrorCode.ERROR_LINK_COLAB_BAD, f"bad Colab link: {self.colab_link}")
 
@@ -458,10 +470,9 @@ class LinksRule(NotebookRule):
 
                 derived_link = os.path.join('https://console.cloud.google.com/vertex-ai/workbench/deploy-notebook?download_url=https://raw.githubusercontent.com/GoogleCloudPlatform/vertex-ai-samples/main/notebooks/', notebook.path)
                 if self.workbench_link != derived_link:
-                    if args.update:
+                    if notebook.report_fix(FixCode.FIX_BAD_LINK, f"fixed Workbench link: {derived_link}"):
                         fix_link = f"<a href={derived_link} target='_blank'>"
                         cell['source'][ix] = fix_link
-                        notebook.report_fix(ErrorCode.ERROR_LINK_WORKBENCH_BAD, f"fixed Workbench link: {derived_link}")
                     else:
                         ret = notebook.report_error(ErrorCode.ERROR_LINK_WORKBENCH_BAD, f"bad Workbench link: {self.workbench_link}")
 
@@ -791,7 +802,7 @@ class SetupProjectRule(NotebookRule):
                 ret = notebook.report_error(ErrorCode.ERROR_PROJECTID_TEMPLATE, "Set project ID not match template")
                 
         return ret
-    
+
 
 class TextRule(ABC):
     """
@@ -806,7 +817,7 @@ class TextRule(ABC):
         Returns whether the test passed the validation rules
         '''
         return False
-    
+
 
 class BrandingRule(TextRule):
     def validate(self, notebook: Notebook, text: List[str]) -> bool:
@@ -870,7 +881,7 @@ class BrandingRule(TextRule):
                     ret = notebook.report_error(ErrorCode.ERROR_TWRULE_BRANDING, f"Branding {mistake} -> {brand}: {line}")
 
         return ret
-    
+
 
 class SentenceCaseTWRule(TextRule):
     def validate(self,
@@ -1032,6 +1043,13 @@ beforebegin = BeforeBeginRule()
 enableapis = EnableAPIsRule()
 setupproject = SetupProjectRule()
 
+ # Cell Validation
+rules = [ copyright, notices, title, links, overview, objective,
+          recommendations, dataset, costs, setuplocal, helpers,
+          installation, restart, versions, beforebegin, enableapis,
+          setupproject
+]
+
 if args.web:
     print('<table>')
     print('    <th>Vertex AI Feature</th>')
@@ -1047,7 +1065,7 @@ elif args.notebook:
     if not os.path.isfile(args.notebook):
         print("Error: not a notebook:", args.notebook)
         exit(1)
-    exit_code = parse_notebook(args.notebook, tag='', linkback=None)
+    exit_code = parse_notebook(args.notebook, tag='', linkback=None, rules=rules)
 elif args.notebook_file:
     if not os.path.isfile(args.notebook_file):
         print("Error: file does not exist", args.notebook_file)
@@ -1066,7 +1084,7 @@ elif args.notebook_file:
                         linkback = row[2]
                     except:
                         linkback = None
-                    exit_code += parse_notebook(notebook, tag=tag, linkback=linkback)
+                    exit_code += parse_notebook(notebook, tag=tag, linkback=linkback, rules=rules)
 else:
     print("Error: must specify a directory or notebook")
     exit(1)
