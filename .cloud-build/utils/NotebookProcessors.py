@@ -73,13 +73,19 @@ def generate_uuid(length: int = 8) -> str:
 
 
 class UniqueStringsPreprocessor(Preprocessor):
-    # A preprocessor that replaces strings that end with "-unique" with a uuid.
+    # A preprocessor that replaces strings that end with "-unique" or "_unique" with a uuid.
 
     @staticmethod
     def update_unique_strings(content: str):
-        # Replace strings that end with "-unique" with a uuid.
+        # Replace strings that end with "-unique" or "_unique" with a uuid.
 
-        return content.replace('-unique"', f'-{generate_uuid()}"')
+        unique_id = generate_uuid()
+        return (
+            content.replace('-unique"', f'-{unique_id}"')
+            .replace("-unique'", f'-{unique_id}"')
+            .replace('_unique"', f'_{unique_id}"')
+            .replace("_unique'", f'_{unique_id}"')
+        )
 
     def preprocess(self, notebook, resources=None):
         executable_cells = []
