@@ -38,7 +38,7 @@ from utils import NotebookProcessors, util
 
 # A buffer so that workers finish before the orchestrating job
 WORKER_TIMEOUT_BUFFER_IN_SECONDS: int = 60 * 60
-PYTHON_VERSION = "3.9" # Set default python version
+PYTHON_VERSION = "3.9"  # Set default python version
 
 
 def format_timedelta(delta: datetime.timedelta) -> str:
@@ -102,6 +102,7 @@ def _process_notebook(
             "VPC_NETWORK": variable_vpc_network,
         },
     )
+    unique_strings_preprocessor = NotebookProcessors.UniqueStringsPreprocessor()
 
     # Use no-execute preprocessor
     (
@@ -127,13 +128,15 @@ def _get_notebook_python_version(notebook_path: str) -> str:
     src = file.read()
     nb_json = json.loads(src)
 
-    #Iterate over the cells in the ipynb
-    for cell in nb_json['cells']:
-        if cell['cell_type'] == 'markdown':
-            markdown = str.join('', cell['source'])
+    # Iterate over the cells in the ipynb
+    for cell in nb_json["cells"]:
+        if cell["cell_type"] == "markdown":
+            markdown = str.join("", cell["source"])
 
             # Look for the python version specification pattern
-            re_match = re.search('python version = (\d\.\d)', markdown, flags=re.IGNORECASE)
+            re_match = re.search(
+                "python version = (\d\.\d)", markdown, flags=re.IGNORECASE
+            )
             if re_match:
                 # get the version number
                 python_version = re_match.group(1)
@@ -201,7 +204,9 @@ def process_and_execute_notebook(
     operation = None
     try:
         # Get the python version for running the notebook if specified
-        notebook_exec_python_version = _get_notebook_python_version(notebook_path=notebook)
+        notebook_exec_python_version = _get_notebook_python_version(
+            notebook_path=notebook
+        )
         print(f"Running notebook with python {notebook_exec_python_version}")
 
         # Pre-process notebook by substituting variable names
@@ -230,7 +235,7 @@ def process_and_execute_notebook(
             private_pool_id=private_pool_id,
             private_pool_region=variable_region,
             timeout_in_seconds=timeout_in_seconds,
-            python_version=notebook_exec_python_version
+            python_version=notebook_exec_python_version,
         )
 
         operation_metadata = BuildOperationMetadata(mapping=operation.metadata)
@@ -443,7 +448,7 @@ def process_and_execute_notebooks(
                         result.log_url,
                         result.output_uri,
                         result.output_uri_web,
-                        result.logs_bucket
+                        result.logs_bucket,
                     ]
                     for result in results_sorted
                 ],
@@ -454,34 +459,34 @@ def process_and_execute_notebooks(
                     "log_url",
                     "output_uri",
                     "output_uri_web",
-                    "logs_bucket"
+                    "logs_bucket",
                 ],
             )
         )
 
         if len(notebooks) == 1:
-          print("="*100)
-          print("The notebook execution build log:\n")
-          print("="*100)
+            print("=" * 100)
+            print("The notebook execution build log:\n")
+            print("=" * 100)
 
-          build_id = results_sorted[0].build_id
-          logs_bucket_name = (results_sorted[0].logs_bucket).removeprefix("gs://")
-          log_file_name = f"log-{build_id}.txt"
+            build_id = results_sorted[0].build_id
+            logs_bucket_name = (results_sorted[0].logs_bucket).removeprefix("gs://")
+            log_file_name = f"log-{build_id}.txt"
 
-          log_contents = util.download_blob_into_memory(
-            bucket_name=logs_bucket_name,
-            blob_name=log_file_name,
-            download_as_text=True
+            log_contents = util.download_blob_into_memory(
+                bucket_name=logs_bucket_name,
+                blob_name=log_file_name,
+                download_as_text=True,
             )
 
-          # Remove extra steps from the log
-          match = re.search("starting Step #4", log_contents, flags=re.IGNORECASE)
+            # Remove extra steps from the log
+            match = re.search("starting Step #4", log_contents, flags=re.IGNORECASE)
 
-          if match is not None:
-            match_index = match.span()[0]
-            print(log_contents[match_index:])
-          else:
-            print(log_contents)
+            if match is not None:
+                match_index = match.span()[0]
+                print(log_contents[match_index:])
+            else:
+                print(log_contents)
 
         print("\n=== END RESULTS===\n")
 
