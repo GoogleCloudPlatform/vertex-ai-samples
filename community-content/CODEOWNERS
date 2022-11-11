@@ -1,7 +1,9 @@
 *  @vertex-ai-samples-contributors  @GoogleCloudPlatform/cloudml-samples-owners
 /tf_agents_bandits_movie_recommendation_with_kfp_and_vertex_sdk	@yinghsienwu
+/pytorch_pre_built_images_deployment @googleapis/vertex-prediction-team
 /pytorch_text_classification_using_vertex_sdk_and_gcloud  @RajeshThallam
 /pytorch_text_classification_using_vertex_sdk_and_gcloud		@RajeshThallam @ultrons
 /sklearn_text_classification_from_script_using_vertex_sdk       @maxhardt
 /pluto_on_workbench @wkharold
 /cpr-examples @samthrasher
+/Train_tabular_models_with_many_frameworks_and_import_to_Vertex_AI_using_Pipelines @Ark-kun
