@@ -17,6 +17,7 @@
 
 import errno
 import os
+import pathlib
 import shutil
 import sys
 
@@ -76,6 +77,7 @@ def execute_notebook(
             log_output=should_log_output,
             stdout_file=sys.stdout if should_log_output else None,
             stderr_file=sys.stderr if should_log_output else None,
+            cwd=pathlib.Path(notebook_source).resolve().parent,
         )
     except Exception as exception:
         execution_exception = exception
