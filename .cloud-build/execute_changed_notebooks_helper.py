@@ -111,6 +111,7 @@ def _process_notebook(
     ) = remove_no_execute_cells_preprocessor.preprocess(nb)
 
     (nb, resources) = update_variables_preprocessor.preprocess(nb, resources)
+    (nb, resources) = unique_strings_preprocessor.preprocess(nb, resources)
 
     with open(notebook_path, mode="w", encoding="utf-8") as new_file:
         nbformat.write(nb, new_file)
