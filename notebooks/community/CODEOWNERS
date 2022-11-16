@@ -23,6 +23,7 @@
 /feature_store @nayaknishant @morgandu
 /prediction @googleapis/vertex-prediction-team
 /vertex_endpoints/tf_hub_obj_detection/deploy_tfhub_object_detection_on_vertex_endpoints.ipynb @entrpn
+/vertex_endpoints/find_ideal_machine_type/find_ideal_machine_type/find_ideal_machine_type.ipynb @entrpn
 /vertex_endpoints/nvidia-triton/nvidia-triton-custom-container-prediction.ipynb @RajeshThallam
 /vertex_endpoints/optimized_tensorflow_runtime @vlasenkoalexey
 /notebooks/community/ml_ops/stage2/get_started_with_visionapi_and_automl.ipynb @mansari
