@@ -12,7 +12,6 @@
 
 /managed_notebooks/
 /bigquery_ml/ @polong
-/sdk/SDK_FBProphet_Forecasting_Online.ipynb @brianchunkang
 /pipelines/google_cloud_pipeline_components_TPU_model_train_upload_deploy.ipynb @brianchunkang
 /explainable_ai/SDK_Custom_Container_XAI.ipynb @brianchunkang
 /matching_engine/sdk_matching_engine_for_indexing.ipynb @ivanmkc
