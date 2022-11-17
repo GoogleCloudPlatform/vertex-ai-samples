@@ -1,6 +1,4 @@
 ## Vertex-AI: Matching Engine Notebook
----
----
 
 <a id="sdk_matching_engine_for_indexing"></a>[Create Vertex AI Matching Engine index](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/matching_engine/sdk_matching_engine_for_indexing.ipynb)
 
