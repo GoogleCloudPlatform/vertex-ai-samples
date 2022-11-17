@@ -56,7 +56,7 @@ The steps performed include:
     
     * Deploy the embedding model for online serving
         ```python
-        # [START aiplatform_intro-swivel]
+        # [START aiplatform_intro_swivel]
         ENDPOINT_NAME = "swivel_embedding"  # <---CHANGE THIS (OPTIONAL)
         MODEL_VERSION_NAME = "movie-tf2-cpu-2.4"  # <---CHANGE THIS (OPTIONAL)
 
@@ -77,7 +77,7 @@ The steps performed include:
             endpoint=endpoint,
             machine_type="n1-standard-2",
         )
-        # [END aiplatform_intro-swivel]
+        # [END aiplatform_intro_swivel]
         ```
         [:notebook: intro-swivel.ipynb](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/matching_engine/intro-swivel.ipynb)
     </details>
@@ -101,7 +101,7 @@ The steps performed include:
     
     * Deploy the model
         ```python
-        # [START aiplatform_two-tower-model-introduction]
+        # [START aiplatform_two_tower_model_introduction]
 
         # Create a model endpoint
         endpoint = aiplatform.Endpoint.create(display_name=DATASET_NAME)
@@ -114,7 +114,7 @@ The steps performed include:
             deployed_model_display_name=DISPLAY_NAME,
         )
 
-        # [END aiplatform_two-tower-model-introduction]
+        # [END aiplatform_two_tower_model_introduction]
         ```
         [:notebook: two-tower-model-introduction.ipynb](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/matching_engine/two-tower-model-introduction.ipynb)
     </details>
