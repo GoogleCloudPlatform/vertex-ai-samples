@@ -1,4 +1,4 @@
 google-cloud-pubsub==2.5.0
 pillow==9.0.1
 tf-agents==0.8.0
-tensorflow==2.7.2
+tensorflow==2.9.3
