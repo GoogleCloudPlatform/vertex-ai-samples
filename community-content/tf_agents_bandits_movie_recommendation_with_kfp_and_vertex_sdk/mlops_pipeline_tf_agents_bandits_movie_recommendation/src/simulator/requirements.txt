@@ -1,5 +1,5 @@
 dataclasses==0.6
 google-cloud-aiplatform==1.8.1
 tensorflow==2.7.2
-pillow==9.0.1
+pillow==9.3.0
 tf-agents==0.8.0
