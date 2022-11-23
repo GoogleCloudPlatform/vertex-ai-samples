@@ -47,12 +47,22 @@ done
 
 echo "Test mode: $is_test"
 
+# Read in user-provided notebooks
+notebooks=()
+for arg in "$@"; do
+    if [[ $arg == *.ipynb ]]; then
+        notebooks+=("$arg")
+    fi
+done
+
 # Only check notebooks in test folders modified in this pull request.
 # Note: Use process substitution to persist the data in the array
-notebooks=()
-while read -r file || [ -n "$line" ]; do
-    notebooks+=("$file")
-done < <(git diff --name-only main... | grep '\.ipynb$')
+if [ ${#notebooks[@]} -eq 0 ]; then
+    echo "Checking for changed notebooked using git"
+    while read -r file || [ -n "$line" ]; do
+        notebooks+=("$file")
+    done < <(git diff --name-only main... | grep '\.ipynb$')
+fi
 
 problematic_notebooks=()
 if [ ${#notebooks[@]} -gt 0 ]; then
@@ -68,7 +78,7 @@ if [ ${#notebooks[@]} -gt 0 ]; then
 
             if [ "$is_test" = true ]; then
                 echo "Running nbfmt..."
-                python3 -m tensorflow_docs.tools.nbfmt --remove_outputs --test "$notebook"
+                python3 -m tensorflow_docs.tools.nbfmt --test "$notebook"
                 NBFMT_RTN=$?
                 # echo "Running black..."
                 # python3 -m nbqa black "$notebook" --check
@@ -93,7 +103,7 @@ if [ ${#notebooks[@]} -gt 0 ]; then
                 python3 -m nbqa isort "$notebook"
                 ISORT_RTN=$?
                 echo "Running nbfmt..."
-                python3 -m tensorflow_docs.tools.nbfmt --remove_outputs "$notebook"
+                python3 -m tensorflow_docs.tools.nbfmt "$notebook"
                 NBFMT_RTN=$?
                 echo "Running flake8..."
                 python3 -m nbqa flake8 "$notebook" --show-source --extend-ignore=W391,E501,F821,E402,F404,W503,E203,E722,W293,W291

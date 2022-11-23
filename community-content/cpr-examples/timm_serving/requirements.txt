@@ -1,0 +1,8 @@
+absl-py==1.1.0
+fastapi==0.75.2
+uvicorn==0.18.2
+timm==0.5.4
+smart_open==6.0.0
+
+google-cloud-storage>=1.26.0,<2.0.0dev
+google-cloud-aiplatform[prediction]>=1.16.0

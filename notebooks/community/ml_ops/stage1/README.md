@@ -22,31 +22,31 @@ The first stage in MLOps is the collection and preparation for the purpose of de
 - Data is preprocessed for training and evaluation using Dataflow.
 - Data augmentation is performed on-the-fly and is coupled with model feeding.
 
-<img src='stage1.jpg'>
+<img src='stage1v2.png'>
 
 ## Notebooks
 
 ### Get Started
 
-[Get Started with BQ datasets](get_started_bq_datasets.ipynb)
+[Get started with Dataflow](community/ml_ops/stage1/get_started_dataflow.ipynb)
 
-```
+In this tutorial, you learn how to use `Dataflow` for training with `Vertex AI`.
+
 The steps performed include:
 
-- Create a Vertex AI `Dataset` resource from `BigQuery` table -- compatible for `AutoML` training.
-- Extract a copy of the dataset from `BigQuery` to a CSV file in Cloud Storage -- compatible for `AutoML` or custom training.
-- Select rows from a `BigQuery` dataset into a `pandas` dataframe -- compatible for custom training.
-- Select rows from a `BigQuery` dataset into a `tf.data.Dataset` -- compatible for custom training `TensorFlow` models.
-- Select rows from extracted CSV files into a `tf.data.Dataset` -- compatible for custom training `TensorFlow` models.
-- Create a `BigQuery` dataset from CSV files.
-- Extract data from `BigQuery` table into a `DMatrix` -- compatible for custom training `XGBoost` models.
-```
+- Offline preprocessing of data:
+    - Serially - w/o dataflow
+    - Parallel - with dataflow
+- Upstream preprocessing of data:
+    - tabular data
+    - image data
 
-[Get Started with Vertex datasets](get_started_vertex_datasets.ipynb)
+[Get started with Vertex AI datasets](community/ml_ops/stage1/get_started_vertex_datasets.ipynb)
 
-```
+In this tutorial, you learn how to use `Vertex AI Dataset` for training with `Vertex AI`.
+
 The steps performed include:
-  
+
 - Create a Vertex AI `Dataset` resource for:
     - image data
     - text data
@@ -61,28 +61,54 @@ The steps performed include:
 - Detect anomalies in new data using TensorFlow Data Validation.
 - Generate a TFRecord feature specification using TensorFlow Transform from the data schema.
 - Export a dataset and convert to TFRecords.
-```
 
-[Get Started with Dataflow](get_started_dataflow.ipynb)
+[Get started with BigQuery datasets](community/ml_ops/stage1/get_started_bq_datasets.ipynb)
 
-```
+In this tutorial, you learn how to use `BigQuery` as a dataset for training with `Vertex AI`.
+
 The steps performed include:
 
-- Offline preprocessing of data:
-    - Serially - w/o dataflow
-    - Parallel - with dataflow
-- Upstream preprocessing of data:
-    - tabular data
-    - image data
-```
+- Create a Vertex AI `Dataset` resource from `BigQuery` table -- compatible for `AutoML` training.
+- Extract a copy of the dataset from `BigQuery` to a CSV file in Cloud Storage -- compatible for `AutoML` or custom training.
+- Select rows from a `BigQuery` dataset into a `pandas` dataframe -- compatible for custom training.
+- Select rows from a `BigQuery` dataset into a `tf.data.Dataset` -- compatible for custom training `TensorFlow` models.
+- Select rows from extracted CSV files into a `tf.data.Dataset` -- compatible for custom training `TensorFlow` models.
+- Create a `BigQuery` dataset from CSV files.
+- Extract data from `BigQuery` table into a `DMatrix` -- compatible for custom training `XGBoost` models.
+
+[Get started with Vertex AI Data Labeling](community/ml_ops/stage1/get_started_with_data_labeling.ipynb)
+
+In this tutorial, you learn how to use the `Vertex AI Data Labeling` service.
+
+The steps performed include:
+
+- Create a Specialist Pool for data labelers.
+- Create a data labeling job.
+- Submit the data labeling job.
+- List data labeling jobs.
+- Cancel a data labeling job.
+
+
+
+[Create an unlabelled Vertex AI AutoML text entity extraction dataset from PDFs using Vision API](community/ml_ops/stage1/get_started_with_visionapi_and_vertex_datasets.ipynb)
+
+In this tutorial, you learn to use `Vision API` to extract text from PDF files stored on a Cloud Storage bucket. You then process the results and create an unlabelled `Vertex AI Dataset`, compatible with `AutoML`, for text entity extraction.
+
+The steps performed include:
+
+1. Using `Vision API` to perform Optical Character Recognition (OCR) to extract text from PDF files.
+2. Processing the results and saving them to text files.
+3. Generating a `Vertex AI Dataset` import file.
+4. Creating a new unlabelled text entity extraction `Vertex AI Dataset` resource in `Vertex AI`.
+
 
 ### E2E Stage Example
 
 [Stage 1: Data Management](mlops_data_management.ipynb)
-  
+
+
 ```
 The steps performed include:
-
 - Explore and visualize the data.
 - Create a Vertex AI `Dataset` resource from `BigQuery` table -- for AutoML training.
 - Extract a copy of the dataset to a CSV file in Cloud Storage.
@@ -92,4 +118,3 @@ The steps performed include:
 - Generate a TFRecord feature specification using TensorFlow Data Validation from the data schema.
 - Preprocess a portion of the BigQuery data using `Dataflow` -- for custom training.
 ```
-
