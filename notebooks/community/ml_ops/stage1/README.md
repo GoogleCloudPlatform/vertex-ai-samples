@@ -76,7 +76,7 @@ The steps performed include:
 - Create a `BigQuery` dataset from CSV files.
 - Extract data from `BigQuery` table into a `DMatrix` -- compatible for custom training `XGBoost` models.
 
-[Get started with Vertex AI Data Labeling](community/ml_ops/stage1/get_started_with_data_labeling.ipynb)
+[Get started with Vertex AI Data Labeling](get_started_with_data_labeling.ipynb)
 
 In this tutorial, you learn how to use the `Vertex AI Data Labeling` service.
 
