@@ -12,7 +12,6 @@
 
 /managed_notebooks/
 /bigquery_ml/ @polong
-/sdk/SDK_FBProphet_Forecasting_Online.ipynb @brianchunkang
 /pipelines/google_cloud_pipeline_components_TPU_model_train_upload_deploy.ipynb @brianchunkang
 /explainable_ai/SDK_Custom_Container_XAI.ipynb @brianchunkang
 /matching_engine/sdk_matching_engine_for_indexing.ipynb @ivanmkc
@@ -23,6 +22,7 @@
 /feature_store @nayaknishant @morgandu
 /prediction @googleapis/vertex-prediction-team
 /vertex_endpoints/tf_hub_obj_detection/deploy_tfhub_object_detection_on_vertex_endpoints.ipynb @entrpn
+/vertex_endpoints/find_ideal_machine_type/find_ideal_machine_type/find_ideal_machine_type.ipynb @entrpn
 /vertex_endpoints/nvidia-triton/nvidia-triton-custom-container-prediction.ipynb @RajeshThallam
 /vertex_endpoints/optimized_tensorflow_runtime @vlasenkoalexey
 /notebooks/community/ml_ops/stage2/get_started_with_visionapi_and_automl.ipynb @mansari
