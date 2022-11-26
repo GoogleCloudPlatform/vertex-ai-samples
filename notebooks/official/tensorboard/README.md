@@ -20,3 +20,14 @@ The steps performed include:
 * Create a custom container image with your customized training code.
 * Setup service account and Google Cloud Storage buckets.
 * Create & launch your custom training job with your custom container.
+
+[Profile model training performance using Profiler](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tensorboard/tensorboard_profiler_custom_training.ipynb)
+
+Learn how to enable Vertex AI TensorBoard Profiler for custom training jobs.
+
+The steps performed include:
+
+* Setup a service account and a Cloud Storage bucket
+* Create a TensorBoard instance
+* Create and run a custom training job that enables TensorBoard Profiler
+* View the TensorBoard Profiler dashboard to debug your model training performance
