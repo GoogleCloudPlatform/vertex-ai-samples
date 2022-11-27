@@ -358,9 +358,9 @@ class Notebook(object):
                 
     def writeback(self):
         """
-        Write the updated (autofixed) notebook to a temporary file
+        Write back the updated (autofixed) notebook 
         """
-        with open('tmp.ipynb', 'w') as f:
+        with open(self._path, 'w') as f:
             json.dump(self._content, f)
 
 
@@ -700,7 +700,9 @@ class InstallationRule(NotebookRule):
                         notebook.report_error(ErrorCode.ERROR_INSTALLATION_QUIET, "Installation code section: use -q with pip3")
                     if 'USER_FLAG' not in line and 'sh(' not in line:
                         notebook.report_error(ErrorCode.ERROR_INSTALLATION_USER_FLAG, "Installation code section: use {USER_FLAG} with pip3")
-            if 'if IS_WORKBENCH_NOTEBOOK:' not in text:
+            if 'required_packages <' in text:
+                pass  # R kernel
+            elif 'if IS_WORKBENCH_NOTEBOOK:' not in text:
                 ret = notebook.report_error(ErrorCode.ERROR_INSTALLATION_CODE_TEMPLATE, "Installation code section out of date (see template)")
         return ret
 
@@ -724,10 +726,11 @@ class RestartRule(NotebookRule):
                 break
             notebook.pop()
 
-        cell = notebook.get()
+        cell = notebook.peek()
         if not cell['source'][0].startswith("### Restart the kernel"):
             ret = notebook.report_error(ErrorCode.ERROR_RESTART_NOTFOUND, "Restart the kernel section not found")
         else:
+            notebook.pop()
             cell = notebook.get()  # code cell
             if cell['cell_type'] != 'code':
                 ret = notebook.report_error(ErrorCode.ERROR_RESTART_CODE_NOTFOUND, "Restart the kernel code section not found")
