@@ -443,7 +443,7 @@ class LinksRule(NotebookRule):
             line = cell['source'][ix]
             source += line
             if '<a href="https://github.com' in line:
-                self.git_link = line.strip()[9:-2].replace('" target="_blank', '')
+                self.git_link = line.strip()[9:-2].replace('" target="_blank', '').replace('" target=\'_blank', '')
                 
                 derived_link = os.path.join('https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/', notebook.path)
                 if self.git_link != derived_link:
@@ -454,7 +454,7 @@ class LinksRule(NotebookRule):
                         ret = notebook.report_error(ErrorCode.ERROR_LINK_GIT_BAD, f"bad GitHub link: {self.git_link}")
                     
             if '<a href="https://colab.research.google.com/' in line:
-                self.colab_link = 'https://colab.research.google.com/github/' + line.strip()[50:-2].replace('" target="_blank', '')
+                self.colab_link = 'https://colab.research.google.com/github/' + line.strip()[50:-2].replace('" target="_blank', '').replace('" target=\'_blank', '')
  
                 derived_link = os.path.join('https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks', notebook.path)
                 if self.colab_link != derived_link:
@@ -464,9 +464,8 @@ class LinksRule(NotebookRule):
                     else:
                         ret = notebook.report_error(ErrorCode.ERROR_LINK_COLAB_BAD, f"bad Colab link: {self.colab_link}")
 
-
             if '<a href="https://console.cloud.google.com/vertex-ai/workbench/' in line:
-                self.workbench_link = line.strip()[9:-2].replace('" target="_blank', '')
+                self.workbench_link = line.strip()[9:-2].replace('" target="_blank', '').replace('" target=\'_blank', '')
 
                 derived_link = os.path.join('https://console.cloud.google.com/vertex-ai/workbench/deploy-notebook?download_url=https://raw.githubusercontent.com/GoogleCloudPlatform/vertex-ai-samples/main/notebooks/', notebook.path)
                 if self.workbench_link != derived_link:
