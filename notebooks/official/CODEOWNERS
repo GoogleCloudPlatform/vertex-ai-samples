@@ -1,21 +1,16 @@
 # These owners will be the default owners for everything in
-
 # the repo. Unless a later match takes precedence,
-
 # @global-owner1 and @global-owner2 will be requested for
-
 # review when someone opens a pull request.
-
-- @GoogleCloudPlatform/vertex-ai-samples-contributors @GoogleCloudPlatform/caiis-tw
+* @GoogleCloudPlatform/vertex-ai-samples-contributors  @GoogleCloudPlatform/caiis-tw
 
 # matching_engine folder
-
 /matching_engine @shenzhimo2 @ivanmkc
 
 /tabnet/tabnet_vertex_tutorial.ipynb @longtle
 
 /migration @andrewferlitsch
-/explainabl_ai  
+/explainabl_ai
 /pipelines @andrewferlitsch
 /ml_metadata @andrewferlitsch
 /model_monitoring @andrewferlitsch
@@ -35,5 +30,14 @@
 /automl/automl_forecasting_bqml_arima_plus_comparison.ipynb @TheMichaelHu
 /automl/automl_tabular_on_vertex_pipelines.ipynb @helinwang
 /custom/custom_training_tensorboard_profiler.ipynb @itseric
-/workbench/spark/spark_sample_notebook.ipynb @bmiro
+/workbench/spark/spark_sample_notebook.ipynb @bradmiro
+/workbench/spark/spark_ml.ipynb @bradmiro
+/model_registry/bqml_vertexai_model_registry.ipynb @soheilazangeneh
+/workbench/exploratory_data_analysis/explore_data_in_bigquery_with_workbench.ipynb @alokpattani
+/model_evaluation/automl_tabular_classification_model_evaluation.ipynb @soheilazangeneh
+/model_evaluation/automl_tabular_regression_model_evaluation.ipynb @soheilazangeneh
+/tabular_workflows/tabnet_on_vertex_pipelines.ipynb @sakagarwal
+/tabular_workflows/wide_and_deep_on_vertex_pipelines.ipynb @sakagarwal
+/model_evaluation/custom_tabular_classification_model_evaluation.ipynb @soheilazangeneh
+/sdk/SDK_FBProphet_Forecasting_Online.ipynb @brianchunkang
 /automl/sdk_automl_forecasting_hierarchical_batch.ipynb @ivanmkc
