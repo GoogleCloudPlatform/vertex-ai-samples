@@ -1,0 +1,141 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "./.cloud-build",
+                "GRPC_DEFAULT_SSL_ROOTS_FILE_PATH": "/Users/ivanmkc/Downloads/roots.pem"
+            }
+        },
+        {
+            "type": "node-terminal",
+            "request": "launch",
+            "name": "Run linter",
+            "command": "source env/bin/activate && .github/workflows/linter/run_linter.sh"
+        },
+        {
+            "name": "Run execution test (normal notebooks)",
+            "type": "python",
+            "request": "launch",
+            "program": ".cloud-build/execute_changed_notebooks_cli.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "--base_branch",
+                "main",
+                "--test_paths_file",
+                ".cloud-build/test_folders.txt",
+                "--variable_project_id",
+                "python-docs-samples-tests",
+                "--variable_region",
+                "us-central1",
+                "--container_uri",
+                "gcr.io/cloud-devrel-public-resources/python-samples-testing-docker:latest",
+                "--staging_bucket",
+                "gs://ivanmkc-test2",
+                "--artifacts_bucket",
+                "gs://ivanmkc-test2/artifacts",
+                "--private_pool_id",
+                "projects/1012616486416/locations/us-central1/workerPools/notebook-ci",
+                "--should_parallelize",
+                "False",
+                "--timeout",
+                "86400",
+                "--variable_service_account",
+                "dummy@dummy.com"
+            ],
+            "env": {
+                "IS_TESTING": "True"
+            }
+        },
+        {
+            "name": "Run execution test (quick notebooks)",
+            "type": "python",
+            "request": "launch",
+            "program": ".cloud-build/execute_changed_notebooks_cli.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "--test_paths_file",
+                ".cloud-build/test_notebook_vm.txt",
+                "--variable_project_id",
+                "python-docs-samples-tests",
+                "--variable_region",
+                "us-central1",
+                "--variable_service_account",
+                "dummy@dummy.com",                
+                "--container_uri",
+                "gcr.io/cloud-devrel-public-resources/python-samples-testing-docker:latest",
+                "--staging_bucket",
+                "gs://ivanmkc-test2",
+                "--artifacts_bucket",
+                "gs://ivanmkc-test2/artifacts",
+                "--private_pool_id",
+                "projects/1012616486416/locations/us-central1/workerPools/notebook-ci",
+                "--should_parallelize",
+                "True",
+                "--timeout",
+                "86400",
+            ],
+            "env": {
+                "IS_TESTING": "True"
+            }
+        },
+        {
+            "name": "Execute notebook (remote)",
+            "type": "python",
+            "request": "launch",
+            "module": "cloudbuild.ExecuteNotebook",
+            "args": [
+                "--notebook_source",
+                "gs://ivanmkc-test2/notebooks/notebooks/aiplatform-2021-10-26-21:23:03.232-custom-tabular-bq-managed-dataset.ipynb",
+                "--output_folder_or_uri",
+                "gs://ivanmkc-test2/notebooks/notebooks/output"
+            ]
+        },
+        {
+            "name": "Run tests",
+            "type": "python",
+            "request": "launch",
+            "module": "pytest",
+            "args": [
+                ".cloud-build/utils/tests"
+            ], 
+            "env": {"PYTHONPATH": "./.cloud-build"}
+        },
+        {
+            "name": "Execute notebook (remote, gcloud)",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "gcloud builds submit --config=.cloud-build/notebook-execution-test-cloudbuild-single.yaml --substitutions=_PYTHON_IMAGE=gcr.io/cloud-devrel-public-resources/python-samples-testing-docker:latest,_NOTEBOOK_GCS_URI=gs://ivanmkc-test2/cloudbuild-test/test.ipynb,_NOTEBOOK_OUTPUT_GCS_URI=gs://ivanmkc-test2/notebooks/notebooks/output"
+        },
+        {
+            "name": "Execute changed notebooks (gcloud)",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "gcloud builds submit --config=.cloud-build/notebook-execution-test-cloudbuild.yaml --substitutions=_PYTHON_IMAGE=gcr.io/cloud-devrel-public-resources/python-samples-testing-docker:latest,_BASE_BRANCH=main,_TEST_PATHS_FILE=.cloud-build/test_folders.txt,_FORCED_BASE_BRANCH=main,_GCP_REGION=us-central1,_GCS_STAGING_BUCKET=gs://ivanmkc-test2/artifacts,_PR_NUMBER=1234 --no-source"
+        },
+        {
+            "name": "Cleanup resources",
+            "type": "python",
+            "request": "launch",
+            "program": ".cloud-build/cleanup/cleanup.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+        },
+        {
+            "name": "Cloud Build: Build linter docker image",
+            "request": "launch",
+            "command": "gcloud builds submit --tag gcr.io/python-docs-samples-tests/notebook_linter",
+        }
+    ]
+}
