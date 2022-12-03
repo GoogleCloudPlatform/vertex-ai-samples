@@ -15,15 +15,19 @@ pip install -r requirements.txt
 * resnet_dp.py - Train ResNet-50 on single node multiple GPUs with `DataParallel` strategy.
 * resnet_ddp.py - Train ResNet-50 on single node multiple GPUs with `DistributedDataParallel` strategy.
 * resnet_ddp_wds.py - Train ResNet-50 on single node multiple GPUs with `DistributedDataParallel` strategy and `Webdataset`.
+* resnet_fsdp.py - Train ResNet-50 on single node multiple GPUs with `FullyShardedDataParallel` strategy.
+* resnet_fsdp_wds.py - Train ResNet-50 on single node multiple GPUs with `FullyShardedDataParallel` strategy and `Webdataset`.
 * shard_imagenet.py - Shard ImagNet individual files into `tar` files.
 
 ## Benchmark
 
 When run the benchmark on Nvidia T4 GPUs using ImageNet validation dataset, you can get the result like:
-Strategy              | Seconds/Epoch - Local Data | Seconds/Epoch - Cloud Data
---------------------- | -------------------------- | --------------------------
-On 1 GPU              | 489                        | 804 (2x slower)
-On 4 GPUs (DP)        | 157                        | 738 (5x slower)
-On 4 GPUs (DDP)       | 134                        | 432 (3x slower)
-On 4 GPUs (DDP + WDS) | 131                        | 133 (same performance)
+Strategy               | Seconds/Epoch - Local Data | Seconds/Epoch - Cloud Data
+---------------------- | -------------------------- | --------------------------
+On 1 GPU               | 489                        | 804 (2x slower)
+On 4 GPUs (DP)         | 157                        | 738 (5x slower)
+On 4 GPUs (DDP)        | 134                        | 432 (3x slower)
+On 4 GPUs (DDP + WDS)  | 131                        | 133 (same performance)
+On 4 GPUs (FSDP)       | 139                        | 353 (3x slower)
+On 4 GPUs (FSDP + WDS) | 138                        | 135 (same performance)
 
