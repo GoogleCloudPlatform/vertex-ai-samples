@@ -61,9 +61,7 @@ def archive_code_and_upload(staging_bucket: str):
 
 
 def download_blob_into_memory(
-  bucket_name: str,
-  blob_name: str,
-  download_as_text: Optional[bool]=False
+    bucket_name: str, blob_name: str, download_as_text: Optional[bool] = False
 ) -> Union[bytes, str]:
     """
     Downloads a blob into memory as byte or as text if
@@ -79,13 +77,10 @@ def download_blob_into_memory(
 
     # Download the blob content
     if download_as_text:
-      contents = blob.download_as_text()
+        contents = blob.download_as_text()
     else:
-      contents = blob.download_as_bytes()
+        contents = blob.download_as_bytes()
 
-    print(
-        f"Downloaded storage object {blob_name} from bucket {bucket_name}."
-    )
+    print(f"Downloaded storage object {blob_name} from bucket {bucket_name}.")
 
     return contents
-
