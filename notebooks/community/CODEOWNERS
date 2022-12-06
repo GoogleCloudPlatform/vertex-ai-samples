@@ -35,3 +35,4 @@
 /notebooks/community/vertex-ai-samples/notebooks/community/model_registry/vertex_ai_model_registry_automl_model_versioning.ipynb @inardini
 /notebooks/community/vizier/conversions_vertex_vizier_and_open_source_vizier.ipynb @halio-g
 /notebooks/community/experiments/vertex_ai_model_experimentation.ipynb @inardini @asobran
+/notebooks/community/pipelines/google_cloud_pipeline_components_bqml_pipeline_anomaly_detection.ipynb @inardini
