@@ -38,3 +38,6 @@
 /model_evaluation/automl_tabular_regression_model_evaluation.ipynb @soheilazangeneh
 /tabular_workflows/tabnet_on_vertex_pipelines.ipynb @sakagarwal
 /tabular_workflows/wide_and_deep_on_vertex_pipelines.ipynb @sakagarwal
+/model_evaluation/custom_tabular_classification_model_evaluation.ipynb @soheilazangeneh
+/sdk/SDK_FBProphet_Forecasting_Online.ipynb @brianchunkang
+/automl/sdk_automl_forecasting_hierarchical_batch.ipynb @ivanmkc
