@@ -54,7 +54,7 @@ implementation:
           import pickle
           from sklearn import linear_model
 
-          df = pandas.read_csv(dataset_path).convert_dtypes()
+          df = pandas.read_csv(dataset_path)
           model = linear_model.LogisticRegression(
               penalty=penalty,
               #dual=False,
