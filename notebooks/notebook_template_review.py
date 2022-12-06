@@ -388,7 +388,7 @@ class CopyrightRule(NotebookRule):
         """
         cell = notebook.get()
         if not 'Copyright' in cell['source'][0]:
-            return self.report_error(ErrorCode.ERROR_COPYRIGHT, "missing copyright cell")
+            return notebook.report_error(ErrorCode.ERROR_COPYRIGHT, "missing copyright cell")
         return True
 
 
@@ -448,7 +448,7 @@ class LinksRule(NotebookRule):
                 derived_link = os.path.join('https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/', notebook.path)
                 if self.git_link != derived_link:
                     if notebook.report_fix(FixCode.FIX_BAD_LINK, f"fixed GitHub link: {derived_link}"):
-                        fix_link = f"<a href={derived_link} target='_blank'>"
+                        fix_link = f"<a href=\"{derived_link}\" target='_blank'>\n"
                         cell['source'][ix] = fix_link
                     else:
                         ret = notebook.report_error(ErrorCode.ERROR_LINK_GIT_BAD, f"bad GitHub link: {self.git_link}")
@@ -459,7 +459,7 @@ class LinksRule(NotebookRule):
                 derived_link = os.path.join('https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks', notebook.path)
                 if self.colab_link != derived_link:
                     if notebook.report_fix(FixCode.FIX_BAD_LINK, f"fixed Colab link: {derived_link}"):
-                        fix_link = f"<a href={derived_link} target='_blank'>"
+                        fix_link = f"<a href=\"{derived_link}\" target='_blank'>\n"
                         cell['source'][ix] = fix_link
                     else:
                         ret = notebook.report_error(ErrorCode.ERROR_LINK_COLAB_BAD, f"bad Colab link: {self.colab_link}")
@@ -470,7 +470,7 @@ class LinksRule(NotebookRule):
                 derived_link = os.path.join('https://console.cloud.google.com/vertex-ai/workbench/deploy-notebook?download_url=https://raw.githubusercontent.com/GoogleCloudPlatform/vertex-ai-samples/main/notebooks/', notebook.path)
                 if self.workbench_link != derived_link:
                     if notebook.report_fix(FixCode.FIX_BAD_LINK, f"fixed Workbench link: {derived_link}"):
-                        fix_link = f"<a href={derived_link} target='_blank'>"
+                        fix_link = f"<a href=\"{derived_link}\" target='_blank'>\n"
                         cell['source'][ix] = fix_link
                     else:
                         ret = notebook.report_error(ErrorCode.ERROR_LINK_WORKBENCH_BAD, f"bad Workbench link: {self.workbench_link}")
