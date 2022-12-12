@@ -1,21 +1,21 @@
 # Administrative Howto notes on CI Notebook Ingestion
 
-This readme covers administrative actions that are perform on an as-needed basis.
+This readme covers administrative actions that are performed on an as-needed basis.
 
 ## Team: vertex-ai-owners
 
-Members of the vertex-ai-owners (git team) have administrative priveleges. 
+Members of the vertex-ai-owners (git team) have administrative privileges. 
 
 ### Viewing members
 
 1. Goto the repo
-2. From top-level menu, select: (Settings -> Colaborators and Teams)[https://github.com/GoogleCloudPlatform/vertex-ai-samples/settings/access]
+2. From top-level menu, select: (Settings -> Collaborators and Teams)[https://github.com/GoogleCloudPlatform/vertex-ai-samples/settings/access]
 
 ### Adding a new member
 
 If another member needs to be added:
-   - Have the new member make request to join the team.
-   - vertex-ai-owners with the `Maintainer` tag may the new member.
+   - Have the new member make a request to join the team.
+   - vertex-ai-owners with the `Maintainer` tag may add the new member.
    
 ## Executing CI notebook ingestion checks on a PR
    
@@ -24,7 +24,7 @@ If another member needs to be added:
 If the CI notebook ingestion test is stuck (not terminating), you can kill the process by:
 
 1. Goto the PR
-2. Under checks, find the entry: vertex-ai-notebook-execution-test (python-docs-samples-tests) In progress — Summary
+2. Under checks, find the entry: vertex-ai-notebook-execution-test (python-docs-samples-tests) In progress —> Summary
 3. Select Details
 4. At bottom of details page, select: View more details on Google Cloud Build
 5. In Cloud Build history page, select Cancel on the top menu bar.
