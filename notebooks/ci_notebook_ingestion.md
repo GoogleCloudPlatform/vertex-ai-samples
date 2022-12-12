@@ -1,21 +1,25 @@
 # Administrative Howto notes on CI Notebook Ingestion
 
+
 This readme covers administrative actions that are performed on an as-needed basis.
 
 ## Team: vertex-ai-owners
 
 Members of the vertex-ai-owners (git team) have administrative privileges. 
 
+
 ### Viewing members
 
 1. Goto the repo
 2. From top-level menu, select: (Settings -> Collaborators and Teams)[https://github.com/GoogleCloudPlatform/vertex-ai-samples/settings/access]
+
 
 ### Adding a new member
 
 If another member needs to be added:
    - Have the new member make a request to join the team.
    - vertex-ai-owners with the `Maintainer` tag may add the new member.
+
    
 ## Executing CI notebook ingestion checks on a PR
    
