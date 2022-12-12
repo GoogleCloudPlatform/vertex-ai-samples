@@ -1,0 +1,70 @@
+tag,notebook,doc
+"AutoML, Text data",official/automl/automl-text-classification.ipynb,vertex-ai/docs/text-data/classification/train-model
+"AutoML, Text data",official/automl/sdk_automl_text_entity_extraction_online.ipynb,
+"AutoML, Text data",official/automl/sdk_automl_text_sentiment_analysis_online.ipynb,
+"AutoML, Tabular data",official/automl/sdk_automl_tabular_forecasting_batch.ipynb,vertex-ai/docs/tabular-data/forecasting/tutorials-samples
+"AutoML, Tabular Data",official/automl/automl_tabular_on_vertex_pipelines.ipynb,vertex-ai/docs/tabular-data/tabular-workflows/e2e-automl
+"AutoML, Tabular Data",official/automl/sdk_automl_tabular_regression_batch_bq.ipynb,
+"AutoML, Tabular Data",official/automl/sdk_automl_tabular_regression_batch_bq.ipynb,
+"AutoML, Forecasting",official/automl/automl_forecasting_bqml_arima_plus_comparison.ipynb,vertex-ai/docs/tabular-data/forecasting-arima/overview
+"AutoML, Forecasting",official/automl/sdk_automl_tabular_forecasting_batch.ipynb,
+"AutoML, Image data",official/automl/sdk_automl_text_sentiment_analysis_online.ipynb,
+"AutoML, Video data",official/automl/sdk_automl_text_sentiment_analysis_online.ipynb,
+"AutoML, Video data",official/automl/sdk_automl_video_classification_batch.ipynb,
+"AutoML, Video data",official/automl/sdk_automl_video_object_tracking_batch.ipynb,
+"AutoML, Video data",official/sdk/SDK_AutoML_Video_Classification.ipynb,
+"BigQuery, Vertex AI Workbench",official/workbench/exploratory_data_analysis/explore_data_in_bigquery_with_workbench.ipynb,
+"BigQuery ML, Vertex AI Model Registry, Batch prediction",official/model_registry/bqml_vertexai_model_registry.ipynb,
+"BigQuery ML, Vertex AI Model Registry, Online prediction",official/bigquery_ml/bqml-online-prediction.ipynb,
+"BigQuery ML",official/structured_data/rapid_prototyping_bqml_automl.ipynb,
+Custom Training,official/custom/sdk-custom-image-classification-batch.ipynb,
+Custom Training,official/custom/sdk-custom-image-classification-online.ipynb,
+Custom Training,official/custom/SDK_Custom_Container_Prediction.ipynb,
+"Custom Training, BiqQuery dataset",official/custom/custom-tabular-bq-managed-dataset.ipynb,
+"Custom Training, TensorBoard",official/custom/custom-tabular-bq-managed-dataset.ipynb,
+"Custom Training, TensorBoard",official/tensorboard/tensorboard_custom_training_with_custom_container.ipynb,
+"Custom Training, TensorBoard",official/tensorboard/tensorboard_custom_training_with_prebuilt_container.ipynb
+"Custom Training, Managed dataset",official/sdk/SDK_Custom_Training_Python_Package_Managed_Text_Dataset_Tensorflow_Serving_Container.ipynb,
+"Custom Training, Distributed",official/training/multi_node_ddp_gloo_vertex_training_with_custom_container.ipynb,
+"Custom Training, Distributed",official/training/multi_node_ddp_nccl_vertex_training_with_custom_container.ipynb
+Vertex AI Experiments,official/experiments/comparing_pipeline_runs.ipynb,
+Vertex AI Experiments,official/experiments/build_model_experimentation_lineage_with_prebuild_code.ipynb,
+Vertex AI Experiments,official/experiments/comparing_local_trained_models.ipynb,
+"Vertex Explainable AI, Tabular data",official/explainable_ai/sdk_automl_tabular_binary_classification_batch_explain.ipynb,vertex-ai/docs/explainable-ai/overview
+"Vertex Explainable AI, Tabular data",official/explainable_ai/sdk_automl_tabular_classification_online_explain.ipynb,vertex-ai/docs/explainable-ai/overview
+"Vertex Explainable AI, Image data",official/explainable_ai/sdk_custom_image_classification_batch_explain.ipynb,vertex-ai/docs/explainable-ai/overview
+"Vertex Explainable AI, Tabular data",official/explainable_ai/sdk_custom_tabular_regression_batch_explain.ipynb,vertex-ai/docs/explainable-ai/overview
+"Vertex Explainable AI, Tabular data",official/explainable_ai/sdk_custom_tabular_regression_online_explain.ipynb,vertex-ai/docs/explainable-ai/overview
+Vertex ML Metadata,official/ml_metadata/sdk-metric-parameter-tracking-for-custom-jobs.ipynb,
+"Vertex Explainable AI, Image data",official/explainable_ai/sdk_custom_image_classification_online_explain.ipynb,vertex-ai/docs/explainable-ai/overview
+Vertex AI Feature Store,official/feature_store/sdk-feature-store.ipynb,
+Vertex AI Feature Store,official/feature_store/sdk-feature-store-pandas.ipynb,
+Vertex AI Matching Engine,official/matching_engine/sdk_matching_engine_for_indexing.ipynb,
+Vertex ML Metadata,official/ml_metadata/sdk-metric-parameter-tracking-for-custom-jobs.ipynb,
+Vertex ML Metadata,official/ml_metadata/sdk-metric-parameter-tracking-for-locally-trained-models.ipynb,
+"Vertex ML Metadata, Vertex AI Pipelines",official/ml_metadata/sdk-metric-parameter-tracking-for-locally-trained-models.ipynb,
+"Vertex AI Model Evaluation, AutoML",official/model_evaluation/automl_tabular_classification_model_evaluation.ipynb,
+"Vertex AI Model Evaluation, AutoML",official/model_evaluation/automl_tabular_regression_model_evaluation.ipynb,
+"Vertex AI Model Evaluation, AutoML",official/model_evaluation/automl_text_classification_model_evaluation.ipynb,
+"Vertex AI Model Evaluation, AutoML",official/model_evaluation/automl_video_classification_model_evaluation.ipynb,
+"Vertex AI Model Evaluation, Custom Training",official/model_evaluation/custom_tabular_regression_model_evaluation.ipynb,
+Model Monitoring,official/model_monitoring/model_monitoring.ipynb,
+Vertex AI Pipelines,official/pipelines/pipelines_intro_kfp.ipynb,
+Vertex AI Pipelines,official/pipelines/control_flow_kfp.ipynb,
+Vertex AI Pipelines,official/pipelines/metrics_viz_run_compare_kfp.ipynb,
+Vertex AI Pipelines,official/pipelines/lightweight_functions_component_io_kfp.ipynb,
+"Vertex AI Pipelines Image data",official/pipelines/google_cloud_pipeline_components_automl_images.ipynb,
+"Vertex AI Pipelines, Tabular data",official/pipelines/automl_tabular_classification_beans.ipynb,
+"Vertex AI Pipelines, Tabular data",official/pipelines/google_cloud_pipeline_components_automl_tabular.ipynb,
+"Vertex AI Pipelines, Tabular data",official/pipelines/google_cloud_pipeline_components_dataproc_tabular.ipynb,
+"Vertex AI Pipelines, Text data",official/pipelines/google_cloud_pipeline_components_automl_text.ipynb,
+"Vertex AI Pipelines, Text data",official/pipelines/google_cloud_pipeline_components_bqml_text.ipynb,
+Vertex AI Pipelines,official/pipelines/custom_model_training_and_batch_prediction.ipynb,
+Vertex AI Pipelines,official/pipelines/google_cloud_pipeline_components_model_train_upload_deploy.ipynb,
+Vertex AI Pipelines,official/pipelines/google_cloud_pipeline_components_model_upload_predict_evaluate.ipynb,
+"Vertex AI Training, Reduction Server, PyTorch",official/reduction_server/pytorch_distributed_training_reduction_server.ipynb,
+"Tabular Workflows, Vertex AI TabNet",official/tabnet/tabnet_vertex_tutorial.ipynb,
+"Tabular Workflows, Vertex AI TabNet, Vertex Explainablee AI",official/tabnet/ai-explanations-tabnet-algorithm.ipynb,
+"Tabular Workflows, Vertex AI TabNet, Vertex AI Pipelines",official/tabular_workflows/tabnet_on_vertex_pipelines.ipynb,
+"Tabular Workflows, Vertex AI Wide and Deep",official/tabular_workflows/wide_and_deep_on_vertex_pipelines.ipynb,
+Vertex AI Vizier,official/vizier/gapic-vizier-multi-objective-optimization.ipynb,vertex-ai/docs/vizier/using-vizier
