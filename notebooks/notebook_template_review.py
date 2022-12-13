@@ -554,7 +554,13 @@ class ObjectiveRule(NotebookRule):
                 else:
                     ch = sline[0]
                     if ch in ['-', '*', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
-                        self.steps += line
+                        # check for italic font setting
+                        if ch == '*' and sline[1] != ' ':
+                            in_steps = False
+                        else:
+                            self.steps += line
+                    elif ch == '#':
+                        in_steps = False
             
         if self.desc == '':
             ret = notebook.report_error(ErrorCode.ERROR_OBJECTIVE_MISSING_DESC, "Objective section missing desc")
@@ -1016,6 +1022,7 @@ def add_index(path: str,
             print(f"\n### {flat_list}\n")
         print(f"\n[{title}]({git_link})\n")
     
+        print("```")
         if args.desc:
             print(desc)
 
@@ -1023,7 +1030,8 @@ def add_index(path: str,
             print(uses)
 
         if args.steps:
-            print(steps)
+            print(steps.rstrip() + '\n')
+        print("```\n")
 
 
 # Instantiate the rules
