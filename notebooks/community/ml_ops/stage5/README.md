@@ -25,9 +25,10 @@ The fifth stage in MLOps is deployment to production of the blessed model, which
 ### Get Started
 
 
-[Get started with Vertex AI Endpoints](community/ml_ops/stage5/get_started_with_vertex_endpoints.ipynb)
+[Get started with Vertex AI Endpoints](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage5/get_started_with_vertex_endpoints.ipynb)
 
-In this tutorial, you learn how to use `Vertex AI Endpoint` resources.
+```
+Learn how to use `Vertex AI Endpoint` resources.
 
 The steps performed include:
 
@@ -46,9 +47,13 @@ The steps performed include:
 - In pipeline: Create an `Endpoint` resource and deploy an existing `Model` resource to the `Endpoint` resource.
 - In pipeline: Deploy an existing `Model` resource to an existing `Endpoint` resource.
 
-[Get started with Vertex AI Endpoint and shared VM](community/ml_ops/stage5/get_started_with_vertex_endpoint_and_shared_vm.ipynb)
+```
 
-In this tutorial, you learn how to use deployment resource pools for deploying models. A deployment resouce pool provides one with the ability to co-host more than one model on the same (shared) VM.
+
+[Get started with Vertex AI Endpoint and shared VM](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage5/get_started_with_vertex_endpoint_and_shared_vm.ipynb)
+
+```
+Learn how to use deployment resource pools for deploying models.
 
 The steps performed include:
 
@@ -62,9 +67,13 @@ The steps performed include:
 - Make a prediction request with first deployed model (model A).
 - Make a prediction request with second deployed model (model B).
 
-[Get started with configuring autoscaling for Vertex AI Endpoint deployment](community/ml_ops/stage5/get_started_with_autoscaling.ipynb)
+```
 
-In this tutorial, you learn how to use fine-tune control auto-scaling configuration when deploying a `Model` resource to an `Endpoint` resource.
+
+[Get started with configuring autoscaling for Vertex AI Endpoint deployment](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage5/get_started_with_autoscaling.ipynb)
+
+```
+Learn how to use fine-tune control auto-scaling configuration when deploying a `Model` resource to an `Endpoint` resource.
 
 The steps performed include:
 
@@ -78,9 +87,13 @@ The steps performed include:
 - Fine-tune scaling thresholds for GPU utilization.
 - Deploy mix of CPU and GPU model instances with auto-scaling to an `Endpoint` resource.
 
-[Get started with Vertex AI Private Endpoints](community/ml_ops/stage5/get_started_with_vertex_private_endpoints.ipynb)
+```
 
-In this tutorial, you learn how to use `Vertex AI Private Endpoint` resources.
+
+[Get started with Vertex AI Private Endpoints](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage5/get_started_with_vertex_private_endpoints.ipynb)
+
+```
+Learn how to use `Vertex AI Private Endpoint` resources.
 
 The steps performed include:
 
@@ -89,8 +102,5 @@ The steps performed include:
 - Configuring the serving binary of a `Model` resource for deployment to a `Private Endpoint` resource.
 - Deploying a `Model` resource to a `Private Endpoint` resource.
 - Send a prediction request to a `Private Endpoint`
-- Enable two additional APIs: Service Networking and Cloud DNS.
-- Add Compute Admin Network role to your (default) service account.
-- Issue two gcloud commands to setup the VPC peering for your service account.
-- There is *currently* no SDK support yet, so private endpoint is created with GAPIC client and has an extra argument for the peering network.
-- To send a request, you can't use SDK/GAPIC since they do a HTTP internet request. Instead, you use curl to send a peer-to-peer request.
+
+```
