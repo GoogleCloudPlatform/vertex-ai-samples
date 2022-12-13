@@ -401,6 +401,16 @@ class NoticesRule(NotebookRule):
         if cell['source'][0].startswith('This notebook'):
             notebook.pop()
         return True
+    
+class TestEnvRule(NotebookRule):
+    def validate(self, notebook: Notebook) -> bool:
+        """
+        Parse the (optional) test in which environment cell
+        """
+        cell = notebook.peek()
+        if cell['source'][0].startswith('**_NOTE_**: This notebook has been tested'):
+            notebook.pop()
+        return True
 
 
 class TitleRule(NotebookRule): 
@@ -1039,6 +1049,7 @@ copyright = CopyrightRule()
 notices = NoticesRule()
 title = TitleRule()
 links = LinksRule()
+testenv = TestEnvRule()
 overview = OverviewRule()
 objective = ObjectiveRule()
 recommendations = RecommendationsRule()
@@ -1054,7 +1065,7 @@ enableapis = EnableAPIsRule()
 setupproject = SetupProjectRule()
 
  # Cell Validation
-rules = [ copyright, notices, title, links, overview, objective,
+rules = [ copyright, notices, title, links, testenv, overview, objective,
           recommendations, dataset, costs, setuplocal, helpers,
           installation, restart, versions, beforebegin, enableapis,
           setupproject
