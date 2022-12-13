@@ -380,7 +380,6 @@ class NotebookRule(ABC):
         pass
 
 
-
 class CopyrightRule(NotebookRule):
     def validate(self, notebook: Notebook) -> bool:
         """
@@ -399,16 +398,6 @@ class NoticesRule(NotebookRule):
         """
         cell = notebook.peek()
         if cell['source'][0].startswith('This notebook'):
-            notebook.pop()
-        return True
-    
-class TestEnvRule(NotebookRule):
-    def validate(self, notebook: Notebook) -> bool:
-        """
-        Parse the (optional) test in which environment cell
-        """
-        cell = notebook.peek()
-        if cell['source'][0].startswith('**_NOTE_**: This notebook has been tested'):
             notebook.pop()
         return True
 
@@ -494,6 +483,28 @@ class LinksRule(NotebookRule):
             ret = notebook.report_error(ErrorCode.ERROR_LINK_WORKBENCH_MISSING, 'Missing link for Workbench')
         
         return ret
+
+
+class TableRule(NotebookRule):
+    def validate(self, notebook: Notebook) -> bool:
+        """
+        Parse the (optional) table of contents cell
+        """
+        cell = notebook.peek()
+        if cell['source'][0].startswith('## Table of contents'):
+            notebook.pop()
+        return True
+
+
+class TestEnvRule(NotebookRule):
+    def validate(self, notebook: Notebook) -> bool:
+        """
+        Parse the (optional) test in which environment cell
+        """
+        cell = notebook.peek()
+        if cell['source'][0].startswith('**_NOTE_**: This notebook has been tested'):
+            notebook.pop()
+        return True
 
 
 class OverviewRule(NotebookRule):
@@ -1050,6 +1061,7 @@ notices = NoticesRule()
 title = TitleRule()
 links = LinksRule()
 testenv = TestEnvRule()
+table = TableRule()
 overview = OverviewRule()
 objective = ObjectiveRule()
 recommendations = RecommendationsRule()
@@ -1065,7 +1077,7 @@ enableapis = EnableAPIsRule()
 setupproject = SetupProjectRule()
 
  # Cell Validation
-rules = [ copyright, notices, title, links, testenv, overview, objective,
+rules = [ copyright, notices, title, links, testenv, table, overview, objective,
           recommendations, dataset, costs, setuplocal, helpers,
           installation, restart, versions, beforebegin, enableapis,
           setupproject
