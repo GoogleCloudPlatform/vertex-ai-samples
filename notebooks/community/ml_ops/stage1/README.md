@@ -28,9 +28,11 @@ The first stage in MLOps is the collection and preparation for the purpose of de
 
 ### Get Started
 
-[Get started with Dataflow](get_started_dataflow.ipynb)
 
-In this tutorial, you learn how to use `Dataflow` for training with `Vertex AI`.
+[Get started with Dataflow](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage1/get_started_dataflow.ipynb)
+
+```
+Learn how to use `Dataflow` for training with `Vertex AI`.
 
 The steps performed include:
 
@@ -40,10 +42,13 @@ The steps performed include:
 - Upstream preprocessing of data:
     - tabular data
     - image data
+```
 
-[Get started with Vertex AI datasets](get_started_vertex_datasets.ipynb)
 
-In this tutorial, you learn how to use `Vertex AI Dataset` for training with `Vertex AI`.
+[Get started with Vertex AI datasets](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage1/get_started_vertex_datasets.ipynb)
+
+```
+Learn how to use `Vertex AI Dataset` for training with `Vertex AI`.
 
 The steps performed include:
 
@@ -61,10 +66,13 @@ The steps performed include:
 - Detect anomalies in new data using TensorFlow Data Validation.
 - Generate a TFRecord feature specification using TensorFlow Transform from the data schema.
 - Export a dataset and convert to TFRecords.
+```
 
-[Get started with BigQuery datasets](get_started_bq_datasets.ipynb)
 
-In this tutorial, you learn how to use `BigQuery` as a dataset for training with `Vertex AI`.
+[Get started with BigQuery datasets](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage1/get_started_bq_datasets.ipynb)
+
+```
+Learn how to use `BigQuery` as a dataset for training with `Vertex AI`.
 
 The steps performed include:
 
@@ -75,10 +83,13 @@ The steps performed include:
 - Select rows from extracted CSV files into a `tf.data.Dataset` -- compatible for custom training `TensorFlow` models.
 - Create a `BigQuery` dataset from CSV files.
 - Extract data from `BigQuery` table into a `DMatrix` -- compatible for custom training `XGBoost` models.
+```
 
-[Get started with Vertex AI Data Labeling](get_started_with_data_labeling.ipynb)
 
-In this tutorial, you learn how to use the `Vertex AI Data Labeling` service.
+[Get started with Vertex AI Data Labeling](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage1/get_started_with_data_labeling.ipynb)
+
+```
+Learn how to use the `Vertex AI Data Labeling` service/
 
 The steps performed include:
 
@@ -87,28 +98,31 @@ The steps performed include:
 - Submit the data labeling job.
 - List data labeling jobs.
 - Cancel a data labeling job.
+```
 
 
+[Create an unlabelled Vertex AI AutoML text entity extraction dataset from PDFs using Vision API](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage1/get_started_with_visionapi_and_vertex_datasets.ipynb)
 
-[Create an unlabelled Vertex AI AutoML text entity extraction dataset from PDFs using Vision API](get_started_with_visionapi_and_vertex_datasets.ipynb)
-
-In this tutorial, you learn to use `Vision API` to extract text from PDF files stored on a Cloud Storage bucket. You then process the results and create an unlabelled `Vertex AI Dataset`, compatible with `AutoML`, for text entity extraction.
+```
+Learn to use `Vision API` to extract text from PDF files stored on a Cloud Storage bucket.
 
 The steps performed include:
 
 1. Using `Vision API` to perform Optical Character Recognition (OCR) to extract text from PDF files.
 2. Processing the results and saving them to text files.
 3. Generating a `Vertex AI Dataset` import file.
-4. Creating a new unlabelled text entity extraction `Vertex AI Dataset` resource in `Vertex AI`.
+4. Cr
 
 
 ### E2E Stage Example
 
-[Stage 1: Data Management](mlops_data_management.ipynb)
-
+[Data management](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage1/mlops_data_management.ipynb)
 
 ```
+In this tutorial, you create a MLOps stage 1: data management process.
+
 The steps performed include:
+
 - Explore and visualize the data.
 - Create a Vertex AI `Dataset` resource from `BigQuery` table -- for AutoML training.
 - Extract a copy of the dataset to a CSV file in Cloud Storage.

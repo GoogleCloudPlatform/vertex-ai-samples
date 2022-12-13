@@ -34,9 +34,10 @@ The third stage in MLOps is formalization to develop an automated pipeline proce
 ### Get Started
 
 
-[Get started with Vertex AI Model Registry](get_started_with_model_registry.ipynb)
+[Get started with Vertex AI Model Registry](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage3/get_started_with_model_registry.ipynb)
 
-In this tutorial, you learn how to use `Vertex AI Model Registry` to create and register multiple versions of a model.
+```
+Learn how to use `Vertex AI Model Registry` to create and register multiple versions of a model.
 
 The steps performed include:
 
@@ -46,9 +47,13 @@ The steps performed include:
 - Deleting a model version.
 - Retraining the next model version.
 
-[Get started with Dataflow pipeline components](get_started_with_dataflow_pipeline_components.ipynb)
+```
 
-In this tutorial, you learn how to use prebuilt `Google Cloud Pipeline Components` for `Dataflow`.
+
+[Get started with Dataflow pipeline components](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage3/get_started_with_dataflow_pipeline_components.ipynb)
+
+```
+Learn how to use prebuilt `Google Cloud Pipeline Components` for `Dataflow`.
 
 The steps performed include:
 
@@ -56,9 +61,13 @@ The steps performed include:
 - Encapsulate the Apache Beam data pipeline with a Dataflow component in a Vertex AI pipeline.
 - Execute a Vertex AI pipeline.
 
-[Get started with Apache Airflow and Vertex AI Pipelines](get_started_with_airflow_and_vertex_pipelines.ipynb)
+```
 
-In this tutorial, you learn how to use Apache Airflow with `Vertex AI Pipelines`.
+
+[Get started with Apache Airflow and Vertex AI Pipelines](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage3/get_started_with_airflow_and_vertex_pipelines.ipynb)
+
+```
+Learn how to use Apache Airflow with `Vertex AI Pipelines`.
 
 The steps performed include:
 
@@ -67,9 +76,13 @@ The steps performed include:
 - Create a `Vertex AI Pipeline` that triggers the Airflow DAG.
 - Execute the `Vertex AI Pipeline`.
 
-[Get started with Kubeflow Pipelines](get_started_with_kubeflow_pipelines.ipynb)
+```
 
-In this tutorial, you learn how to use `Kubeflow Pipelines`(KFP).
+
+[Get started with Kubeflow Pipelines](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage3/get_started_with_kubeflow_pipelines.ipynb)
+
+```
+Learn how to use `Kubeflow Pipelines`(KFP).
 
 The steps performed include:
 
@@ -80,9 +93,13 @@ The steps performed include:
 - Building sequential, parallel, multiple output components.
 - Building control flow into pipelines.
 
-[Get started with Vertex AI custom training pipeline components](get_started_with_custom_training_pipeline_components.ipynb)
+```
 
-In this tutorial, you learn how to use prebuilt `Google Cloud Pipeline Components` for `Vertex AI Training`.
+
+[Get started with Vertex AI custom training pipeline components](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage3/get_started_with_custom_training_pipeline_components.ipynb)
+
+```
+Learn how to use prebuilt `Google Cloud Pipeline Components` for `Vertex AI Training`.
 
 The steps performed include:
 
@@ -98,11 +115,13 @@ The steps performed include:
     - Deploying a Vertex AI custom trained model.
 - Execute a Vertex AI pipeline.
 
-[Get started with Dataproc Serverless pipeline components](get_started_with_dataproc_serverless_pipeline_components.ipynb)
+```
 
 
-In this tutorial, you learn how to use prebuilt `Google Cloud Pipeline Components` for `Dataproc Serverless` service. 
+[Get started with Dataproc Serverless pipeline components](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage3/get_started_with_dataproc_serverless_pipeline_components.ipynb)
 
+```
+Learn how to use prebuilt `Google Cloud Pipeline Components` for `Dataproc Serverless` service.
 
 The steps performed include:
 
@@ -111,9 +130,13 @@ The steps performed include:
 - `DataprocSparkSqlBatchOp` for running Spark SQL batch workloads.
 - `DataprocSparkRBatchOp` for running SparkR batch workloads.
 
-[Get started with Vertex AI Hyperparameter Tuning pipeline components](get_started_with_hpt_pipeline_components.ipynb)
+```
 
-In this tutorial, you learn how to use prebuilt `Google Cloud Pipeline Components` for `Vertex AI Hyperparameter Tuning`.
+
+[Get started with Vertex AI Hyperparameter Tuning pipeline components](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage3/get_started_with_hpt_pipeline_components.ipynb)
+
+```
+Learn how to use prebuilt `Google Cloud Pipeline Components` for `Vertex AI Hyperparameter Tuning`.
 
 The steps performed include:
 
@@ -125,23 +148,28 @@ The steps performed include:
       - Upload the model artifacts to a `Vertex AI Model` resource.
 - Execute a Vertex AI pipeline.
 
-[Get started with machine management for Vertex AI Pipelines](get_started_with_machine_management.ipynb)
+```
 
-In this tutorial, you convert a self-contained custom training component into a `Vertex AI CustomJob`, whereby:
 
-    - The training job and artifacts are trackable.
-    - Set machine resources, such as machine-type, cpu/gpu, memory, disk, etc.
+[Get started with machine management for Vertex AI Pipelines](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage3/get_started_with_machine_management.ipynb)
+
+```
+Learn how to convert a self-contained custom training component into a `Vertex AI CustomJob`, whereby:
 
 The steps performed in this tutorial include:
 
 - Create a custom component with a self-contained training job.
 - Execute pipeline using component-level settings for machine resources
 - Convert the self-contained training component into a `Vertex AI CustomJob`.
-- Execute pipeline using customjob-level settings for machine resources 
+- Execute pipeline using customjob-level settings for machine resources
 
-[Get started with TFX pipelines](get_started_with_tfx_pipeline.ipynb)
+```
 
-In this tutorial, you learn how to use TensorFlow Extended (TFX) with `Vertex AI Pipelines`.
+
+[Get started with TFX pipelines](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage3/get_started_with_tfx_pipeline.ipynb)
+
+```
+Learn how to use TensorFlow Extended (TFX) with `Vertex AI Pipelines`.
 
 The steps performed include:
 
@@ -150,9 +178,28 @@ The steps performed include:
 - Execute the pipeline on Google Cloud using `Vertex AI Training`
 - Execute the pipeline using `Vertex AI Pipelines`.
 
-[Get started with BigQuery ML pipeline components](get_started_with_bqml_pipeline_components.ipynb)
+```
 
-In this tutorial, you learn how to use prebuilt `Google Cloud Pipeline Components` for `BigQuery ML`.
+
+[Orchestrating a workflow to train and deploy an scikit-learn model using Vertex AI Pipelines with online prediction](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage3/get_started_vertex_pipelines_sklearn_with_prediction.ipynb)
+
+```
+Learn how to use prebuilt components in `Vertex AI Pipelines` for training and deploying a scikit-Learn custom model, and then using `Vertex AI Prediction` to make an online prediction.
+
+The steps performed include:
+
+- Construct a scikit-learn training package.
+- Construct a pipeline to train and deploy a scikit-learn model.
+- Execute the pipeline.
+- Make an online prediction.
+
+```
+
+
+[Get started with BigQuery ML pipeline components](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage3/get_started_with_bqml_pipeline_components.ipynb)
+
+```
+Learn how to use prebuilt `Google Cloud Pipeline Components` for `BigQuery ML`.
 
 The steps performed include:
 
@@ -165,9 +212,28 @@ The steps performed include:
 - Execute a Vertex AI pipeline.
 - Make a prediction with the deployed Vertex AI model.
 
-[Get started with AutoML tabular pipeline workflows](get_started_with_automl_tabular_pipeline_workflow.ipynb)
+```
 
-In this tutorial, you learn how to use `AutoML Tabular Pipeline Template` for training, exporting and tuning an AutoML tabular model.
+
+[Orchestrating a workflow to train and deploy an XGBoost model using Vertex AI Pipelines with Vertex AI Experiments](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage3/get_started_vertex_pipelines_xgboost_with_experiments.ipynb)
+
+```
+Learn how to use prebuilt components in `Vertex AI Pipelines` for training and deploying a XGBoost custom model, and using `Vertex AI Experiments` to log the corresponding training parameters and metrics, from within the training package.
+
+The steps performed include:
+
+- Construct a XGBoost training package.
+  - Add tracking the experiment
+- Construct a pipeline to train and deploy a XGBoost model.
+- Execute the pipeline.
+
+```
+
+
+[Get started with AutoML tabular pipeline workflows](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage3/get_started_with_automl_tabular_pipeline_workflow.ipynb)
+
+```
+Learn how to use `AutoML Tabular Pipeline Template` for training, exporting and tuning an AutoML tabular model.
 
 The steps performed include:
 
@@ -183,9 +249,13 @@ The steps performed include:
 - Deploy exported OSS TF model.
 - Make a prediction.
 
-[Get started with rapid prototyping with AutoML and BigQuery ML](cget_started_with_rapid_prototyping_bqml_automl.ipynb)
+```
 
-In this tutorial, you learn how to use `Vertex AI Predictions` for rapid prototyping a model.
+
+[Get started with rapid prototyping with AutoML and BigQuery ML](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage3/get_started_with_rapid_prototyping_bqml_automl.ipynb)
+
+```
+Learn how to use `Vertex AI Predictions` for rapid prototyping a model.
 
 The steps performed include:
 
@@ -196,9 +266,13 @@ The steps performed include:
 - Deploying the best trained model.
 - Testing the deployed model infrastructure.
 
-[Get started with AutoML pipeline components](get_started_with_automl_pipeline_components.ipynb)
+```
 
-In this tutorial, you learn how to use prebuilt `Google Cloud Pipeline Components` for `Vertex AI AutoML`.
+
+[Get started with AutoML pipeline components](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage3/get_started_with_automl_pipeline_components.ipynb)
+
+```
+Learn how to use prebuilt `Google Cloud Pipeline Components` for `Vertex AI AutoML`.
 
 The steps performed include:
 
@@ -208,10 +282,28 @@ The steps performed include:
     - Deploying a Vertex AI AutoML trained model.
 - Execute a Vertex AI pipeline.
 
+```
 
-[Get started with BigQuery and TFDV pipeline components](get_started_with_bq_tfdv_pipeline_components.ipynb)
 
-In this tutorial, you learn how to use build lightweight Python components for BigQuery and TensorFlow Data Validation.
+[Orchestrating a workflow to train and deploy an XGBoost model using Vertex AI Pipelines with online prediction](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage3/get_started_vertex_pipelines_xgboost_with_prediction.ipynb)
+
+```
+Learn how to use prebuilt components in `Vertex AI Pipelines` for training and deploying a XGBoost custom model, and then using `Vertex AI Prediction` to make an online prediction.
+
+The steps performed include:
+
+- Construct a XGBoost training package.
+- Construct a pipeline to train and deploy a XGBoost model.
+- Execute the pipeline.
+- Make an online prediction.
+
+```
+
+
+[Get started with BigQuery and TFDV pipeline components](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage3/get_started_with_bq_tfdv_pipeline_components.ipynb)
+
+```
+Learn how to use build lightweight Python components for BigQuery and TensorFlow Data Validation.
 
 The steps performed include:
 
@@ -219,22 +311,28 @@ The steps performed include:
 - Build and execute a pipeline component for generating TFDV statistics and schema from a Vertex AI Tabular Dataset.
 - Execute a Vertex AI pipeline.
 
+```
+
 ### E2E Stage Example
 
-[Stage 3: Formalization](mlops_formalization.ipynb)
+[Formalization](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage3/mlops_formalization.ipynb)
 
 ```
+In this tutorial, you create a MLOps stage 3: formalization process.
+
 The steps performed include:
+
 - Obtain resources from the experimentation stage.
     - Baseline model.
     - Dataset schema/statistics for baseline model.
 - Formalize a data preprocessing pipeline.
     - Extract columns/rows from BigQuery table to local BigQuery table.
-    - Use Tensorflow Data Validation library to determine statistics, schema, and features.
+    - Use TensorFlow Data Validation library to determine statistics, schema, and features.
     - Use Dataflow to preprocess the data.
     - Create a Vertex AI Dataset.
 - Formalize a build model architecture pipeline.
     - Create the Vertex AI Model base model.
 - Formalize a training pipeline.
+
 ```
 
