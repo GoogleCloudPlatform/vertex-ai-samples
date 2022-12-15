@@ -40,4 +40,6 @@ of the previous notebook. The notebooks are as follows:
 
 1. [Storing training data in Firestore](1_firestore.ipynb)
 2. Creating a Vertex AI Pipeline to store training data in Firestore
-3. 
+3. Building an AutoML image object detection model
+4. Creating a Vertex AI Pipeline to train and deploy an AutoML model
+5. Getting predictions from the deployed model
