@@ -99,7 +99,11 @@ def execute_notebook_remote(
     if tag:
         build.tags = [tag]
 
-    operation = client.create_build(project_id=project_id, build=build)
+    try:
+        operation = client.create_build(project_id=project_id, build=build)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
     # Print the in-progress operation
     # print("IN PROGRESS:")
     # print(operation.metadata)
