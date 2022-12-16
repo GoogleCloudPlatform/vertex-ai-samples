@@ -35,9 +35,30 @@ This stage may be done entirely by MLOps. We recommend:
 
 ### Get Started
 
+
 [Vertex AI Model Monitoring for custom tabular models with TensorFlow Serving container](get_started_with_model_monitoring_custom_tf_serving.ipynb)
 
-In this notebook, you learn to use the `Vertex AI Model Monitoring` service to detect feature skew and drift in the input predict requests, for custom tabular models, using a custom deployment container. 
+
+```
+Learn to use the `Vertex AI Model Monitoring` service to detect feature skew and drift in the input predict requests for XGBoost models.
+
+The steps performed include:
+
+- Download a pre-trained XGBoost model.
+- Upload the pre-trained model as a `Model` resource.
+- Deploy the `Model` resource to the `Endpoint` resource.
+- Configure the `Endpoint` resource for model monitoring:
+  - drift detection only -- no access to training data.
+  - predefine the input schema to map feature alias names to the unnamed array input to the model.
+- Generate synthetic prediction requests for drift.
+
+```
+
+
+[Vertex AI Model Monitoring for custom tabular models with TensorFlow Serving container](get_started_with_model_monitoring_custom_tf_serving.ipynb)
+
+```
+Learn to use the `Vertex AI Model Monitoring` service to detect feature skew and drift in the input predict requests, for custom tabular models, using a custom deployment container.
 
 The steps performed include:
 
@@ -50,11 +71,15 @@ The steps performed include:
 - Generate synthetic prediction requests for drift.
 - Wait for email alert notification.
 
+```
+
 
 
 [Vertex AI Model Monitoring for AutoML tabular models](get_started_with_model_monitoring_automl.ipynb)
 
-In this notebook, you learn to use the `Vertex AI Model Monitoring` service to detect feature skew and drift in the input predict requests, for AutoML tabular models.
+
+```
+Learn to use the `Vertex AI Model Monitoring` service to detect feature skew and drift in the input predict requests, for AutoML tabular models.
 
 The steps performed include:
 
@@ -66,10 +91,15 @@ The steps performed include:
 - Generate synthetic prediction requests for drift.
 - Wait for email alert notification.
 
+```
+
+
 
 [Vertex AI Model Monitoring for custom tabular models](get_started_with_model_monitoring_custom.ipynb)
 
-In this notebook, you learn to use the `Vertex AI Model Monitoring` service to detect feature skew and drift in the input predict requests, for custom tabular models.
+
+```
+Learn to use the `Vertex AI Model Monitoring` service to detect feature skew and drift in the input predict requests, for custom tabular models.
 
 The steps performed include:
 
@@ -82,11 +112,15 @@ The steps performed include:
 - Generate synthetic prediction requests for drift.
 - Wait for email alert notification.
 
+```
+
 
 
 [Vertex AI Model Monitoring for setup for tabular models](get_started_with_model_monitoring_setup.ipynb)
 
-In this notebook, you learn to setup the `Vertex AI Model Monitoring` service to detect feature skew and drift in the input predict requests.
+
+```
+Learn to setup the `Vertex AI Model Monitoring` service to detect feature skew and drift in the input predict requests.
 
 The steps performed include:
 
@@ -100,3 +134,5 @@ The steps performed include:
 - List, pause, resume and delete monitoring jobs.
 - Restart monitoring job with predefined `input schema`.
 - View logged monitored data.
+
+```
