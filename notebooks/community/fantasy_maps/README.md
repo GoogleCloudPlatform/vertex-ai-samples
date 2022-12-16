@@ -15,7 +15,7 @@ This project uses
 AutoML object detection models to train a model capable of identifying gridlines on a map
 like the example below:
 
-![Predictions shown on map of a desert](artifacts/predicted-gridded-desert.png)
+![Predictions shown on map of a desert](resources/predicted-gridded-desert.png)
 
 ## Products demonstrated
 
