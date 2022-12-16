@@ -66,6 +66,7 @@ def execute_notebook(
 
     # Execute notebook
     try:
+        print("DEBUG HERE\n")
         # Execute notebook
         pm.execute_notebook(
             input_path=notebook_source,
