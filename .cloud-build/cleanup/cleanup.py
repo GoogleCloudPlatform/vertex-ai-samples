@@ -5,8 +5,6 @@ from resource_cleanup_manager import (
     ModelResourceCleanupManager,
     EndpointResourceCleanupManager,
     ResourceCleanupManager,
-    MatchingEngineIndexEndpointResourceCleanupManager,
-    MatchingEngineIndexResourceCleanupManager,
 )
 
 rate_limit = RateLimit(max_count=25, per=60, greedy=False)
@@ -42,12 +40,10 @@ if is_dry_run:
     print("Starting cleanup in dry run mode...")
 
 # List of all cleanup managers
-managers: List[ResourceCleanupManager] = [
+managers = [
     DatasetResourceCleanupManager(),
     EndpointResourceCleanupManager(),
     ModelResourceCleanupManager(),  # ModelResourceCleanupManager must follow EndpointResourceCleanupManager due to deployed models blocking model deletion.
-    MatchingEngineIndexEndpointResourceCleanupManager(),
-    MatchingEngineIndexResourceCleanupManager(),
 ]
 
 run_cleanup_managers(managers=managers, is_dry_run=is_dry_run)

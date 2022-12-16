@@ -110,10 +110,3 @@ class EndpointResourceCleanupManager(VertexAIResourceCleanupManager):
 class ModelResourceCleanupManager(VertexAIResourceCleanupManager):
     vertex_ai_resource = aiplatform.Model
 
-
-class MatchingEngineIndexResourceCleanupManager(VertexAIResourceCleanupManager):
-    vertex_ai_resource = aiplatform.MatchingEngineIndex
-
-
-class MatchingEngineIndexEndpointResourceCleanupManager(VertexAIResourceCleanupManager):
-    vertex_ai_resource = aiplatform.MatchingEngineIndexEndpoint
