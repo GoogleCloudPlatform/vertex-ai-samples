@@ -9,5 +9,6 @@ tabulate
 google-cloud-aiplatform
 google-cloud-storage
 google-cloud-build==3.9.3
+protobuf==4.21.9
 ratemate
 GitPython
