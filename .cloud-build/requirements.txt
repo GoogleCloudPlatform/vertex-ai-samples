@@ -8,6 +8,6 @@ matplotlib
 tabulate
 google-cloud-aiplatform
 google-cloud-storage
-google-cloud-build
+google-cloud-build==3.9.3
 ratemate
 GitPython
