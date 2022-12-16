@@ -45,6 +45,10 @@ def execute_notebook_remote(
     """Create and execute a single notebook on Google Cloud Build"""
     # Load build steps from YAML
 
+    print(f"DEBUG TIMEOUT {timeout_in_seconds}\n")
+    timeout_in_seconds = 86400
+    
+
     cloudbuild_config = yaml.load(open(CLOUD_BUILD_FILEPATH), Loader=FullLoader)
 
     substitutions = {
