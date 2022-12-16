@@ -100,10 +100,13 @@ def execute_notebook_remote(
         build.tags = [tag]
 
     try:
+        print("DEBUG: START\n")
         operation = client.create_build(project_id=project_id, build=build)
     except Exception as e:
         import traceback
         traceback.print_exc()
+    print("DEBUG: FINISH\n")
+    print(operation)
     # Print the in-progress operation
     # print("IN PROGRESS:")
     # print(operation.metadata)
