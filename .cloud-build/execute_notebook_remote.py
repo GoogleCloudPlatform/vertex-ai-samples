@@ -46,7 +46,7 @@ def execute_notebook_remote(
     # Load build steps from YAML
 
     print(f"DEBUG TIMEOUT {timeout_in_seconds}\n")
-    timeout_in_seconds = 86400
+    timeout_in_seconds = 1200
     
 
     cloudbuild_config = yaml.load(open(CLOUD_BUILD_FILEPATH), Loader=FullLoader)
