@@ -252,6 +252,8 @@ def process_and_execute_notebook(
         print(f"{notebook} PASSED in {format_timedelta(result.duration)}.")
     except Exception as error:
         result.error_message = str(error)
+        import traceback
+        traceback.print_exc()
 
         if operation and should_get_tail_logs:
             # Extract the logs
