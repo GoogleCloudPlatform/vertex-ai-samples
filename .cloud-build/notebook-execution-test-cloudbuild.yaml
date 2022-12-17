@@ -36,7 +36,8 @@ steps:
     - -c
     - |
       . workspace/env/bin/activate &&
-      python3 .cloud-build/execute_changed_notebooks_cli.py --test_paths_file "${_TEST_PATHS_FILE}" --base_branch "${_FORCED_BASE_BRANCH}" --container_uri ${_PYTHON_IMAGE} --staging_bucket ${_GCS_STAGING_BUCKET}  --artifacts_bucket ${_GCS_STAGING_BUCKET}/executed_notebooks/PR_${_PR_NUMBER}/BUILD_${BUILD_ID} --variable_project_id ${PROJECT_ID} --variable_region ${_GCP_REGION} --variable_service_account ${_GCP_SERVICE_ACCOUNT} --variable_vpc_network "${_GPC_VPC_NETWORK_NAME}" --timeout 86400 `if [ ! -z "${_PRIVATE_POOL_NAME}" ]; then echo "--private_pool_id ${_PRIVATE_POOL_NAME}"; fi`
+      python3 .cloud-build/execute_changed_notebooks_cli.py --test_paths_file .cloud-build/test_notebook_vm.txt --variable_project_id python-docs-samples-tests --variable_region us-central1 --container_uri gcr.io/cloud-devrel-public-resources/python-samples-testing-docker:latest --staging_bucket gs://andyf-test-ci --artifacts_bucket gs://andyf-test-ci/artifacts --private_pool_id projects/1012616486416/locations/us-central1/workerPools/notebook-ci-vpc --should_parallelize True --timeout 86400 --variable_service_account serviceeacouuutnt@google.com
+      #python3 .cloud-build/execute_changed_notebooks_cli.py --test_paths_file "${_TEST_PATHS_FILE}" --base_branch "${_FORCED_BASE_BRANCH}" --container_uri ${_PYTHON_IMAGE} --staging_bucket ${_GCS_STAGING_BUCKET}  --artifacts_bucket ${_GCS_STAGING_BUCKET}/executed_notebooks/PR_${_PR_NUMBER}/BUILD_${BUILD_ID} --variable_project_id ${PROJECT_ID} --variable_region ${_GCP_REGION} --variable_service_account ${_GCP_SERVICE_ACCOUNT} --variable_vpc_network "${_GPC_VPC_NETWORK_NAME}" --timeout 86400 `if [ ! -z "${_PRIVATE_POOL_NAME}" ]; then echo "--private_pool_id ${_PRIVATE_POOL_NAME}"; fi`
     env:
     - 'IS_TESTING=1'
 timeout: 86400s
