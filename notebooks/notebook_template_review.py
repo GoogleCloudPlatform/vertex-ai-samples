@@ -218,6 +218,10 @@ def parse_notebook(path: str,
     
     # Automatic Index Generation
     if objective.desc != '':
+        if overview.linkback:
+            linkback = overview.linkback
+        if overview.tag:
+            tag = overview.tag
         add_index(path, 
                   tag, 
                   linkback,
@@ -512,9 +516,19 @@ class OverviewRule(NotebookRule):
         """
         Parse the overview cell
         """
+        self.linkback = ''
+        self.tag = ''
+        
         cell = notebook.get()
         if not cell['source'][0].startswith("## Overview"):
             return notebook.report_error(ErrorCode.ERROR_OVERVIEW_NOTFOUND, "Overview section not found")
+        
+        last_line = cell['source'][-1]
+        if last_line.startswith('Learn more about'):
+            linkback = last_line.split('(')[1].split(')')[0]
+            self.linkback = linkback
+            tag = last_line.split('[')[1].split(']')[0]
+            self.tag = tag
         return True
 
 
@@ -1010,6 +1024,8 @@ def add_index(path: str,
         print('        <td>')
         tags = tag.split(',')
         for tag in tags:
+            if tag == 'automl':
+                tag = 'AutoML'
             print(f'            {tag.strip()}<br/>\n')
         print('        </td>')
         print('        <td>')
@@ -1022,15 +1038,18 @@ def add_index(path: str,
             for tag in tags:
                 text += tag.strip() + ' '
                 
-            print(f'            Learn more about <a src="https://cloud.google.com/{linkback}">{text}</a><br/>\n')
+            if linkback.startswith("vertex-ai"):
+                print(f'            Learn more about <a src="https://cloud.google.com/{linkback}">{text}</a><br/>\n')
+            else:
+                print(f'            Learn more about <a src="{linkback}">{text}</a><br/>\n')
         print('        </td>')
         print('        <td>')
         if colab_link:
-            print(f'            <a src="{colab_link}">Colab</a><br/>\n')
+            print(f'            <a src="{colab_link}" target="_blank">Colab</a><br/>\n')
         if git_link:
-            print(f'            <a src="{git_link}">GitHub</a><br/>\n')
+            print(f'            <a src="{git_link}" target="_blank">GitHub</a><br/>\n')
         if workbench_link:
-            print(f'            <a src="{workbench_link}">Vertex AI Workbench</a><br/>\n')
+            print(f'            <a src="{workbench_link}" target="_blank">Vertex AI Workbench</a><br/>\n')
         print('        </td>')
         print('    </tr>\n')
     elif args.repo:
