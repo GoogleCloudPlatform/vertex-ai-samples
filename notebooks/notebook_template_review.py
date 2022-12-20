@@ -191,7 +191,15 @@ def parse_dir(directory: str) -> int:
                 continue
             exit_code += parse_dir(entry.path)
         elif entry.name.endswith('.ipynb'):
-            exit_code += parse_notebook(entry.path, tag=directory.split('/')[-1], linkback=None, rules=rules)
+            tag = directory.split('/')[-1]
+            if tag == 'automl':
+                tag = 'AutoML'
+            elif tag == 'bigquery_ml':
+                tag = 'BigQuery ML'
+            elif tag == 'explainable_ai':
+                tag = 'Vertex Explainable AI'
+                
+            exit_code += parse_notebook(entry.path, tag=tag, linkback=None, rules=rules)
             
     return exit_code
 
@@ -1024,8 +1032,6 @@ def add_index(path: str,
         print('        <td>')
         tags = tag.split(',')
         for tag in tags:
-            if tag == 'automl':
-                tag = 'AutoML'
             print(f'            {tag.strip()}<br/>\n')
         print('        </td>')
         print('        <td>')
@@ -1110,12 +1116,12 @@ if args.web:
 
 if args.notebook_dir:
     if not os.path.isdir(args.notebook_dir):
-        print("Error: not a directory:", args.notebook_dir)
+        print(f"Error: not a directory: {args.notebook_dir}", file=sys.stderr)
         exit(1)
     exit_code = parse_dir(args.notebook_dir)
 elif args.notebook:
     if not os.path.isfile(args.notebook):
-        print("Error: not a notebook:", args.notebook)
+        print(f"Error: not a notebook: {args.notebook}", file=sys.stderr)
         exit(1)
     exit_code = parse_notebook(args.notebook, tag='', linkback=None, rules=rules)
 elif args.notebook_file:
@@ -1138,7 +1144,7 @@ elif args.notebook_file:
                         linkback = None
                     exit_code += parse_notebook(notebook, tag=tag, linkback=linkback, rules=rules)
 else:
-    print("Error: must specify a directory or notebook")
+    print("Error: must specify a directory or notebook", file=sys.stderr)
     exit(1)
 
 if args.web:
