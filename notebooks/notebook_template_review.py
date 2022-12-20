@@ -205,7 +205,7 @@ def parse_dir(directory: str) -> int:
             elif tag == 'feature_store':
                 tag = 'Vertex AI Feature Store'
             elif tag == 'matching_engine':
-                tag == 'Vertex AI Matching Engine'
+                tag = 'Vertex AI Matching Engine'
             elif tag == 'migration':
                 tag = 'CAIP to Vertex AI migration'
             elif tag == 'ml_metadata':
@@ -221,7 +221,7 @@ def parse_dir(directory: str) -> int:
             elif tag == 'prediction':
                 tag = 'Vertex AI Prediction'
             elif tag == 'pytorch':
-                tag == 'Vertex AI Training'
+                tag = 'Vertex AI Training'
             elif tag == 'reduction_server':
                 tag = 'Vertex AI Reduction Server'
             elif tag == 'sdk':
@@ -238,6 +238,10 @@ def parse_dir(directory: str) -> int:
                 tag = 'Vertex AI Training'
             elif tag == 'vizier':
                 tag = 'Vertex AI Vizier'
+                
+            # special case
+            if 'workbench' in directory:
+                tag = 'Vertex AI Workbench'
                 
             exit_code += parse_notebook(entry.path, tag=tag, linkback=None, rules=rules)
             
@@ -572,7 +576,7 @@ class OverviewRule(NotebookRule):
             return notebook.report_error(ErrorCode.ERROR_OVERVIEW_NOTFOUND, "Overview section not found")
         
         last_line = cell['source'][-1]
-        if last_line.startswith('Learn more about'):
+        if last_line.startswith('Learn more about ['):
             linkback = last_line.split('(')[1].split(')')[0]
             self.linkback = linkback
             tag = last_line.split('[')[1].split(']')[0]
