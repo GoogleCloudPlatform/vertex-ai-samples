@@ -1092,17 +1092,17 @@ def add_index(path: str,
                 text += tag.strip() + ' '
                 
             if linkback.startswith("vertex-ai"):
-                print(f'            Learn more about <a src="https://cloud.google.com/{linkback}">{text}</a><br/>\n')
+                print(f'            Learn more about <a href="https://cloud.google.com/{linkback}">{text}</a><br/>\n')
             else:
-                print(f'            Learn more about <a src="{linkback}">{text}</a><br/>\n')
+                print(f'            Learn more about <a href="{linkback}">{text}</a><br/>\n')
         print('        </td>')
         print('        <td>')
         if colab_link:
-            print(f'            <a src="{colab_link}" target="_blank">Colab</a><br/>\n')
+            print(f'            <a href="{colab_link}" target="_blank">Colab</a><br/>\n')
         if git_link:
-            print(f'            <a src="{git_link}" target="_blank">GitHub</a><br/>\n')
+            print(f'            <a href="{git_link}" target="_blank">GitHub</a><br/>\n')
         if workbench_link:
-            print(f'            <a src="{workbench_link}" target="_blank">Vertex AI Workbench</a><br/>\n')
+            print(f'            <a href="{workbench_link}" target="_blank">Vertex AI Workbench</a><br/>\n')
         print('        </td>')
         print('    </tr>\n')
     elif args.repo:
