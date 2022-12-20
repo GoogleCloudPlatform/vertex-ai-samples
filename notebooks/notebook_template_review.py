@@ -196,8 +196,48 @@ def parse_dir(directory: str) -> int:
                 tag = 'AutoML'
             elif tag == 'bigquery_ml':
                 tag = 'BigQuery ML'
+            elif tag == 'custom':
+                tag = 'Vertex AI Training'
+            elif tag == 'experiments':
+                tag = 'Vertex AI Experiments'
             elif tag == 'explainable_ai':
                 tag = 'Vertex Explainable AI'
+            elif tag == 'feature_store':
+                tag = 'Vertex AI Feature Store'
+            elif tag == 'matching_engine':
+                tag == 'Vertex AI Matching Engine'
+            elif tag == 'migration':
+                tag = 'CAIP to Vertex AI migration'
+            elif tag == 'ml_metadata':
+                tag = 'Vertex ML Metadata'
+            elif tag == 'model_evaluation':
+                tag = 'Vertex AI Model Evaluation'
+            elif tag == 'model_monitoring':
+                tag = 'Vertex AI Model Monitoring'
+            elif tag == 'model_registry':
+                tag = 'Vertex AI Model Registry'
+            elif tag == 'pipelines':
+                tag = 'Vertex AI Pipelines'
+            elif tag == 'prediction':
+                tag = 'Vertex AI Prediction'
+            elif tag == 'pytorch':
+                tag == 'Vertex AI Training'
+            elif tag == 'reduction_server':
+                tag = 'Vertex AI Reduction Server'
+            elif tag == 'sdk':
+                tag = 'Vertex AI SDK'
+            elif tag == 'structured_data':
+                tag = 'AutoML / BQML'
+            elif tag == 'tabnet':
+                tag = 'Vertex AI TabNet'
+            elif tag == 'tabular_workflows':
+                tag = 'AutoML Tabular Workflows'
+            elif tag == 'tensorboard':
+                tag = 'Vertex AI TensorBoard'
+            elif tag == 'training':
+                tag = 'Vertex AI Training'
+            elif tag == 'vizier':
+                tag = 'Vertex AI Vizier'
                 
             exit_code += parse_notebook(entry.path, tag=tag, linkback=None, rules=rules)
             
