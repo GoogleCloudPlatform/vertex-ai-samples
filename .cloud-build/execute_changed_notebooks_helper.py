@@ -245,7 +245,7 @@ def process_and_execute_notebook(
         result.logs_bucket = operation_metadata.build.logs_bucket
 
         # Block and wait for the result
-        operation_result = operation.result(timeout=86400)
+        operation_result = operation.result(timeout=timeout_in_seconds)
 
         result.duration = datetime.datetime.now() - time_start
         result.is_pass = True

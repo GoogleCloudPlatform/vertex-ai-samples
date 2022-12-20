@@ -242,6 +242,7 @@ def parse_dir(directory: str) -> int:
             # special case
             if 'workbench' in directory:
                 tag = 'Vertex AI Workbench'
+
                 
             exit_code += parse_notebook(entry.path, tag=tag, linkback=None, rules=rules)
             
@@ -1076,6 +1077,8 @@ def add_index(path: str,
         print('        <td>')
         tags = tag.split(',')
         for tag in tags:
+            if tag == 'automl':
+                tag = 'AutoML'
             print(f'            {tag.strip()}<br/>\n')
         print('        </td>')
         print('        <td>')
