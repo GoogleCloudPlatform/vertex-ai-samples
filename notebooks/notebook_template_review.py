@@ -274,7 +274,11 @@ def parse_notebook(path: str,
         if overview.linkbacks:
             linkbacks = overview.linkbacks
         else:
-            linkbacks = [linkback]
+            if linkback:
+                linkbacks = [linkback]
+            else:
+                linkbacks = []
+
         if overview.tags:
             tags = overview.tags
                 
@@ -1100,7 +1104,7 @@ def add_index(path: str,
                     print(f'<br/>            Learn more about <a href="https://cloud.google.com/{linkbacks[_]}">{tags[_]}</a>\n')
                 else:
                     print(f'<br/>            Learn more about <a href="{linkbacks[_]}">{tags[_]}</a>\n')
-
+                    
         print('        </td>')
         print('        <td>')
         if colab_link:
