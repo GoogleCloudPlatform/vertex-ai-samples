@@ -1100,6 +1100,7 @@ def add_index(path: str,
                     print(f'<br/>            Learn more about <a href="https://cloud.google.com/{linkbacks[_]}">{tags[_]}</a>\n')
                 else:
                     print(f'<br/>            Learn more about <a href="{linkbacks[_]}">{tags[_]}</a>\n')
+
         print('        </td>')
         print('        <td>')
         if colab_link:
