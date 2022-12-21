@@ -1079,14 +1079,14 @@ def add_index(path: str,
             print(f'            {tag.strip()}<br/>\n')
         print('        </td>')
         print('        <td>')
-        print(f'            {title}<br/>\n')
+        print(f'            <b>{title}</b><br/>\n')
         if args.desc:
             desc = desc.replace('`', '')
             print('<br/>')
             print(f'            {desc}<br/>\n')
             
         if args.steps:
-            print('<br/>' + steps.replace('\n', '<br/>').replace('-', '&nbsp;&nbsp;-').replace('*', '&nbsp;&nbsp;-'))
+            print('<br/>' + steps.replace('\n', '<br/>').replace('-', '&nbsp;&nbsp;-').replace('*', '&nbsp;&nbsp;-') +  '<br/>')
             
         if linkback:
             text = ''
@@ -1094,9 +1094,9 @@ def add_index(path: str,
                 text += tag.strip() + ' '
                 
             if linkback.startswith("vertex-ai"):
-                print(f'            Learn more about <a href="https://cloud.google.com/{linkback}">{text}</a><br/>\n')
+                print(f'<br/>            Learn more about <a href="https://cloud.google.com/{linkback}">{text}</a><br/>\n')
             else:
-                print(f'            Learn more about <a href="{linkback}">{text}</a><br/>\n')
+                print(f'<br/>            Learn more about <a href="{linkback}">{text}</a><br/>\n')
         print('        </td>')
         print('        <td>')
         if colab_link:
