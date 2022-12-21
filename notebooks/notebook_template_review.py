@@ -270,10 +270,15 @@ def parse_notebook(path: str,
     
     # Automatic Index Generation
     if objective.desc != '':
-        if overview.linkback:
-            linkback = overview.linkback
-        if overview.tag:
-            tag = overview.tag
+        if overview.linkbacks:
+            linkback = overview.linkbacks[0]  # hack
+        if overview.tags:
+            tags = overview.tags
+            tag = ''
+            for _ in tags:
+                tag += ',' + _
+            tag = tag[1:]
+                
         add_index(path, 
                   tag, 
                   linkback,
@@ -568,8 +573,8 @@ class OverviewRule(NotebookRule):
         """
         Parse the overview cell
         """
-        self.linkback = ''
-        self.tag = ''
+        self.linkbacks = []
+        self.tags = []
         
         cell = notebook.get()
         if not cell['source'][0].startswith("## Overview"):
@@ -577,10 +582,12 @@ class OverviewRule(NotebookRule):
         
         last_line = cell['source'][-1]
         if last_line.startswith('Learn more about ['):
-            linkback = last_line.split('(')[1].split(')')[0]
-            self.linkback = linkback
-            tag = last_line.split('[')[1].split(']')[0]
-            self.tag = tag
+            for more in last_line.split('[')[1:]:
+                tag = more.split(']')[0]
+                linkback = more.split('(')[1].split(')')[0]
+                self.tags.append(tag)
+                self.linkbacks.append(linkback)
+                
         return True
 
 
