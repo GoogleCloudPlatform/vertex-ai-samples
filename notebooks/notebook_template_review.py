@@ -242,7 +242,6 @@ def parse_dir(directory: str) -> int:
             # special case
             if 'workbench' in directory:
                 tag = 'Vertex AI Workbench'
-
                 
             exit_code += parse_notebook(entry.path, tag=tag, linkback=None, rules=rules)
             
@@ -1077,24 +1076,27 @@ def add_index(path: str,
         print('        <td>')
         tags = tag.split(',')
         for tag in tags:
-            if tag == 'automl':
-                tag = 'AutoML'
             print(f'            {tag.strip()}<br/>\n')
         print('        </td>')
         print('        <td>')
-        print(f'            {title}<br/>\n')
+        print(f'            <b>{title}</b><br/>\n')
         if args.desc:
             desc = desc.replace('`', '')
+            print('<br/>')
             print(f'            {desc}<br/>\n')
+            
+        if args.steps:
+            print('<br/>' + steps.replace('\n', '<br/>').replace('-', '&nbsp;&nbsp;-').replace('*', '&nbsp;&nbsp;-') +  '<br/>')
+            
         if linkback:
             text = ''
             for tag in tags:
                 text += tag.strip() + ' '
                 
             if linkback.startswith("vertex-ai"):
-                print(f'            Learn more about <a href="https://cloud.google.com/{linkback}">{text}</a><br/>\n')
+                print(f'<br/>            Learn more about <a href="https://cloud.google.com/{linkback}">{text}</a><br/>\n')
             else:
-                print(f'            Learn more about <a href="{linkback}">{text}</a><br/>\n')
+                print(f'<br/>            Learn more about <a href="{linkback}">{text}</a><br/>\n')
         print('        </td>')
         print('        <td>')
         if colab_link:
@@ -1156,8 +1158,14 @@ rules = [ copyright, notices, title, links, testenv, table, overview, objective,
 ]
 
 if args.web:
+    print('<style>')
+    print('table, th, td {')
+    print('  border: 1px solid black;')
+    print('  padding-left:10px')
+    print('}')
+    print('</style>')
     print('<table>')
-    print('    <th>Vertex AI Feature</th>')
+    print('    <th>Services</th>')
     print('    <th>Description</th>')
     print('    <th>Open in</th>')
 
