@@ -1,6 +1,10 @@
 
+### tabnet 
+
+
 [Vertex AI Explainations with TabNet models](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tabnet/ai-explanations-tabnet-algorithm.ipynb)
 
+```
 Learn how to provide a sample plotting tool to visualize the output of TabNet, which is helpful in explaining the algorithm.
 
 The steps performed are:
@@ -9,8 +13,12 @@ The steps performed are:
 * Visualize and understand the feature importance based on the masks output.
 * Clean up the resource created by this tutorial.
 
+```
+
+
 [Vertex AI TabNet](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tabnet/tabnet_vertex_tutorial.ipynb)
 
+```
 Learn how to run TabNet model on Vertex AI.
 
 The steps performed are:
@@ -20,3 +28,6 @@ The steps performed are:
 4. **Hyperparameter tuning**: Running a hyperparameter tuning job.
 5. **Hyperparameter on Vertex AI Training with BigQuery input**: Submitting a training job using BigQuery input.
 6. **Cleaning up**: Deleting resources created by this tutorial.
+
+```
+
