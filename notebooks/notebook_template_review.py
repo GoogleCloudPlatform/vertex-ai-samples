@@ -242,15 +242,14 @@ def parse_dir(directory: str) -> int:
             # special case
             if 'workbench' in directory:
                 tag = 'Vertex AI Workbench'
-
                 
-            exit_code += parse_notebook(entry.path, tag=tag, linkback=None, rules=rules)
+            exit_code += parse_notebook(entry.path, tags=[tag], linkback=None, rules=rules)
             
     return exit_code
 
 
 def parse_notebook(path: str,
-                   tag: str,
+                   tags: List,
                    linkback: str,
                    rules: List) -> int:
     """
@@ -258,8 +257,9 @@ def parse_notebook(path: str,
         and notebook authoring requirements.
         
             path: The path to the notebook.
-            tag: The associated tag
+            tags: The associated tags
             linkback: A link back to the web docs
+            rules: The cell rules to apply
             
         Returns the number of errors
     """
@@ -271,13 +271,20 @@ def parse_notebook(path: str,
     
     # Automatic Index Generation
     if objective.desc != '':
-        if overview.linkback:
-            linkback = overview.linkback
-        if overview.tag:
-            tag = overview.tag
+        if overview.linkbacks:
+            linkbacks = overview.linkbacks
+        else:
+            if linkback:
+                linkbacks = [linkback]
+            else:
+                linkbacks = []
+
+        if overview.tags:
+            tags = overview.tags
+                
         add_index(path, 
-                  tag, 
-                  linkback,
+                  tags, 
+                  linkbacks,
                   title.title, 
                   objective.desc, 
                   objective.uses, 
@@ -569,8 +576,8 @@ class OverviewRule(NotebookRule):
         """
         Parse the overview cell
         """
-        self.linkback = ''
-        self.tag = ''
+        self.linkbacks = []
+        self.tags = []
         
         cell = notebook.get()
         if not cell['source'][0].startswith("## Overview"):
@@ -578,10 +585,12 @@ class OverviewRule(NotebookRule):
         
         last_line = cell['source'][-1]
         if last_line.startswith('Learn more about ['):
-            linkback = last_line.split('(')[1].split(')')[0]
-            self.linkback = linkback
-            tag = last_line.split('[')[1].split(']')[0]
-            self.tag = tag
+            for more in last_line.split('[')[1:]:
+                tag = more.split(']')[0]
+                linkback = more.split('(')[1].split(')')[0]
+                self.tags.append(tag)
+                self.linkbacks.append(linkback)
+                
         return True
 
 
@@ -1039,8 +1048,8 @@ class TextTWRule(TextRule):
 
 
 def add_index(path: str, 
-              tag: str, 
-              linkback: str,
+              tags: List, 
+              linkbacks: List,
               title : str, 
               desc: str, 
               uses: str, 
@@ -1053,15 +1062,15 @@ def add_index(path: str,
     Add a discoverability index for this notebook
     
         path: The path to the notebook
-        tag: The tag (if any) for the notebook
+        tags: The tags (if any) for the notebook
         title: The H1 title for the notebook
-        desc:
-        uses:
-        steps:
-        git_link:
-        colab_link:
-        workbench_link:
-        linkback:
+        desc: The notebook description
+        uses: The resources/services used by the notebook
+        steps: The steps specified by the notebook
+        git_link: The link to the notebook in the git repo
+        colab_link: Link to launch notebook in Colab
+        workbench_link: Link to launch notebook in Workbench
+        linkbacks: The linkbacks per tag
     """
     global last_tag
     
@@ -1075,26 +1084,27 @@ def add_index(path: str,
         
         print('    <tr>')
         print('        <td>')
-        tags = tag.split(',')
         for tag in tags:
-            if tag == 'automl':
-                tag = 'AutoML'
             print(f'            {tag.strip()}<br/>\n')
         print('        </td>')
         print('        <td>')
-        print(f'            {title}<br/>\n')
+        print(f'            <b>{title}</b><br/>\n')
         if args.desc:
             desc = desc.replace('`', '')
+            print('<br/>')
             print(f'            {desc}<br/>\n')
-        if linkback:
-            text = ''
-            for tag in tags:
-                text += tag.strip() + ' '
-                
-            if linkback.startswith("vertex-ai"):
-                print(f'            Learn more about <a href="https://cloud.google.com/{linkback}">{text}</a><br/>\n')
-            else:
-                print(f'            Learn more about <a href="{linkback}">{text}</a><br/>\n')
+            
+        if args.steps:
+            print('<br/>' + steps.replace('\n', '<br/>').replace('-', '&nbsp;&nbsp;-').replace('*', '&nbsp;&nbsp;-') +  '<br/>')
+            
+        if linkbacks:
+            num = len(tags)
+            for _ in range(num):
+                if linkbacks[_].startswith("vertex-ai"):
+                    print(f'<br/>            Learn more about <a href="https://cloud.google.com/{linkbacks[_]}">{tags[_]}</a>\n')
+                else:
+                    print(f'<br/>            Learn more about <a href="{linkbacks[_]}">{tags[_]}</a>\n')
+                    
         print('        </td>')
         print('        <td>')
         if colab_link:
@@ -1106,7 +1116,6 @@ def add_index(path: str,
         print('        </td>')
         print('    </tr>\n')
     elif args.repo:
-        tags = tag.split(',')
         if tags != last_tag and tag != '':
             last_tag = tags
             flat_list = ''
@@ -1156,10 +1165,16 @@ rules = [ copyright, notices, title, links, testenv, table, overview, objective,
 ]
 
 if args.web:
+    print('<style>')
+    print('table, th, td {')
+    print('  border: 1px solid black;')
+    print('  padding-left:10px')
+    print('}')
+    print('</style>')
     print('<table>')
-    print('    <th>Vertex AI Feature</th>')
+    print('    <th width="180px">Services</th>')
     print('    <th>Description</th>')
-    print('    <th>Open in</th>')
+    print('    <th width="80px">Open in</th>')
 
 if args.notebook_dir:
     if not os.path.isdir(args.notebook_dir):
@@ -1170,7 +1185,7 @@ elif args.notebook:
     if not os.path.isfile(args.notebook):
         print(f"Error: not a notebook: {args.notebook}", file=sys.stderr)
         exit(1)
-    exit_code = parse_notebook(args.notebook, tag='', linkback=None, rules=rules)
+    exit_code = parse_notebook(args.notebook, tags=[], linkback=None, rules=rules)
 elif args.notebook_file:
     if not os.path.isfile(args.notebook_file):
         print("Error: file does not exist", args.notebook_file)
@@ -1183,13 +1198,13 @@ elif args.notebook_file:
                 if heading:
                     heading = False
                 else:
-                    tag = row[0]
+                    tags = row[0].split(',')
                     notebook = row[1]
                     try:
                         linkback = row[2]
                     except:
                         linkback = None
-                    exit_code += parse_notebook(notebook, tag=tag, linkback=linkback, rules=rules)
+                    exit_code += parse_notebook(notebook, tags=tags, linkback=linkback, rules=rules)
 else:
     print("Error: must specify a directory or notebook", file=sys.stderr)
     exit(1)
