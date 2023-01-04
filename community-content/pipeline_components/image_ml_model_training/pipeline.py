@@ -3,7 +3,6 @@ from kfp import components
 from kfp.v2 import dsl
 
 # %% Loading components
-download_from_gcs_op = components.load_component_from_url('https://raw.githubusercontent.com/kubeflow/pipelines/c783705c0e566c611ef70160a01e3ed0865051bd/components/contrib/google-cloud/storage/download/component.yaml')
 upload_Tensorflow_model_to_Google_Cloud_Vertex_AI_op = components.load_component_from_url('https://raw.githubusercontent.com/GoogleCloudPlatform/vertex-ai-samples/399405402d95f4a011e2d2e967c96f8508ba5688/community-content/pipeline_components/google-cloud/Vertex_AI/Models/Upload_Tensorflow_model/component.yaml')
 deploy_model_to_endpoint_op = components.load_component_from_url('https://raw.githubusercontent.com/GoogleCloudPlatform/vertex-ai-samples/399405402d95f4a011e2d2e967c96f8508ba5688/community-content/pipeline_components/google-cloud/Vertex_AI/Models/Deploy_to_endpoint/component.yaml')
 transcode_imagedataset_tfrecord_from_csv_op = components.load_component_from_url('https://raw.githubusercontent.com/GoogleCloudPlatform/vertex-ai-samples/main/community-content/pipeline_components/image_ml_model_training/transcode_tfrecord_image_dataset_from_csv/component.yaml')
