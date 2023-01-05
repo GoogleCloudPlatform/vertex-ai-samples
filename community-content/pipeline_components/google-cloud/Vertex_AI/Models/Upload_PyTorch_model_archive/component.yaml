@@ -1,0 +1,297 @@
+name: Upload PyTorch model archive to Google Cloud Vertex AI
+metadata:
+  annotations: {author: Alexey Volkov <alexey.volkov@ark-kun.com>, canonical_location: 'https://raw.githubusercontent.com/Ark-kun/pipeline_components/KFPv2_hell/components/google-cloud/Vertex_AI/Models/Upload_PyTorch_model_archive/workaround_for_buggy_KFPv2_compiler/component.yaml'}
+inputs:
+- {name: model_archive, type: PyTorchModelArchive}
+- {name: torchserve_version, type: String, default: 0.6.0, optional: true}
+- name: use_gpu
+  type: Boolean
+  default: "False"
+  optional: true
+- {name: display_name, type: String, optional: true}
+- {name: description, type: String, optional: true}
+- {name: project, type: String, optional: true}
+- {name: location, type: String, optional: true}
+- {name: labels, type: JsonObject, optional: true}
+- {name: staging_bucket, type: String, optional: true}
+outputs:
+- {name: model_name, type: String}
+- {name: model_dict, type: JsonObject}
+implementation:
+  container:
+    image: python:3.9
+    command:
+    - sh
+    - -c
+    - (PIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet --no-warn-script-location
+      'google-cloud-aiplatform==1.13.1' 'google-cloud-build==3.8.3' || PIP_DISABLE_PIP_VERSION_CHECK=1
+      python3 -m pip install --quiet --no-warn-script-location 'google-cloud-aiplatform==1.13.1'
+      'google-cloud-build==3.8.3' --user) && "$0" "$@"
+    - sh
+    - -ec
+    - |
+      program_path=$(mktemp)
+      printf "%s" "$0" > "$program_path"
+      python3 -u "$program_path" "$@"
+    - |
+      def upload_PyTorch_model_archive_to_Google_Cloud_Vertex_AI(
+          model_archive_path,
+          torchserve_version = "0.6.0",
+          use_gpu = False,
+
+          display_name = None,
+          description = None,
+
+          # Uncomment when anyone requests these:
+          # instance_schema_uri: str = None,
+          # parameters_schema_uri: str = None,
+          # prediction_schema_uri: str = None,
+          # explanation_metadata: "google.cloud.aiplatform_v1.types.explanation_metadata.ExplanationMetadata" = None,
+          # explanation_parameters: "google.cloud.aiplatform_v1.types.explanation.ExplanationParameters" = None,
+
+          project = None,
+          location = None,
+          labels = None,
+          # encryption_spec_key_name: str = None,
+          staging_bucket = None,
+      ):
+          import json
+          import os
+          from google.cloud import aiplatform
+
+          if not location:
+              location = os.environ.get("CLOUD_ML_REGION")
+
+          if not labels:
+              labels = {}
+          labels["component-source"] = "github-com-ark-kun-pipeline-components"
+
+          container_image_tag = torchserve_version + "-" + ("gpu" if use_gpu else "cpu")
+          container_image_uri = f"pytorch/torchserve:{container_image_tag}"
+
+          # Vertex Endpoints refuse to support non-Google container registries.
+          # We have to work around this to reduce user frustration
+          # TODO: Remove this code when Vertex Endpoints service starts supporting other container registries.
+          def copy_container_image(
+              src_container_image_uri,
+              dst_container_image_uri,
+              project_id,
+          ):
+              from google.cloud.devtools import cloudbuild
+              from google import protobuf
+              build_client = cloudbuild.CloudBuildClient()
+              build_config = cloudbuild.Build(
+                  images=[dst_container_image_uri],
+                  steps=[
+                      cloudbuild.BuildStep(
+                          name="gcr.io/cloud-builders/docker",
+                          entrypoint="bash",
+                          args=[
+                              "-exc",
+                              'docker pull --quiet "$0" && docker tag "$0" "$1"',
+                              src_container_image_uri,
+                              dst_container_image_uri,
+                          ],
+                      ),
+                  ],
+                  timeout=protobuf.duration_pb2.Duration(
+                      seconds=1800,
+                  ),
+              )
+              build_operation = build_client.create_build(
+                  project_id=project_id,
+                  build=build_config,
+              )
+              try:
+                  result = build_operation.result()
+              except:
+                  print(f"Logs are available at [{build_operation.metadata.build.log_url}].")
+                  raise
+              return result
+
+          project_id = aiplatform.initializer.global_config.project
+          mirrored_container_uri = f"gcr.io/{project_id}/container_mirror/{container_image_uri}"
+          # FIX: Only mirror when image does not exist
+          # docker does is unable to get the registry data from inside container (it cannot connecto to docker socket):
+          # docker.errors.DockerException: Error while fetching server API version: ('Connection aborted.', FileNotFoundError(2, 'No such file or directory'))
+          # import docker
+          # try:
+          #     docker_client = docker.from_env()
+          #     docker_client.images.get_registry_data(mirrored_container_uri)
+          # except docker.errors.NotFound:
+          if True:
+              print(f"Mirroring {container_image_uri} to {mirrored_container_uri}")
+              copy_container_image(
+                  src_container_image_uri=container_image_uri,
+                  dst_container_image_uri=mirrored_container_uri,
+                  project_id=project_id,
+              )
+          container_image_uri = mirrored_container_uri
+          # End of container image mirroring code
+
+          model_archive_file_name = os.path.basename(model_archive_path)
+          model_archive_dir = os.path.dirname(model_archive_path)
+
+          model = aiplatform.Model.upload(
+              # FIX: Use public image or mirror the official image
+              #serving_container_image_uri="gcr.io/avolkov-31337/mirror/pytorch/torchserve",
+              serving_container_image_uri=container_image_uri,
+              artifact_uri=model_archive_dir,
+              serving_container_command=[
+                  "bash",
+                  "-exc",
+                  '''
+      model_archive_uri="$0"
+      #model_archive_local_path=$(mktemp --suffix ".mar")
+      # For some reason the model must already be inside the model-store directory.
+      model_archive_local_path=./model-store/model.mar
+
+      # Downloading the model archive from GCS
+      # TODO: Fix gsutil bugs (requires project ID, has auth issues) and use gsutil instead.
+      # gsutil cp "$model_archive_uri" "$model_archive_local_path"
+      pip install google-cloud-storage
+      python -c '
+      import sys
+      from google.cloud import storage
+
+      model_archive_uri = sys.argv[1]
+      model_archive_local_path = sys.argv[2]
+
+      storage_client = storage.Client()
+      blob = storage.Blob.from_string(uri=model_archive_uri, client=storage_client)
+      blob.download_to_filename(filename=model_archive_local_path)
+      ' "$model_archive_uri" "$model_archive_local_path"
+
+      #Note: config.properties is owned by root. Our user is not root.
+      echo "
+      service_envelope=json
+      # Needed for external access
+      inference_address=http://0.0.0.0:8080
+      management_address=http://0.0.0.0:8081
+      " > config2.properties
+      torchserve --start --foreground --no-config-snapshots --models main-model="$model_archive_local_path" --model-store ./model-store/ --ts-config config2.properties
+                  ''',
+                  "$(AIP_STORAGE_URI)/" + model_archive_file_name,
+              ],
+              serving_container_predict_route="/predictions/main-model",
+              #serving_container_predict_route="/v1/models/main-model:predict",
+              serving_container_health_route="/ping",
+              serving_container_ports=[8080],
+
+              display_name=display_name,
+              description=description,
+
+              # instance_schema_uri=instance_schema_uri,
+              # parameters_schema_uri=parameters_schema_uri,
+              # prediction_schema_uri=prediction_schema_uri,
+              # explanation_metadata=explanation_metadata,
+              # explanation_parameters=explanation_parameters,
+
+              project=project,
+              location=location,
+              labels=labels,
+              # encryption_spec_key_name=encryption_spec_key_name,
+              staging_bucket=staging_bucket,
+          )
+          model_json = json.dumps(model.to_dict(), indent=2)
+          print(model_json)
+          return (model.resource_name, model_json)
+
+      def _deserialize_bool(s) -> bool:
+          from distutils.util import strtobool
+          return strtobool(s) == 1
+
+      def _serialize_json(obj) -> str:
+          if isinstance(obj, str):
+              return obj
+          import json
+          def default_serializer(obj):
+              if hasattr(obj, 'to_struct'):
+                  return obj.to_struct()
+              else:
+                  raise TypeError("Object of type '%s' is not JSON serializable and does not have .to_struct() method." % obj.__class__.__name__)
+          return json.dumps(obj, default=default_serializer, sort_keys=True)
+
+      def _serialize_str(str_value: str) -> str:
+          if not isinstance(str_value, str):
+              raise TypeError('Value "{}" has type "{}" instead of str.'.format(str(str_value), str(type(str_value))))
+          return str_value
+
+      import json
+      import argparse
+      _parser = argparse.ArgumentParser(prog='Upload PyTorch model archive to Google Cloud Vertex AI', description='')
+      _parser.add_argument("--model-archive", dest="model_archive_path", type=str, required=True, default=argparse.SUPPRESS)
+      _parser.add_argument("--torchserve-version", dest="torchserve_version", type=str, required=False, default=argparse.SUPPRESS)
+      _parser.add_argument("--use-gpu", dest="use_gpu", type=_deserialize_bool, required=False, default=argparse.SUPPRESS)
+      _parser.add_argument("--display-name", dest="display_name", type=str, required=False, default=argparse.SUPPRESS)
+      _parser.add_argument("--description", dest="description", type=str, required=False, default=argparse.SUPPRESS)
+      _parser.add_argument("--project", dest="project", type=str, required=False, default=argparse.SUPPRESS)
+      _parser.add_argument("--location", dest="location", type=str, required=False, default=argparse.SUPPRESS)
+      _parser.add_argument("--labels", dest="labels", type=json.loads, required=False, default=argparse.SUPPRESS)
+      _parser.add_argument("--staging-bucket", dest="staging_bucket", type=str, required=False, default=argparse.SUPPRESS)
+      _parser.add_argument("----output-paths", dest="_output_paths", type=str, nargs=2)
+      _parsed_args = vars(_parser.parse_args())
+      _output_files = _parsed_args.pop("_output_paths", [])
+
+      _outputs = upload_PyTorch_model_archive_to_Google_Cloud_Vertex_AI(**_parsed_args)
+
+      _output_serializers = [
+          _serialize_str,
+          _serialize_json,
+
+      ]
+
+      import os
+      for idx, output_file in enumerate(_output_files):
+          try:
+              os.makedirs(os.path.dirname(output_file))
+          except OSError:
+              pass
+          with open(output_file, 'w') as f:
+              f.write(_output_serializers[idx](_outputs[idx]))
+    args:
+    - --model-archive
+    - {inputPath: model_archive}
+    - if:
+        cond: {isPresent: torchserve_version}
+        then:
+        - --torchserve-version
+        - {inputValue: torchserve_version}
+    - if:
+        cond: {isPresent: use_gpu}
+        then:
+        - --use-gpu
+        - {inputValue: use_gpu}
+    - if:
+        cond: {isPresent: display_name}
+        then:
+        - --display-name
+        - {inputValue: display_name}
+    - if:
+        cond: {isPresent: description}
+        then:
+        - --description
+        - {inputValue: description}
+    - if:
+        cond: {isPresent: project}
+        then:
+        - --project
+        - {inputValue: project}
+    - if:
+        cond: {isPresent: location}
+        then:
+        - --location
+        - {inputValue: location}
+    - if:
+        cond: {isPresent: labels}
+        then:
+        - --labels
+        - {inputValue: labels}
+    - if:
+        cond: {isPresent: staging_bucket}
+        then:
+        - --staging-bucket
+        - {inputValue: staging_bucket}
+    - '----output-paths'
+    - {outputPath: model_name}
+    - {outputPath: model_dict}

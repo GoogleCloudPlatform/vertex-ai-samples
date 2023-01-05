@@ -1,4 +1,5 @@
 notebooks/official/vizier/gapic-vizier-multi-objective-optimization.ipynb
 notebooks/official/pipelines/lightweight_functions_component_io_kfp.ipynb
 notebooks/official/ml_metadata/sdk-metric-parameter-tracking-for-locally-trained-models.ipynb
-notebooks/official/pipelines/metrics_viz_run_compare_kfp.ipynb
+notebooks/official/custom/custom-tabular-bq-managed-dataset.ipynb
+.cloud-build/tests/python_version_test.ipynb

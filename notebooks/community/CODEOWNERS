@@ -7,24 +7,33 @@
 /gapic @andrewferlitsch
 /gapic/custom/showcase_custom_image_classification_online_explain_example_based_api.ipynb @inardini
 /ml_ops @andrewferlitsch
-/model_monitoring/* @mco-gh
+/model_monitoring/* @andrewferlitsch
 /structured_data/rapid_prototyping_* @rafael-carvalho
 
 /managed_notebooks/
 /bigquery_ml/ @polong
-/sdk/SDK_FBProphet_Forecasting_Online.ipynb @brianchunkang
 /pipelines/google_cloud_pipeline_components_TPU_model_train_upload_deploy.ipynb @brianchunkang
 /explainable_ai/SDK_Custom_Container_XAI.ipynb @brianchunkang
 /matching_engine/sdk_matching_engine_for_indexing.ipynb @ivanmkc
 /matching_engine/matching_engine_for_indexing.ipynb @yinghsienwu
+/matching_engine/stream_update_for_matching_engine.ipynb @peterping666
 /sdk/pytorch_lightning_custom_container_training.ipynb @brianchunkang
+/sdk/sdk_pytorch_torchrun_custom_container_training_imagenet.ipynb @brianchunkang
 /tensorboard @yfang1
 /feature_store @nayaknishant @morgandu
 /prediction @googleapis/vertex-prediction-team
 /vertex_endpoints/tf_hub_obj_detection/deploy_tfhub_object_detection_on_vertex_endpoints.ipynb @entrpn
+/vertex_endpoints/find_ideal_machine_type/find_ideal_machine_type/find_ideal_machine_type.ipynb @entrpn
 /vertex_endpoints/nvidia-triton/nvidia-triton-custom-container-prediction.ipynb @RajeshThallam
 /vertex_endpoints/optimized_tensorflow_runtime @vlasenkoalexey
 /notebooks/community/ml_ops/stage2/get_started_with_visionapi_and_automl.ipynb @mansari
 /notebooks/community/neo4j/graph_paysim.ipynb @benofben @laeg
 /notebooks/community/ml_ops/stage1/get_started_with_visionapi_and_vertex_datasets.ipynb @mansari
 /notebooks/community/pipelines/google_cloud_pipeline_components_bqml_pipeline_demand_forecasting.ipynb @inardini
+/notebooks/community/ml_ops/stage2/get_started_vertex_hpt_r_kernel.ipynb @fhirschmann
+/notebooks/community/ml_ops/stage2/get_started_vertex_training_r_using_r_kernel.ipynb @fhirschmann
+/notebooks/community/vertex-ai-samples/notebooks/community/model_registry/vertex_ai_model_registry_bqml_custom_model_versioning.ipynb @inardini
+/notebooks/community/vertex-ai-samples/notebooks/community/model_registry/vertex_ai_model_registry_automl_model_versioning.ipynb @inardini
+/notebooks/community/vizier/conversions_vertex_vizier_and_open_source_vizier.ipynb @halio-g
+/notebooks/community/experiments/vertex_ai_model_experimentation.ipynb @inardini @asobran
+/notebooks/community/pipelines/google_cloud_pipeline_components_bqml_pipeline_anomaly_detection.ipynb @inardini
