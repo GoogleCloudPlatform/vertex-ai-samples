@@ -1,0 +1,190 @@
+name: Upload Tensorflow model to Google Cloud Vertex AI
+metadata:
+  annotations: {author: Alexey Volkov <alexey.volkov@ark-kun.com>, canonical_location: 'https://raw.githubusercontent.com/Ark-kun/pipeline_components/KFPv2_hell/components/google-cloud/Vertex_AI/Models/Upload_Tensorflow_model/workaround_for_buggy_KFPv2_compiler/component.yaml'}
+inputs:
+- {name: model, type: TensorflowSavedModel}
+- {name: tensorflow_version, type: String, optional: true}
+- name: use_gpu
+  type: Boolean
+  default: "False"
+  optional: true
+- {name: display_name, type: String, optional: true}
+- {name: description, type: String, optional: true}
+- {name: project, type: String, optional: true}
+- {name: location, type: String, optional: true}
+- {name: labels, type: JsonObject, optional: true}
+- {name: staging_bucket, type: String, optional: true}
+outputs:
+- {name: model_name, type: String}
+- {name: model_dict, type: JsonObject}
+implementation:
+  container:
+    image: python:3.9
+    command:
+    - sh
+    - -c
+    - (PIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet --no-warn-script-location
+      'google-cloud-aiplatform==1.16.0' || PIP_DISABLE_PIP_VERSION_CHECK=1 python3
+      -m pip install --quiet --no-warn-script-location 'google-cloud-aiplatform==1.16.0'
+      --user) && "$0" "$@"
+    - sh
+    - -ec
+    - |
+      program_path=$(mktemp)
+      printf "%s" "$0" > "$program_path"
+      python3 -u "$program_path" "$@"
+    - |
+      def upload_Tensorflow_model_to_Google_Cloud_Vertex_AI(
+          model_path,
+          tensorflow_version = None,
+          use_gpu = False,
+
+          display_name = None,
+          description = None,
+
+          # Uncomment when anyone requests these:
+          # instance_schema_uri: str = None,
+          # parameters_schema_uri: str = None,
+          # prediction_schema_uri: str = None,
+          # explanation_metadata: "google.cloud.aiplatform_v1.types.explanation_metadata.ExplanationMetadata" = None,
+          # explanation_parameters: "google.cloud.aiplatform_v1.types.explanation.ExplanationParameters" = None,
+
+          project = None,
+          location = None,
+          labels = None,
+          # encryption_spec_key_name: str = None,
+          staging_bucket = None,
+      ):
+          import json
+          import os
+          from google.cloud import aiplatform
+
+          if not location:
+              location = os.environ.get("CLOUD_ML_REGION")
+
+          if not labels:
+              labels = {}
+          labels["component-source"] = "github-com-ark-kun-pipeline-components"
+
+          model = aiplatform.Model.upload_tensorflow_saved_model(
+              saved_model_dir=model_path,
+              tensorflow_version=tensorflow_version,
+              use_gpu=use_gpu,
+
+              display_name=display_name,
+              description=description,
+
+              # instance_schema_uri=instance_schema_uri,
+              # parameters_schema_uri=parameters_schema_uri,
+              # prediction_schema_uri=prediction_schema_uri,
+              # explanation_metadata=explanation_metadata,
+              # explanation_parameters=explanation_parameters,
+
+              project=project,
+              location=location,
+              labels=labels,
+              # encryption_spec_key_name=encryption_spec_key_name,
+              staging_bucket=staging_bucket,
+          )
+          model_json = json.dumps(model.to_dict(), indent=2)
+          print(model_json)
+          return (model.resource_name, model_json)
+
+      def _deserialize_bool(s) -> bool:
+          from distutils.util import strtobool
+          return strtobool(s) == 1
+
+      def _serialize_json(obj) -> str:
+          if isinstance(obj, str):
+              return obj
+          import json
+          def default_serializer(obj):
+              if hasattr(obj, 'to_struct'):
+                  return obj.to_struct()
+              else:
+                  raise TypeError("Object of type '%s' is not JSON serializable and does not have .to_struct() method." % obj.__class__.__name__)
+          return json.dumps(obj, default=default_serializer, sort_keys=True)
+
+      def _serialize_str(str_value: str) -> str:
+          if not isinstance(str_value, str):
+              raise TypeError('Value "{}" has type "{}" instead of str.'.format(str(str_value), str(type(str_value))))
+          return str_value
+
+      import json
+      import argparse
+      _parser = argparse.ArgumentParser(prog='Upload Tensorflow model to Google Cloud Vertex AI', description='')
+      _parser.add_argument("--model", dest="model_path", type=str, required=True, default=argparse.SUPPRESS)
+      _parser.add_argument("--tensorflow-version", dest="tensorflow_version", type=str, required=False, default=argparse.SUPPRESS)
+      _parser.add_argument("--use-gpu", dest="use_gpu", type=_deserialize_bool, required=False, default=argparse.SUPPRESS)
+      _parser.add_argument("--display-name", dest="display_name", type=str, required=False, default=argparse.SUPPRESS)
+      _parser.add_argument("--description", dest="description", type=str, required=False, default=argparse.SUPPRESS)
+      _parser.add_argument("--project", dest="project", type=str, required=False, default=argparse.SUPPRESS)
+      _parser.add_argument("--location", dest="location", type=str, required=False, default=argparse.SUPPRESS)
+      _parser.add_argument("--labels", dest="labels", type=json.loads, required=False, default=argparse.SUPPRESS)
+      _parser.add_argument("--staging-bucket", dest="staging_bucket", type=str, required=False, default=argparse.SUPPRESS)
+      _parser.add_argument("----output-paths", dest="_output_paths", type=str, nargs=2)
+      _parsed_args = vars(_parser.parse_args())
+      _output_files = _parsed_args.pop("_output_paths", [])
+
+      _outputs = upload_Tensorflow_model_to_Google_Cloud_Vertex_AI(**_parsed_args)
+
+      _output_serializers = [
+          _serialize_str,
+          _serialize_json,
+
+      ]
+
+      import os
+      for idx, output_file in enumerate(_output_files):
+          try:
+              os.makedirs(os.path.dirname(output_file))
+          except OSError:
+              pass
+          with open(output_file, 'w') as f:
+              f.write(_output_serializers[idx](_outputs[idx]))
+    args:
+    - --model
+    - {inputPath: model}
+    - if:
+        cond: {isPresent: tensorflow_version}
+        then:
+        - --tensorflow-version
+        - {inputValue: tensorflow_version}
+    - if:
+        cond: {isPresent: use_gpu}
+        then:
+        - --use-gpu
+        - {inputValue: use_gpu}
+    - if:
+        cond: {isPresent: display_name}
+        then:
+        - --display-name
+        - {inputValue: display_name}
+    - if:
+        cond: {isPresent: description}
+        then:
+        - --description
+        - {inputValue: description}
+    - if:
+        cond: {isPresent: project}
+        then:
+        - --project
+        - {inputValue: project}
+    - if:
+        cond: {isPresent: location}
+        then:
+        - --location
+        - {inputValue: location}
+    - if:
+        cond: {isPresent: labels}
+        then:
+        - --labels
+        - {inputValue: labels}
+    - if:
+        cond: {isPresent: staging_bucket}
+        then:
+        - --staging-bucket
+        - {inputValue: staging_bucket}
+    - '----output-paths'
+    - {outputPath: model_name}
+    - {outputPath: model_dict}

@@ -1,0 +1,37 @@
+name: Transcode imagedataset tfrecord from csv
+description: |
+  Transcodes CSV Data into TFRecord file of TFExamples.
+  Args:
+    csv_image_data_path (str):
+        Path to the CSV image data. Data must include 'image_filepath' (Path to image file) and
+        'image_label' (output for a prediction) fields.
+    class_names (Sequence[str]):
+        Sequence of strings of categories for classification corresponding to input data.
+    tfrecord_image_data_path (str):
+        Output path for the TFRecord image data. Data will be formatted as 'label' (encoded image
+        label), and 'image_raw' (the binary string of the image data).
+inputs:
+- {name: csv_image_data_path, type: ImageDatasetCSV, description: Input path for the
+    CSV image data}
+- {name: class_names, type: 'typing.List[str]', description: List of class names corresponding
+    to the input image data}
+outputs:
+- {name: tfrecord_image_data_path, type: ImageDatasetTFRecord, description: Output
+    path for the TFRecord image data}
+implementation:
+  container:
+    image: us-docker.pkg.dev/vertex-ai/ready-to-go-image-classification/image-components:v0.1
+    # command is a list of strings (command-line arguments).
+    # The YAML language has two syntaxes for lists and you can use either of them.
+    # Here we use the "flow syntax" - comma-separated strings inside square brackets.
+    command: [
+      python3,
+      # Path of the program inside the container
+      /pipelines/component/src/transcoding_csv_component.py,
+      --csv-image-data-path,
+      {inputPath: csv_image_data_path},
+      --tfrecord-image-data-path,
+      {outputPath: tfrecord_image_data_path},
+      --class-names,
+      {inputValue: class_names},
+    ]

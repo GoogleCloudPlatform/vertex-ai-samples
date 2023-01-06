@@ -17,11 +17,12 @@
 /tensorboard @zbl94
 
 /bigquery_ml/bqml-online-prediction.ipynb @polong-lin
-/model_monitoring/model_monitoring.ipynb @mco-gh
+/model_monitoring/model_monitoring.ipynb @andrewferlitsch
 /ml_metadata/sdk-metric-parameter-tracking-for-custom-jobs.ipynb @jialuzh
 /ml_metadata/sdk-metric-parameter-tracking-for-locally-trained-models.ipynb @jialuzh
 /ml_metadata/vertex-pipelines-ml-metadata.ipynb @sararob
 /vizier/gapic-vizier-multi-objective-optimization.ipynb @halio-g
+/training/xgboost_data_parallel_training_on_cpu_using_dask.ipynb @halio-g
 /feature_store/gapic-feature-store.ipynb @diemtvu
 /managed_notebooks @GoogleCloudPlatform/notebooks-team
 /pipelines/google_cloud_pipeline_components_bqml_text.ipynb @inardini
@@ -29,6 +30,16 @@
 /automl/automl_forecasting_bqml_arima_plus_comparison.ipynb @TheMichaelHu
 /automl/automl_tabular_on_vertex_pipelines.ipynb @helinwang
 /custom/custom_training_tensorboard_profiler.ipynb @itseric
-/workbench/spark/spark_sample_notebook.ipynb @bmiro
-/model-registry/bqml-vertexai-model-registry.ipynb @soheilazangeneh
+/workbench/spark/spark_sample_notebook.ipynb @bradmiro
+/workbench/spark/spark_ml.ipynb @bradmiro
+/model_registry/bqml_vertexai_model_registry.ipynb @soheilazangeneh
 /workbench/exploratory_data_analysis/explore_data_in_bigquery_with_workbench.ipynb @alokpattani
+/model_evaluation/automl_tabular_classification_model_evaluation.ipynb @soheilazangeneh
+/model_evaluation/automl_tabular_regression_model_evaluation.ipynb @soheilazangeneh
+/tabular_workflows/tabnet_on_vertex_pipelines.ipynb @sakagarwal
+/tabular_workflows/wide_and_deep_on_vertex_pipelines.ipynb @sakagarwal
+/model_evaluation/custom_tabular_classification_model_evaluation.ipynb @soheilazangeneh
+/sdk/SDK_FBProphet_Forecasting_Online.ipynb @brianchunkang
+/automl/sdk_automl_forecasting_hierarchical_batch.ipynb @ivanmkc
+/prediction/custom_batch_prediction_feature_filter.ipynb @soheilazangeneh
+/feature_store/feature_store_streaming_ingestion_sdk.ipynb @soheilazangeneh
