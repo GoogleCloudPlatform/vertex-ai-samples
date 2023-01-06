@@ -1080,30 +1080,32 @@ def add_index(path: str,
     title = title.split(':')[-1].strip()
     title = title[0].upper() + title[1:]
     if args.web:
-        title = title.replace('`', '')
+        title = replace_cl(title.replace('`', ''))
         
         print('    <tr>')
         print('        <td>')
         for tag in tags:
+            tag = replace_cl(tag)
             print(f'            {tag.strip()}<br/>\n')
         print('        </td>')
         print('        <td>')
         print(f'            <b>{title}</b><br/>\n')
         if args.desc:
-            desc = desc.replace('`', '')
+            desc = replace_cl(desc.replace('`', ''))
             print('<br/>')
             print(f'            {desc}<br/>\n')
             
         if args.steps:
-            print('<br/>' + steps.replace('\n', '<br/>').replace('-', '&nbsp;&nbsp;-').replace('*', '&nbsp;&nbsp;-') +  '<br/>')
+            steps = replace_cl(steps.replace('\n', '<br/>').replace('-', '&nbsp;&nbsp;-').replace('*', '&nbsp;&nbsp;-').replace('`', ''))
+            print('<br/>' + steps +  '<br/>')
             
         if linkbacks:
             num = len(tags)
             for _ in range(num):
                 if linkbacks[_].startswith("vertex-ai"):
-                    print(f'<br/>            Learn more about <a href="https://cloud.google.com/{linkbacks[_]}">{tags[_]}</a>\n')
+                    print(f'<br/>            Learn more about <a href="https://cloud.google.com/{linkbacks[_]}" target="_blank">{replace_cl(tags[_])}</a>.\n')
                 else:
-                    print(f'<br/>            Learn more about <a href="{linkbacks[_]}">{tags[_]}</a>\n')
+                    print(f'<br/>            Learn more about <a href="{linkbacks[_]}" target="_blank">{replace_cl(tags[_])}</a>.\n')
                     
         print('        </td>')
         print('        <td>')
@@ -1134,6 +1136,30 @@ def add_index(path: str,
         if args.steps:
             print(steps.rstrip() + '\n')
         print("```\n")
+
+def replace_cl(text : str ) -> str:
+    '''
+    '''
+    substitutions = {
+        'AutoML Tabular Workflow': '{{automl_name}} Tabular Workflow',
+        'AutoML Tables': '{{automl_tables_name}}',
+        'AutoML Tabular': '{{automl_tables_name}}',
+        'AutoML Vision': '{automl_vision_name}}',
+        'AutoML Image': '{automl_vision_name}}',
+        'AutoML': '{{automl_name}}',
+        
+        'BigQuery ML': '{{bigqueryl_name}}',
+        'BigQuery': '{{bigquery_name}}',
+        
+        'Vertex AI': '{{vertex_ai_name}}',
+    }
+    
+    for key, value in substitutions.items():
+        if key in text:
+            text = text.replace(key, value)
+            
+    return text
+
 
 
 # Instantiate the rules
