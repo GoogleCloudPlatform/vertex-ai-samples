@@ -1146,11 +1146,11 @@ def replace_cl(text : str ) -> str:
     Replace product names with CL substitution variables
     '''
     substitutions = {
-        'AutoML Tabular Workflow': '{{automl_name}} Tabular Workflow',
-        'AutoML Tables': '{{automl_tables_name}}',
-        'AutoML Tabular': '{{automl_tables_name}}',
-        'AutoML Vision': '{automl_vision_name}}',
-        'AutoML Image': '{automl_vision_name}}',
+        #'AutoML Tabular Workflow': '{{automl_name}} Tabular Workflow',
+        #'AutoML Tables': '{{automl_tables_name}}',
+        #'AutoML Tabular': '{{automl_tables_name}}',
+        #'AutoML Vision': '{automl_vision_name}}',
+        #'AutoML Image': '{automl_vision_name}}',
         'AutoML': '{{automl_name}}',
         
         'BigQuery ML': '{{bigqueryml_name}}',
