@@ -654,10 +654,14 @@ class ObjectiveRule(NotebookRule):
                         # check for italic font setting
                         if ch == '*' and sline[1] != ' ':
                             in_steps = False
+                        # special case
+                        elif sline.startswith('* Prediction Service'):
+                            in_steps = False
                         else:
                             self.steps += line
                     elif ch == '#':
                         in_steps = False
+
             
         if self.desc == '':
             ret = notebook.report_error(ErrorCode.ERROR_OBJECTIVE_MISSING_DESC, "Objective section missing desc")
@@ -1148,9 +1152,20 @@ def replace_cl(text : str ) -> str:
         'AutoML Image': '{automl_vision_name}}',
         'AutoML': '{{automl_name}}',
         
-        'BigQuery ML': '{{bigqueryl_name}}',
+        'BigQuery ML': '{{bigqueryml_name}}',
+        'BQML': '{{bigqueryml_name}}',
         'BigQuery': '{{bigquery_name}}',
+        'BQ': '{{bigquery_name}}',
         
+        'Vertex Dataset': '{{vertex_ai_name}} Dataset',
+        'Vertex Model': '{{vertex_ai_name}} Model',
+        'Vertex Endpoint': '{{vertex_ai_name}} Endpoint',
+        'Vertex Model Registry': '{{vertex_model_registry_name}}',
+        'Vertex AI Model Registry': '{{vertex_model_registry_name}}',
+        'Vertex Training': '{{vertex_training_name}}',
+        'Vertex AI Training': '{{vertex_training_name}}',
+        'Vertex Prediction': '{{vertex_training_name}}',
+        'Vertex AI Prediction': '{{vertex_training_name}}',
         'Vertex AI': '{{vertex_ai_name}}',
     }
     
