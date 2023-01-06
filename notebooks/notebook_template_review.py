@@ -1164,9 +1164,19 @@ def replace_cl(text : str ) -> str:
         'Vertex AI Model Registry': '{{vertex_model_registry_name}}',
         'Vertex Training': '{{vertex_training_name}}',
         'Vertex AI Training': '{{vertex_training_name}}',
-        'Vertex Prediction': '{{vertex_training_name}}',
-        'Vertex AI Prediction': '{{vertex_training_name}}',
+        'Vertex Prediction': '{{vertex_prediction_name}}',
+        'Vertex AI Prediction': '{{vertex_prediction_name}}',
+        'Vertex TensorBoard': '{{vertex_tensorboard_name}}',
+        'Vertex AI TensorBoard': '{{vertex_tensorboard_name}}',
+        'Vertex ML Metadata': '{{vertex_metadata_name}}',
+        'Vertex Pipelines': '{{vertex_pipelines_name}}',
+        'Vertex AI Pipelines': '{{vertex_pipelines_name}}',
+        'Vertex AI Data Labeling': '{{vertex_data_labeling_name}}',
         'Vertex AI': '{{vertex_ai_name}}',
+        
+        'Cloud Storage': '{{storage_name}}',
+        'TensorFlow Enterprise': '{{tf4gcp_name}}',
+        'TensorFlow': '{{tensorflow_name}}',
     }
     
     for key, value in substitutions.items():
