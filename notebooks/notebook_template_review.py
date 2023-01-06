@@ -1143,6 +1143,7 @@ def add_index(path: str,
 
 def replace_cl(text : str ) -> str:
     '''
+    Replace product names with CL substitution variables
     '''
     substitutions = {
         'AutoML Tabular Workflow': '{{automl_name}} Tabular Workflow',
