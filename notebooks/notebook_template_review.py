@@ -109,13 +109,14 @@ class ErrorCode(Enum):
     #   Costs cell required
     #     Check for required Vertex and optional BQ and Dataflow
     ERROR_OVERVIEW_NOTFOUND = 10,
-    ERROR_OBJECTIVE_NOTFOUND = 11,
-    ERROR_OBJECTIVE_MISSING_DESC = 12,
-    ERROR_OBJECTIVE_MISSING_USES = 13,
-    ERROR_OBJECTIVE_MISSING_STEPS = 14,
-    ERROR_DATASET_NOTFOUND = 15,
-    ERROR_COSTS_NOTFOUND = 16,
-    ERROR_COSTS_MISSING = 17,
+    ERROR_LINKBACK_NOTFOUND = 11,
+    ERROR_OBJECTIVE_NOTFOUND = 12,
+    ERROR_OBJECTIVE_MISSING_DESC = 13,
+    ERROR_OBJECTIVE_MISSING_USES = 14,
+    ERROR_OBJECTIVE_MISSING_STEPS = 15,
+    ERROR_DATASET_NOTFOUND = 16,
+    ERROR_COSTS_NOTFOUND = 17,
+    ERROR_COSTS_MISSING = 18,
 
     # Installation cell
     #   Installation cell required
@@ -126,34 +127,34 @@ class ErrorCode(Enum):
     #   option {USER_FLAG} required
     #   installation code cell not match template
     #   all packages must be installed as a single pip3
-    ERROR_INSTALLATION_NOTFOUND = 18,
-    ERROR_INSTALLATION_HEADING = 19,
-    ERROR_INSTALLATION_CODE_NOTFOUND = 20,
-    ERROR_INSTALLATION_PIP3 = 21,
-    ERROR_INSTALLATION_QUIET = 22,
-    ERROR_INSTALLATION_USER_FLAG = 23,
-    ERROR_INSTALLATION_CODE_TEMPLATE = 24,
-    ERROR_INSTALLATION_SINGLE_PIP3 = 25,
+    ERROR_INSTALLATION_NOTFOUND = 19,
+    ERROR_INSTALLATION_HEADING = 20,
+    ERROR_INSTALLATION_CODE_NOTFOUND = 21,
+    ERROR_INSTALLATION_PIP3 = 22,
+    ERROR_INSTALLATION_QUIET = 23,
+    ERROR_INSTALLATION_USER_FLAG = 24,
+    ERROR_INSTALLATION_CODE_TEMPLATE = 25,
+    ERROR_INSTALLATION_SINGLE_PIP3 = 26,
 
     # Restart kernel cell
     #    Restart code cell required
     #    Restart code cell not found
-    ERROR_RESTART_NOTFOUND = 23,
-    ERROR_RESTART_CODE_NOTFOUND = 24,
+    ERROR_RESTART_NOTFOUND = 27,
+    ERROR_RESTART_CODE_NOTFOUND = 28,
 
     # Before you begin cell
     #    Before you begin cell required
     #    Before you begin cell incomplete
-    ERROR_BEFOREBEGIN_NOTFOUND = 25,
-    ERROR_BEFOREBEGIN_INCOMPLETE = 26,
+    ERROR_BEFOREBEGIN_NOTFOUND = 29,
+    ERROR_BEFOREBEGIN_INCOMPLETE = 30,
 
     # Set Project ID
     #    Set project ID cell required
     #    Set project ID code cell not found
     #    Set project ID not match template
-    ERROR_PROJECTID_NOTFOUND = 27,
-    ERROR_PROJECTID_CODE_NOTFOUND = 28,
-    ERROR_PROJECTID_TEMPLATE = 29,
+    ERROR_PROJECTID_NOTFOUND = 31,
+    ERROR_PROJECTID_CODE_NOTFOUND = 32,
+    ERROR_PROJECTID_TEMPLATE = 33,
 
     # Technical Writer Rules
     ERROR_TWRULE_TODO = 51,
@@ -590,6 +591,8 @@ class OverviewRule(NotebookRule):
                 linkback = more.split('(')[1].split(')')[0]
                 self.tags.append(tag)
                 self.linkbacks.append(linkback)
+        else:
+            return notebook.report_error(ErrorCode.ERROR_LINKBACK_NOTFOUND, "Linkback missing in overview section")
                 
         return True
 
@@ -1100,7 +1103,7 @@ def add_index(path: str,
             print(f'            {desc}<br/>\n')
             
         if args.steps:
-            steps = replace_cl(steps.replace('\n', '<br/>').replace('-', '&nbsp;&nbsp;-').replace('*', '&nbsp;&nbsp;-').replace('`', ''))
+            steps = replace_cl(steps.replace('\n', '<br/>').replace('-', '&nbsp;&nbsp;-').replace('**', '').replace('*', '&nbsp;&nbsp;-').replace('`', ''))
             print('<br/>' + steps +  '<br/>')
             
         if linkbacks:
@@ -1181,6 +1184,16 @@ def replace_cl(text : str ) -> str:
         'Vertex AI Model Monitoring': '{{vertex_model_monitoring_name}}',
         'Vertex Feature Store': '{{vertex_featurestore_name}}',
         'Vertex AI Feature Store': '{{vertex_featurestore_name}}',
+        'Vertex Vizier': '{{vertex_vizier_name}}',
+        'Vertex AI Vizier': '{{vertex_vizier_name}}',
+        'Vertex Explainable AI': '{{vertex_xai_name}}',
+        'NAS': '{{vertex_nas_name}',
+        'Vertex AI Neural Architectural Search': '{{vertex_nas_name}}',
+        'Vertex Workbench': '{{vertex_workbench_name}}',
+        'Vertex AI Workbench': '{{vertex_workbench_name}}',
+        'Vertex AI Edge Manager': '{{vertex_edge_manager_name}}',
+        'Vertex SDK': '{{vertex_sdk_name}}',
+        'Vertex AI SDK': '{{vertex_sdk_name}}',
         'Vertex AI': '{{vertex_ai_name}}',
         
         'Cloud Storage': '{{storage_name}}',
