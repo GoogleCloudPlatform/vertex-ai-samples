@@ -1,7 +1,4 @@
 
-### tabnet 
-
-
 [Vertex AI Explainations with TabNet models](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tabnet/ai-explanations-tabnet-algorithm.ipynb)
 
 ```
@@ -14,6 +11,10 @@ The steps performed are:
 * Clean up the resource created by this tutorial.
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI TabNet](https://cloud.google.com/vertex-ai/docs/tabular-data/tabular-workflows/tabnet).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex Explainable AI](https://cloud.google.com/vertex-ai/docs/explainable-ai/overview).
 
 
 [Vertex AI TabNet](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tabnet/tabnet_vertex_tutorial.ipynb)
@@ -30,4 +31,8 @@ The steps performed are:
 6. **Cleaning up**: Deleting resources created by this tutorial.
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI TabNet](https://cloud.google.com/vertex-ai/docs/tabular-data/tabular-workflows/tabnet).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Hyperparameter Tuning](https://cloud.google.com/vertex-ai/docs/training/hyperparameter-tuning-overview).
 
