@@ -1,3 +1,4 @@
+
 [Online prediction with BigQuery ML](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/bigquery_ml/bqml-online-prediction.ipynb)
 
 ```
@@ -13,4 +14,6 @@ The steps performed include:
 - Making sample online predictions to the model endpoint
 
 ```
+
+Learn more about [BigQuery ML](https://cloud.google.com/bigquery-ml/docs/introduction).
 
