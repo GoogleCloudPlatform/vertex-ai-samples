@@ -64,6 +64,27 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [BigQuery ML](https://cloud.google.com/bigquery-ml/docs/managing-models-vertex).
 
+[Predictive Maintenance using Vertex AI](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/workbench/predictive_maintainance/predictive_maintenance_usecase.ipynb)
+
+```
+
+The steps performed are:
+
+- Loading the required dataset from a Cloud Storage bucket.
+- Analyzing the fields present in the dataset.
+- Selecting the required data for the predictive maintenance model.
+- Training an XGBoost regression model for predicting the remaining useful life.
+- Evaluating the model.
+- Running the notebook end-to-end as a training job using Executor.
+- Deploying the model on Vertex AI.
+- Clean up.
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Workbench](https://cloud.google.com/vertex-ai/docs/workbench/introduction).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+
 
 [Predictive Maintenance using Vertex AI](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/workbench/predictive_maintainance/predictive_maintenance_usecase.ipynb)
 
