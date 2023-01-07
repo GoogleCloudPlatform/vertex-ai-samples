@@ -61,6 +61,8 @@ parser.add_argument('--uses', dest='uses', action='store_true',
                     default=False, help='Output uses (resources)')
 parser.add_argument('--steps', dest='steps', action='store_true', 
                     default=False, help='Ouput steps')
+parser.add_argument('--linkback', dest='linkback', action='store_true', 
+                    default=False, help='Ouput linkback')
 parser.add_argument('--web', dest='web', action='store_true', 
                     default=False, help='Output format in HTML')
 parser.add_argument('--repo', dest='repo', action='store_true', 
@@ -1106,7 +1108,7 @@ def add_index(path: str,
             steps = replace_cl(steps.replace('\n', '<br/>').replace('-', '&nbsp;&nbsp;-').replace('**', '').replace('*', '&nbsp;&nbsp;-').replace('`', ''))
             print('<br/>' + steps +  '<br/>')
             
-        if linkbacks:
+        if args.linkback and linkbacks:
             num = len(tags)
             for _ in range(num):
                 if linkbacks[_].startswith("vertex-ai"):
@@ -1125,12 +1127,15 @@ def add_index(path: str,
         print('        </td>')
         print('    </tr>\n')
     elif args.repo:
-        if tags != last_tag and tag != '':
-            last_tag = tags
-            flat_list = ''
-            for item in tags:
-                flat_list += item.replace("'", '') + ' '
-            print(f"\n### {flat_list}\n")
+        try:
+            if tags != last_tag and tag != '':
+                last_tag = tags
+                flat_list = ''
+                for item in tags:
+                    flat_list += item.replace("'", '') + ' '
+                print(f"\n### {flat_list}\n")
+        except:
+            pass
         print(f"\n[{title}]({git_link})\n")
     
         print("```")
@@ -1142,6 +1147,14 @@ def add_index(path: str,
 
         if args.steps:
             print(steps.rstrip() + '\n')
+            
+        if args.linkback and linkbacks:
+            num = len(tags)
+            for _ in range(num):
+                if linkbacks[_].startswith("vertex-ai"):
+                    print(f'Learn more about [{tags[_]}]({linkbacks[_]})\n')
+                else:
+                    print(f'Learn more about [{tags[_]}]({linkbacks[_]})\n')
         print("```\n")
 
 def replace_cl(text : str ) -> str:
