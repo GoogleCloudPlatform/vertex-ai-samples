@@ -623,6 +623,10 @@ class ObjectiveRule(NotebookRule):
         in_steps = False
     
         for line in cell['source'][1:]:
+            # TOC anchor
+            if line.startswith('<a name='):
+                continue
+                
             if line.startswith('This tutorial uses'):
                 in_desc = False
                 in_steps = False
@@ -692,7 +696,7 @@ class ObjectiveRule(NotebookRule):
             ret = notebook.report_error(ErrorCode.ERROR_OBJECTIVE_MISSING_STEPS, "Objective section missing steps list")
             
         notebook.costs = self.costs
-        ret = True
+        return ret
 
 
 class RecommendationsRule(NotebookRule):
