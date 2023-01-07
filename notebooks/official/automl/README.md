@@ -91,7 +91,6 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [AutoML Text](https://cloud.google.com/vertex-ai/docs/text-data/entity-extraction/train-model).
 
-
 [AutoML tabular forecasting model for batch prediction](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/sdk_automl_tabular_forecasting_batch.ipynb)
 
 ```
