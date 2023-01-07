@@ -1,3 +1,4 @@
+
 [Create Vertex AI Matching Engine index](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/matching_engine/sdk_matching_engine_for_indexing.ipynb)
 
 ```
@@ -12,6 +13,8 @@ The steps performed include:
 * Compute recall
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Matching Engine](https://cloud.google.com/vertex-ai/docs/matching-engine/overview).
 
 
 [Introduction to builtin Swivel embedding algorithm](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/matching_engine/intro-swivel.ipynb)
@@ -30,11 +33,13 @@ The steps performed include:
 
 ```
 
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Matching Engine](https://cloud.google.com/vertex-ai/docs/matching-engine/overview).
 
-[Introduction to builtin Two-towers embedding algorithm](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/matching_engine/two-tower-model-introduction.ipynb)
+
+[Introduction to builtin Two-Towers embedding algorithm](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/matching_engine/two-tower-model-introduction.ipynb)
 
 ```
-Learn how to run the two-tower model.
+Learn how to run the Two-Tower model.
 
 The steps performed include:
 1. **Setup**: Importing the required libraries and setting your global variables.
@@ -46,4 +51,6 @@ The steps performed include:
 7. **Cleaning up**: Deleting resources created by this tutorial.
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Matching Engine](https://cloud.google.com/vertex-ai/docs/matching-engine/overview).
 

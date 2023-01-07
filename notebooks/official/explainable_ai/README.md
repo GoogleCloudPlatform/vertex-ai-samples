@@ -1,3 +1,4 @@
+
 [Custom training tabular regression model for batch prediction with explainabilty](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/explainable_ai/sdk_custom_tabular_regression_batch_explain.ipynb)
 
 ```
@@ -13,6 +14,10 @@ The steps performed include:
 
 ```
 
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex Explainable AI](https://cloud.google.com/vertex-ai/docs/explainable-ai/overview).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Batch Prediction](https://cloud.google.com/vertex-ai/docs/tabular-data/classification-regression/get-batch-predictions).
+
 
 [AutoML training tabular binary classification model for batch explanation](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/explainable_ai/sdk_automl_tabular_binary_classification_batch_explain.ipynb)
 
@@ -27,6 +32,10 @@ The steps performed include:
 - Make a batch prediction request with explainability.
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [AutoML Tabular](https://cloud.google.com/vertex-ai/docs/tabular-data/overview).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex Explainable AI](https://cloud.google.com/vertex-ai/docs/explainable-ai/overview).
 
 
 [AutoML training tabular classification model for online explanation](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/explainable_ai/sdk_automl_tabular_classification_online_explain.ipynb)
@@ -45,6 +54,10 @@ The steps performed include:
 - Undeploy the `Model` resource.
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [AutoML Tabular](https://cloud.google.com/vertex-ai/docs/tabular-data/overview).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex Explainable AI](https://cloud.google.com/vertex-ai/docs/explainable-ai/overview).
 
 
 [Custom training image classification model for online prediction with explainabilty](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/explainable_ai/sdk_custom_image_classification_online_explain.ipynb)
@@ -65,6 +78,10 @@ The steps performed include:
 
 ```
 
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex Explainable AI](https://cloud.google.com/vertex-ai/docs/explainable-ai/overview).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Prediction](https://cloud.google.com/vertex-ai/docs/predictions/get-predictions).
+
 
 [Custom training tabular regression model for online prediction with explainabilty](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/explainable_ai/sdk_custom_tabular_regression_online_explain.ipynb)
 
@@ -84,11 +101,15 @@ The steps performed include:
 
 ```
 
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex Explainable AI](https://cloud.google.com/vertex-ai/docs/explainable-ai/overview).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Prediction](https://cloud.google.com/vertex-ai/docs/predictions/get-predictions).
+
 
 [Custom training tabular regression model for online prediction with explainabilty using get_metadata](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/explainable_ai/sdk_custom_tabular_regression_online_explain_get_metadata.ipynb)
 
 ```
-Learn how to create a custom model from a Python script in a Google prebuilt Docker container using the Vertex SDK, and then do a prediction with explanations on the deployed model by sending data.
+Learn how to create a custom model from a Python script in a Google prebuilt Docker container using the Vertex AI SDK, and then do a prediction with explanations on the deployed model by sending data.
 
 The steps performed include:
 
@@ -103,6 +124,10 @@ The steps performed include:
 - Undeploy the `Model` resource.
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex Explainable AI](https://cloud.google.com/vertex-ai/docs/explainable-ai/overview).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Prediction](https://cloud.google.com/vertex-ai/docs/predictions/get-predictions).
 
 
 [Custom training image classification model for batch prediction with explainabilty](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/explainable_ai/sdk_custom_image_classification_batch_explain.ipynb)
@@ -119,4 +144,8 @@ The steps performed include:
 - Make a batch prediction with explanations.
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex Explainable AI](https://cloud.google.com/vertex-ai/docs/explainable-ai/overview).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Batch Prediction](https://cloud.google.com/vertex-ai/docs/tabular-data/classification-regression/get-batch-predictions).
 
