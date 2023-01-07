@@ -1,3 +1,4 @@
+
 [Compare pipeline runs with Vertex AI Experiments](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/experiments/comparing_pipeline_runs.ipynb)
 
 ```
@@ -11,6 +12,10 @@ The steps performed include:
 * Compare different Pipeline jobs
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Experiments](https://cloud.google.com/vertex-ai/docs/experiments/intro-vertex-ai-experiments).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
 
 
 [Track parameters and metrics for locally trained models](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/experiments/comparing_local_trained_models.ipynb)
@@ -26,13 +31,27 @@ The steps performed include:
 
 ```
 
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Experiments](https://cloud.google.com/vertex-ai/docs/experiments/intro-vertex-ai-experiments).
+
 
 [Build Vertex AI Experiment lineage for custom training](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/experiments/build_model_experimentation_lineage_with_prebuild_code.ipynb)
 
 ```
 Learn how to integrate preprocessing code in a Vertex AI experiments.
 
+The steps performed include:
 
+- Execute module for preprocessing data
+  - Create a dataset artifact
+  - Log parameters
+-  Execute module for training the model
+  - Log parameters
+  - Create model artifact
+  - Assign tracking lineage to dataset, model and parameters
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Experiments](https://cloud.google.com/vertex-ai/docs/experiments/intro-vertex-ai-experiments).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex ML Metadata](https://cloud.google.com/vertex-ai/docs/ml-metadata).
 

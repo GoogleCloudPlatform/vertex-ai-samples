@@ -1,3 +1,4 @@
+
 [Training and deploying a sales forecasting model using FBProphet and Vertex AI](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/custom/SDK_FBProphet_Forecasting_Online.ipynb)
 
 ```
@@ -16,6 +17,10 @@ The steps performed include:
 
 ```
 
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Prediction](https://cloud.google.com/vertex-ai/docs/predictions/get-predictions).
+
 
 [Custom training and batch prediction](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/custom/sdk-custom-image-classification-batch.ipynb)
 
@@ -29,6 +34,10 @@ The steps performed include:
 - Make a batch prediction.
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Batch Prediction](https://cloud.google.com/vertex-ai/docs/tabular-data/classification-regression/get-batch-predictions).
 
 
 [Profile model training performance using Profiler](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/custom/custom_training_tensorboard_profiler.ipynb)
@@ -45,6 +54,8 @@ The steps performed include:
 
 ```
 
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI TensorBoard Profiler](https://cloud.google.com/vertex-ai/docs/experiments/tensorboard-profiler).
+
 
 [Training a TensorFlow model on BigQuery data](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/custom/custom-tabular-bq-managed-dataset.ipynb)
 
@@ -60,6 +71,8 @@ The steps performed include:
 - Undeploy the `Model` resource.
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
 
 
 [Custom training and online prediction](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/custom/sdk-custom-image-classification-online.ipynb)
@@ -78,6 +91,10 @@ The steps performed include:
 
 ```
 
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Prediction](https://cloud.google.com/vertex-ai/docs/predictions/get-predictions).
+
 
 [Deploying Iris-detection model using FastAPI and Vertex AI custom container serving](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/custom/SDK_Custom_Container_Prediction.ipynb)
 
@@ -93,4 +110,8 @@ The steps performed include:
 - Upload and deploy custom container to Vertex AI Endpoints.
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Prediction](https://cloud.google.com/vertex-ai/docs/predictions/get-predictions).
 
