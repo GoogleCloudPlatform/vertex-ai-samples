@@ -86,6 +86,25 @@ The steps performed are:
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
 
 
+[Predictive Maintenance using Vertex AI](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/workbench/predictive_maintainance/predictive_maintenance_usecase.ipynb)
+
+```
+Learn how to the executor feature of Vertex AI Workbench to automate a workflow to train and deploy a model.
+
+```
+The steps performed are:
+
+- Loading the required dataset from a Cloud Storage bucket.
+- Analyzing the fields present in the dataset.
+- Selecting the required data for the predictive maintenance model.
+- Training an XGBoost regression model for predicting the remaining useful life.
+- Evaluating the model.
+- Running the notebook end-to-end as a training job using Executor.
+- Deploying the model on Vertex AI.
+- Clean up.
+```
+
+
 [Telecom subscriber churn prediction on Vertex AI](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/workbench/subscriber_churn_prediction/telecom-subscriber-churn-prediction.ipynb)
 
 ```
