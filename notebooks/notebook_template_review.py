@@ -1154,9 +1154,9 @@ def add_index(path: str,
             num = len(tags)
             for _ in range(num):
                 if linkbacks[_].startswith("vertex-ai"):
-                    print(f'Learn more about [{tags[_]}]({linkbacks[_]}).\n')
+                    print(f'&nbsp;&nbsp;Learn more about [{tags[_]}]({linkbacks[_]}).\n')
                 else:
-                    print(f'Learn more about [{tags[_]}]({linkbacks[_]}).\n')
+                    print(f'&nbsp;&nbsp;Learn more about [{tags[_]}]({linkbacks[_]}).\n')
 
 def replace_cl(text : str ) -> str:
     '''

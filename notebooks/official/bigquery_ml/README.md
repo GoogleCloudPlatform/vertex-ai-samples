@@ -15,5 +15,5 @@ The steps performed include:
 
 ```
 
-Learn more about [BigQuery ML](https://cloud.google.com/bigquery-ml/docs/introduction).
+&nbsp;&nbsp;Learn more about [BigQuery ML](https://cloud.google.com/bigquery-ml/docs/introduction).
 
