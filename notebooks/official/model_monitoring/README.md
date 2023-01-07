@@ -1,7 +1,4 @@
 
-### model_monitoring 
-
-
 [Vertex AI Batch Prediction with Model Monitoring](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/model_monitoring/batch_prediction_model_monitoring.ipynb)
 
 ```
