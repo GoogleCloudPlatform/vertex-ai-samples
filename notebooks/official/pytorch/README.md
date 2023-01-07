@@ -1,7 +1,4 @@
 
-### pytorch 
-
-
 [Training, tuning and deploying a PyTorch text sentiment classification model on Vertex AI](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pytorch/pytorch-text-sentiment-classification-custom-train-deploy.ipynb)
 
 ```
@@ -18,4 +15,6 @@ The steps performed include:
 - Clean up the resources created in this notebook.
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
 
