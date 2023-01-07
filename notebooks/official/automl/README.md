@@ -141,7 +141,6 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [AutoML Video](https://cloud.google.com/vertex-ai/docs/video-data/action-recognition/train-model).
 
-
 [AutoML Tabular Workflow pipelines](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/automl_tabular_on_vertex_pipelines.ipynb)
 
 ```
