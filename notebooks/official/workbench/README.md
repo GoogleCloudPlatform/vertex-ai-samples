@@ -2,7 +2,7 @@
 [Sentiment Analysis using AutoML Natural Language and Vertex AI](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/workbench/sentiment_analysis/Sentiment_Analysis.ipynb)
 
 ```
-<a name="section-2"></a>
+Learn how to train and deploy an AutoML sentiment analysis model, and make predictions.
 
 The steps performed are:
 
@@ -64,11 +64,9 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [BigQuery ML](https://cloud.google.com/bigquery-ml/docs/managing-models-vertex).
 
-
 [Predictive Maintenance using Vertex AI](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/workbench/predictive_maintainance/predictive_maintenance_usecase.ipynb)
 
 ```
-<a name="section-2"></a>
 
 The steps performed are:
 
@@ -258,7 +256,7 @@ The steps performed include:
 [Churn prediction for game developers using Google Analytics 4 and BigQuery ML](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/workbench/gaming_churn_prediction/churn_prediction_for_game_developers.ipynb)
 
 ```
-<a name="section-2"></a>
+Learn how to train, evaluate a propensity model in BigQuery ML.
 
 The steps performed include:
 
@@ -278,7 +276,7 @@ The steps performed include:
 [Analysis of pricing optimization on CDM Pricing Data](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/workbench/pricing_optimization/pricing-optimization.ipynb)
 
 ```
-<a name="section-2"></a>
+The objective of this notebook is to build a pricing optimization model using BigQuery ML.
 
 The steps performed include:
 
