@@ -1,7 +1,4 @@
 
-### pipelines 
-
-
 [AutoML image classification pipelines using google-cloud-pipeline-components](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/google_cloud_pipeline_components_automl_images.ipynb)
 
 ```
@@ -18,6 +15,10 @@ The steps performed include:
 - Execute the KFP pipeline using `Vertex AI Pipelines`
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
+
+&nbsp;&nbsp;&nbsp;Learn more about [AutoML components](https://cloud.google.com/vertex-ai/docs/pipelines/vertex-automl-component).
 
 
 [Metrics visualization and run comparison using the KFP SDK](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/metrics_viz_run_compare_kfp.ipynb)
@@ -36,6 +37,8 @@ The steps performed include:
 
 ```
 
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
+
 
 [Lightweight Python function-based components, and component I/O](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/lightweight_functions_component_io_kfp.ipynb)
 
@@ -53,6 +56,8 @@ The steps performed include:
 
 ```
 
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
+
 
 [Custom training with pre-built Google Cloud Pipeline Components](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/custom_model_training_and_batch_prediction.ipynb)
 
@@ -69,6 +74,10 @@ The steps performed include:
     - Make a batch prediction request.
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training components](https://cloud.google.com/vertex-ai/docs/training/create-training-pipeline).
 
 
 [AutoML Tabular pipelines using google-cloud-pipeline-components](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/automl_tabular_classification_beans.ipynb)
@@ -88,6 +97,10 @@ The steps performed include:
 
 ```
 
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
+
+&nbsp;&nbsp;&nbsp;Learn more about [AutoML components](https://cloud.google.com/vertex-ai/docs/pipelines/vertex-automl-component).
+
 
 [Training an acquisition-prediction model using Swivel, BigQuery ML and Vertex AI Pipelines](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/google_cloud_pipeline_components_bqml_text.ipynb)
 
@@ -105,6 +118,10 @@ The steps performed include:
 
 ```
 
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
+
+&nbsp;&nbsp;&nbsp;Learn more about [BigQuery ML components](https://cloud.google.com/vertex-ai/docs/pipelines/bigqueryml-component).
+
 
 [Pipelines introduction for KFP](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/pipelines_intro_kfp.ipynb)
 
@@ -117,6 +134,8 @@ The steps performed include:
 - Specify which service account to use for a pipeline run.
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
 
 
 [AutoML tabular regression pipelines using google-cloud-pipeline-components](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/google_cloud_pipeline_components_automl_tabular.ipynb)
@@ -136,6 +155,10 @@ The steps performed include:
 
 ```
 
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
+
+&nbsp;&nbsp;&nbsp;Learn more about [AutoML components](https://cloud.google.com/vertex-ai/docs/pipelines/vertex-automl-component).
+
 
 [Model upload, predict, and evaluate using google-cloud-pipeline-components](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/google_cloud_pipeline_components_model_upload_predict_evaluate.ipynb)
 
@@ -150,6 +173,10 @@ The steps performed include:
 - Compare the evaluation metrics to a threshold.
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Model components](https://cloud.google.com/vertex-ai/docs/pipelines/model-endpoint-component).
 
 
 [Pipeline control structures using the KFP SDK](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/control_flow_kfp.ipynb)
@@ -166,21 +193,27 @@ The steps performed include:
 
 ```
 
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
+
 
 [Loan eligibility prediction using `google-cloud-pipeline-components` and Spark ML](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/google_cloud_pipeline_components_dataproc_tabular.ipynb)
 
 ```
-Learn how to build a Vertex AI pipeline and train a Random-forest model using Spark ML for loan-eligibility classification problem.
+Learn how to build a Vertex AI pipeline and train a random-forest model using Spark ML for loan-eligibility classification problem.
 
 The steps performed include:
 
 *   Use the `DataprocPySparkBatchOp` to preprocess data.
 *   Create a Vertex AI dataset resource on the training data.
-*   Train a random forest model using Pyspark.
+*   Train a random forest model using PySpark.
 *   Build a Vertex AI pipeline and run the training job.
 *   Use the Spark serving image in order to deploy a Spark model on Vertex AI Endpoint.
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Dataproc components](https://cloud.google.com/vertex-ai/docs/pipelines/dataproc-component).
 
 
 [Model train, upload, and deploy using Google Cloud Pipeline Components](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/google_cloud_pipeline_components_model_train_upload_deploy.ipynb)
@@ -200,6 +233,10 @@ The steps performed include:
 
 ```
 
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training components](https://cloud.google.com/vertex-ai/docs/pipelines/customjob-component).
+
 
 [AutoML text classification pipelines using google-cloud-pipeline-components](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/google_cloud_pipeline_components_automl_text.ipynb)
 
@@ -217,6 +254,10 @@ The steps performed include:
 - Execute the KFP pipeline using `Vertex AI Pipelines`
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
+
+&nbsp;&nbsp;&nbsp;Learn more about [AutoML components](https://cloud.google.com/vertex-ai/docs/pipelines/vertex-automl-component).
 
 
 [Training and batch prediction with BigQuery source and destinantion for a custom tabular classification model](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/custom_tabular_train_batch_pred_bq_pipeline.ipynb)
@@ -239,4 +280,8 @@ The steps performed include:
 - Clean up the resources created in this notebook.
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Batch Prediction components](https://cloud.google.com/vertex-ai/docs/pipelines/batchprediction-component).
 
