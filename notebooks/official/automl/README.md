@@ -12,7 +12,6 @@ The steps performed include:
 - Deploy the `Model` resource to a serving `Endpoint` resource.
 - Make a prediction.
 - Undeploy the `Model`.
-
 ```
 
 Learn more about [AutoML Forecasting](https://cloud.google.com/vertex-ai/docs/tabular-data/forecasting/overview).
@@ -30,6 +29,8 @@ The steps performed include the following:
 - Deploy the `Model` resource to a serving `Endpoint` resource.
 - Make a prediction by sending data.
 - Undeploy the `Model` resource.
+
+Learn more about [AutoML Tabular](https://cloud.google.com/vertex-ai/docs/training-overview#tabular_data)
 
 ```
 
@@ -51,6 +52,8 @@ The steps performed include:
 * Make an online prediction
 * Make a batch prediction
 
+Learn more about [AutoML Text classification](https://cloud.google.com/vertex-ai/docs/text-data/classification/train-model)
+
 ```
 
 Learn more about [AutoML Text classification](https://cloud.google.com/vertex-ai/docs/text-data/classification/train-model).
@@ -67,6 +70,8 @@ The steps performed include:
 - Train the model.
 - View the model evaluation.
 - Make a batch prediction.
+
+Learn more about [AutoML Video](https://cloud.google.com/vertex-ai/docs/video-data/classification/train-model)
 
 ```
 
@@ -87,6 +92,8 @@ The steps performed include:
 - Make a prediction.
 - Undeploy the `Model`.
 
+Learn more about [AutoML Text](https://cloud.google.com/vertex-ai/docs/text-data/entity-extraction/train-model)
+
 ```
 
 Learn more about [AutoML Text](https://cloud.google.com/vertex-ai/docs/text-data/entity-extraction/train-model).
@@ -103,6 +110,25 @@ The steps performed include:
 - Train an `AutoML` tabular forecasting `Model` resource.
 - Obtain the evaluation metrics for the `Model` resource.
 - Make a batch prediction.
+
+Learn more about [AutoML Forecasting](https://cloud.google.com/vertex-ai/docs/tabular-data/forecasting/tutorials-samples)
+
+```
+
+
+[AutoML training image object detection model for batch prediction](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/sdk_automl_image_object_detection_batch.ipynb)
+
+```
+In this tutorial, you create an AutoML image object detection model from a Python script, and then do a batch prediction using the Vertex AI SDK.
+
+The steps performed include:
+
+- Create a Vertex `Dataset` resource.
+- Train the model.
+- View the model evaluation.
+- Make a batch prediction.
+
+Learn more about [AutoML Image](https://cloud.google.com/vertex-ai/docs/image-data/object-detection/train-model)
 
 ```
 
@@ -137,11 +163,9 @@ The steps performed include:
 - Train the model.
 - View the model evaluation.
 - Make a batch prediction.
-
 ```
 
 Learn more about [AutoML Video](https://cloud.google.com/vertex-ai/docs/video-data/action-recognition/train-model).
-
 
 [AutoML Tabular Workflow pipelines](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/automl_tabular_on_vertex_pipelines.ipynb)
 
@@ -152,6 +176,8 @@ The steps performed are:
 
 - Create a training pipeline that reduces the search space from the default to save time.
 - Create a training pipeline that reuses the architecture search results from the previous pipeline to save time.
+
+Learn more about [AutoML Tabular Workflows](https://cloud.google.com/vertex-ai/docs/tabular-data/tabular-workflows/e2e-automl)
 
 ```
 
@@ -173,6 +199,8 @@ The steps performed include:
 - Undeploy the model from endpoint.
 - Perform clean up process.
 
+Learn more about [AutoML Text](https://cloud.google.com/vertex-ai/docs/text-data/sentiment-analysis/train-model)
+
 ```
 
 Learn more about [AutoML Text](https://cloud.google.com/vertex-ai/docs/text-data/sentiment-analysis/train-model).
@@ -192,6 +220,10 @@ The steps performed are:
 - Train the Vertex AI Forecasting model.
 - View the Model evaluation.
 - Make a batch prediction with the Model.
+
+Learn more about [AutoML Forecasting](https://cloud.google.com/vertex-ai/docs/tabular-data/forecasting/overview)
+
+Learn more about [BQML Forecasting](https://cloud.google.com/vertex-ai/docs/tabular-data/forecasting-arima/overview)
 
 ```
 
@@ -214,6 +246,8 @@ The steps performed include:
 - Make a prediction.
 - Undeploy the `Model`.
 
+Learn more about [AutoML Tabular](https://cloud.google.com/vertex-ai/docs/training-overview#tabular_data)
+
 ```
 
 Learn more about [AutoML Tabular](https://cloud.google.com/vertex-ai/docs/training-overview#tabular_data).
@@ -230,7 +264,6 @@ The steps performed include:
 - Train the model.
 - View the model evaluation.
 - Make a batch prediction.
-
 ```
 
 Learn more about [AutoML Video](https://cloud.google.com/vertex-ai/docs/video-data/object-tracking/train-model).
@@ -249,7 +282,6 @@ The steps performed include:
 - Deploy the `Model` resource to a serving `Endpoint` resource.
 - Make a prediction.
 - Undeploy the `Model`.
-
 ```
 
 Learn more about [AutoML Tabular](https://cloud.google.com/vertex-ai/docs/training-overview#tabular_data).
