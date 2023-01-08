@@ -91,6 +91,7 @@ The steps performed are:
 ```
 Learn how to the executor feature of Vertex AI Workbench to automate a workflow to train and deploy a model.
 
+```
 The steps performed are:
 
 - Loading the required dataset from a Cloud Storage bucket.
@@ -101,12 +102,7 @@ The steps performed are:
 - Running the notebook end-to-end as a training job using Executor.
 - Deploying the model on Vertex AI.
 - Clean up.
-
 ```
-
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Workbench](https://cloud.google.com/vertex-ai/docs/workbench/introduction).
-
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
 
 
 [Telecom subscriber churn prediction on Vertex AI](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/workbench/subscriber_churn_prediction/telecom-subscriber-churn-prediction.ipynb)
