@@ -1,19 +1,4 @@
 
-[Track parameters and metrics for locally trained models](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/ml_metadata/sdk-metric-parameter-tracking-for-locally-trained-models.ipynb)
-
-```
-Learn how to use `Vertex ML Metadata` to track training parameters and evaluation metrics.
-
-The steps performed include:
-
-- Track parameters and metrics for a locally trained model.
-- Extract and perform analysis for all parameters and metrics within an Experiment.
-
-```
-
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex ML Metadata](https://cloud.google.com/vertex-ai/docs/ml-metadata).
-
-
 [Track parameters and metrics for custom training jobs](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/ml_metadata/sdk-metric-parameter-tracking-for-custom-jobs.ipynb)
 
 ```
@@ -28,6 +13,21 @@ The steps performed include:
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex ML Metadata](https://cloud.google.com/vertex-ai/docs/ml-metadata).
 
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+
+
+[Track parameters and metrics for locally trained models](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/ml_metadata/sdk-metric-parameter-tracking-for-locally-trained-models.ipynb)
+
+```
+Learn how to use `Vertex ML Metadata` to track training parameters and evaluation metrics.
+
+The steps performed include:
+
+- Track parameters and metrics for a locally trained model.
+- Extract and perform analysis for all parameters and metrics within an Experiment.
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex ML Metadata](https://cloud.google.com/vertex-ai/docs/ml-metadata).
 
 
 [Track artifacts and metrics across Vertex AI Pipelines runs using Vertex ML Metadata](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/ml_metadata/vertex-pipelines-ml-metadata.ipynb)

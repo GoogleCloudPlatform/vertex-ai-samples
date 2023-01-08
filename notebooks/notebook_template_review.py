@@ -185,7 +185,21 @@ def parse_dir(directory: str) -> int:
     """
     exit_code = 0
     
+    sorted_entries = []
     entries = os.scandir(directory)
+    for entry in entries:
+
+        inserted = False
+        for ix in range(len(sorted_entries)):
+            if entry.name < sorted_entries[ix].name:
+                sorted_entries.insert(ix, entry)
+                inserted = True
+                break
+        
+        if not inserted:
+            sorted_entries.append(entry)
+    
+    entries = sorted_entries
     for entry in entries:
         if entry.is_dir():
             if entry.name[0] == '.':
