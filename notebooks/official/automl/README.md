@@ -14,7 +14,7 @@ The steps performed include the following:
 
 ```
 
-&nbsp;&nbsp;&nbsp;Learn more about [AutoML Tabular](https://cloud.google.com/vertex-ai/docs/training-overview#tabular_data).
+&nbsp;&nbsp;&nbsp;Learn more about [Tabular classification](https://cloud.google.com/vertex-ai/docs/tabular-data/classification-regression/overview).
 
 
 [Create, train, and deploy an AutoML text classification model](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/automl-text-classification.ipynb)
