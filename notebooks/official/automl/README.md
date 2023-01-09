@@ -34,7 +34,7 @@ The steps performed include:
 
 ```
 
-&nbsp;&nbsp;&nbsp;Learn more about [Classification for text data](https://cloud.google.com/vertex-ai/docs/text-data/classification/train-model).
+&nbsp;&nbsp;&nbsp;Learn more about [Classification for text data](https://cloud.google.com/vertex-ai/docs/training-overview#classification_for_text).
 
 
 [Compare Vertex AI Forecasting and BigQuery ML ARIMA_PLUS](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/automl_forecasting_bqml_arima_plus_comparison.ipynb)
@@ -105,7 +105,7 @@ The steps performed include:
 
 ```
 
-&nbsp;&nbsp;&nbsp;Learn more about [Object detection for image data](https://cloud.google.com/vertex-ai/docs/image-data/object-detection/train-model).
+&nbsp;&nbsp;&nbsp;Learn more about [Object detection for image data](https://cloud.google.com/vertex-ai/docs/training-overview#object_detection_for_images).
 
 
 [AutoML tabular forecasting model for batch prediction](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/sdk_automl_tabular_forecasting_batch.ipynb)
@@ -179,7 +179,7 @@ The steps performed include:
 
 ```
 
-&nbsp;&nbsp;&nbsp;Learn more about [Entity extraction for text data](https://cloud.google.com/vertex-ai/docs/text-data/entity-extraction/train-model).
+&nbsp;&nbsp;&nbsp;Learn more about [Entity extraction for text data](https://cloud.google.com/vertex-ai/docs/training-overview#entity_extraction_for_text).
 
 
 [Training an AutoML text sentiment analysis model for online predictions](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/sdk_automl_text_sentiment_analysis_online.ipynb)
@@ -199,7 +199,7 @@ The steps performed include:
 
 ```
 
-&nbsp;&nbsp;&nbsp;Learn more about [Sentiment analysis for text data](https://cloud.google.com/vertex-ai/docs/text-data/sentiment-analysis/train-model).
+&nbsp;&nbsp;&nbsp;Learn more about [Sentiment analysis for text data](https://cloud.google.com/vertex-ai/docs/training-overview#sentiment_analysis_for_text).
 
 
 [AutoML training video action recognition model for batch prediction](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/sdk_automl_video_action_recognition_batch.ipynb)
@@ -216,7 +216,7 @@ The steps performed include:
 
 ```
 
-&nbsp;&nbsp;&nbsp;Learn more about [Action recognition for video data](https://cloud.google.com/vertex-ai/docs/video-data/action-recognition/train-model).
+&nbsp;&nbsp;&nbsp;Learn more about [Action recognition for video data](https://cloud.google.com/vertex-ai/docs/training-overview#action_recognition_for_videos).
 
 
 [AutoML training video classification model for batch prediction](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/sdk_automl_video_classification_batch.ipynb)
@@ -233,7 +233,7 @@ The steps performed include:
 
 ```
 
-&nbsp;&nbsp;&nbsp;Learn more about [Classification for video data](https://cloud.google.com/vertex-ai/docs/video-data/classification/train-model).
+&nbsp;&nbsp;&nbsp;Learn more about [Classification for video data](https://cloud.google.com/vertex-ai/docs/training-overview#classification_for_videos).
 
 
 [AutoML training video object tracking model for batch prediction](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/sdk_automl_video_object_tracking_batch.ipynb)
@@ -250,5 +250,5 @@ The steps performed include:
 
 ```
 
-&nbsp;&nbsp;&nbsp;Learn more about [Object tracking for video data](https://cloud.google.com/vertex-ai/docs/video-data/object-tracking/train-model).
+&nbsp;&nbsp;&nbsp;Learn more about [Object tracking for video data](https://cloud.google.com/vertex-ai/docs/training-overview#object_tracking_for_videos).
 
