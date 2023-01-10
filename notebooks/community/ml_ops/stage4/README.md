@@ -42,10 +42,63 @@ This stage may be done entirely by MLOps. We recommend:
 
 ### Get Started
 
-[Get started with Vertex Explainable AI](get_started_with_vertex_xai.ipynb)
+
+[Get started with Vertex ML Metadata](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage4/get_started_with_vertex_ml_metadata.ipynb)
 
 ```
+Learn how to use `Vertex ML Metadata`.
+
 The steps performed include:
+
+- Create a `Metadatastore` resource.
+- Create (record)/List an `Artifact`, with artifacts and metadata.
+- Create (record)/List an `Execution`.
+- Create (record)/List a `Context`.
+- Add `Artifact` to `Execution` as events.
+- Add `Execution` and `Artifact` into the `Context`
+- Delete `Artifact`, `Execution` and `Context`.
+- Create and run a `Vertex AI Pipeline` ML workflow to train and deploy a scikit-learn model.
+    - Create custom pipeline components that generate artifacts and metadata.
+    - Compare Vertex AI Pipelines runs.
+    - Trace the lineage for pipeline-generated artifacts.
+    - Query your pipeline run metadata.
+
+```
+
+
+[Get started with Google Artifact Registry](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage4/get_started_with_google_artifact_registry.ipynb)
+
+```
+Learn how to use `Google Artifact Registry`.
+
+The steps performed include:
+
+- Creating a private Docker repository.
+- Tagging a container image, specific to the private Docker repository.
+- Pushing a container image to the private Docker repository.
+- Pulling a container image from the private Docker repository.
+- Deleting a private Docker repository.
+
+```
+
+
+[Get started with Vertex AI Model Evaluation](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage4/get_started_with_model_evaluation.ipynb)
+
+```
+Learn how to use `Vertex AI Model Evaluation`.
+
+The steps performed include:
+
+```
+
+
+[Get started with Vertex Explainable AI](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage4/get_started_with_vertex_xai.ipynb)
+
+```
+Learn how to use `Vertex AI Explainable AI`.
+
+The steps performed include:
+
 - Train an AutoML tabular model.
     - Do a batch prediction with explanations.
     - Do an online prediction with explanations.
@@ -67,21 +120,14 @@ The steps performed include:
 
 ```
 
-[Get started with Google Artifact Registry](get_started_with_google_artifact_registry.ipynb)
+
+[Get started with AutoML Training and ML Metadata](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/ml_ops/stage4/get_started_with_vertex_ml_metadata_and_automl.ipynb)
 
 ```
+Learn how to use `AutoML` for training and assemble the corresponding artifact linkage for `Vertex ML Metadata`.
+
 The steps performed include:
-- Creating a private Docker repository.
-- Tagging a container image, specific to the private Docker repository.
-- Pushing a container image to the private Docker repository.
-- Pulling a container image from the private Docker repository.
-- Deleting a private Docker repository.
-```
 
-[Get started with AutoML training and ML Metadata](get_started_with_vertex_ml_metadata_and_automl.ipynb)
-
-```
-The steps performed include:
 - Create a `Dataset` resource.
 - Create a corresponding `google.VertexDataset` artifact.
 - Train a model using `AutoML`.
@@ -93,53 +139,8 @@ The steps performed include:
 - Add the corresponding artifacts and context to the execution.
 - Add artifact links (event) to the execution.
 - Display the execution graph.
-```
-
-[Get started with Vertex AI ML Metadata](get_started_with_vertex_ml_metadata.ipynb)
 
 ```
-The steps performed include:
-- Create a `Metadatastore` resource.
-- Create (record)/List an `Artifact`, with artifacts and metadata.
-- Create (record)/List an `Execution`.
-- Create (record)/List a `Context`.
-- Add `Artifact` to `Execution` as events.
-- Add `Execution` and `Artifact` into the `Context`
-- Delete `Artifact`, `Execution` and `Context`.
-- Create and run a `Vertex AI Pipeline` ML workflow to train and deploy a scikit-learn model.
-    - Create custom pipeline components that generate artifacts and metadata.
-    - Compare Vertex AI Pipelines runs.
-    - Trace the lineage for pipeline-generated artifacts.
-    - Query your pipeline run metadata.
-```
 
-[Get started with Vertex AI Model Evaluation](get_started_with_model_evaluation.ipynb)
-
-```
-The steps performed include:
-- Evaluate an `AutoML` model.
-    - Train an `AutoML` image classification model.
-    - Retrieve the default evaluation metrics from training.
-    - Do a batch evaluation for a custom evaluation slice.
-- Evaluate a BigQuery ML model.
-    - Train a `BigQuery ML` tabular classification model.
-    - Retrieve the default evaluation metrics from training.
-    - Do a batch evaluation for a custom evaluation slice.
-- Evaluate a custom model.
-    - Do a batch evaluation for a custom evaluation slice.
-    - Add an evaluation to the `Model Registry` for the `Model` resource.
-- Evaluate an `AutoML` model.
-    - Train an `AutoML` image classification model.
-    - Retrieve the default evaluation metrics from training.
-    - Do a batch evaluation for a custom evaluation slice.
-- Evaluate a BigQuery ML model.
-    - Train a `BigQuery ML` tabular classification model.
-    - Retrieve the default evaluation metrics from training.
-    - Do a batch evaluation for a custom evaluation slice.
-- Evaluate a custom model.
-    - Do a batch evaluation for a custom evaluation slice.
-    - Add an evaluation to the `Model Registry` for the `Model` resource.
-```
 ### E2E Stage Example
 
-Stage 4: Evaluation
