@@ -1,3 +1,20 @@
+
+[Track parameters and metrics for custom training jobs](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/ml_metadata/sdk-metric-parameter-tracking-for-custom-jobs.ipynb)
+
+```
+Learn how to use Vertex AI SDK for Python to:
+
+The steps performed include:
+- Track training parameters and prediction metrics for a custom training job.
+- Extract and perform analysis for all parameters and metrics within an Experiment.
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex ML Metadata](https://cloud.google.com/vertex-ai/docs/ml-metadata).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+
+
 [Track parameters and metrics for locally trained models](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/ml_metadata/sdk-metric-parameter-tracking-for-locally-trained-models.ipynb)
 
 ```
@@ -10,17 +27,7 @@ The steps performed include:
 
 ```
 
-
-[Track parameters and metrics for custom training jobs](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/ml_metadata/sdk-metric-parameter-tracking-for-custom-jobs.ipynb)
-
-```
-Learn how to use Vertex AI SDK for Python to:
-
-The steps performed include:
-- Track training parameters and prediction metrics for a custom training job.
-- Extract and perform analysis for all parameters and metrics within an Experiment.
-
-```
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex ML Metadata](https://cloud.google.com/vertex-ai/docs/ml-metadata).
 
 
 [Track artifacts and metrics across Vertex AI Pipelines runs using Vertex ML Metadata](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/ml_metadata/vertex-pipelines-ml-metadata.ipynb)
@@ -38,4 +45,8 @@ The steps performed include:
 * Query your pipeline run metadata
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex ML Metadata](https://cloud.google.com/vertex-ai/docs/ml-metadata).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
 

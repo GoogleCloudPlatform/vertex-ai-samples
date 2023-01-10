@@ -1,7 +1,4 @@
 
-### structured_data 
-
-
 [BQML and AutoML - Experimenting with Vertex AI](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/structured_data/rapid_prototyping_bqml_automl.ipynb)
 
 ```
@@ -17,4 +14,8 @@ The steps performed include:
 - Testing the deployed model infrastructure.
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [AutoML](https://cloud.google.com/vertex-ai/docs/start/automl-users).
+
+&nbsp;&nbsp;&nbsp;Learn more about [BigQuery ML](https://cloud.google.com/bigquery-ml/docs/introduction).
 

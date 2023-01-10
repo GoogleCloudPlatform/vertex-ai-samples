@@ -1,3 +1,20 @@
+
+[Streaming ingestion SDK](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/feature_store/feature_store_streaming_ingestion_sdk.ipynb)
+
+```
+Learn how to ingest features from a `Pandas DataFrame` into your Vertex AI Feature Store using `write_feature_values` method from the Vertex AI SDK.
+
+The steps performed include:
+
+- Create `Feature Store`
+- Create new `Entity Type` for your `Feature Store`
+- Ingest feature values from `Pandas DataFrame` into `Feature Store`'s `Entity Types`.
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Feature Store](https://cloud.google.com/vertex-ai/docs/featurestore).
+
+
 [Using Vertex AI Feature Store with Pandas Dataframe](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/feature_store/sdk-feature-store-pandas.ipynb)
 
 ```
@@ -15,6 +32,8 @@ The steps performed include:
 
 ```
 
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Feature Store](https://cloud.google.com/vertex-ai/docs/featurestore).
+
 
 [Online and Batch predictions using Vertex AI Feature Store](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/feature_store/sdk-feature-store.ipynb)
 
@@ -27,6 +46,9 @@ The steps performed include:
 - Import feature data into `Vertex AI Feature Store` resource.
 - Serve online prediction requests using the imported features.
 - Access imported features in offline jobs, such as training jobs.
+- Use streaming ingestion to ingest small amount of data.
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Feature Store](https://cloud.google.com/vertex-ai/docs/featurestore).
 
