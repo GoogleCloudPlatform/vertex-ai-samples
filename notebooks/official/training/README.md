@@ -1,7 +1,4 @@
 
-### training 
-
-
 [Run hyperparameter tuning for a TensorFlow model](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/training/hyperparameter_tuning_tensorflow.ipynb)
 
 ```
@@ -14,6 +11,8 @@ The steps performed include:
 * Configure and launch a hyperparameter tuning job with the Vertex AI Python SDK.
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Hyperparameter Tuning](https://cloud.google.com/vertex-ai/docs/training/hyperparameter-tuning-overview).
 
 
 [PyTorch image classification multi-node distributed data parallel training on cpu using Vertex training with custom container](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/training/multi_node_ddp_gloo_vertex_training_with_custom_container.ipynb)
@@ -31,6 +30,8 @@ The steps performed include:
 
 ```
 
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+
 
 [PyTorch Image Classification Multi-Node Distributed Data Parallel Training on GPU using Vertex AI Training with Custom Container](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/training/multi_node_ddp_nccl_vertex_training_with_custom_container.ipynb)
 
@@ -47,6 +48,8 @@ The steps performed include:
 
 ```
 
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+
 
 [Create a distributed custom training job](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/training/xgboost_data_parallel_training_on_cpu_using_dask.ipynb)
 
@@ -61,4 +64,6 @@ The steps performed include:
 - Run a Vertex AI SDK CustomContainerTrainingJob
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
 

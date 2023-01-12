@@ -1,7 +1,4 @@
 
-### model_monitoring 
-
-
 [Vertex AI Batch Prediction with Model Monitoring](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/model_monitoring/batch_prediction_model_monitoring.ipynb)
 
 ```
@@ -14,6 +11,8 @@ The steps performed include:
 - Interpret the statistics, visualizations, other data reported by the model monitoring feature.
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Model Monitoring for batch predictions](https://cloud.google.com/vertex-ai/docs/model-monitoring/model-monitoring-batch-predictions).
 
 
 [Vertex AI Model Monitoring with Explainable AI Feature Attributions](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/model_monitoring/model_monitoring.ipynb)
@@ -32,4 +31,6 @@ The steps performed include:
 - Understand how to interpret the statistics, visualizations, other data reported by the model monitoring feature.
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Model Monitoring](https://cloud.google.com/vertex-ai/docs/model-monitoring).
 

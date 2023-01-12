@@ -12,6 +12,10 @@
         --errors-codes: A list of error codes to report errors. Otherwise, all errors are reported.
         --errors-csv: Report errors in CSV format
         
+        # options for automatic fixing
+        --fix: Automatic fix
+        --fix-codes: A list of fix codes to fix. Otherwise, all fix codes are enabled.
+        
         # index generatation
         --repo: Generate index in markdown format
         --web: Generate index in HTML format
@@ -19,6 +23,7 @@
         --desc: Add description to index
         --steps: Add steps to index
         --uses: Add "resources" used to index
+        --linkback: Add linkback to index
         
     Format of CSV file for notebooks to review:
     
@@ -61,6 +66,8 @@ parser.add_argument('--uses', dest='uses', action='store_true',
                     default=False, help='Output uses (resources)')
 parser.add_argument('--steps', dest='steps', action='store_true', 
                     default=False, help='Ouput steps')
+parser.add_argument('--linkback', dest='linkback', action='store_true', 
+                    default=False, help='Ouput linkback')
 parser.add_argument('--web', dest='web', action='store_true', 
                     default=False, help='Output format in HTML')
 parser.add_argument('--repo', dest='repo', action='store_true', 
@@ -109,13 +116,14 @@ class ErrorCode(Enum):
     #   Costs cell required
     #     Check for required Vertex and optional BQ and Dataflow
     ERROR_OVERVIEW_NOTFOUND = 10,
-    ERROR_OBJECTIVE_NOTFOUND = 11,
-    ERROR_OBJECTIVE_MISSING_DESC = 12,
-    ERROR_OBJECTIVE_MISSING_USES = 13,
-    ERROR_OBJECTIVE_MISSING_STEPS = 14,
-    ERROR_DATASET_NOTFOUND = 15,
-    ERROR_COSTS_NOTFOUND = 16,
-    ERROR_COSTS_MISSING = 17,
+    ERROR_LINKBACK_NOTFOUND = 11,
+    ERROR_OBJECTIVE_NOTFOUND = 12,
+    ERROR_OBJECTIVE_MISSING_DESC = 13,
+    ERROR_OBJECTIVE_MISSING_USES = 14,
+    ERROR_OBJECTIVE_MISSING_STEPS = 15,
+    ERROR_DATASET_NOTFOUND = 16,
+    ERROR_COSTS_NOTFOUND = 17,
+    ERROR_COSTS_MISSING = 18,
 
     # Installation cell
     #   Installation cell required
@@ -126,34 +134,34 @@ class ErrorCode(Enum):
     #   option {USER_FLAG} required
     #   installation code cell not match template
     #   all packages must be installed as a single pip3
-    ERROR_INSTALLATION_NOTFOUND = 18,
-    ERROR_INSTALLATION_HEADING = 19,
-    ERROR_INSTALLATION_CODE_NOTFOUND = 20,
-    ERROR_INSTALLATION_PIP3 = 21,
-    ERROR_INSTALLATION_QUIET = 22,
-    ERROR_INSTALLATION_USER_FLAG = 23,
-    ERROR_INSTALLATION_CODE_TEMPLATE = 24,
-    ERROR_INSTALLATION_SINGLE_PIP3 = 25,
+    ERROR_INSTALLATION_NOTFOUND = 19,
+    ERROR_INSTALLATION_HEADING = 20,
+    ERROR_INSTALLATION_CODE_NOTFOUND = 21,
+    ERROR_INSTALLATION_PIP3 = 22,
+    ERROR_INSTALLATION_QUIET = 23,
+    ERROR_INSTALLATION_USER_FLAG = 24,
+    ERROR_INSTALLATION_CODE_TEMPLATE = 25,
+    ERROR_INSTALLATION_SINGLE_PIP3 = 26,
 
     # Restart kernel cell
     #    Restart code cell required
     #    Restart code cell not found
-    ERROR_RESTART_NOTFOUND = 23,
-    ERROR_RESTART_CODE_NOTFOUND = 24,
+    ERROR_RESTART_NOTFOUND = 27,
+    ERROR_RESTART_CODE_NOTFOUND = 28,
 
     # Before you begin cell
     #    Before you begin cell required
     #    Before you begin cell incomplete
-    ERROR_BEFOREBEGIN_NOTFOUND = 25,
-    ERROR_BEFOREBEGIN_INCOMPLETE = 26,
+    ERROR_BEFOREBEGIN_NOTFOUND = 29,
+    ERROR_BEFOREBEGIN_INCOMPLETE = 30,
 
     # Set Project ID
     #    Set project ID cell required
     #    Set project ID code cell not found
     #    Set project ID not match template
-    ERROR_PROJECTID_NOTFOUND = 27,
-    ERROR_PROJECTID_CODE_NOTFOUND = 28,
-    ERROR_PROJECTID_TEMPLATE = 29,
+    ERROR_PROJECTID_NOTFOUND = 31,
+    ERROR_PROJECTID_CODE_NOTFOUND = 32,
+    ERROR_PROJECTID_TEMPLATE = 33,
 
     # Technical Writer Rules
     ERROR_TWRULE_TODO = 51,
@@ -182,7 +190,21 @@ def parse_dir(directory: str) -> int:
     """
     exit_code = 0
     
+    sorted_entries = []
     entries = os.scandir(directory)
+    for entry in entries:
+
+        inserted = False
+        for ix in range(len(sorted_entries)):
+            if entry.name < sorted_entries[ix].name:
+                sorted_entries.insert(ix, entry)
+                inserted = True
+                break
+        
+        if not inserted:
+            sorted_entries.append(entry)
+    
+    entries = sorted_entries
     for entry in entries:
         if entry.is_dir():
             if entry.name[0] == '.':
@@ -590,6 +612,8 @@ class OverviewRule(NotebookRule):
                 linkback = more.split('(')[1].split(')')[0]
                 self.tags.append(tag)
                 self.linkbacks.append(linkback)
+        else:
+            return notebook.report_error(ErrorCode.ERROR_LINKBACK_NOTFOUND, "Linkback missing in overview section")
                 
         return True
 
@@ -618,6 +642,10 @@ class ObjectiveRule(NotebookRule):
         in_steps = False
     
         for line in cell['source'][1:]:
+            # TOC anchor
+            if line.startswith('<a name='):
+                continue
+                
             if line.startswith('This tutorial uses'):
                 in_desc = False
                 in_steps = False
@@ -654,10 +682,14 @@ class ObjectiveRule(NotebookRule):
                         # check for italic font setting
                         if ch == '*' and sline[1] != ' ':
                             in_steps = False
+                        # special case
+                        elif sline.startswith('* Prediction Service'):
+                            in_steps = False
                         else:
                             self.steps += line
                     elif ch == '#':
                         in_steps = False
+
             
         if self.desc == '':
             ret = notebook.report_error(ErrorCode.ERROR_OBJECTIVE_MISSING_DESC, "Objective section missing desc")
@@ -683,7 +715,7 @@ class ObjectiveRule(NotebookRule):
             ret = notebook.report_error(ErrorCode.ERROR_OBJECTIVE_MISSING_STEPS, "Objective section missing steps list")
             
         notebook.costs = self.costs
-        ret = True
+        return ret
 
 
 class RecommendationsRule(NotebookRule):
@@ -1080,30 +1112,32 @@ def add_index(path: str,
     title = title.split(':')[-1].strip()
     title = title[0].upper() + title[1:]
     if args.web:
-        title = title.replace('`', '')
+        title = replace_cl(title.replace('`', ''))
         
         print('    <tr>')
         print('        <td>')
         for tag in tags:
+            tag = replace_cl(tag)
             print(f'            {tag.strip()}<br/>\n')
         print('        </td>')
         print('        <td>')
         print(f'            <b>{title}</b><br/>\n')
         if args.desc:
-            desc = desc.replace('`', '')
+            desc = replace_cl(desc.replace('`', ''))
             print('<br/>')
             print(f'            {desc}<br/>\n')
             
         if args.steps:
-            print('<br/>' + steps.replace('\n', '<br/>').replace('-', '&nbsp;&nbsp;-').replace('*', '&nbsp;&nbsp;-') +  '<br/>')
+            steps = replace_cl(steps.replace('\n', '<br/>').replace('-', '&nbsp;&nbsp;-').replace('**', '').replace('*', '&nbsp;&nbsp;-').replace('`', ''))
+            print('<br/>' + steps +  '<br/>')
             
-        if linkbacks:
+        if args.linkback and linkbacks:
             num = len(tags)
             for _ in range(num):
                 if linkbacks[_].startswith("vertex-ai"):
-                    print(f'<br/>            Learn more about <a href="https://cloud.google.com/{linkbacks[_]}">{tags[_]}</a>\n')
+                    print(f'<br/>            Learn more about <a href="https://cloud.google.com/{linkbacks[_]}" target="_blank">{replace_cl(tags[_])}</a>.\n')
                 else:
-                    print(f'<br/>            Learn more about <a href="{linkbacks[_]}">{tags[_]}</a>\n')
+                    print(f'<br/>            Learn more about <a href="{linkbacks[_]}" target="_blank">{replace_cl(tags[_])}</a>.\n')
                     
         print('        </td>')
         print('        <td>')
@@ -1116,12 +1150,15 @@ def add_index(path: str,
         print('        </td>')
         print('    </tr>\n')
     elif args.repo:
-        if tags != last_tag and tag != '':
-            last_tag = tags
-            flat_list = ''
-            for item in tags:
-                flat_list += item.replace("'", '') + ' '
-            print(f"\n### {flat_list}\n")
+        try:
+            if tags != last_tag and tag != '':
+                last_tag = tags
+                flat_list = ''
+                for item in tags:
+                    flat_list += item.replace("'", '') + ' '
+                print(f"\n### {flat_list}\n")
+        except:
+            pass
         print(f"\n[{title}]({git_link})\n")
     
         print("```")
@@ -1133,7 +1170,80 @@ def add_index(path: str,
 
         if args.steps:
             print(steps.rstrip() + '\n')
+            
         print("```\n")
+            
+        if args.linkback and linkbacks:
+            num = len(tags)
+            for _ in range(num):
+                if linkbacks[_].startswith("vertex-ai"):
+                    print(f'&nbsp;&nbsp;&nbsp;Learn more about [{tags[_]}]({linkbacks[_]}).\n')
+                else:
+                    print(f'&nbsp;&nbsp;&nbsp;Learn more about [{tags[_]}]({linkbacks[_]}).\n')
+
+def replace_cl(text : str ) -> str:
+    '''
+    Replace product names with CL substitution variables
+    '''
+    substitutions = {
+        #'AutoML Tabular Workflow': '{{automl_name}} Tabular Workflow',
+        #'AutoML Tables': '{{automl_tables_name}}',
+        #'AutoML Tabular': '{{automl_tables_name}}',
+        #'AutoML Vision': '{automl_vision_name}}',
+        #'AutoML Image': '{automl_vision_name}}',
+        'AutoML': '{{automl_name}}',
+        
+        'BigQuery ML': '{{bigqueryml_name}}',
+        'BQML': '{{bigqueryml_name}}',
+        'BigQuery': '{{bigquery_name}}',
+        'BQ': '{{bigquery_name}}',
+        
+        'Vertex Dataset': '{{vertex_ai_name}} Dataset',
+        'Vertex Model': '{{vertex_ai_name}} Model',
+        'Vertex Endpoint': '{{vertex_ai_name}} Endpoint',
+        'Vertex Model Registry': '{{vertex_model_registry_name}}',
+        'Vertex AI Model Registry': '{{vertex_model_registry_name}}',
+        'Vertex Training': '{{vertex_training_name}}',
+        'Vertex AI Training': '{{vertex_training_name}}',
+        'Vertex Prediction': '{{vertex_prediction_name}}',
+        'Vertex AI Prediction': '{{vertex_prediction_name}}',
+        'Vertex TensorBoard': '{{vertex_tensorboard_name}}',
+        'Vertex AI TensorBoard': '{{vertex_tensorboard_name}}',
+        'Vertex ML Metadata': '{{vertex_metadata_name}}',
+        'Vertex Pipelines': '{{vertex_pipelines_name}}',
+        'Vertex AI Pipelines': '{{vertex_pipelines_name}}',
+        'Vertex AI Data Labeling': '{{vertex_data_labeling_name}}',
+        'Vertex AI Experiments': '{{vertex_experiments_name}}',
+        'Vertex Experiments': '{{vertex_experiments_name}}',
+        'Vertex AI Matching Engine': '{vertex_matching_engine_name}}',
+        'Vertex Matching Engine': '{vertex_matching_engine_name}}',
+        'Vertex Model Monitoring': '{{vertex_model_monitoring_name}}',
+        'Vertex AI Model Monitoring': '{{vertex_model_monitoring_name}}',
+        'Vertex Feature Store': '{{vertex_featurestore_name}}',
+        'Vertex AI Feature Store': '{{vertex_featurestore_name}}',
+        'Vertex Vizier': '{{vertex_vizier_name}}',
+        'Vertex AI Vizier': '{{vertex_vizier_name}}',
+        'Vertex Explainable AI': '{{vertex_xai_name}}',
+        'NAS': '{{vertex_nas_name}',
+        'Vertex AI Neural Architectural Search': '{{vertex_nas_name}}',
+        'Vertex Workbench': '{{vertex_workbench_name}}',
+        'Vertex AI Workbench': '{{vertex_workbench_name}}',
+        'Vertex AI Edge Manager': '{{vertex_edge_manager_name}}',
+        'Vertex SDK': '{{vertex_sdk_name}}',
+        'Vertex AI SDK': '{{vertex_sdk_name}}',
+        'Vertex AI': '{{vertex_ai_name}}',
+        
+        'Cloud Storage': '{{storage_name}}',
+        'TensorFlow Enterprise': '{{tf4gcp_name}}',
+        'TensorFlow': '{{tensorflow_name}}',
+    }
+    
+    for key, value in substitutions.items():
+        if key in text:
+            text = text.replace(key, value)
+            
+    return text
+
 
 
 # Instantiate the rules
