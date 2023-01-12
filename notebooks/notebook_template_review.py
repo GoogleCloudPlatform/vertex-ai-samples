@@ -12,6 +12,10 @@
         --errors-codes: A list of error codes to report errors. Otherwise, all errors are reported.
         --errors-csv: Report errors in CSV format
         
+        # options for automatic fixing
+        --fix: Automatic fix
+        --fix-codes: A list of fix codes to fix. Otherwise, all fix codes are enabled.
+        
         # index generatation
         --repo: Generate index in markdown format
         --web: Generate index in HTML format
@@ -19,6 +23,7 @@
         --desc: Add description to index
         --steps: Add steps to index
         --uses: Add "resources" used to index
+        --linkback: Add linkback to index
         
     Format of CSV file for notebooks to review:
     
