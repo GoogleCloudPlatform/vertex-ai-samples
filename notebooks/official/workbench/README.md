@@ -83,7 +83,7 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Workbench](https://cloud.google.com/vertex-ai/docs/workbench/introduction).
 
-&nbsp;&nbsp;&nbsp;Learn more about [BigQuery](https://cloud.google.com/bigquery).
+&nbsp;&nbsp;&nbsp;Learn more about [BigQuery ML](https://cloud.google.com/vertex-ai/docs/beginner/bqml).
 
 
 [Build a fraud detection model on Vertex AI](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/workbench/fraud_detection/fraud-detection-model.ipynb)
@@ -127,7 +127,7 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Workbench](https://cloud.google.com/vertex-ai/docs/workbench/introduction).
 
-&nbsp;&nbsp;&nbsp;Learn more about [BigQuery ML](https://cloud.google.com/bigquery-ml/docs/managing-models-vertex).
+&nbsp;&nbsp;&nbsp;Learn more about [BigQuery ML](https://cloud.google.com/vertex-ai/docs/beginner/bqml).
 
 
 [Inventory prediction on ecommerce data using Vertex AI](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/workbench/inventory-prediction/inventory_prediction.ipynb)
@@ -194,7 +194,7 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Workbench](https://cloud.google.com/vertex-ai/docs/workbench/introduction).
 
-&nbsp;&nbsp;&nbsp;Learn more about [BigQuery ML](https://cloud.google.com/bigquery-ml/docs/managing-models-vertex).
+&nbsp;&nbsp;&nbsp;Learn more about [BigQuery ML](https://cloud.google.com/vertex-ai/docs/beginner/bqml).
 
 
 [Sentiment Analysis using AutoML Natural Language and Vertex AI](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/workbench/sentiment_analysis/Sentiment_Analysis.ipynb)

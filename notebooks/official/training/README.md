@@ -1,4 +1,22 @@
 
+[Get started with Vertex AI Distributed Training](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/training/get_started_with_vertex_distributed_training.ipynb)
+
+```
+Learn how to use `Vertex AI Distributed Training` for when training with `Vertex AI`.
+
+The steps performed include:
+
+- `MirroredStrategy`: Train on a single VM with multiple GPUs.
+- `MultiWorkerMirroredStrategy`: Train on multiple VMs with automatic setup of replicas.
+- `MultiWorkerMirroredStrategy`: Train on multiple VMs with fine grain control of replicas.
+- `ReductionServer`: Train on multiple VMS and sync updates across VMS with `Vertex AI Reduction Server`.
+- `TPUTraining`: Train with multiple Cloud TPUs.
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Distributed Training](https://cloud.google.com/vertex-ai/docs/training/distributed-training).
+
+
 [Run hyperparameter tuning for a TensorFlow model](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/training/hyperparameter_tuning_tensorflow.ipynb)
 
 ```

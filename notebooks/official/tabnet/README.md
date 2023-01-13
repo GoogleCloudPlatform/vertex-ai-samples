@@ -12,9 +12,7 @@ The steps performed are:
 
 ```
 
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI TabNet](https://cloud.google.com/vertex-ai/docs/tabular-data/tabular-workflows/tabnet).
-
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex Explainable AI](https://cloud.google.com/vertex-ai/docs/explainable-ai/overview).
+&nbsp;&nbsp;&nbsp;Learn more about [Tabular Workflow for TabNet](https://cloud.google.com/vertex-ai/docs/tabular-data/tabular-workflows/tabnet).
 
 
 [Vertex AI TabNet](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tabnet/tabnet_vertex_tutorial.ipynb)
@@ -32,7 +30,5 @@ The steps performed are:
 
 ```
 
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI TabNet](https://cloud.google.com/vertex-ai/docs/tabular-data/tabular-workflows/tabnet).
-
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Hyperparameter Tuning](https://cloud.google.com/vertex-ai/docs/training/hyperparameter-tuning-overview).
+&nbsp;&nbsp;&nbsp;Learn more about [Tabular Workflow for TabNet](https://cloud.google.com/vertex-ai/docs/tabular-data/tabular-workflows/tabnet).
 
