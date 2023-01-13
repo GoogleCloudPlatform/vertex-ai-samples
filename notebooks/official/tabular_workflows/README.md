@@ -11,9 +11,7 @@ The steps performed include:
 
 ```
 
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI TabNet](https://cloud.google.com/vertex-ai/docs/tabular-data/tabular-workflows/tabnet).
-
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
+&nbsp;&nbsp;&nbsp;Learn more about [Tabular Workflow for TabNet](https://cloud.google.com/vertex-ai/docs/tabular-data/tabular-workflows/tabnet).
 
 
 [Wide & Deep Pipeline](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tabular_workflows/wide_and_deep_on_vertex_pipelines.ipynb)
@@ -28,7 +26,5 @@ The steps performed include:
 
 ```
 
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Wide & Deep](https://cloud.google.com/vertex-ai/docs/tabular-data/tabular-workflows/wide-and-deep).
-
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
+&nbsp;&nbsp;&nbsp;Learn more about [Tabular Workflow for Wide & Deep](https://cloud.google.com/vertex-ai/docs/tabular-data/tabular-workflows/wide-and-deep).
 
