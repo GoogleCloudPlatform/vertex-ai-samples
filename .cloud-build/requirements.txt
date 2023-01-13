@@ -11,3 +11,4 @@ google-cloud-storage
 google-cloud-build
 ratemate
 GitPython
+google-api-core==2.10

@@ -1,7 +1,4 @@
 
-### prediction 
-
-
 [Custom model batch prediction with feature filtering](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/prediction/custom_batch_prediction_feature_filter.ipynb)
 
 ```
@@ -14,4 +11,6 @@ The steps performed include:
 - Send batch prediction job.
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Batch Prediction](https://cloud.google.com/vertex-ai/docs/tabular-data/classification-regression/get-batch-predictions).
 

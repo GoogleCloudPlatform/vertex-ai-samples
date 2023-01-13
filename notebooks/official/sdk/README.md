@@ -1,7 +1,4 @@
 
-### sdk 
-
-
 [AutoML Video Classification Example](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/sdk/SDK_AutoML_Video_Classification.ipynb)
 
 ```
@@ -18,6 +15,8 @@ The steps performed include the following:
 - Perform batch prediction job on the model
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [AutoML Video](https://cloud.google.com/vertex-ai/docs/tutorials/video-classification-automl/training).
 
 
 [Custom training using Python package, managed text dataset, and TF Serving container](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/sdk/SDK_Custom_Training_Python_Package_Managed_Text_Dataset_Tensorflow_Serving_Container.ipynb)
@@ -38,4 +37,6 @@ The steps performed include:
 - Create a Batch Prediction Job on the Model
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
 

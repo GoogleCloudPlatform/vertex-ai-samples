@@ -1,0 +1,57 @@
+name: Preprocess image data
+description: |
+  Preprocess the image data and split between train and validation.
+  Args:
+    input_data_path (str):
+        Input path for the TFRecord image data. Data will be formatted as 'label' (encoded image
+        label), and 'image_raw' (the binary string of the image data).
+    height_width_path (str):
+        Path to square height and width to resize images to. File should contain single float value.
+        Value is dependent on training model.
+    preprocessed_training_data_path (str):
+        Output path for the TFRecord training data. Data will be formatted as 'label' (encoded image
+        label), and 'image_raw' (the binary string of the image data).
+    preprocessed_validation_data_path (str):
+        Output path for the TFRecord validation data. Data will be formatted as 'label' (encoded
+        image label), and 'image_raw' (the binary string of the image data).
+    validation_split (Optional[float]):
+        Fraction of data that will make up validation dataset. Value should be between 0.0 and 1.0.
+    seed (Optional[int]):
+        The global random seed to ensure the system gets a unique random sequence
+        that is deterministic (https://www.tensorflow.org/api_docs/python/tf/random/set_seed).
+inputs:
+- {name: input_data_path, type: ImageDatasetTFRecord, description: 'Input path for
+    the TFRecord image data,'}
+- {name: height_width_path, type: HeightWidth, description: 'Path to square height and width to
+    resize images to,'}
+- {name: validation_split, type: Float, description: 'Fraction of data that will make
+    up validation dataset,', default: '0.2', optional: true}
+- {name: seed, type: Integer, description: Random seed, default: '0', optional: true}
+outputs:
+- {name: preprocessed_training_data_path, type: ImageDatasetTFRecord, description: 'Output
+    path for the training data,'}
+- {name: preprocessed_validation_data_path, type: ImageDatasetTFRecord, description: 'Output
+    path for the validation data,'}
+implementation:
+  container:
+    image: us-docker.pkg.dev/vertex-ai/ready-to-go-image-classification/image-components:v0.1
+    # command is a list of strings (command-line arguments).
+    # The YAML language has two syntaxes for lists and you can use either of them.
+    # Here we use the "flow syntax" - comma-separated strings inside square brackets.
+    command: [
+      python3,
+      # Path of the program inside the container
+      /pipelines/component/src/preprocessing_component.py,
+      --input-data-path,
+      {inputPath: input_data_path},
+      --height-width-path,
+      {inputPath: height_width_path},
+      --validation-split,
+      {inputValue: validation_split},
+      --seed,
+      {inputValue: seed},
+      --preprocessed-training-data-path,
+      {outputPath: preprocessed_training_data_path},
+      --preprocessed-validation-data-path,
+      {outputPath: preprocessed_validation_data_path},
+    ]
