@@ -1,7 +1,4 @@
 
-### tabular_workflows 
-
-
 [TabNet Pipeline](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tabular_workflows/tabnet_on_vertex_pipelines.ipynb)
 
 ```
@@ -13,6 +10,10 @@ The steps performed include:
 - Create a TabNet HyperparameterTuningJob. This allows you to get the best set of hyperparameters for your dataset.
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI TabNet](https://cloud.google.com/vertex-ai/docs/tabular-data/tabular-workflows/tabnet).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
 
 
 [Wide & Deep Pipeline](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tabular_workflows/wide_and_deep_on_vertex_pipelines.ipynb)
@@ -26,4 +27,8 @@ The steps performed include:
 - Create a Wide & Deep HyperparameterTuningJob. This allows you to get the best set of hyperparameters for your dataset.
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Wide & Deep](https://cloud.google.com/vertex-ai/docs/tabular-data/tabular-workflows/wide-and-deep).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
 
