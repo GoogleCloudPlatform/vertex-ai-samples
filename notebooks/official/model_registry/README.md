@@ -17,5 +17,5 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Model Registry](https://cloud.google.com/vertex-ai/docs/model-registry/introduction).
 
-&nbsp;&nbsp;&nbsp;Learn more about [BigQuery ML](https://cloud.google.com/bigquery-ml/docs/introduction).
+&nbsp;&nbsp;&nbsp;Learn more about [BigQuery ML](https://cloud.google.com/vertex-ai/docs/beginner/bqml).
 
