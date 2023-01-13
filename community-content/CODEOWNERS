@@ -8,3 +8,4 @@
 /cpr-examples @samthrasher
 /Train_tabular_models_with_many_frameworks_and_import_to_Vertex_AI_using_Pipelines @Ark-kun
 /pipeline_components @Ark-kun
+/prediction_featurestore_integration @googleapis/vertex-prediction-team
