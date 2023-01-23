@@ -30,6 +30,7 @@
 /automl/automl_forecasting_bqml_arima_plus_comparison.ipynb @TheMichaelHu
 /automl/automl_tabular_on_vertex_pipelines.ipynb @helinwang
 /custom/custom_training_tensorboard_profiler.ipynb @itseric
+/custom/get_started_with_vertex_endpoint_and_shared_vm.ipynb @andrewferlitsch @xingziye
 /workbench/spark/spark_sample_notebook.ipynb @bradmiro
 /workbench/spark/spark_ml.ipynb @bradmiro
 /model_registry/bqml_vertexai_model_registry.ipynb @soheilazangeneh
