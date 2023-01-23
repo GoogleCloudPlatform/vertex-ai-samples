@@ -1,7 +1,4 @@
 
-### reduction_server 
-
-
 [PyTorch distributed training with Vertex AI Reduction Server](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/reduction_server/pytorch_distributed_training_reduction_server.ipynb)
 
 ```
@@ -15,4 +12,8 @@ The steps performed include:
 * Submit and monitor the job
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Reduction Server](https://cloud.google.com/blog/topics/developers-practitioners/optimize-training-performance-reduction-server-vertex-ai).
 

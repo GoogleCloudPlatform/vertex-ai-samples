@@ -112,7 +112,7 @@ def benchmark(
 
     results = []
     for qps in qps_list:
-        num_requests = max(qps * duration_sec, 10)
+        num_requests = int(max(qps * duration_sec, 10))
         requests_for_qps = list(
             itertools.islice(itertools.cycle(requests), num_requests)
         )
