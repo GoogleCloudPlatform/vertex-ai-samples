@@ -1215,8 +1215,8 @@ def replace_cl(text : str ) -> str:
         'Vertex AI Data Labeling': '{{vertex_data_labeling_name}}',
         'Vertex AI Experiments': '{{vertex_experiments_name}}',
         'Vertex Experiments': '{{vertex_experiments_name}}',
-        'Vertex AI Matching Engine': '{vertex_matching_engine_name}}',
-        'Vertex Matching Engine': '{vertex_matching_engine_name}}',
+        'Vertex AI Matching Engine': '{{vertex_matching_engine_name}}',
+        'Vertex Matching Engine': '{{vertex_matching_engine_name}}',
         'Vertex Model Monitoring': '{{vertex_model_monitoring_name}}',
         'Vertex AI Model Monitoring': '{{vertex_model_monitoring_name}}',
         'Vertex Feature Store': '{{vertex_featurestore_name}}',
@@ -1282,9 +1282,14 @@ if args.web:
     print('}')
     print('</style>')
     print('<table>')
-    print('    <th width="180px">Services</th>')
-    print('    <th>Description</th>')
-    print('    <th width="80px">Open in</th>')
+    print('    <thead>')
+    print('        <tr>')
+    print('            <th width="180px">Services</th>')
+    print('            <th>Description</th>')
+    print('            <th width="80px">Open in</th>')
+    print('        </tr>')
+    print('    </thead>')
+    print('    <tbody>')
 
 if args.notebook_dir:
     if not os.path.isdir(args.notebook_dir):
@@ -1320,6 +1325,7 @@ else:
     exit(1)
 
 if args.web:
+    print('    </tbody>\n')
     print('</table>\n')
 
 exit(exit_code)
