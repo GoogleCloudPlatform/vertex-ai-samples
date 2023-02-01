@@ -2,7 +2,8 @@
 [Training, tuning and deploying a PyTorch stable diffusion model on Vertex AI](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/stable_diffusion/dreambooth_stablediffusion.ipynb)
 
 ```
-Learn to build, train, tune and deploy a PyTorch model on [Vertex AI](https://cloud.
+Learn to build, train, tune and deploy a stable diffusion 2.0 model using HuggingFace and PyTorch on
+[Vertex AI](https://cloud.google.com/vertex/).
 
 The steps performed include:
 
@@ -12,5 +13,3 @@ The steps performed include:
 - TODO
 
 ```
-
-
