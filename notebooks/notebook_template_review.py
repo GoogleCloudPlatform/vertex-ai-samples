@@ -695,7 +695,26 @@ class ObjectiveRule(NotebookRule):
             ret = notebook.report_error(ErrorCode.ERROR_OBJECTIVE_MISSING_DESC, "Objective section missing desc")
         else:
             self.desc = self.desc.lstrip()
-            sentences = self.desc.split('.')
+            
+            bracket = False
+            paren = False
+            sentences = ""
+            for _ in range(len(self.desc)):
+                if self.desc[_] == '[':
+                    bracket = True
+                    continue
+                elif self.desc[_] == ']':
+                    bracket = False
+                    continue
+                elif self.desc[_] == '(':
+                    paren = True
+                elif self.desc[_] == ')':
+                    paren = False
+                    continue
+                    
+                if not paren:
+                    sentences += self.desc[_]
+            sentences = sentences.split('.')
             if len(sentences) > 1:
                 self.desc = sentences[0] + '.\n'
             if self.desc.startswith('In this tutorial, you learn') or self.desc.startswith('In this notebook, you learn'):
@@ -1121,23 +1140,22 @@ def add_index(path: str,
             print(f'            {tag.strip()}<br/>\n')
         print('        </td>')
         print('        <td>')
-        print(f'            <b>{title}</b><br/>\n')
+        print(f'            <b>{title}</b>.\n')
         if args.desc:
             desc = replace_cl(desc.replace('`', ''))
-            print('<br/>')
-            print(f'            {desc}<br/>\n')
-            
-        if args.steps:
-            steps = replace_cl(steps.replace('\n', '<br/>').replace('-', '&nbsp;&nbsp;-').replace('**', '').replace('*', '&nbsp;&nbsp;-').replace('`', ''))
-            print('<br/>' + steps +  '<br/>')
+            print(f' {desc}\n')
             
         if args.linkback and linkbacks:
             num = len(tags)
             for _ in range(num):
                 if linkbacks[_].startswith("vertex-ai"):
-                    print(f'<br/>            Learn more about <a href="https://cloud.google.com/{linkbacks[_]}" target="_blank">{replace_cl(tags[_])}</a>.\n')
+                    print(f' Learn more about <a href="https://cloud.google.com/{linkbacks[_]}." target="_blank">{replace_cl(tags[_])}</a>.\n')
                 else:
-                    print(f'<br/>            Learn more about <a href="{linkbacks[_]}" target="_blank">{replace_cl(tags[_])}</a>.\n')
+                    print(f' Learn more about <a href="{linkbacks[_]}." target="_blank">{replace_cl(tags[_])}</a>.\n')
+                    
+        if args.steps:
+            steps = replace_cl(steps.replace('\n', '<br/>').replace('-', '&nbsp;&nbsp;-').replace('**', '').replace('*', '&nbsp;&nbsp;-').replace('`', ''))
+            print('<br/><br/>' + steps +  '<br/>')
                     
         print('        </td>')
         print('        <td>')
