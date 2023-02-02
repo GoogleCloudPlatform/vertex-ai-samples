@@ -10,6 +10,9 @@ The steps performed include:
 - Fine tune the stable diffusion 2.0 model with your own images.
 - Upload the model artifacts to Google Cloud Storage.
 - Check the created model artifacts.
-- TODO
+- Upload the model in the PyTorch prebuilt container.
+- Create an endpoint on Vertex AI.
+- Deploy the model to the endpoint.
+- Generate a new image.
 
 ```
