@@ -695,7 +695,26 @@ class ObjectiveRule(NotebookRule):
             ret = notebook.report_error(ErrorCode.ERROR_OBJECTIVE_MISSING_DESC, "Objective section missing desc")
         else:
             self.desc = self.desc.lstrip()
-            sentences = self.desc.split('.')
+            
+            bracket = False
+            paren = False
+            sentences = ""
+            for _ in range(len(self.desc)):
+                if self.desc[_] == '[':
+                    bracket = True
+                    continue
+                elif self.desc[_] == ']':
+                    bracket = False
+                    continue
+                elif self.desc[_] == '(':
+                    paren = True
+                elif self.desc[_] == ')':
+                    paren = False
+                    continue
+                    
+                if not paren:
+                    sentences += self.desc[_]
+            sentences = sentences.split('.')
             if len(sentences) > 1:
                 self.desc = sentences[0] + '.\n'
             if self.desc.startswith('In this tutorial, you learn') or self.desc.startswith('In this notebook, you learn'):
@@ -1121,7 +1140,7 @@ def add_index(path: str,
             print(f'            {tag.strip()}<br/>\n')
         print('        </td>')
         print('        <td>')
-        print(f'            <b>{title}</b><br/>\n')
+        print(f'            <b>{title}</b>.\n')
         if args.desc:
             desc = replace_cl(desc.replace('`', ''))
             print('<br/>')
@@ -1148,9 +1167,13 @@ def add_index(path: str,
             num = len(tags)
             for _ in range(num):
                 if linkbacks[_].startswith("vertex-ai"):
-                    print(f'<br/>            Learn more about <a href="https://cloud.google.com/{linkbacks[_]}" target="_blank">{replace_cl(tags[_])}</a>.\n')
+                    print(f' Learn more about <a href="https://cloud.google.com/{linkbacks[_]}." target="_blank">{replace_cl(tags[_])}</a>.\n')
                 else:
-                    print(f'<br/>            Learn more about <a href="{linkbacks[_]}" target="_blank">{replace_cl(tags[_])}</a>.\n')
+                    print(f' Learn more about <a href="{linkbacks[_]}." target="_blank">{replace_cl(tags[_])}</a>.\n')
+                    
+        if args.steps:
+            steps = replace_cl(steps.replace('\n', '<br/>').replace('-', '&nbsp;&nbsp;-').replace('**', '').replace('*', '&nbsp;&nbsp;-').replace('`', ''))
+            print('<br/><br/>' + steps +  '<br/>')
                     
         print('        </td>')
         print('        <td>')
@@ -1228,8 +1251,8 @@ def replace_cl(text : str ) -> str:
         'Vertex AI Data Labeling': '{{vertex_data_labeling_name}}',
         'Vertex AI Experiments': '{{vertex_experiments_name}}',
         'Vertex Experiments': '{{vertex_experiments_name}}',
-        'Vertex AI Matching Engine': '{vertex_matching_engine_name}}',
-        'Vertex Matching Engine': '{vertex_matching_engine_name}}',
+        'Vertex AI Matching Engine': '{{vertex_matching_engine_name}}',
+        'Vertex Matching Engine': '{{vertex_matching_engine_name}}',
         'Vertex Model Monitoring': '{{vertex_model_monitoring_name}}',
         'Vertex AI Model Monitoring': '{{vertex_model_monitoring_name}}',
         'Vertex Feature Store': '{{vertex_featurestore_name}}',
@@ -1295,9 +1318,14 @@ if args.web:
     print('}')
     print('</style>')
     print('<table>')
-    print('    <th width="180px">Services</th>')
-    print('    <th>Description</th>')
-    print('    <th width="80px">Open in</th>')
+    print('    <thead>')
+    print('        <tr>')
+    print('            <th width="180px">Services</th>')
+    print('            <th>Description</th>')
+    print('            <th width="80px">Open in</th>')
+    print('        </tr>')
+    print('    </thead>')
+    print('    <tbody>')
 
 if args.notebook_dir:
     if not os.path.isdir(args.notebook_dir):
@@ -1333,6 +1361,7 @@ else:
     exit(1)
 
 if args.web:
+    print('    </tbody>\n')
     print('</table>\n')
 
 exit(exit_code)
