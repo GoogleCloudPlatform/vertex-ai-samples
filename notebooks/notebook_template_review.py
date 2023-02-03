@@ -1128,8 +1128,21 @@ def add_index(path: str,
             print(f'            {desc}<br/>\n')
             
         if args.steps:
-            steps = replace_cl(steps.replace('\n', '<br/>').replace('-', '&nbsp;&nbsp;-').replace('**', '').replace('*', '&nbsp;&nbsp;-').replace('`', ''))
-            print('<br/>' + steps +  '<br/>')
+            print("<devsite-expandable>\n")
+            print('  <h6 class="showalways">Notebook steps</h6>\n')
+            print('  <ul style="font-size: .75em">\n')
+            
+            if ":" in steps:
+                steps = steps.split(':')[1].replace('*', '').replace('-', '').strip().split('\n')
+            else:
+                steps = []
+              
+            for step in steps:
+                print(f'    <li>{replace_cl(step)}</li>\n')
+            #steps = replace_cl(steps.replace('\n', '<br/>').replace('-', '&nbsp;&nbsp;-').replace('**', '').replace('*', '&nbsp;&nbsp;-').replace('`', ''))
+            #print('<br/>' + steps +  '<br/>')
+            print('  </ul>\n')
+            print("</devsite-expandable>\n")
             
         if args.linkback and linkbacks:
             num = len(tags)
@@ -1142,11 +1155,11 @@ def add_index(path: str,
         print('        </td>')
         print('        <td>')
         if colab_link:
-            print(f'            <a href="{colab_link}" target="_blank">Colab</a><br/>\n')
+            print(f'            <a href="{colab_link}" target="_blank" class="external" track-type="notebookTutorial" track-name="colabLink">Colab</a><br/>\n')
         if git_link:
-            print(f'            <a href="{git_link}" target="_blank">GitHub</a><br/>\n')
+            print(f'            <a href="{git_link}" target="_blank" class="external" track-type="notebookTutorial" track-name="gitHubLink">GitHub</a><br/>\n')
         if workbench_link:
-            print(f'            <a href="{workbench_link}" target="_blank">Vertex AI Workbench</a><br/>\n')
+            print(f'            <a href="{workbench_link}" target="_blank" class="external" track-type="notebookTutorial" track-name="workbenchLink">Vertex AI Workbench</a><br/>\n')
         print('        </td>')
         print('    </tr>\n')
     elif args.repo:
