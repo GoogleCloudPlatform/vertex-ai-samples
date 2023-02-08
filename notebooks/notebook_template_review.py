@@ -1140,7 +1140,7 @@ def add_index(path: str,
             print(f'            {tag.strip()}<br/>\n')
         print('        </td>')
         print('        <td>')
-        print(f'            <b>{title}</b>.\n')
+        print(f'            <b>{title}</b>. ')
         if args.desc:
             desc = replace_cl(desc.replace('`', ''))
             print('<br/>')
@@ -1172,8 +1172,19 @@ def add_index(path: str,
                     print(f' Learn more about <a href="{linkbacks[_]}." target="_blank">{replace_cl(tags[_])}</a>.\n')
                     
         if args.steps:
-            steps = replace_cl(steps.replace('\n', '<br/>').replace('-', '&nbsp;&nbsp;-').replace('**', '').replace('*', '&nbsp;&nbsp;-').replace('`', ''))
-            print('<br/><br/>' + steps +  '<br/>')
+            print("<devsite-expandable>\n")
+            print('  <h6 class="showalways">Notebook steps</h6>\n')
+            print('  <ul>\n')
+            
+            if ":" in steps:
+                steps = steps.split(':')[1].replace('*', '').replace('-', '').strip().split('\n')
+            else:
+                steps = []
+              
+            for step in steps:
+                print(f'    <li>{replace_cl(step)}</li>\n')
+            print('  </ul>\n')
+            print("</devsite-expandable>\n")
                     
         print('        </td>')
         print('        <td>')
