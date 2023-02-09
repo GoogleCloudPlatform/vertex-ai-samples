@@ -1,0 +1,90 @@
+name: Train tensorflow image classification model
+description: |
+  Creates a trained image classification TensorFlow model.
+  Args:
+    preprocessed_training_data_path (str):
+        Input path to the TFRecord training data. Data will be formatted as 'label' (encoded image
+        label), and 'image_raw' (the binary string of the image data).
+    preprocessed_validation_data_path (str):
+        Input path to the TFRecord validation data. Data will be formatted as 'label' (encoded
+        image label), and 'image_raw' (the binary string of the image data).
+    model_path (str):
+        Input path to the loaded pre-trained model.
+    trained_model_path (str):
+        Output path to save the trained model to.
+    optimizer_name (Optional[str]):
+        Name of the tf.keras optimizer. Available optimizers are listed at
+        https://keras.io/api/optimizers/
+    optimizer_parameters (Optional[Dict[str, str]]):
+        Optimizer parameters.
+    loss_function_name (Optional[str]):
+        Name of the loss function.
+    loss_function_parameters (Optional[Dict[str, str]]):
+        Loss function parameters.
+    number_of_epochs (Optional[int]):
+        Number of training iterations over data.
+    metric_names (Optional[Sequence[str]]):
+        List of tf.keras.metrics to be evaluated by the model during training and testing. Available
+        metrics are listed at https://keras.io/api/metrics/.
+    seed Optional(int):
+        The global random seed to ensure the system gets a unique random sequence
+        that is deterministic (https://www.tensorflow.org/api_docs/python/tf/random/set_seed).
+inputs:
+- {name: preprocessed_training_data_path, type: ImageDatasetTFRecord, description: 'Input
+    path for the training data,'}
+- {name: preprocessed_validation_data_path, type: ImageDatasetTFRecord, description: 'Input
+    path for the validation data,'}
+- {name: model_path, type: TensorflowSavedModel, description: 'Input path for the
+    model,'}
+- {name: optimizer_name, type: String, description: 'Name of the optimizer,', default: SGD,
+  optional: true}
+- {name: optimizer_parameters, type: 'typing.Dict[str, str]', description: 'Optimizer
+    parameters,', default: '{}', optional: true}
+- {name: loss_function_name, type: String, description: 'Name of the loss function,',
+  default: CategoricalCrossentropy, optional: true}
+- {name: loss_function_parameters, type: 'typing.Dict[str, str]', description: 'Loss
+    function parameters,', default: '{}', optional: true}
+- {name: number_of_epochs, type: Integer, description: 'Number of epochs,', default: '10',
+  optional: true}
+- {name: metric_names, type: 'typing.List[str]', description: 'List of metrics to
+    use,', default: '["accuracy"]', optional: true}
+- {name: seed, type: Integer, description: 'Random seed,', default: '0', optional: true}
+- {name: batch_size, type: Integer, description: Batch size, default: '16', optional: true}
+outputs:
+- {name: trained_model_path, type: TensorflowSavedModel, description: 'Output path
+    for the saved model,'}
+implementation:
+  container:
+    image: us-docker.pkg.dev/vertex-ai/ready-to-go-image-classification/image-components:v0.1
+    # command is a list of strings (command-line arguments).
+    # The YAML language has two syntaxes for lists and you can use either of them.
+    # Here we use the "flow syntax" - comma-separated strings inside square brackets.
+    command: [
+      python3,
+      # Path of the program inside the container
+      /pipelines/component/src/training_component.py,
+      --preprocessed-training-data-path,
+      {inputPath: preprocessed_training_data_path},
+      --preprocessed-validation-data-path,
+      {inputPath: preprocessed_validation_data_path},
+      --model-path,
+      {inputPath: model_path},
+      --trained-model-path,
+      {outputPath: trained_model_path},
+      --optimizer-name,
+      {inputValue: optimizer_name},
+      --loss-function-name,
+      {inputValue: loss_function_name},
+      --number-of-epochs,
+      {inputValue: number_of_epochs},
+      --seed,
+      {inputValue: seed},
+      --batch-size,
+      {inputValue: batch_size},
+      --metric-names,
+      {inputValue: metric_names},
+      --optimizer-parameters,
+      {inputValue: optimizer_parameters},
+      --loss-function-parameters,
+      {inputValue: loss_function_parameters},
+    ]
