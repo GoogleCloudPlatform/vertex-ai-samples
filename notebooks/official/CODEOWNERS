@@ -39,6 +39,4 @@
 /tabular_workflows/prophet_on_vertex_pipelines.ipynb @TheMichaelHu
 /model_evaluation/custom_tabular_classification_model_evaluation.ipynb @soheilazangeneh
 /sdk/SDK_FBProphet_Forecasting_Online.ipynb @brianchunkang
-/automl/sdk_automl_forecasting_hierarchical_batch.ipynb @ivanmkc
-/prediction/custom_batch_prediction_feature_filter.ipynb @soheilazangeneh
-/feature_store/feature_store_streaming_ingestion_sdk.ipynb @soheilazangeneh
+/pipelines/Train_tabular_models_with_many_frameworks_and_import_to_Vertex_AI_using_Pipelines @Ark-kun
