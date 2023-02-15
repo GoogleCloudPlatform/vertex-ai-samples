@@ -1,6 +1,7 @@
 
 [AutoML Video Classification Example](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/sdk/SDK_AutoML_Video_Classification.ipynb)
 
+```
 The objective of this notebook is to build a AutoML Video Classification Model.
 
 The steps performed include the following:
@@ -13,9 +14,14 @@ The steps performed include the following:
 - Copy AutoML Video Demo Prediction Data for creating batch prediction job
 - Perform batch prediction job on the model
 
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [AutoML Video](https://cloud.google.com/vertex-ai/docs/tutorials/video-classification-automl/training).
+
 
 [Custom training using Python package, managed text dataset, and TF Serving container](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/sdk/SDK_Custom_Training_Python_Package_Managed_Text_Dataset_Tensorflow_Serving_Container.ipynb)
 
+```
 Learn how to create a Custom Model using Custom Python Package Training and you learn how to serve the model using TensorFlow-Serving Container for online prediction.
 
 The steps performed include:
@@ -29,3 +35,8 @@ The steps performed include:
 - Deploy a Model and Create an Endpoint on Vertex AI
 - Predict on the Endpoint
 - Create a Batch Prediction Job on the Model
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+

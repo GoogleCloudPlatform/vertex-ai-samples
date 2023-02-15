@@ -103,9 +103,20 @@ class EndpointResourceCleanupManager(VertexAIResourceCleanupManager):
             models.id for models in resource._gca_resource.deployed_models
         ]:
             resource._undeploy(deployed_model_id=deployed_model_id)
-
         resource.delete(force=True)
 
 
 class ModelResourceCleanupManager(VertexAIResourceCleanupManager):
     vertex_ai_resource = aiplatform.Model
+
+
+class MatchingEngineIndexResourceCleanupManager(VertexAIResourceCleanupManager):
+    vertex_ai_resource = aiplatform.MatchingEngineIndex
+
+
+class MatchingEngineIndexEndpointResourceCleanupManager(VertexAIResourceCleanupManager):
+    vertex_ai_resource = aiplatform.MatchingEngineIndexEndpoint
+
+    def delete(self, resource):
+        resource.undeploy_all()
+        resource.delete(force=True)
