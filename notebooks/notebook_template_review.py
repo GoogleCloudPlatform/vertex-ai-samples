@@ -1144,24 +1144,8 @@ def add_index(path: str,
         if args.desc:
             desc = replace_cl(desc.replace('`', ''))
             print('<br/>')
-            print(f'            {desc}<br/>\n')
+            print(f'            {desc}.\n')
             
-        if args.steps:
-            print("<devsite-expandable>\n")
-            print('  <h6 class="showalways">Notebook steps</h6>\n')
-            print('  <ul style="font-size: .75em">\n')
-            
-            if ":" in steps:
-                steps = steps.split(':')[1].replace('*', '').replace('-', '').strip().split('\n')
-            else:
-                steps = []
-              
-            for step in steps:
-                print(f'    <li>{replace_cl(step)}</li>\n')
-            #steps = replace_cl(steps.replace('\n', '<br/>').replace('-', '&nbsp;&nbsp;-').replace('**', '').replace('*', '&nbsp;&nbsp;-').replace('`', ''))
-            #print('<br/>' + steps +  '<br/>')
-            print('  </ul>\n')
-            print("</devsite-expandable>\n")
             
         if args.linkback and linkbacks:
             num = len(tags)
@@ -1173,7 +1157,7 @@ def add_index(path: str,
                     
         if args.steps:
             print("<devsite-expandable>\n")
-            print('  <h6 class="showalways">Notebook steps</h6>\n')
+            print('  <p class="showalways">Tutorial steps</p>\n')
             print('  <ul>\n')
             
             if ":" in steps:
