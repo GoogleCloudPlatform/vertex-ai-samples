@@ -1,0 +1,46 @@
+name: "combine"
+backend: "python"
+max_batch_size: 0
+input [
+  {
+    name: "xgb_class"
+    data_type: TYPE_FP32
+    dims: [ 1 ]
+  },
+  {
+    name: "tf_class"
+    data_type: TYPE_FP32
+    dims:  [ -1, 1 ]
+  },
+  {
+    name: "sci_1_class"
+    data_type: TYPE_FP32
+    dims:  [ 1 ] 
+  },
+  {
+    name: "sci_2_class"
+    data_type: TYPE_FP32
+    dims:  [ 1 ]
+  }
+]
+output [
+  {
+    name: "OUTPUT0"
+    data_type: TYPE_FP32
+    dims:  [ -1, 1 ] 
+  }
+]
+parameters [
+  {
+    key: "output_class"
+    value: { string_value: "true" }
+  },
+  {
+    key: "threshold"
+    value: { string_value: "0.5" }
+  }
+]
+
+instance_group[ { kind: KIND_CPU } ]
+
+

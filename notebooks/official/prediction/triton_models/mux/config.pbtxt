@@ -1,0 +1,49 @@
+name: "mux"
+backend: "python"
+max_batch_size: 0
+input [
+  {
+    name: "mux_in"
+    data_type: TYPE_FP32
+    dims: [ -1, 4 ]
+  }
+]
+output [
+  {
+    name: "mux_xgb_out"
+    data_type: TYPE_FP32
+    dims: [ -1, 4 ]
+  },
+  {
+    name: "mux_tf_out"
+    data_type: TYPE_FP32
+    dims: [ -1, 4 ]
+  },
+  {
+    name: "mux_sci_1_out"
+    data_type: TYPE_FP32
+    dims: [ -1, 4 ]
+  },
+  {
+    name: "mux_sci_2_out"
+    data_type: TYPE_FP32
+    dims: [ -1, 4 ]
+  }
+]
+
+parameters [
+  {
+    key: "output_class"
+    value: { string_value: "false" }
+  },
+  {
+    key: "threshold"
+    value: { string_value: "0.5" }
+  }
+]
+
+instance_group[ { kind: KIND_CPU } ]
+
+
+
+
