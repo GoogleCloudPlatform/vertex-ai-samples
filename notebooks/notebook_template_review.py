@@ -695,7 +695,26 @@ class ObjectiveRule(NotebookRule):
             ret = notebook.report_error(ErrorCode.ERROR_OBJECTIVE_MISSING_DESC, "Objective section missing desc")
         else:
             self.desc = self.desc.lstrip()
-            sentences = self.desc.split('.')
+            
+            bracket = False
+            paren = False
+            sentences = ""
+            for _ in range(len(self.desc)):
+                if self.desc[_] == '[':
+                    bracket = True
+                    continue
+                elif self.desc[_] == ']':
+                    bracket = False
+                    continue
+                elif self.desc[_] == '(':
+                    paren = True
+                elif self.desc[_] == ')':
+                    paren = False
+                    continue
+                    
+                if not paren:
+                    sentences += self.desc[_]
+            sentences = sentences.split('.')
             if len(sentences) > 1:
                 self.desc = sentences[0] + '.\n'
             if self.desc.startswith('In this tutorial, you learn') or self.desc.startswith('In this notebook, you learn'):
@@ -1121,32 +1140,44 @@ def add_index(path: str,
             print(f'            {tag.strip()}<br/>\n')
         print('        </td>')
         print('        <td>')
-        print(f'            <b>{title}</b><br/>\n')
+        print(f'            <b>{title}</b>. ')
         if args.desc:
             desc = replace_cl(desc.replace('`', ''))
             print('<br/>')
-            print(f'            {desc}<br/>\n')
+            print(f'            {desc}.\n')
             
-        if args.steps:
-            steps = replace_cl(steps.replace('\n', '<br/>').replace('-', '&nbsp;&nbsp;-').replace('**', '').replace('*', '&nbsp;&nbsp;-').replace('`', ''))
-            print('<br/>' + steps +  '<br/>')
             
         if args.linkback and linkbacks:
             num = len(tags)
             for _ in range(num):
                 if linkbacks[_].startswith("vertex-ai"):
-                    print(f'<br/>            Learn more about <a href="https://cloud.google.com/{linkbacks[_]}" target="_blank">{replace_cl(tags[_])}</a>.\n')
+                    print(f' Learn more about <a href="https://cloud.google.com/{linkbacks[_]}." target="_blank">{replace_cl(tags[_])}</a>.\n')
                 else:
-                    print(f'<br/>            Learn more about <a href="{linkbacks[_]}" target="_blank">{replace_cl(tags[_])}</a>.\n')
+                    print(f' Learn more about <a href="{linkbacks[_]}." target="_blank">{replace_cl(tags[_])}</a>.\n')
+                    
+        if args.steps:
+            print("<devsite-expandable>\n")
+            print('  <p class="showalways">Tutorial steps</p>\n')
+            print('  <ul>\n')
+            
+            if ":" in steps:
+                steps = steps.split(':')[1].replace('*', '').replace('-', '').strip().split('\n')
+            else:
+                steps = []
+              
+            for step in steps:
+                print(f'    <li>{replace_cl(step)}</li>\n')
+            print('  </ul>\n')
+            print("</devsite-expandable>\n")
                     
         print('        </td>')
         print('        <td>')
         if colab_link:
-            print(f'            <a href="{colab_link}" target="_blank">Colab</a><br/>\n')
+            print(f'            <a href="{colab_link}" target="_blank" class="external" track-type="notebookTutorial" track-name="colabLink">Colab</a><br/>\n')
         if git_link:
-            print(f'            <a href="{git_link}" target="_blank">GitHub</a><br/>\n')
+            print(f'            <a href="{git_link}" target="_blank" class="external" track-type="notebookTutorial" track-name="gitHubLink">GitHub</a><br/>\n')
         if workbench_link:
-            print(f'            <a href="{workbench_link}" target="_blank">Vertex AI Workbench</a><br/>\n')
+            print(f'            <a href="{workbench_link}" target="_blank" class="external" track-type="notebookTutorial" track-name="workbenchLink">Vertex AI Workbench</a><br/>\n')
         print('        </td>')
         print('    </tr>\n')
     elif args.repo:
@@ -1215,8 +1246,8 @@ def replace_cl(text : str ) -> str:
         'Vertex AI Data Labeling': '{{vertex_data_labeling_name}}',
         'Vertex AI Experiments': '{{vertex_experiments_name}}',
         'Vertex Experiments': '{{vertex_experiments_name}}',
-        'Vertex AI Matching Engine': '{vertex_matching_engine_name}}',
-        'Vertex Matching Engine': '{vertex_matching_engine_name}}',
+        'Vertex AI Matching Engine': '{{vertex_matching_engine_name}}',
+        'Vertex Matching Engine': '{{vertex_matching_engine_name}}',
         'Vertex Model Monitoring': '{{vertex_model_monitoring_name}}',
         'Vertex AI Model Monitoring': '{{vertex_model_monitoring_name}}',
         'Vertex Feature Store': '{{vertex_featurestore_name}}',
@@ -1282,9 +1313,14 @@ if args.web:
     print('}')
     print('</style>')
     print('<table>')
-    print('    <th width="180px">Services</th>')
-    print('    <th>Description</th>')
-    print('    <th width="80px">Open in</th>')
+    print('    <thead>')
+    print('        <tr>')
+    print('            <th width="180px">Services</th>')
+    print('            <th>Description</th>')
+    print('            <th width="80px">Open in</th>')
+    print('        </tr>')
+    print('    </thead>')
+    print('    <tbody>')
 
 if args.notebook_dir:
     if not os.path.isdir(args.notebook_dir):
@@ -1320,6 +1356,7 @@ else:
     exit(1)
 
 if args.web:
+    print('    </tbody>\n')
     print('</table>\n')
 
 exit(exit_code)

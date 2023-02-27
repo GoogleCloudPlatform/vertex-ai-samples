@@ -55,3 +55,36 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
 
+
+[Get started with Vertex AI Experiments](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/experiments/get_started_with_vertex_experiments.ipynb)
+
+```
+Learn how to use `Vertex AI Experiments` when training with `Vertex AI`.
+
+The steps performed include:
+
+- Local (notebook) Training
+    - Create an experiment
+    - Create a first run in the experiment
+    - Log parameters and metrics
+    - Create artifact lineage
+    - Visualize the experiment results
+    - Execute a second run
+    - Compare the two runs in the experiment
+- Cloud (`Vertex AI`) Training
+    - Within the training script:
+        - Create an experiment
+        - Log parameters and metrics
+        - Create artifact lineage
+    - Create a `Vertex AI Training` custom job
+    - Execute the custom job
+    - Visualize the experiment results
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Experiments](https://cloud.google.com/vertex-ai/docs/experiments/intro-vertex-ai-experiments).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex ML Metadata](https://cloud.google.com/vertex-ai/docs/ml-metadata).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+

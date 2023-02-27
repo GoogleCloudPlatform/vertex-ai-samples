@@ -285,3 +285,48 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
 
+
+[BQML and AutoML - Experimenting with Vertex AI](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/rapid_prototyping_bqml_automl.ipynb)
+
+```
+Learn how to use `Vertex AI Predictions` for rapid prototyping a model.
+
+The steps performed include:
+
+- Creating a BigQuery and Vertex AI training dataset.
+- Training a BigQuery ML and AutoML model.
+- Extracting evaluation metrics from the BigQueryML and AutoML models.
+- Selecting the best trained model.
+- Deploying the best trained model.
+- Testing the deployed model infrastructure.
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [AutoML components](https://cloud.google.com/vertex-ai/docs/pipelines/vertex-automl-component).
+
+[Train custom tabular ML models with many frameworks and import to Vertex AI using Vertex Pipelines](https://github.com/GoogleCloudPlatform/vertex-ai-samples/tree/main/notebooks/official/pipelines/Train_tabular_models_with_many_frameworks_and_import_to_Vertex_AI_using_Pipelines)
+
+Learn how to build a pipeline that does the following:
+
+*   Ingest data
+*   Transform data
+*   Clean up data
+*   Split data into train/test subsets
+*   Configure model
+*   Train model using multiple ML frameworks
+*   Import model into Vertex Model Registry
+*   [Optional] Deploy model to Vertex Endpoints for serving
+
+Included pipelines:
+
+*   Train ML model
+*   *   Tabular classification
+*   *   *   TensorFlow
+*   *   *   PyTorch
+*   *   *   XGBoost
+*   *   *   Scikit-learn
+*   *   Tabular regression
+*   *   *   TensorFlow
+*   *   *   PyTorch
+*   *   *   XGBoost
+*   *   *   Scikit-learn
