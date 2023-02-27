@@ -23,7 +23,62 @@
     - Incorrect examples: "Let's update the field", "We'll update the field", "The user should update the field"
 - **Googlers**: Please follow our [branding guidelines](http://goto/cloud-branding).
 
-### Code
+
+## Authoring guidelines
+
+### Focus
+
+Notebooks for official are expected to be narrow focused, which highlight a subset of features of a Vertex AI product/service.
+The product/feature is to be highlighted in the Overview section. For example:
+
+```
+This tutorial demonstrates using Vertex AI Training to train an XGBoost model using a XGBoost pre-built training container.
+```
+
+In the above example, the Vertex AI product/service is `Vertex AI Training` and the feature is `XGBoost pre-built training container`.
+
+### Scope
+
+Notebooks for official are expected to be narrow in scope, without extra extraneous steps. For example, if the notebook is about training, we discourage ending the notebook with deploying the model and doing an online/batch prediction. On the later, we recommend a separate notebook about prediction that uses a pretrained model.
+
+#### Training
+
+Notebooks for training should be constructed as follows:
+
+1. If the training script(s) are small, embed them in the notebook and use %writefile to store them locally.
+2. If the training script(s) are large, store them in our public bucket: gs://cloud-samples-data/vertex-ai/dataset-management/script, and use !wgets to retrieve and store the script locally.
+3. Train the model using the Vertex AI SDK methods for custom training.
+4. Preferrable have the service upload the trained model to the Vertex AI Model Registry.
+4. Have the script do an evaluation.
+5. Retrieve the evaluation metrics and attach them as an artifact to the corresponding entry in the Model Registry.
+6. Optionally, download the model artifacts and test locally -- i.e., make a local prediction request.
+
+#### Evaluation
+
+Notebooks for evaluation should be constructed as follows:
+
+1. Use a pretrained model from a public repository.
+2. Upload the pretrained model to the Vertex AI Model Registry.
+3. Perform a model evaluation.
+4. Review the model evaluation.
+4. Attach the model evaluation to the corresponding entry in the Model Registry.
+
+#### Prediction
+
+Notebooks for prediction should be constructed as follows:
+
+1. Use a pretrained model from a public repository.
+2. If relevant, attach a serving function to the model artifacts.
+3. Upload the pretrained model to the Vertex AI Model Registry.
+4. For online:<br/>
+    A. Deploy the model.<br/>
+    B. Perform an online prediction.</br>
+    C. Review the result.
+5. For batch:<br/>
+    A. Perform a batch prediction.</br/>
+    B. Review the result.
+    
+## Code
 
 - Put all your installs and imports in a setup section.
 - Save the notebook with the Table of Contents open.
@@ -31,7 +86,7 @@
 - Follow the [Google Python Style guide](https://github.com/google/styleguide/blob/gh-pages/pyguide.md) and write readable code.
 - Keep cells small (max ~20 lines).
 
-## TensorFlow code style
+### TensorFlow code style
 
 Use the highest level API that gets the job done (unless the goal is to demonstrate the low level API). For example, when using Tensorflow:
 
