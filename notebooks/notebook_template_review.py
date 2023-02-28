@@ -1144,14 +1144,14 @@ def add_index(path: str,
         if args.desc:
             desc = replace_cl(desc.replace('`', ''))
             print('<br/>')
-            print(f'            {desc}.\n')
+            print(f'            {desc}\n')
             
             
         if args.linkback and linkbacks:
             num = len(tags)
             for _ in range(num):
                 if linkbacks[_].startswith("vertex-ai"):
-                    print(f' Learn more about <a href="https://cloud.google.com/{linkbacks[_]}." target="_blank">{replace_cl(tags[_])}</a>.\n')
+                    print(f' Learn more about <a href="https://cloud.google.com/{linkbacks[_]}" target="_blank">{replace_cl(tags[_])}</a>.\n')
                 else:
                     print(f' Learn more about <a href="{linkbacks[_]}." target="_blank">{replace_cl(tags[_])}</a>.\n')
                     
@@ -1320,7 +1320,7 @@ if args.web:
     print('            <th width="80px">Open in</th>')
     print('        </tr>')
     print('    </thead>')
-    print('    <tbody>')
+    print('    <tbody class="list">')
 
 if args.notebook_dir:
     if not os.path.isdir(args.notebook_dir):
