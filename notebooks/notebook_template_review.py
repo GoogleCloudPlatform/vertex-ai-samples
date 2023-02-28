@@ -1153,7 +1153,7 @@ def add_index(path: str,
                 if linkbacks[_].startswith("vertex-ai"):
                     print(f' Learn more about <a href="https://cloud.google.com/{linkbacks[_]}" target="_blank">{replace_cl(tags[_])}</a>.\n')
                 else:
-                    print(f' Learn more about <a href="{linkbacks[_]}." target="_blank">{replace_cl(tags[_])}</a>.\n')
+                    print(f' Learn more about <a href="{linkbacks[_]}" target="_blank">{replace_cl(tags[_])}</a>.\n')
                     
         if args.steps:
             print("<devsite-expandable>\n")
