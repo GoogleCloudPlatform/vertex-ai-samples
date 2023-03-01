@@ -1241,6 +1241,7 @@ def replace_cl(text : str ) -> str:
         'Vertex TensorBoard': '{{vertex_tensorboard_name}}',
         'Vertex AI TensorBoard': '{{vertex_tensorboard_name}}',
         'TensorBoard': '{{vertex_tensorboard_name}}',
+        'Tensorboard': '{{vertex_tensorboard_name}}',
         'Vertex ML Metadata': '{{vertex_metadata_name}}',
         'Vertex Pipelines': '{{vertex_pipelines_name}}',
         'Vertex AI Pipelines': '{{vertex_pipelines_name}}',
