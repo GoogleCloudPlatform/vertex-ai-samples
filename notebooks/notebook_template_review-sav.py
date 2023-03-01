@@ -1217,17 +1217,15 @@ def replace_cl(text : str ) -> str:
     Replace product names with CL substitution variables
     '''
     substitutions = {
-        #'AutoML Tabular Workflow': '{{automl_name}} Tabular Workflow',
-        #'AutoML Tables': '{{automl_tables_name}}',
-        #'AutoML Tabular': '{{automl_tables_name}}',
-        #'AutoML Vision': '{automl_vision_name}}',
-        #'AutoML Image': '{automl_vision_name}}',
         'AutoML': '{{automl_name}}',
         
         'BigQuery ML': '{{bigqueryml_name}}',
         'BQML': '{{bigqueryml_name}}',
         'BigQuery': '{{bigquery_name}}',
         'BQ': '{{bigquery_name}}',
+        
+        'GCS': '{{storage_name}}',
+        'GCP': '{{gcp_name}}',
         
         'Vertex Dataset': '{{vertex_ai_name}} Dataset',
         'Vertex Model': '{{vertex_ai_name}} Model',
@@ -1240,7 +1238,6 @@ def replace_cl(text : str ) -> str:
         'Vertex AI Prediction': '{{vertex_prediction_name}}',
         'Vertex TensorBoard': '{{vertex_tensorboard_name}}',
         'Vertex AI TensorBoard': '{{vertex_tensorboard_name}}',
-        'TensorBoard': '{{vertex_tensorboard_name}}',
         'Vertex ML Metadata': '{{vertex_metadata_name}}',
         'Vertex Pipelines': '{{vertex_pipelines_name}}',
         'Vertex AI Pipelines': '{{vertex_pipelines_name}}',
@@ -1266,8 +1263,6 @@ def replace_cl(text : str ) -> str:
         'Vertex AI': '{{vertex_ai_name}}',
         
         'Cloud Storage': '{{storage_name}}',
-        'GCS': '{{storage_name}}',
-        'GCP': '{{gcp_name}}',
         'TensorFlow Enterprise': '{{tf4gcp_name}}',
         'TensorFlow': '{{tensorflow_name}}',
     }
