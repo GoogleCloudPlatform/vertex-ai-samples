@@ -15,7 +15,7 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Migrate to Vertex AI](https://cloud.google.com/vertex-ai/docs/start/migrating-to-vertex-ai).
 
-&nbsp;&nbsp;&nbsp;Learn more about [AutoML Image](https://cloud.google.com/vertex-ai/docs/tutorials/image-recognition-automl/training).
+&nbsp;&nbsp;&nbsp;Learn more about [Classification for image data](https://cloud.google.com/vertex-ai/docs/training-overview#classification_for_images).
 
 
 [Custom Scikit-Learn model with pre-built training container](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/migration/UJ10 Vertex SDK Custom Scikit-Learn with pre-built training container.ipynb)
@@ -35,7 +35,7 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Migrate to Vertex AI](https://cloud.google.com/vertex-ai/docs/start/migrating-to-vertex-ai).
 
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+&nbsp;&nbsp;&nbsp;Learn more about [Custom training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
 
 
 [Hyperparameter Tuning](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/migration/UJ11 Vertex SDK Hyperparameter Tuning.ipynb)
@@ -51,10 +51,10 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Migrate to Vertex AI](https://cloud.google.com/vertex-ai/docs/training/hyperparameter-tuning-overview).
 
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+&nbsp;&nbsp;&nbsp;Learn more about [Custom training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
 
 
-[AutoML Video Classificaton](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/migration/UJ14 Vertex SDK AutoML Video Classification.ipynb)
+[AutoML Video Classification](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/migration/UJ14 Vertex SDK AutoML Video Classification.ipynb)
 
 ```
 Learn to use `AutoML` to train a video model and use `Vertex AI Batch Prediction` to do batch predictions.
@@ -68,7 +68,7 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Migrate to Vertex AI](https://cloud.google.com/vertex-ai/docs/start/migrating-to-vertex-ai).
 
-&nbsp;&nbsp;&nbsp;Learn more about [AutoML Video](https://cloud.google.com/vertex-ai/docs/tutorials/video-classification-automl/training).
+&nbsp;&nbsp;&nbsp;Learn more about [Classification for video data](https://cloud.google.com/vertex-ai/docs/training-overview#classification_for_videos).
 
 
 [AutoML Video Object Tracking](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/migration/UJ15 Vertex SDK AutoML Object Tracking.ipynb)
@@ -85,7 +85,7 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Migrate to Vertex AI](https://cloud.google.com/vertex-ai/docs/start/migrating-to-vertex-ai).
 
-&nbsp;&nbsp;&nbsp;Learn more about [AutoML Video](https://cloud.google.com/video-intelligence/automl/object-tracking/docs/index-object-tracking).
+&nbsp;&nbsp;&nbsp;Learn more about [Object tracking for video data](https://cloud.google.com/vertex-ai/docs/training-overview#object_tracking_for_videos).
 
 
 [Custom Image Classification w/pre-built training container](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/migration/UJ2,12 Vertex SDK Custom Image Classification with pre-built training container.ipynb)
@@ -109,7 +109,7 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Migrate to Vertex AI](https://cloud.google.com/vertex-ai/docs/start/migrating-to-vertex-ai).
 
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+&nbsp;&nbsp;&nbsp;Learn more about [Custom training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
 
 
 [Custom Image Classification w/custom training container](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/migration/UJ3 Vertex SDK Custom Image Classification with custom training container.ipynb)
@@ -133,7 +133,7 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Migrate to Vertex AI](https://cloud.google.com/vertex-ai/docs/start/migrating-to-vertex-ai).
 
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+&nbsp;&nbsp;&nbsp;Learn more about [Custom training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
 
 
 [AutoML Tabular Binary Classification](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/migration/UJ4 Vertex SDK AutoML Tabular Binary Classification.ipynb)
@@ -154,7 +154,7 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Migrate to Vertex AI](https://cloud.google.com/vertex-ai/docs/start/migrating-to-vertex-ai).
 
-&nbsp;&nbsp;&nbsp;Learn more about [AutoML Tabular](https://cloud.google.com/vertex-ai/docs/start/automl-users#tables).
+&nbsp;&nbsp;&nbsp;Learn more about [Classification for tabular data](https://cloud.google.com/vertex-ai/docs/tabular-data/classification-regression/overview).
 
 
 [AutoML Image Object Detection](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/migration/UJ5 Vertex SDK AutoML Image Object Detection.ipynb)
@@ -173,35 +173,35 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Migrate to Vertex AI](https://cloud.google.com/vertex-ai/docs/start/migrating-to-vertex-ai).
 
-&nbsp;&nbsp;&nbsp;Learn more about [AutoML Image](https://cloud.google.com/vertex-ai/docs/tutorials/image-recognition-automl/training).
+&nbsp;&nbsp;&nbsp;Learn more about [Object detection for image data](https://cloud.google.com/vertex-ai/docs/training-overview#object_detection_for_images).
 
 
 [AutoML Text Classification](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/migration/UJ6 Vertex SDK AutoML Text Classification.ipynb)
 
 ```
-The objective of this notebook is to build a AutoML Video Classification Model.
+The objective of this notebook is to build a AutoML Text Classification Model.
 
 The steps performed include the following:
 
 * Set your task name, and GCS prefix
-* Copy AutoML video demo train data for creating managed dataset
+* Copy AutoML text demo train data for creating managed dataset
 * Create a dataset on Vertex AI.
 * Configure a training job
 * Launch a training job and create a model on Vertex AI
-* Copy AutoML Video Demo Prediction Data for creating batch prediction job
+* Copy AutoML Text Demo Prediction Data for creating batch prediction job
 * Perform batch prediction job on the model
 
 ```
 
 &nbsp;&nbsp;&nbsp;Learn more about [Migrate to Vertex AI](https://cloud.google.com/vertex-ai/docs/start/migrating-to-vertex-ai).
 
-&nbsp;&nbsp;&nbsp;Learn more about [AutoML Text](https://cloud.google.com/vertex-ai/docs/text-data/classification/prepare-data).
+&nbsp;&nbsp;&nbsp;Learn more about [Classification for text data](https://cloud.google.com/vertex-ai/docs/training-overview#classification_for_text).
 
 
 [AutoML Text Entity Extraction](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/migration/UJ7 Vertex SDK AutoML Text Entity Extraction.ipynb)
 
 ```
-The objective of this notebook is to build a AutoML Text Entity Extraction Model.
+The objective of this notebook is to build a AutoML Text Entity Extraction model.
 
 The steps performed include the following:
 
@@ -217,7 +217,7 @@ The steps performed include the following:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Migrate to Vertex AI](https://cloud.google.com/vertex-ai/docs/start/migrating-to-vertex-ai).
 
-&nbsp;&nbsp;&nbsp;Learn more about [AutoML Text](https://cloud.google.com/vertex-ai/docs/text-data/entity-extraction/prepare-data).
+&nbsp;&nbsp;&nbsp;Learn more about [Entity extraction for text data](https://cloud.google.com/vertex-ai/docs/training-overview#entity_extraction_for_text).
 
 
 [AutoML Text Sentiment Analysis](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/migration/UJ8 Vertex SDK AutoML Text Sentiment Analysis.ipynb)
@@ -238,7 +238,7 @@ The steps performed include the following:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Migrate to Vertex AI](https://cloud.google.com/vertex-ai/docs/start/migrating-to-vertex-ai).
 
-&nbsp;&nbsp;&nbsp;Learn more about [AutoML Text](https://cloud.google.com/vertex-ai/docs/text-data/sentiment-analysis/prepare-data).
+&nbsp;&nbsp;&nbsp;Learn more about [Sentiment analysis for text data](https://cloud.google.com/vertex-ai/docs/training-overview#sentiment_analysis_for_text).
 
 
 [Custom XGBoost model with pre-built training container](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/migration/UJ9 Vertex SDK Custom XGBoost with pre-built training container.ipynb)
@@ -258,5 +258,5 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Migrate to Vertex AI](https://cloud.google.com/vertex-ai/docs/start/migrating-to-vertex-ai).
 
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+&nbsp;&nbsp;&nbsp;Learn more about [Custom training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
 

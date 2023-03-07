@@ -15,7 +15,7 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI TensorBoard](https://cloud.google.com/vertex-ai/docs/experiments/tensorboard-overview).
 
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+&nbsp;&nbsp;&nbsp;Learn more about [Custom training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
 
 
 [Vertex AI TensorBoard custom training with prebuilt container](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tensorboard/tensorboard_custom_training_with_prebuilt_container.ipynb)
@@ -34,7 +34,23 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI TensorBoard](https://cloud.google.com/vertex-ai/docs/experiments/tensorboard-overview).
 
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+&nbsp;&nbsp;&nbsp;Learn more about [Custom training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+
+
+[Vertex AI TensorBoard Hyperparameter Tuning with the HParams Dashboard](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tensorboard/tensorboard_hyperparameter_tuning_with_hparams.ipynb)
+
+```
+This tutorial shows you how to log hyperparameter experiment results in TensorFlow and visualize the results in TensorBoard's Hparams dashboard.
+
+The steps performed include:
+
+* Adapt TensorFlow runs to log hyperparameters and metrics.
+* Start runs and log them all under one parent directory.
+* Visualize the results in TensorBoard's HParams dashboard.
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI TensorBoard](https://cloud.google.com/vertex-ai/docs/experiments/tensorboard-overview).
 
 
 [Profile model training performance using Vertex AI TensorBoard Profiler](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tensorboard/tensorboard_profiler_custom_training.ipynb)
@@ -47,6 +63,22 @@ The steps performed include:
 - Setup a service account and a Cloud Storage bucket
 - Create a TensorBoard instance
 - Create and run a custom training job that enables TensorBoard Profiler
+- View the TensorBoard Profiler dashboard to debug your model training performance
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI TensorBoard Profiler](https://cloud.google.com/vertex-ai/docs/experiments/tensorboard-profiler).
+
+
+[Profile model training performance using Vertex AI TensorBoard Profiler in custom training with prebuilt container](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tensorboard/tensorboard_profiler_custom_training_with_prebuilt_container.ipynb)
+
+```
+Learn how to enable the TensorBoard Profiler in Vertex AI for custom training jobs with a prebuilt container.
+
+The steps performed include:
+
+- Prepare your custom training code and load your training code as a Python package to a prebuilt container
+- Create and run a custom training job that enables the TensorBoard Profiler
 - View the TensorBoard Profiler dashboard to debug your model training performance
 
 ```

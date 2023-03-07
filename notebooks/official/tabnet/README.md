@@ -1,11 +1,11 @@
 
-[Vertex AI Explainations with TabNet models](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tabnet/ai-explanations-tabnet-algorithm.ipynb)
+[Vertex AI Explanations with TabNet models](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tabnet/ai-explanations-tabnet-algorithm.ipynb)
 
 ```
 Learn how to provide a sample plotting tool to visualize the output of TabNet, which is helpful in explaining the algorithm.
 
 The steps performed are:
-* Setup the the project.
+* Setup the project.
 * Download the prediction data of pretrain model onf Syn2 data.
 * Visualize and understand the feature importance based on the masks output.
 * Clean up the resource created by this tutorial.

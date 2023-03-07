@@ -40,7 +40,7 @@ The steps performed include:
 [Compare Vertex AI Forecasting and BigQuery ML ARIMA_PLUS](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/automl_forecasting_bqml_arima_plus_comparison.ipynb)
 
 ```
-Learn how to create an BigQuery ML ARIMA_PLUS model using a training [Vertex AI Pipeline](https://cloud.
+Learn how to create an BigQuery ML ARIMA_PLUS model using a training Vertex AI Pipeline from Google Cloud Pipeline Components , and then do a batch prediction using the corresponding prediction pipeline.
 
 The steps performed are:
 
@@ -60,7 +60,7 @@ The steps performed are:
 [AutoML Tabular Workflow pipelines](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/automl_tabular_on_vertex_pipelines.ipynb)
 
 ```
-Learn how to create two regression models using [Vertex AI Pipelines](https://cloud.
+Learn how to create two regression models using Vertex AI Pipelines downloaded from Google Cloud Pipeline Components .
 
 The steps performed are:
 
@@ -88,7 +88,7 @@ The steps performed include:
 
 ```
 
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI for AutoML](https://cloud.google.com/vertex-ai/docs/start/automl-users).
+&nbsp;&nbsp;&nbsp;Learn more about [AutoML training](https://cloud.google.com/vertex-ai/docs/training-overview).
 
 
 [AutoML training hierarchical forecasting for batch prediction](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/sdk_automl_forecasting_hierarchical_batch.ipynb)

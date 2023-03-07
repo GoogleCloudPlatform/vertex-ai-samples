@@ -1,4 +1,20 @@
 
+[Train a Prophet Model using Vertex AI Tabular Workflows](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tabular_workflows/prophet_on_vertex_pipelines.ipynb)
+
+```
+Learn how to create several Prophet models using a training Vertex AI Pipeline from Google Cloud Pipeline Components , and then do a batch prediction using the corresponding prediction pipeline.
+
+The steps performed are:
+
+1. Train the Prophet models.
+1. View the evaluation metrics.
+1. Make a batch prediction with the Prophet models.
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Google Cloud Pipeline Components](https://cloud.google.com/vertex-ai/docs/pipelines/components-introduction).
+
+
 [TabNet Pipeline](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tabular_workflows/tabnet_on_vertex_pipelines.ipynb)
 
 ```

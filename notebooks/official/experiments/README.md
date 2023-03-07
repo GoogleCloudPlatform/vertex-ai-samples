@@ -86,5 +86,5 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex ML Metadata](https://cloud.google.com/vertex-ai/docs/ml-metadata).
 
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+&nbsp;&nbsp;&nbsp;Learn more about [Custom training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
 

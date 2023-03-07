@@ -55,7 +55,7 @@ The steps performed include:
 * Model with BigQuery and the ARIMA model
 * Evaluate the model
 * Evaluate the model results using BigQuery ML (on training data)
-* Evalute the model results - MAE, MAPE, MSE, RMSE (on test data)
+* Evaluate the model results - MAE, MAPE, MSE, RMSE (on test data)
 * Use the executor feature
 
 ```
@@ -107,7 +107,7 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Workbench](https://cloud.google.com/vertex-ai/docs/workbench/introduction).
 
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+&nbsp;&nbsp;&nbsp;Learn more about [Custom training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
 
 
 [Churn prediction for game developers using Google Analytics 4 and BigQuery ML](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/workbench/gaming_churn_prediction/churn_prediction_for_game_developers.ipynb)
