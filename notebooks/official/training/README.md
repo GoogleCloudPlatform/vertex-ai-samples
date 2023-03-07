@@ -2,7 +2,7 @@
 [Get started with Vertex AI Distributed Training](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/training/get_started_with_vertex_distributed_training.ipynb)
 
 ```
-Learn how to use `Vertex AI Distributed Training` for when training with `Vertex AI`.
+Learn how to use `Vertex AI Distributed Training` when training with `Vertex AI`.
 
 The steps performed include:
 
@@ -66,7 +66,27 @@ The steps performed include:
 
 ```
 
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+&nbsp;&nbsp;&nbsp;Learn more about [Custom training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+
+
+[Training, tuning and deploying a PyTorch text sentiment classification model on Vertex AI](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/training/pytorch-text-sentiment-classification-custom-train-deploy.ipynb)
+
+```
+Learn to build, train, tune and deploy a PyTorch model on Vertex AI.
+
+The steps performed include:
+
+- Create training package for the text classification model.
+- Train the model with custom training on Vertex AI.
+- Check the created model artifacts.
+- Create a custom container for predictions.
+- Deploy the trained model to a Vertex AI Endpoint using the custom container for predictions.
+- Send online prediction requests to the deployed model and validate.
+- Clean up the resources created in this notebook.
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Custom training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
 
 
 [Create a distributed custom training job](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/training/xgboost_data_parallel_training_on_cpu_using_dask.ipynb)
@@ -83,5 +103,5 @@ The steps performed include:
 
 ```
 
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+&nbsp;&nbsp;&nbsp;Learn more about [Custom training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
 

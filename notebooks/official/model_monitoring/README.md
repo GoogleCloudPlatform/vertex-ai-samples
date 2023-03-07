@@ -26,7 +26,6 @@ The steps performed include:
 - Deploy the `Model` resource to the `Endpoint` resource.
 - Configure the `Endpoint` resource for model monitoring.
 - Generate synthetic prediction requests for skew.
-- Wait for email alert notification.
 - Generate synthetic prediction requests for drift.
 - Wait for email alert notification.
 
@@ -46,6 +45,25 @@ The steps performed include:
 2. Submit a batch prediction containing both in and out of distribution images.
 3. Use Model Monitoring to calculate anomaly score on each image.
 4. Identify the images in the batch prediction request that are out of distribution.
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Model Monitoring](https://cloud.google.com/vertex-ai/docs/model-monitoring).
+
+
+[Vertex AI Model Monitoring for online prediction in AutoML image models](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/model_monitoring/get_started_with_model_monitoring_automl_image_online.ipynb)
+
+```
+Learn how to use `Vertex AI Model Monitoring` with `Vertex AI Online Prediction` with an AutoML image classification model to detect an out of distribution image.
+
+The steps performed include:
+
+1. Train an AutoML image classification model.
+2. Create an endpoint.
+3. Deploy the model to the endpoint, and configure for model monitoring.
+4. Submit a online prediction containing both in and out of distribution images.
+5. Use Model Monitoring to calculate anomaly score on each image.
+6. Identify the images in the online prediction request that are out of distribution.
 
 ```
 

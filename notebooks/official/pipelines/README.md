@@ -20,6 +20,31 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [AutoML components](https://cloud.google.com/vertex-ai/docs/pipelines/vertex-automl-component).
 
+&nbsp;&nbsp;&nbsp;Learn more about [Classification for tabular data](https://cloud.google.com/vertex-ai/docs/tabular-data/classification-regression/overview).
+
+
+[Challenger vs Blessed methodology for model deployment into production](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/pipelines/challenger_vs_blessed_deployment_method.ipynb)
+
+```
+Learn how to construct a Vertex AI pipeline, which trains a new challenger version of a model, evaluates the model and compares the evaluation to the existing blessed model in production, to determine whether the challenger model becomes the blessed model for replacement in production.
+
+The steps performed include:
+
+- Import a pretrained (blessed) model to the `Vertex AI Model Registry`.
+- Import synthetic model evaluation metrics to the corresponding (blessed) model.
+- Create a `Vertex AI Endpoint` resource
+- Deploy the blessed model to the `Endpoint` resource.
+- Create a Vertex AI Pipeline
+    - Get the blessed model.
+    - Import another instance (challenger) of the pretrained model.
+    - Register the pretrained (challenger) model as a new version of the existing blessed model.
+    - Create a synthetic model evaluation.
+    - Import the synthetic model evaluation metrics to the corresponding challenger model.
+    - Compare the evaluations and set the blessed or challenger as the default.
+    - Deploy the new blessed model.
+
+```
+
 
 [Pipeline control structures using the KFP SDK](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/control_flow_kfp.ipynb)
 
@@ -56,7 +81,7 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
 
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training components](https://cloud.google.com/vertex-ai/docs/training/create-training-pipeline).
+&nbsp;&nbsp;&nbsp;Learn more about [Custom training components](https://cloud.google.com/vertex-ai/docs/training/create-training-pipeline).
 
 
 [Training and batch prediction with BigQuery source and destinantion for a custom tabular classification model](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/custom_tabular_train_batch_pred_bq_pipeline.ipynb)
@@ -127,6 +152,8 @@ The steps performed include:
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
 
 &nbsp;&nbsp;&nbsp;Learn more about [AutoML components](https://cloud.google.com/vertex-ai/docs/pipelines/vertex-automl-component).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Regression for tabular data](https://cloud.google.com/vertex-ai/docs/tabular-data/classification-regression/overview).
 
 
 [AutoML text classification pipelines using google-cloud-pipeline-components](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/google_cloud_pipeline_components_automl_text.ipynb)
@@ -211,7 +238,7 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
 
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training components](https://cloud.google.com/vertex-ai/docs/pipelines/customjob-component).
+&nbsp;&nbsp;&nbsp;Learn more about [Custom training components](https://cloud.google.com/vertex-ai/docs/pipelines/customjob-component).
 
 
 [Model upload, predict, and evaluate using google-cloud-pipeline-components](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/google_cloud_pipeline_components_model_upload_predict_evaluate.ipynb)
@@ -304,29 +331,5 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [AutoML components](https://cloud.google.com/vertex-ai/docs/pipelines/vertex-automl-component).
 
-[Train custom tabular ML models with many frameworks and import to Vertex AI using Vertex Pipelines](https://github.com/GoogleCloudPlatform/vertex-ai-samples/tree/main/notebooks/official/pipelines/Train_tabular_models_with_many_frameworks_and_import_to_Vertex_AI_using_Pipelines)
+&nbsp;&nbsp;&nbsp;Learn more about [BigQuery ML components](https://cloud.google.com/vertex-ai/docs/pipelines/bigqueryml-component).
 
-Learn how to build a pipeline that does the following:
-
-*   Ingest data
-*   Transform data
-*   Clean up data
-*   Split data into train/test subsets
-*   Configure model
-*   Train model using multiple ML frameworks
-*   Import model into Vertex Model Registry
-*   [Optional] Deploy model to Vertex Endpoints for serving
-
-Included pipelines:
-
-*   Train ML model
-*   *   Tabular classification
-*   *   *   TensorFlow
-*   *   *   PyTorch
-*   *   *   XGBoost
-*   *   *   Scikit-learn
-*   *   Tabular regression
-*   *   *   TensorFlow
-*   *   *   PyTorch
-*   *   *   XGBoost
-*   *   *   Scikit-learn
