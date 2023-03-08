@@ -37,3 +37,21 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [BigQuery ML](https://cloud.google.com/vertex-ai/docs/beginner/bqml).
 
+[Google Analytics GA4 Audience Segmentation using BQML](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/bqml_GA4_data_notebooks_lavinigam/notebooks/official/bigquery_ml/GA4_Audience_Segmentation_Notebook_and_Implementation_Guide.ipynb) 
+
+```
+Learn how to build a system to create audience segmentation of GA4 e-commerce data using BigQuery ML (BQML).
+
+The steps performed include:
+
+- Loading the e-commerce data
+- Exploratory analysis of the data
+- Feature engineering and pre-processing of the data for model
+- Create, train, and deploy the model in BigQuery
+- Evaluate the model to understand various clusters
+- Batch prediction using the trained model-
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [BigQuery ML](https://cloud.google.com/vertex-ai/docs/beginner/bqml).
+
