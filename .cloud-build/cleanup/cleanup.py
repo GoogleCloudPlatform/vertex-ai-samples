@@ -7,6 +7,12 @@ from resource_cleanup_manager import (
     ResourceCleanupManager,
     MatchingEngineIndexEndpointResourceCleanupManager,
     MatchingEngineIndexResourceCleanupManager,
+    FeatureStoreCleanupManager,
+    PipelineJobCleanupManager,
+    TrainingJobCleanupManager,
+    HyperparameterTuningCleanupManager,
+    BatchPredictionJobCleanupManager,
+    ExperimentCleanupManager
 )
 
 rate_limit = RateLimit(max_count=25, per=60, greedy=False)
@@ -48,6 +54,12 @@ managers: List[ResourceCleanupManager] = [
     ModelResourceCleanupManager(),  # ModelResourceCleanupManager must follow EndpointResourceCleanupManager due to deployed models blocking model deletion.
     MatchingEngineIndexEndpointResourceCleanupManager(),
     MatchingEngineIndexResourceCleanupManager(),
+    FeatureStoreCleanupManager(),
+    PipelineJobCleanupManager(),
+    TrainingJobCleanupManager(),
+    HyperparameterTuningCleanupManager(),
+    BatchPredictionJobCleanupManager(),
+    # ExperimentCleanupManager(), # Experiment missing _resource_noun
 ]
 
 run_cleanup_managers(managers=managers, is_dry_run=is_dry_run)
