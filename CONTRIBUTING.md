@@ -45,7 +45,7 @@ automatically fix any issues. If the fixes can't be performed automatically,
 then you will need to manually address them before submitting your PR.
 
 ```shell
-docker run -v ${PWD}:/setup/app gcr.io/python-docs-samples-tests/notebook_linter:latest <your_notebooks>
+docker run -v ${PWD}:/setup/app gcr.io/cloud-devrel-public-resources/notebook_linter:latest <your_notebooks>
 ```
 
 ## Code Reviews
