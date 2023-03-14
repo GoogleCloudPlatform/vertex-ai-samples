@@ -97,8 +97,6 @@ class EndpointResourceCleanupManager(VertexAIResourceCleanupManager):
     vertex_ai_resource = aiplatform.Endpoint
 
     def delete(self, resource):
-        # TODO: Remove this once https://github.com/googleapis/python-aiplatform/issues/1441 is fixed
-        resource._sync_gca_resource()
         for deployed_model_id in [
             models.id for models in resource._gca_resource.deployed_models
         ]:
@@ -120,3 +118,41 @@ class MatchingEngineIndexEndpointResourceCleanupManager(VertexAIResourceCleanupM
     def delete(self, resource):
         resource.undeploy_all()
         resource.delete(force=True)
+
+class FeatureStoreCleanupManager(VertexAIResourceCleanupManager):
+    vertex_ai_resource = aiplatform.Featurestore
+
+class PipelineJobCleanupManager(VertexAIResourceCleanupManager):
+    vertex_ai_resource = aiplatform.PipelineJob
+
+class TrainingJobCleanupManager(VertexAIResourceCleanupManager):
+    vertex_ai_resource = aiplatform.training_jobs._CustomTrainingJob
+
+    job_types = [
+            aiplatform.AutoMLImageTrainingJob,
+            aiplatform.AutoMLTextTrainingJob,
+            aiplatform.AutoMLTabularTrainingJob,
+            aiplatform.AutoMLVideoTrainingJob,
+            aiplatform.AutoMLForecastingTrainingJob,
+            aiplatform.CustomJob,
+            aiplatform.CustomTrainingJob,
+            aiplatform.CustomContainerTrainingJob,
+            aiplatform.CustomPythonPackageTrainingJob
+    ]
+
+    def list(self) -> Any:
+        return [
+            job
+            for job_type in self.job_types
+            for job in job_type.list()
+        ]
+
+class HyperparameterTuningCleanupManager(VertexAIResourceCleanupManager):
+    vertex_ai_resource = aiplatform.HyperparameterTuningJob
+
+
+class BatchPredictionJobCleanupManager(VertexAIResourceCleanupManager):
+    vertex_ai_resource = aiplatform.BatchPredictionJob
+
+class ExperimentCleanupManager(VertexAIResourceCleanupManager):
+    vertex_ai_resource = aiplatform.Experiment
