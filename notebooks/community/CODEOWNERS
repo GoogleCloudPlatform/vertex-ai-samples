@@ -42,6 +42,8 @@
 /notebooks/community/pipelines/google_cloud_pipeline_components_ready_to_go_text_classification_pipeline.ipynb @Narwhalprime
 /notebooks/community/feature_store/get_started_vertex_feature_store.ipynb @junkourata
 /notebooks/community/model_garden/model_garden_tfvision_image_classification.ipynb @genquan9
+/notebooks/community/model_garden/model_garden_tfvision_image_object_detection.ipynb @genquan9
+/notebooks/community/model_garden/model_garden_tfvision_image_segmentation.ipynb @genquan9
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion.ipynb @xiangxu-google
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_inpainting.ipynb @xiangxu-google
 /notebooks/community/model_garden/model_garden_pytorch_instructpix2pix.ipynb @xiangxu-google
