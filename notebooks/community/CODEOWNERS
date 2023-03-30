@@ -48,3 +48,7 @@
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_inpainting.ipynb @xiangxu-google
 /notebooks/community/model_garden/model_garden_pytorch_instructpix2pix.ipynb @xiangxu-google
 /notebooks/community/model_garden/model_garden_pytorch_controlnet.ipynb @xiangxu-google
+/notebooks/community/model_garden/model_garden_pytorch_blip_image_captioning.ipynb @xiangxu-google
+/notebooks/community/model_garden/model_garden_pytorch_blip_vqa.ipynb @xiangxu-google
+/notebooks/community/model_garden/model_garden_pytorch_vilt_vqa.ipynb @xiangxu-google
+/notebooks/community/model_garden/model_garden_pytorch_vit_gpt2_image_captioning.ipynb @xiangxu-google
