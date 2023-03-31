@@ -3,6 +3,7 @@ from typing import Any, Type
 
 from google.cloud import aiplatform
 from google.cloud.aiplatform import base
+from google.cloud import storage
 from proto.datetime_helpers import DatetimeWithNanoseconds
 
 # If a resource was updated within this number of seconds, do not delete.
@@ -156,3 +157,29 @@ class BatchPredictionJobCleanupManager(VertexAIResourceCleanupManager):
 
 class ExperimentCleanupManager(VertexAIResourceCleanupManager):
     vertex_ai_resource = aiplatform.Experiment
+
+class BucketCleanupManager(VertexAIResourceCleanupManager):
+    vertex_ai_resource = storage.bucket.Bucket
+
+    def list(self) -> Any:
+        storage_client = storage.Client()
+        return [ bucket for bucket in storage_client.list_buckets()]
+
+    def delete(self, resouce):
+        if not 'tests' in resouce.name:
+            return
+        try:
+            resoure.delete(force=True)
+        except:
+            pass
+
+    @property
+    def type_name(self) -> str:
+        return str(type(self.vertex_ai_resource))
+
+    def get_seconds_since_modification(self, resource: Any) -> float:
+        created = resource.time_created
+        return int(resource.time_created.timestamp())
+
+    def resource_name(self, resource: Any) -> str:
+        return resource.name
