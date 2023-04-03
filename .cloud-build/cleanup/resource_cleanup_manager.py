@@ -171,7 +171,6 @@ class BucketCleanupManager(ResourceCleanupManager):
 
     def list(self) -> Any:
         storage_client = storage.Client()
-        #return [ bucket for bucket in storage_client.list_buckets()]
         return list(storage_client.list_buckets())
 
     def delete(self, resource):
