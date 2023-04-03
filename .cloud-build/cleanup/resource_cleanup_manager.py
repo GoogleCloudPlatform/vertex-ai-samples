@@ -176,8 +176,10 @@ class BucketCleanupManager(ResourceCleanupManager):
         return str(type(self.vertex_ai_resource))
 
     def get_seconds_since_modification(self, resource: Any) -> float:
-        created = resource.time_created
-        return float(resource.time_created.timestamp())
+        # Bucket has no last_update property, only time created
+        created_time = resource.time_created
+        current_time = DatetimeWithNanoseconds.now()
+        return float(current_time.timestamp() - created_time.timestamp())
 
     def resource_name(self, resource: Any) -> str:
         return resource.name
