@@ -52,3 +52,6 @@
 /notebooks/community/model_garden/model_garden_pytorch_blip_vqa.ipynb @xiangxu-google
 /notebooks/community/model_garden/model_garden_pytorch_vilt_vqa.ipynb @xiangxu-google
 /notebooks/community/model_garden/model_garden_pytorch_vit_gpt2_image_captioning.ipynb @xiangxu-google
+/notebooks/community/model_garden/model_garden_pytorch_clip.ipynb @xiangxu-google
+/notebooks/community/model_garden/model_garden_pytorch_owlvit.ipynb @xiangxu-google
+/notebooks/community/model_garden/model_garden_pytorch_layoutml_document_qa.ipynb @xiangxu-google
