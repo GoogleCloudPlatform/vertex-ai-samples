@@ -196,7 +196,7 @@ class BucketCleanupManager(ResourceCleanupManager):
     def is_deletable(self, resource: Any) -> bool:
         time_difference = self.get_seconds_since_modification(resource)
 
-        if not 'your-bucket-name' in self.resource_name(resource):
+        if self.resource_name(resource).startswith('your-bucket-name'):
             print(f"Skipping '{resource}' not a Vertex AI notebook bucket")
             return False
 
