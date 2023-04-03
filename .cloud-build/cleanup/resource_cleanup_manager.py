@@ -70,7 +70,7 @@ class VertexAIResourceCleanupManager(ResourceCleanupManager):
     def delete(self, resource):
         resource.delete()
 
-    def get_seconds_since_modification(self, resource: Any) -> bool:
+    def get_seconds_since_modification(self, resource: Any) -> float:
         update_time = resource.update_time
         current_time = DatetimeWithNanoseconds.now(tz=update_time.tzinfo)
         return (current_time - update_time).total_seconds()
@@ -158,20 +158,18 @@ class BatchPredictionJobCleanupManager(VertexAIResourceCleanupManager):
 class ExperimentCleanupManager(VertexAIResourceCleanupManager):
     vertex_ai_resource = aiplatform.Experiment
 
-class BucketCleanupManager(VertexAIResourceCleanupManager):
+class BucketCleanupManager(ResourceCleanupManager):
     vertex_ai_resource = storage.bucket.Bucket
 
     def list(self) -> Any:
         storage_client = storage.Client()
         return [ bucket for bucket in storage_client.list_buckets()]
 
-    def delete(self, resouce):
-        if not 'tests' in resouce.name:
-            return
+    def delete(self, resource):
         try:
-            resoure.delete(force=True)
-        except:
-            pass
+            resource.delete(force=True)
+        except Exception as e:
+            print(e)
 
     @property
     def type_name(self) -> str:
@@ -179,7 +177,7 @@ class BucketCleanupManager(VertexAIResourceCleanupManager):
 
     def get_seconds_since_modification(self, resource: Any) -> float:
         created = resource.time_created
-        return int(resource.time_created.timestamp())
+        return float(resource.time_created.timestamp())
 
     def resource_name(self, resource: Any) -> str:
         return resource.name
