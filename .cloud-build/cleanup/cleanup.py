@@ -12,7 +12,8 @@ from resource_cleanup_manager import (
     TrainingJobCleanupManager,
     HyperparameterTuningCleanupManager,
     BatchPredictionJobCleanupManager,
-    ExperimentCleanupManager
+    ExperimentCleanupManager,
+    BucketCleanupManager
 )
 
 rate_limit = RateLimit(max_count=25, per=60, greedy=False)
@@ -29,7 +30,6 @@ def run_cleanup_managers(managers: List[ResourceCleanupManager], is_dry_run: boo
             try:
                 if not manager.is_deletable(resource):
                     continue
-
                 if is_dry_run:
                     resource_name = manager.resource_name(resource)
                     print(f"Will delete '{type_name}': {resource_name}")
@@ -60,6 +60,7 @@ managers: List[ResourceCleanupManager] = [
     HyperparameterTuningCleanupManager(),
     BatchPredictionJobCleanupManager(),
     # ExperimentCleanupManager(), # Experiment missing _resource_noun
+    BucketCleanupManager()
 ]
 
 run_cleanup_managers(managers=managers, is_dry_run=is_dry_run)
