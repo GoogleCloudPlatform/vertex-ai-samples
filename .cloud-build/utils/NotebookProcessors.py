@@ -85,6 +85,8 @@ class UniqueStringsPreprocessor(Preprocessor):
             .replace("-unique'", f'-{unique_id}"')
             .replace('_unique"', f'_{unique_id}"')
             .replace("_unique'", f'_{unique_id}"')
+            # special case for weekly regression testing
+            .replace('-unique-python-doc-samples-tests"', f'_{unique_id}"')
         )
 
     def preprocess(self, notebook, resources=None):
