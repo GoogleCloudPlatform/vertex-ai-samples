@@ -42,7 +42,7 @@ def run_cleanup_managers(managers: List[ResourceCleanupManager], is_dry_run: boo
         print("")
 
 
-is_dry_run = Falsee
+is_dry_run = False
 
 if is_dry_run:
     print("Starting cleanup in dry run mode...")
