@@ -131,6 +131,9 @@ class MatchingEngineIndexEndpointResourceCleanupManager(VertexAIResourceCleanupM
 class FeatureStoreCleanupManager(VertexAIResourceCleanupManager):
     vertex_ai_resource = aiplatform.Featurestore
 
+    def resource_name(self, resource: Any) -> str:
+        return resource.name
+
 class PipelineJobCleanupManager(VertexAIResourceCleanupManager):
     vertex_ai_resource = aiplatform.PipelineJob
 
@@ -166,6 +169,18 @@ class BatchPredictionJobCleanupManager(VertexAIResourceCleanupManager):
 class ExperimentCleanupManager(VertexAIResourceCleanupManager):
     vertex_ai_resource = aiplatform.Experiment
 
+    @property
+    def type_name(self) -> str:
+        return "Experiment"
+
+    def resource_name(self, resource: Any) -> str:
+        return resource.name
+
+    def get_seconds_since_modification(self, resource: Any) -> float:
+        created_time = resource._metadata_context.update_time
+        current_time = DatetimeWithNanoseconds.now()
+        return float(current_time.timestamp() - created_time.timestamp())
+
 class BucketCleanupManager(ResourceCleanupManager):
     vertex_ai_resource = storage.bucket.Bucket
 
@@ -181,7 +196,7 @@ class BucketCleanupManager(ResourceCleanupManager):
 
     @property
     def type_name(self) -> str:
-        return str(type(self.vertex_ai_resource))
+        return "Bucket"
 
     def get_seconds_since_modification(self, resource: Any) -> float:
         # Bucket has no last_update property, only time created

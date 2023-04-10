@@ -42,7 +42,7 @@ def run_cleanup_managers(managers: List[ResourceCleanupManager], is_dry_run: boo
         print("")
 
 
-is_dry_run = False
+is_dry_run = Falsee
 
 if is_dry_run:
     print("Starting cleanup in dry run mode...")
@@ -59,7 +59,7 @@ managers: List[ResourceCleanupManager] = [
     TrainingJobCleanupManager(),
     HyperparameterTuningCleanupManager(),
     BatchPredictionJobCleanupManager(),
-    # ExperimentCleanupManager(), # Experiment missing _resource_noun
+    ExperimentCleanupManager(), # Experiment missing _resource_noun
     BucketCleanupManager()
 ]
 
