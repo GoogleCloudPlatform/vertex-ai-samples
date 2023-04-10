@@ -59,7 +59,7 @@ managers: List[ResourceCleanupManager] = [
     TrainingJobCleanupManager(),
     HyperparameterTuningCleanupManager(),
     BatchPredictionJobCleanupManager(),
-    # ExperimentCleanupManager(), # Experiment missing _resource_noun
+    ExperimentCleanupManager(), # Experiment missing _resource_noun
     BucketCleanupManager()
 ]
 
