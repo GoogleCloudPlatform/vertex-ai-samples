@@ -177,9 +177,9 @@ class ExperimentCleanupManager(VertexAIResourceCleanupManager):
         return resource.name
 
     def get_seconds_since_modification(self, resource: Any) -> float:
-        created_time = resource._metadata_context.update_time
+        update_time = resource._metadata_context.update_time
         current_time = DatetimeWithNanoseconds.now()
-        return float(current_time.timestamp() - created_time.timestamp())
+        return float(current_time.timestamp() - update_time.timestamp())
 
 class BucketCleanupManager(ResourceCleanupManager):
     vertex_ai_resource = storage.bucket.Bucket
