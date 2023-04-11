@@ -33,7 +33,7 @@ import execute_notebook_remote
 import nbformat
 from google.cloud.devtools.cloudbuild_v1.types import BuildOperationMetadata
 from pyrate_limiter import (Duration, RequestRate,
-                            Limiter)
+                            Limiter, FileLockSQLiteBucket)
 from tabulate import tabulate
 from utils import NotebookProcessors, util
 
@@ -158,7 +158,7 @@ def _create_tag(filepath: str) -> str:
 
 
 rate_limit = RequestRate(10, Duration.HOUR)
-limiter = Limiter(rate_limit)
+limiter = Limiter(rate_limit, bucket_class=FileLockSQLiteBucket)
 
 @limiter.ratelimit('testing', delay=True, max_delay=360)
 def process_and_execute_notebook(
