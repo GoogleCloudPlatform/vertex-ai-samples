@@ -12,3 +12,4 @@ google-cloud-build
 GitPython
 tqdm
 pyrate-limiter
+filelock
