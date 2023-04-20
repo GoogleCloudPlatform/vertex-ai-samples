@@ -60,7 +60,7 @@ The steps performed include:
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Batch Prediction](https://cloud.google.com/vertex-ai/docs/tabular-data/classification-regression/get-batch-predictions).
 
 
-[Custom training image classification model for online prediction with explainabilty](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/explainable_ai/sdk_custom_image_classification_online_explain.ipynb)
+[Custom training image classification model for online prediction with explainability](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/explainable_ai/sdk_custom_image_classification_online_explain.ipynb)
 
 ```
 Learn how to use `Vertex AI Training and Explainable AI` to create a custom image classification model with explanations, and then you learn to use `Vertex AI Prediction` to make an online prediction request with explanations.

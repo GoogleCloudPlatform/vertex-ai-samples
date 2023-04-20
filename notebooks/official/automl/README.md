@@ -57,6 +57,77 @@ The steps performed are:
 &nbsp;&nbsp;&nbsp;Learn more about [BQML ARIMA+ forecasting for tabular data](https://cloud.google.com/vertex-ai/docs/tabular-data/forecasting-arima/overview).
 
 
+[AutoML training image classification model for batch prediction](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/automl_image_classification_batch_prediction.ipynb)
+
+```
+In this tutorial, you create an AutoML image classification model from a Python script, and then do a batch prediction using the Vertex SDK.
+
+The steps performed include:
+
+- Create a Vertex `Dataset` resource.
+- Train the model.
+- View the model evaluation.
+- Make a batch prediction.
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Get predictions from an image classification model](https://cloud.google.com/vertex-ai/docs/image-data/classification/get-predictions).
+
+
+[AutoML training image classification model for online prediction](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/automl_image_classification_online_prediction.ipynb)
+
+```
+In this tutorial, you create an AutoML image classification model and deploy for online prediction from a Python script using the Vertex SDK.
+
+The steps performed include:
+
+- Create a Vertex `Dataset` resource.
+- Train the model.
+- View the model evaluation.
+- Deploy the `Model` resource to a serving `Endpoint` resource.
+- Make a prediction.
+- Undeploy the `Model`.
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Get predictions from an image classification model](https://cloud.google.com/vertex-ai/docs/image-data/classification/get-predictions).
+
+
+[AutoML training image object detection model for export to edge](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/automl_image_object_detection_export_edge.ipynb)
+
+```
+In this tutorial, you create an AutoML image object detection model from a Python script using the Vertex SDK, and then export the model as an Edge model in TFLite format.
+
+The steps performed include:
+
+- Create a Vertex `Dataset` resource.
+- Train the model.
+- Export the `Edge` model from the `Model` resource to Cloud Storage.
+- Download the model locally.
+- Make a local prediction.
+
+```
+
+
+[AutoML training image object detection model for online prediction](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/automl_image_object_detection_online_prediction.ipynb)
+
+```
+In this tutorial, you create an AutoML image object detection model and deploy for online prediction from a Python script using the Vertex AI SDK.
+
+The steps performed include:
+
+- Create a Vertex `Dataset` resource.
+- Train the model.
+- View the model evaluation.
+- Deploy the `Model` resource to a serving `Endpoint` resource.
+- Make a prediction.
+- Undeploy the `Model`.
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Object detection for image data](https://cloud.google.com/vertex-ai/docs/training-overview#object_detection_for_images).
+
+
 [AutoML Tabular Workflow pipelines](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/automl_tabular_on_vertex_pipelines.ipynb)
 
 ```
@@ -70,6 +141,38 @@ The steps performed are:
 ```
 
 &nbsp;&nbsp;&nbsp;Learn more about [Tabular Workflow for E2E AutoML](https://cloud.google.com/vertex-ai/docs/tabular-data/tabular-workflows/e2e-automl).
+
+
+[AutoML training text entity extraction model for batch prediction](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/automl_text_entity_extraction_batch_prediction.ipynb)
+
+```
+In this tutorial, you create an AutoML text entity extraction model from a Python script, and then do a batch prediction using the Vertex AI SDK.
+
+The steps performed include:
+
+- Create a Vertex `Dataset` resource.
+- Train the model.
+- View the model evaluation.
+- Make a batch prediction.
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Entity extraction for text data](https://cloud.google.com/vertex-ai/docs/training-overview#entity_extraction_for_text).
+
+
+[AutoML training text sentiment analysis model for batch prediction](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/automl_text_sentiment_analysis_batch_prediction.ipynb)
+
+```
+In this tutorial, you create an AutoML text sentiment analysis model from a Python script, and then do a batch prediction using the Vertex SDK.
+
+The steps performed include:
+
+- Create a Vertex `Dataset` resource.
+- Train the model.
+- View the model evaluation.
+- Make a batch prediction.
+
+```
 
 
 [Get started with AutoML Training](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/automl/get_started_automl_training.ipynb)
@@ -101,9 +204,7 @@ The steps performed include:
 - Create a Vertex AI `TimeSeriesDataset` resource.
 - Train the model.
 - View the model evaluation.
-- Deploy the `Model` resource to a serving `Endpoint` resource.
-- Make a prediction.
-- Undeploy the `Model`.
+- Make a batch prediction.
 
 ```
 
