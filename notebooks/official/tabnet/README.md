@@ -15,6 +15,26 @@ The steps performed are:
 &nbsp;&nbsp;&nbsp;Learn more about [Tabular Workflow for TabNet](https://cloud.google.com/vertex-ai/docs/tabular-data/tabular-workflows/tabnet).
 
 
+[Get started with TabNet builtin algorithm for training tabular models](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tabnet/get_started_with_tabnet.ipynb)
+
+```
+Learn how to run `Vertex AI TabNet` built algorithm for training custom tabular models.
+
+The steps performed include:
+
+- Get the training data.
+- Configure training parameters for the `Vertex AI TabNet` container.
+- Train the model using `Vertex AI Training` using CSV data.
+- Upload the model as a `Vertex AI Model` resource.
+- Deploy the `Vertex AI Model` resource to a `Vertex AI Endpoint` resource.
+- Make a prediction with the deployed model.
+- Hyperparameter tuning the `Vertex AI TabNet` model.
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Tabular Workflow for TabNet](https://cloud.google.com/vertex-ai/docs/tabular-data/tabular-workflows/tabnet).
+
+
 [Vertex AI TabNet](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tabnet/tabnet_vertex_tutorial.ipynb)
 
 ```

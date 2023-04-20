@@ -18,6 +18,8 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [BigQuery Datasets](https://cloud.google.com/bigquery/docs/datasets-intro).
 
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI for BigQuery users](https://cloud.google.com/vertex-ai/docs/beginner/bqml).
+
 
 [Get started with Vertex AI Data Labeling](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/datasets/get_started_with_data_labeling.ipynb)
 
