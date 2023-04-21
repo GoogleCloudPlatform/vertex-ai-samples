@@ -17,6 +17,7 @@
 
 import argparse
 import pathlib
+import random
 
 import execute_changed_notebooks_helper
 
@@ -38,6 +39,13 @@ parser.add_argument(
     type=pathlib.Path,
     help="The path to the file that has newline-limited folders of notebooks that should be tested.",
     required=True,
+)
+parser.add_argument(
+    "--test_percent",
+    type=int,
+    help="The percent of notebooks to be tested (between 1 and 100).",
+    required=False,
+    default=100,
 )
 parser.add_argument(
     "--base_branch",
@@ -110,10 +118,18 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-notebooks = execute_changed_notebooks_helper.get_changed_notebooks(
+changed_notebooks = execute_changed_notebooks_helper.get_changed_notebooks(
     test_paths_file=args.test_paths_file,
     base_branch=args.base_branch,
 )
+
+if args.test_percent == 100:
+    notebooks = changed_notebooks
+else:
+    notebooks = []
+    for changed_notebook in changed_notebooks:
+        if random.randint(1, 100) < args.test_percent:
+            notebooks.append(changed_notebook)
 
 execute_changed_notebooks_helper.process_and_execute_notebooks(
     notebooks=notebooks,
