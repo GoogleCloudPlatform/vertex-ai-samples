@@ -132,10 +132,7 @@ changed_notebooks = execute_changed_notebooks_helper.get_changed_notebooks(
 if args.test_percent == 100:
     notebooks = changed_notebooks
 else:
-    notebooks = []
-    for changed_notebook in changed_notebooks:
-        if random.randint(1, 100) < args.test_percent:
-            notebooks.append(changed_notebook)
+    notebooks = [changed_notebook for changed_notebook in changed_notebooks if random.randint(1, 100) < args.test_percent]
 
 if args.dry_run:
     print("Dry run ...\n")
