@@ -115,6 +115,12 @@ parser.add_argument(
     default=True,
     help="Should run notebooks in parallel.",
 )
+parser.add_argument(
+    "--dry_run",
+    type=str2bool,
+    default=False,
+    help="Dry run for testing - no execution",
+)
 
 args = parser.parse_args()
 
@@ -131,16 +137,21 @@ else:
         if random.randint(1, 100) < args.test_percent:
             notebooks.append(changed_notebook)
 
-execute_changed_notebooks_helper.process_and_execute_notebooks(
-    notebooks=notebooks,
-    container_uri=args.container_uri,
-    staging_bucket=args.staging_bucket,
-    artifacts_bucket=args.artifacts_bucket,
-    should_parallelize=args.should_parallelize,
-    timeout=args.timeout,
-    variable_project_id=args.variable_project_id,
-    variable_region=args.variable_region,
-    variable_service_account=args.variable_service_account,
-    variable_vpc_network=args.variable_vpc_network,
-    private_pool_id=args.private_pool_id,
+if args.dry_run:
+    print("Dry run ...\n")
+    for notebook in notebooks:
+        print(f"Would execute: {notebook.path}")
+else:
+    execute_changed_notebooks_helper.process_and_execute_notebooks(
+        notebooks=notebooks,
+        container_uri=args.container_uri,
+        staging_bucket=args.staging_bucket,
+        artifacts_bucket=args.artifacts_bucket,
+        should_parallelize=args.should_parallelize,
+        timeout=args.timeout,
+        variable_project_id=args.variable_project_id,
+        variable_region=args.variable_region,
+        variable_service_account=args.variable_service_account,
+        variable_vpc_network=args.variable_vpc_network,
+        private_pool_id=args.private_pool_id,
 )
