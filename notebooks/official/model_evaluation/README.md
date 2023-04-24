@@ -50,7 +50,7 @@ Learn how to use `Vertex AI Pipelines` and `Google Cloud Pipeline Components` to
 The steps performed include:
 
 - Create a Vertex AI `Dataset`.
-- Train a Automl Tabular Classification model on the `Dataset` resource.
+- Train a Automl Text Classification model on the `Dataset` resource.
 - Import the trained `AutoML model resource` into the pipeline.
 - Run a `Batch Prediction` job.
 - Evaulate the AutoML model using the `Classification Evaluation Component`.
@@ -151,4 +151,6 @@ The steps performed include:
 - List the second model evaluation for the corresponding model in the Vertex AI Model Registry.
 
 ```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Model evaluation in Vertex AI](https://cloud.google.com/vertex-ai/docs/evaluation/introduction).
 

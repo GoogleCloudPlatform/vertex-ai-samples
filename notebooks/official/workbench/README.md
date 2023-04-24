@@ -81,7 +81,7 @@ The steps performed include:
 
 ```
 
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Workbench](https://cloud.google.com/vertex-ai/docs/workbench/introduction).
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Workbench](https://cloud.google.com/vertex-ai/docs/workbench/managed/visualize-data-bigquery).
 
 &nbsp;&nbsp;&nbsp;Learn more about [BigQuery ML](https://cloud.google.com/vertex-ai/docs/beginner/bqml).
 
@@ -127,7 +127,7 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Workbench](https://cloud.google.com/vertex-ai/docs/workbench/introduction).
 
-&nbsp;&nbsp;&nbsp;Learn more about [BigQuery ML](https://cloud.google.com/vertex-ai/docs/beginner/bqml).
+&nbsp;&nbsp;&nbsp;Learn more about [BigQuery ML](https://cloud.google.com/vertex-ai/docs/beginner/bqml#machine_learning_directly_in).
 
 
 [Inventory prediction on ecommerce data using Vertex AI](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/workbench/inventory-prediction/inventory_prediction.ipynb)
@@ -194,7 +194,7 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Workbench](https://cloud.google.com/vertex-ai/docs/workbench/introduction).
 
-&nbsp;&nbsp;&nbsp;Learn more about [BigQuery ML](https://cloud.google.com/vertex-ai/docs/beginner/bqml).
+&nbsp;&nbsp;&nbsp;Learn more about [BigQuery ML](https://cloud.google.com/vertex-ai/docs/beginner/bqml#machine_learning_directly_in).
 
 
 [Sentiment Analysis using AutoML Natural Language and Vertex AI](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/workbench/sentiment_analysis/Sentiment_Analysis.ipynb)
@@ -218,7 +218,7 @@ The steps performed are:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Workbench](https://cloud.google.com/vertex-ai/docs/workbench/introduction).
 
-&nbsp;&nbsp;&nbsp;Learn more about [AutoML Text](https://cloud.google.com/vertex-ai/docs/tutorials/text-classification-automl/training).
+&nbsp;&nbsp;&nbsp;Learn more about [Sentiment analysis for text data](https://cloud.google.com/vertex-ai/docs/training-overview#sentiment_analysis_for_text).
 
 
 [Digest and analyze data from BigQuery with Dataproc](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/workbench/spark/spark_bigquery.ipynb)

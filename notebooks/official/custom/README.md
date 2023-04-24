@@ -60,6 +60,22 @@ The steps performed include:
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
 
 
+[Custom training with custom training container and automatic registering of the model](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/custom/custom_training_container_and_model_registry.ipynb)
+
+```
+In this tutorial, you create a custom model from a Python script in a custom Docker container using the Vertex AI SDK, and automatically register the model in the Vertex AI Model Registry.
+
+The steps performed include:
+
+- Create a Vertex AI custom job for training a model.
+- Train and register a TensorFlow model using a custom container,
+- List the registered model from the Vertex AI Model Registry.
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Custom training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+
+
 [Profile model training performance using Profiler](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/custom/custom_training_tensorboard_profiler.ipynb)
 
 ```
@@ -75,6 +91,45 @@ The steps performed include:
 ```
 
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI TensorBoard Profiler](https://cloud.google.com/vertex-ai/docs/experiments/tensorboard-profiler).
+
+
+[Get started with Vertex AI Training for XGBoost](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/custom/get_started_vertex_training.ipynb)
+
+```
+Learn how to use `Vertex AI Training` for training a XGBoost custom model.
+
+The steps performed include:
+
+- Training using a Python package.
+- Report accuracy when hyperparameter tuning.
+- Save the model artifacts to Cloud Storage using GCSFuse.
+- Create a `Vertex AI Model` resource.
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Custom training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
+
+
+[Get started with Endpoint and shared VM](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/custom/get_started_with_vertex_endpoint_and_shared_vm.ipynb)
+
+```
+Learn how to use deployment resource pools for deploying models.
+
+The steps performed include:
+
+- Upload a pre-trained image classification model as a `Model` resource (model A).
+- Upload a pre-trained text sentence encoder model as a `Model` resource (model B).
+- Create a shared VM deployment resource pool.
+- List shared VM deployment resource pools.
+- Create two `Endpoint` resources.
+- Deploy first model (model A) to first `Endpoint` resource using deployment resource pool.
+- Deploy second model (model B) to second `Endpoint` resource using deployment resource pool.
+- Make a prediction request with first deployed model (model A).
+- Make a prediction request with second deployed model (model B).
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Shared resources across deployments](https://cloud.google.com/vertex-ai/docs/predictions/model-co-hosting).
 
 
 [Custom training and batch prediction](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/custom/sdk-custom-image-classification-batch.ipynb)

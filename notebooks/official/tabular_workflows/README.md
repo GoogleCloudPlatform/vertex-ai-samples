@@ -14,6 +14,8 @@ The steps performed are:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Google Cloud Pipeline Components](https://cloud.google.com/vertex-ai/docs/pipelines/components-introduction).
 
+&nbsp;&nbsp;&nbsp;Learn more about [Prophet for tabular data](https://cloud.google.com/vertex-ai/docs/tabular-data/forecasting-prophet).
+
 
 [TabNet Pipeline](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tabular_workflows/tabnet_on_vertex_pipelines.ipynb)
 
