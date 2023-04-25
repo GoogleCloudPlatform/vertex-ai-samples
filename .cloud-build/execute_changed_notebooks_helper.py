@@ -24,6 +24,7 @@ import os
 import pathlib
 import re
 import subprocess
+import csv
 import utils
 from typing import List, Optional
 from utils import util
@@ -39,6 +40,8 @@ from utils import NotebookProcessors, util
 # A buffer so that workers finish before the orchestrating job
 WORKER_TIMEOUT_BUFFER_IN_SECONDS: int = 60 * 60
 PYTHON_VERSION = "3.9"  # Set default python version
+
+RESULTS_FILE = "gs://cloud-samples-data/vertex-ai/ci-cd/results.csv"
 
 
 def format_timedelta(delta: datetime.timedelta) -> str:
@@ -250,6 +253,7 @@ def process_and_execute_notebook(
         result.duration = datetime.datetime.now() - time_start
         result.is_pass = True
         print(f"{notebook} PASSED in {format_timedelta(result.duration)}.")
+
     except Exception as error:
         result.error_message = str(error)
 
@@ -335,6 +339,36 @@ def get_changed_notebooks(
             print(f"\t{notebook}")
 
     return notebooks
+
+def _save_results(results: List[NotebookExecutionResult]):
+    # read in existing prior results data
+    with open(RESULTS_FILE, 'r') as f:
+        reader = csv.reader(f)
+
+        rows = []
+        for row in reader:
+            rows.append(row)
+
+    #
+    for result in results:
+        found = False
+        for row in rows:
+            if row[0] == result.name:
+                found = True
+                row[1] = result.duration
+                if result.is_pass:
+                    row[2] += 1
+                else:
+                    row[3] += 1
+
+        if not found:
+            if result.is_pass:
+                passed = 1
+                failed = 0
+            else:
+                failed = 1
+                passed = 0
+            rows.append([result.name, result.duration, passed, failed])
 
 
 def process_and_execute_notebooks(
@@ -488,6 +522,8 @@ def process_and_execute_notebooks(
                 print(log_contents[match_index:])
             else:
                 print(log_contents)
+
+        _save_result(results)
 
         print("\n=== END RESULTS===\n")
 
