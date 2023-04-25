@@ -137,7 +137,7 @@ else:
 if args.dry_run:
     print("Dry run ...\n")
     for notebook in notebooks:
-        print(f"Would execute: {notebook.path}")
+        print(f"Would execute: {notebook}")
 else:
     execute_changed_notebooks_helper.process_and_execute_notebooks(
         notebooks=notebooks,
