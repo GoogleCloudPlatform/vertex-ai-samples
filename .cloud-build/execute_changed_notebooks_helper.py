@@ -379,6 +379,7 @@ def _save_results(results: List[NotebookExecutionResult],
 
     updated_df = pd.DataFrame(rows, columns=['notebook', 'duration', 'passed', 'failed'])
     print("Updating accumulative results ...")
+    print(updated_df)
 
     client = storage.Client()
     bucket = client.get_bucket(artifacts_bucket)
