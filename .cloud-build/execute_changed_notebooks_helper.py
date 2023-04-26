@@ -344,6 +344,9 @@ def get_changed_notebooks(
 def _save_results(results: List[NotebookExecutionResult],
                   artifacts_bucket: str,
                   results_file: str):
+
+    artifacts_bucket = artifacts_bucket.replace("gs://", "")
+
     # read in existing prior results data
     rows = []
     try:
