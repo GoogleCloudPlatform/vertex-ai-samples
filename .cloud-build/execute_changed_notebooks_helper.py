@@ -42,8 +42,6 @@ from utils import NotebookProcessors, util
 WORKER_TIMEOUT_BUFFER_IN_SECONDS: int = 60 * 60
 PYTHON_VERSION = "3.9"  # Set default python version
 
-RESULTS_FILE = "vertex-ai/ci-cd/results.csv"
-
 
 def format_timedelta(delta: datetime.timedelta) -> str:
     """Formats a timedelta duration to [N days] %H:%M:%S format"""
@@ -345,9 +343,7 @@ def _save_results(results: List[NotebookExecutionResult],
                   artifacts_bucket: str,
                   results_file: str):
 
-    print("ARTIFACT", artifacts_bucket)
-    artifacts_bucket = artifacts_bucket.replace("gs://", "")
-    artifacts_bucket = "cloud-samples-data"
+    artifacts_bucket = artifacts_bucket.replace("gs://", "").split('/')[0]
 
     # read in existing prior results data
     rows = []
@@ -383,13 +379,11 @@ def _save_results(results: List[NotebookExecutionResult],
 
     updated_df = pd.DataFrame(rows, columns=['notebook', 'duration', 'passed', 'failed'])
     print("Updating accumulative results ...")
-    '''
+
     client = storage.Client()
     bucket = client.get_bucket(artifacts_bucket)
     bucket.blob(str(results_file)).upload_from_string(updated_df.to_csv(index=False, header=True), 'text/csv')
-    '''
-    filename = f"/gcs/{artifacts_bucket}/{results_file}"
-    updated_df.to_csv(filename, index=False, header=True)
+
 
 
 def process_and_execute_notebooks(
