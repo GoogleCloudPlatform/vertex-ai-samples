@@ -387,6 +387,7 @@ def process_and_execute_notebooks(
     container_uri: str,
     staging_bucket: str,
     artifacts_bucket: str,
+    results_file: str,
     should_parallelize: bool,
     timeout: int,
     variable_project_id: str,
@@ -414,6 +415,8 @@ def process_and_execute_notebooks(
             Required. The GCS staging bucket to write source code to.
         artifacts_bucket (str):
             Required. The GCS staging bucket to write executed notebooks to.
+        results_file (str):
+            Required: The path to the artifacts bucket to save results 
         variable_project_id (str):
             Required. The value for PROJECT_ID to inject into notebooks.
         variable_region (str):

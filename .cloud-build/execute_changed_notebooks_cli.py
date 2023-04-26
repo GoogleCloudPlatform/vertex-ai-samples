@@ -48,6 +48,12 @@ parser.add_argument(
     default=100,
 )
 parser.add_argument(
+    "--test_results",
+    type=pathlib.Path,
+    help="The path relative to the artifacts bucket where to save execution results",
+    default="vertex-ai/ci-cd/results.csv"
+)
+parser.add_argument(
     "--base_branch",
     help="The base git branch to diff against to find changed files.",
     required=False,
@@ -144,11 +150,12 @@ else:
         container_uri=args.container_uri,
         staging_bucket=args.staging_bucket,
         artifacts_bucket=args.artifacts_bucket,
+        results_file=args.test_results,
         should_parallelize=args.should_parallelize,
         timeout=args.timeout,
         variable_project_id=args.variable_project_id,
         variable_region=args.variable_region,
         variable_service_account=args.variable_service_account,
         variable_vpc_network=args.variable_vpc_network,
-        private_pool_id=args.private_pool_id,
+        private_pool_id=args.private_pool_id
 )
