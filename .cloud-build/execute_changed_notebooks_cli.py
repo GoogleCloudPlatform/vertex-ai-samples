@@ -23,6 +23,8 @@ import os
 
 import execute_changed_notebooks_helper
 
+RESULTS_FILE = "vertex-ai/ci-cd/results.csv"
+
 
 def str2bool(v):
     if isinstance(v, bool):
@@ -53,7 +55,7 @@ parser.add_argument(
     "--test_results",
     type=pathlib.Path,
     help="The path relative to the artifacts bucket where to save execution results",
-    default="vertex-ai/ci-cd/results.csv"
+    default=RESULTS_FILE
 )
 parser.add_argument(
     "--base_branch",
