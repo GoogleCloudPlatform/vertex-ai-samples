@@ -342,11 +342,12 @@ def get_changed_notebooks(
     return notebooks
 
 def _save_results(results: List[NotebookExecutionResult],
-                  artifacts_bucket: str):
+                  artifacts_bucket: str,
+                  results_file: str):
     # read in existing prior results data
     rows = []
     try:
-        df = pd.read_csv(os.path.join(f"gs://{artifacts_bucket}", RESULTS_FILE))
+        df = pd.read_csv(os.path.join(f"gs://{artifacts_bucket}", results_file))
         df = df.reset_index()
     
         for index, row in df.iterrows():
@@ -379,7 +380,7 @@ def _save_results(results: List[NotebookExecutionResult],
     print("Updating accumulative results ...")
     client = storage.Client()
     bucket = client.get_bucket(artifacts_bucket)
-    bucket.blob(RESULTS_FILE).upload_from_string(updated_df.to_csv(index=False, header=True), 'text/csv')
+    bucket.blob(str(results_file)).upload_from_string(updated_df.to_csv(index=False, header=True), 'text/csv')
 
 
 def process_and_execute_notebooks(
@@ -537,7 +538,7 @@ def process_and_execute_notebooks(
             else:
                 print(log_contents)
 
-        _save_results(results_sorted, artifacts_bucket)
+        _save_results(results_sorted, artifacts_bucket, results_file)
 
         print("\n=== END RESULTS===\n")
 

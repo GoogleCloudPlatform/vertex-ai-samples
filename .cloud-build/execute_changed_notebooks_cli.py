@@ -18,6 +18,8 @@
 import argparse
 import pathlib
 import random
+import pandas as pd
+import os
 
 import execute_changed_notebooks_helper
 
@@ -138,6 +140,10 @@ changed_notebooks = execute_changed_notebooks_helper.get_changed_notebooks(
 if args.test_percent == 100:
     notebooks = changed_notebooks
 else:
+    try:
+        df = pd.read_csv(os.path.join(f"gs://{args.artifacts_bucket}", args.test_results))
+    except Exception as e:
+        print(e)
     notebooks = [changed_notebook for changed_notebook in changed_notebooks if random.randint(1, 100) < args.test_percent]
 
 if args.dry_run:
