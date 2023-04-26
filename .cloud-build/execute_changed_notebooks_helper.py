@@ -541,7 +541,7 @@ def process_and_execute_notebooks(
             else:
                 print(log_contents)
 
-        _save_results(results_sorted, artifacts_bucket, results_file)
+        _save_results(results_sorted, staging_bucket, results_file)
 
         print("\n=== END RESULTS===\n")
 

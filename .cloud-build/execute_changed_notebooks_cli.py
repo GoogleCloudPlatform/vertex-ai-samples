@@ -140,8 +140,13 @@ changed_notebooks = execute_changed_notebooks_helper.get_changed_notebooks(
 if args.test_percent == 100:
     notebooks = changed_notebooks
 else:
+    rows = []
     try:
         df = pd.read_csv(os.path.join(f"gs://{args.artifacts_bucket}", args.test_results))
+        df = df.reset_index()
+
+        for row in df.iterrows():
+            rows.append(row)
     except Exception as e:
         print(e)
     notebooks = [changed_notebook for changed_notebook in changed_notebooks if random.randint(1, 100) < args.test_percent]
