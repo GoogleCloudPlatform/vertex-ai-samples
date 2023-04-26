@@ -346,6 +346,7 @@ def _save_results(results: List[NotebookExecutionResult],
                   results_file: str):
 
     artifacts_bucket = artifacts_bucket.replace("gs://", "")
+    artifacts_bucket = "cloud-samples-data"
 
     # read in existing prior results data
     rows = []
@@ -541,7 +542,7 @@ def process_and_execute_notebooks(
             else:
                 print(log_contents)
 
-        _save_results(results_sorted, staging_bucket, results_file)
+        _save_results(results_sorted, artifacts_bucket, results_file)
 
         print("\n=== END RESULTS===\n")
 

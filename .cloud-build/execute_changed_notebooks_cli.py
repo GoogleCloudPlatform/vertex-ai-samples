@@ -137,9 +137,11 @@ changed_notebooks = execute_changed_notebooks_helper.get_changed_notebooks(
     base_branch=args.base_branch,
 )
 
-if args.test_percent == 100:
-    notebooks = changed_notebooks
-else:
+
+def _load_results() -> list:
+    '''
+    Load accumulated notebook test results
+    '''
     rows = []
     try:
         df = pd.read_csv(os.path.join(f"gs://{args.artifacts_bucket}", args.test_results))
@@ -149,7 +151,32 @@ else:
             rows.append(row)
     except Exception as e:
         print(e)
-    notebooks = [changed_notebook for changed_notebook in changed_notebooks if random.randint(1, 100) < args.test_percent]
+
+    return rows
+
+def _select_notebook(changed_notebook: str) -> int:
+    '''
+    Algorithm to randomly select a notebook, but weight the liklihood based on past failures
+    '''
+    passed = 1
+    failed = 0
+    for notebook_result in notebook_results:
+        if notebook_result[0] == changed_notebook:
+            passed = notebook_result[2]
+            failed = notebook_result[3]
+            break
+
+    if not failed:
+        return random.randint(1, 100)
+    else:
+        return randinit(1, 100) * failed
+
+if args.test_percent == 100:
+    notebooks = changed_notebooks
+else:
+    notebook_results = _load_results()
+
+    notebooks = [changed_notebook for changed_notebook in changed_notebooks if _select_notebook(changed_notebook) < args.test_percent]
 
 if args.dry_run:
     print("Dry run ...\n")
