@@ -347,7 +347,7 @@ def _save_results(results: List[NotebookExecutionResult],
 
     print("ARTIFACT", artifacts_bucket)
     artifacts_bucket = artifacts_bucket.replace("gs://", "")
-    #artifacts_bucket = "cloud-samples-data"
+    artifacts_bucket = "cloud-samples-data"
 
     # read in existing prior results data
     rows = []
