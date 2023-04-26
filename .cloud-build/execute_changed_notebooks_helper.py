@@ -346,7 +346,7 @@ def _save_results(results: List[NotebookExecutionResult],
     # read in existing prior results data
     rows = []
     try:
-        df = pd.read_csv(os.path.join(artifacts_bucket, RESULTS_FILE))
+        df = pd.read_csv(os.path.join(f"gs://{artifacts_bucket}", RESULTS_FILE))
         df = df.reset_index()
     
         for index, row in df.iterrows():
@@ -378,7 +378,7 @@ def _save_results(results: List[NotebookExecutionResult],
     updated_df = pd.DataFrame(rows, columns=['notebook', 'duration', 'passed', 'failed'])
     print("Updating accumulative results ...")
     client = storage.Client()
-    bucket = client.get_bucket(artifacts_bucket.replace("gs://", ""))
+    bucket = client.get_bucket(artifacts_bucket)
     bucket.blob(RESULTS_FILE).upload_from_string(updated_df.to_csv(index=False, header=True), 'text/csv')
 
 
