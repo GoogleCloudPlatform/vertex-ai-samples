@@ -346,7 +346,7 @@ def _save_results(results: List[NotebookExecutionResult],
                   results_file: str):
 
     print("ARTIFACT", artifacts_bucket)
-    artifacts_bucket = artifacts_bucket.replace("gs://", "").split('?')[0]
+    artifacts_bucket = artifacts_bucket.replace("gs://", "")
     #artifacts_bucket = "cloud-samples-data"
 
     # read in existing prior results data
@@ -383,9 +383,13 @@ def _save_results(results: List[NotebookExecutionResult],
 
     updated_df = pd.DataFrame(rows, columns=['notebook', 'duration', 'passed', 'failed'])
     print("Updating accumulative results ...")
+    '''
     client = storage.Client()
     bucket = client.get_bucket(artifacts_bucket)
     bucket.blob(str(results_file)).upload_from_string(updated_df.to_csv(index=False, header=True), 'text/csv')
+    '''
+    filename = f"/gcs/{artifacts_bucket}/{results_file}"
+    updated_df.to_csv(filename, index=False, header=True)
 
 
 def process_and_execute_notebooks(
