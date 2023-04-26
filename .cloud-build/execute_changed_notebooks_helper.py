@@ -345,6 +345,7 @@ def _save_results(results: List[NotebookExecutionResult],
                   artifacts_bucket: str,
                   results_file: str):
 
+    print("ARTIFACT", artifacts_bucket)
     artifacts_bucket = artifacts_bucket.replace("gs://", "").split('?')[0]
     #artifacts_bucket = "cloud-samples-data"
 
