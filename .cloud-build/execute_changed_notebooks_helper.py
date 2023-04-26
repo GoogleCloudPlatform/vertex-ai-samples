@@ -42,8 +42,7 @@ from utils import NotebookProcessors, util
 WORKER_TIMEOUT_BUFFER_IN_SECONDS: int = 60 * 60
 PYTHON_VERSION = "3.9"  # Set default python version
 
-BUCKET_NAME = "cloud-samples-data"
-RESULTS_FILE = "gs://cloud-samples-data/vertex-ai/ci-cd/results.csv"
+RESULTS_FILE = "vertex-ai/ci-cd/results.csv"
 
 
 def format_timedelta(delta: datetime.timedelta) -> str:
@@ -342,14 +341,18 @@ def get_changed_notebooks(
 
     return notebooks
 
-def _save_results(results: List[NotebookExecutionResult]):
+def _save_results(results: List[NotebookExecutionResult],
+                  artifacts_bucket: str):
     # read in existing prior results data
-    df = pd.read_csv(RESULTS_FILE)
-    df = df.reset_index()
-    
     rows = []
-    for index, row in df.iterrows():
-        rows.append(row)
+    try:
+        df = pd.read_csv(os.path.join(artifacts_bucket, RESULTS_FILE))
+        df = df.reset_index()
+    
+        for index, row in df.iterrows():
+            rows.append(row)
+    except Exception as e:
+        print(e)
 
     #
     for result in results:
@@ -375,8 +378,8 @@ def _save_results(results: List[NotebookExecutionResult]):
     updated_df = pd.DataFrame(rows, columns=['notebook', 'duration', 'passed', 'failed'])
     print("Updating accumulative results ...")
     client = storage.Client()
-    bucket = client.get_bucket(BUCKET_NAME)
-    bucket.blob('vertex-ai/ci-cd//test.csv').upload_from_string(updated_df.to_csv(index=False, header=True), 'text/csv')
+    bucket = client.get_bucket(artifacts_bucket.replace("gs://", ""))
+    bucket.blob(RESULTS_FILE).upload_from_string(updated_df.to_csv(index=False, header=True), 'text/csv')
 
 
 def process_and_execute_notebooks(
@@ -531,7 +534,7 @@ def process_and_execute_notebooks(
             else:
                 print(log_contents)
 
-        _save_results(results_sorted)
+        _save_results(results_sorted, artifacts_bucket)
 
         print("\n=== END RESULTS===\n")
 
