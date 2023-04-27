@@ -14,4 +14,4 @@ GitPython
 tqdm
 fsspec
 gcsfs
-pandas
+pandas==2.0.1
