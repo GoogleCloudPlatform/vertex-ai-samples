@@ -67,6 +67,7 @@ def format_timedelta(delta: datetime.timedelta) -> str:
 @dataclasses.dataclass
 class NotebookExecutionResult:
     name: str
+    path: str
     duration: datetime.timedelta
     is_pass: bool
     log_url: str
@@ -193,6 +194,7 @@ def process_and_execute_notebook(
 
     result = NotebookExecutionResult(
         name=tag,
+        path=notebook,
         duration=datetime.timedelta(seconds=0),
         is_pass=False,
         output_uri=notebook_output_uri,
@@ -362,7 +364,7 @@ def _save_results(results: List[NotebookExecutionResult],
     for result in results:
         found = False
         for row in rows:
-            if row[0] == result.name:
+            if row[0] == result.path:
                 found = True
                 row[1] = result.duration
                 if result.is_pass:
@@ -377,7 +379,7 @@ def _save_results(results: List[NotebookExecutionResult],
             else:
                 failed = 1
                 passed = 0
-            rows.append([result.name, result.duration, passed, failed])
+            rows.append([result.path, result.duration, passed, failed])
 
     updated_df = pd.DataFrame(rows, columns=['notebook', 'duration', 'passed', 'failed'])
     print("Saving accumulative results ...")
