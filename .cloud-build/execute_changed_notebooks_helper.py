@@ -353,7 +353,7 @@ def _save_results(results: List[NotebookExecutionResult],
     try:
         client = storage.Client()
         bucket = client.get_bucket(artifacts_bucket)
-        blob = bucket.blob(results_file)
+        blob = bucket.blob(str(results_file))
         data = blob.download_as_bytes()
         df = pd.read_csv(io.BytesIO(data))
         '''
