@@ -360,17 +360,13 @@ def _save_results(results: List[NotebookExecutionResult],
         contents = blob.decode('utf=8')
         contents = io.StringIO(contents)
 
+        header = True
         for row in csv.reader(contents):
-            rows.append(row)
+            if header:
+                header = False
+            else:
+                rows.append(row)
 
-        '''
-        data = blob.download_as_bytes()
-        df = pd.read_csv(io.BytesIO(data))
-        
-        for index, row in df.iterrows():
-            rows.append(row)
-        '''
- 
     except Exception as e:
         print('Exception', e)
     print(rows)
