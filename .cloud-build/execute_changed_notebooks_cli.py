@@ -144,6 +144,7 @@ def _load_results() -> list:
     '''
     Load accumulated notebook test results
     '''
+    print("Loading existing accumulative results ...")
     rows = []
     try:
         df = pd.read_csv(os.path.join(f"gs://{args.artifacts_bucket}", args.test_results))
@@ -151,6 +152,7 @@ def _load_results() -> list:
 
         for row in df.iterrows():
             rows.append(row)
+        print(rows)
     except Exception as e:
         print(e)
 
