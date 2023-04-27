@@ -13,3 +13,5 @@ google-cloud-storage
 ratemate
 GitPython
 tqdm
+fsspec
+gcsfs
