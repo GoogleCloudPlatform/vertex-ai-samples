@@ -376,6 +376,7 @@ def _save_results(results: List[NotebookExecutionResult],
                     row[2] += 1
                 else:
                     row[3] += 1
+                print(f"updating {results.path}")
 
         if not found:
             if result.is_pass:
@@ -384,7 +385,8 @@ def _save_results(results: List[NotebookExecutionResult],
             else:
                 failed = 1
                 passed = 0
-            rows.append([result.path, result.duration.total_seconds, passed, failed])
+            rows.append([result.path, result.duration.total_seconds(), passed, failed])
+            print(f"adding {results.path}")
 
     print("Saving accumulative results ...")
     content = "notebook,duration,passed,failed\n"
