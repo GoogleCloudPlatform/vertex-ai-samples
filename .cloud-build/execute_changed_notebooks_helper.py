@@ -381,9 +381,13 @@ def _save_results(results: List[NotebookExecutionResult],
     print("Updating accumulative results ...")
     print(updated_df)
 
+    updated_df.to_csv(os.path.join(artifacts_bucket, reults_file), index=False, header=True)
+
+    '''
     client = storage.Client()
     bucket = client.get_bucket(artifacts_bucket)
     bucket.blob(str(results_file)).upload_from_string(updated_df.to_csv(index=False, header=True), 'text/csv')
+    '''
 
 
 
