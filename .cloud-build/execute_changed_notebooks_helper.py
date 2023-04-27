@@ -351,11 +351,18 @@ def _save_results(results: List[NotebookExecutionResult],
     print("Reading existing accumulative results ...")
     rows = []
     try:
+        client = storage.Client()
+        bucket = client.get_bucket(artifacts_bucket)
+        blob = bucket.blob(results_file)
+        data = blob.download_as_bytes()
+        df = pd.read_csv(io.BytesIO(data))
+        '''
         df = pd.read_csv(os.path.join(f"gs://{artifacts_bucket}", results_file))
         df = df.reset_index()
-    
+        ''' 
         for index, row in df.iterrows():
             rows.append(row)
+ 
     except Exception as e:
         print('Exception', e)
     print(rows)
