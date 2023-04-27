@@ -346,6 +346,7 @@ def _save_results(results: List[NotebookExecutionResult],
     artifacts_bucket = artifacts_bucket.replace("gs://", "").split('/')[0]
 
     # read in existing prior results data
+    print("Reading existing accumulative results ...")
     rows = []
     try:
         df = pd.read_csv(os.path.join(f"gs://{artifacts_bucket}", results_file))
@@ -355,8 +356,9 @@ def _save_results(results: List[NotebookExecutionResult],
             rows.append(row)
     except Exception as e:
         print(e)
+    print(rows)
 
-    #
+    print("Updating accumulative results ...")
     for result in results:
         found = False
         for row in rows:
@@ -378,7 +380,7 @@ def _save_results(results: List[NotebookExecutionResult],
             rows.append([result.name, result.duration, passed, failed])
 
     updated_df = pd.DataFrame(rows, columns=['notebook', 'duration', 'passed', 'failed'])
-    print("Updating accumulative results ...")
+    print("Saving accumulative results ...")
     print(updated_df)
 
     updated_df.to_csv(os.path.join("gs://" + artifacts_bucket, results_file), index=False, header=True)
