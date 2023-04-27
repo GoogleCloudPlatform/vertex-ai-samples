@@ -357,7 +357,7 @@ def _save_results(results: List[NotebookExecutionResult],
         for index, row in df.iterrows():
             rows.append(row)
     except Exception as e:
-        print(e)
+        print('Exception', e)
     print(rows)
 
     print("Updating accumulative results ...")
