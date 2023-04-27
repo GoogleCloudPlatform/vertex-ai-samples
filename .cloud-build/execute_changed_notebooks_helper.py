@@ -389,15 +389,21 @@ def _save_results(results: List[NotebookExecutionResult],
                 passed = 0
             rows.append([result.path, result.duration, passed, failed])
 
-    updated_df = pd.DataFrame(rows, columns=['notebook', 'duration', 'passed', 'failed'])
     print("Saving accumulative results ...")
+    '''
+    updated_df = pd.DataFrame(rows, columns=['notebook', 'duration', 'passed', 'failed'])
     print(updated_df)
+    '''
+    content = "notebook,duration,passed,failed\n"
+    for row in rows:
+        content += str(row).replace('[', '').replace(']', '') + '\n'
 
     #updated_df.to_csv(os.path.join("gs://" + artifacts_bucket, results_file), index=False, header=True)
 
     client = storage.Client()
     bucket = client.get_bucket(artifacts_bucket)
-    bucket.blob(str(results_file)).upload_from_string(updated_df.to_csv(index=False, header=True), 'text/csv')
+    #bucket.blob(str(results_file)).upload_from_string(updated_df.to_csv(index=False, header=True), 'text/csv')
+    bucket.blob(str(results_file)).upload_from_string(content, 'text/csv')
 
 
 
