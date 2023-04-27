@@ -13,5 +13,4 @@ ratemate
 GitPython
 tqdm
 fsspec
-gcsfs
 pandas
