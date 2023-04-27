@@ -22,6 +22,7 @@ import git
 import operator
 import os
 import io
+import csv
 import pathlib
 import re
 import subprocess
@@ -355,15 +356,25 @@ def _save_results(results: List[NotebookExecutionResult],
         client = storage.Client()
         bucket = client.get_bucket(artifacts_bucket)
         blob = bucket.blob(str(results_file))
+        blob = blob.download_as_string()
+        contents = blob.decode('utf=8')
+        contents = io.StringIO(contents)
+
+        for row in csv.reader(contents):
+            rows.append(row)
+
+        '''
         data = blob.download_as_bytes()
         df = pd.read_csv(io.BytesIO(data))
         
         for index, row in df.iterrows():
             rows.append(row)
+        '''
  
     except Exception as e:
         print('Exception', e)
     print(rows)
+
 
     print("Updating accumulative results ...")
     for result in results:
