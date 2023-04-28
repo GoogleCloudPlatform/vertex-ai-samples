@@ -398,7 +398,7 @@ def _save_results(results: List[NotebookExecutionResult],
     print("Saving accumulative results ...")
     content = "notebook,duration,passed,failed\n"
     for row in rows:
-        content += str(row).replace('[', '').replace(']', '').replace('"', "") + '\n'
+        content += str(row).replace('[', '').replace(']', '').replace('"', "").replace("'", '') + '\n'
 
     client = storage.Client()
     bucket = client.get_bucket(artifacts_bucket)
