@@ -381,7 +381,7 @@ def _save_results(results: List[NotebookExecutionResult],
         for row in rows:
             if row[0] == result.path:
                 found = True
-                row[1] = result.duration
+                row[1] = result.duration.to_seconds()
                 if result.is_pass:
                     row[2] += 1
                 else:
