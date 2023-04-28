@@ -55,7 +55,7 @@ parser.add_argument(
     "--test_results",
     type=pathlib.Path,
     help="The path relative to the artifacts bucket where to save execution results",
-    default=RESULTS_FILE
+    default=None
 )
 parser.add_argument(
     "--base_branch",
@@ -150,15 +150,15 @@ def _load_results() -> list:
         df = pd.read_csv(os.path.join(f"gs://{args.artifacts_bucket}", args.test_results))
         df = df.reset_index()
 
-        for row in df.iterrows():
-            rows.append(row)
+        for index, row in df.iterrows():
+            rows.append([row["notebook"], row["duration"], row["passed"], row["failed"]])
         print(rows)
     except Exception as e:
         print(e)
 
     return rows
 
-def _select_notebook(changed_notebook: str) -> int:
+def _select_notebook(changed_notebook: str) -> float:
     '''
     Algorithm to randomly select a notebook, but weight the liklihood based on past failures
     '''
@@ -171,10 +171,11 @@ def _select_notebook(changed_notebook: str) -> int:
             break
 
     if not failed:
-        return random.randint(1, 100)
+        return random.randint(1, 100) * passed
     else:
-        return randinit(1, 100) * failed
+        return randinit(1, 100) / failed
 
+args.test_percent = 80
 if args.test_percent == 100:
     notebooks = changed_notebooks
 else:

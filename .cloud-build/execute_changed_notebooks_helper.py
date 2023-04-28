@@ -547,7 +547,7 @@ def process_and_execute_notebooks(
             print("=" * 100)
 
             build_id = results_sorted[0].build_id
-            logs_bucket_name = (results_sorted[0].logs_bucket).removeprefix("gs://")
+            logs_bucket_name = (results_sorted[0].logs_bucket).replace("gs://", "")
             log_file_name = f"log-{build_id}.txt"
 
             log_contents = util.download_blob_into_memory(
@@ -565,7 +565,8 @@ def process_and_execute_notebooks(
             else:
                 print(log_contents)
 
-        _save_results(results_sorted, artifacts_bucket, results_file)
+        if results_file:
+            _save_results(results_sorted, artifacts_bucket, results_file)
 
         print("\n=== END RESULTS===\n")
 
