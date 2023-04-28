@@ -387,6 +387,8 @@ def _save_results(results: List[NotebookExecutionResult],
                 else:
                     row[3] += 1
                 print(f"updating {result.path}")
+                rows.aapend(row)
+                break
 
         if not found:
             if result.is_pass:
