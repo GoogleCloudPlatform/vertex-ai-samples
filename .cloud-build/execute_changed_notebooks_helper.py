@@ -365,6 +365,9 @@ def _save_results(results: List[NotebookExecutionResult],
             if header:
                 header = False
             else:
+                row[1] = float(row[1])
+                row[2] = int(row[2])
+                row[3] = int(row[3])
                 rows.append(row)
 
     except Exception as e:
