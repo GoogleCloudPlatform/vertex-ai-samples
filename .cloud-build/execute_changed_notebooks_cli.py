@@ -53,10 +53,10 @@ parser.add_argument(
     default=100,
 )
 parser.add_argument(
-    "--test_results",
-    type=pathlib.Path,
-    help="The path relative to the artifacts bucket where to save execution results",
-    default=None
+    "--build_id",
+    type=str,
+    help="The build id (which may be cloud run specified or user explicit.",
+    default=RESULTS_FILE
 )
 parser.add_argument(
     "--base_branch",
@@ -145,43 +145,45 @@ def _load_results() -> List[Dict[str, Any]]:
     '''
     Load accumulated notebook test results
     '''
+
+    results_file = f"gs://{args.artifacts_bucket}/{args.build_id}"
+    if results_file.endswith(".csv"):
+        results_file = results_file + ".csv"
+
     print("Loading existing accumulative results ...")
     rows = []
     try:
-        df = pd.read_csv(os.path.join(f"gs://{args.artifacts_bucket}", args.test_results))
+        df = pd.read_csv(results_file)
         df = df.reset_index()
 
         rows = df[["notebook", "duration", "passed", "failed"]].to_dict('records')
-        '''
-        for index, row in df.iterrows():
-            rows.append([row["notebook"], row["duration"], row["passed"], row["failed"]])
-        '''
         print(rows)
     except Exception as e:
         print(e)
 
     # If there are no accumulative results, an empty list is returned
-    return rows
+    return results_file, rows
 
 def _select_notebook(changed_notebook: str, 
                      notebook_results: List[Dict[str, Any]]) -> float:
     '''
     Algorithm to randomly select a notebook, but weight the propbability of selected based on past failures
     '''
-    passed = 1
-    failed = 0
+
+    pass_count = 1
+    fail_count = 0
     for notebook_result in notebook_results:
         if notebook_result['notebook'] == changed_notebook:
-            passed = notebook_result['passed']
-            failed = notebook_result['failed']
+            pass_count = notebook_result['passed']
+            fail_count = notebook_result['failed']
             break
 
-    return random.randint(1, 100) * (failed/ passed)
+    return random.randint(1, 100) * (fail_count / (pass_count + fail_count))
 
 if args.test_percent == 100:
     notebooks = changed_notebooks
 else:
-    notebook_results = _load_results()
+    results_file, notebook_results = _load_results()
 
     notebooks = [changed_notebook for changed_notebook in changed_notebooks if _select_notebook(changed_notebook, notebook_results) < args.test_percent]
 
@@ -195,7 +197,7 @@ else:
         container_uri=args.container_uri,
         staging_bucket=args.staging_bucket,
         artifacts_bucket=args.artifacts_bucket,
-        results_file=args.test_results,
+        results_file=results_file,
         should_parallelize=args.should_parallelize,
         timeout=args.timeout,
         variable_project_id=args.variable_project_id,
