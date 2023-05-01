@@ -55,7 +55,7 @@ parser.add_argument(
     "--test_results",
     type=pathlib.Path,
     help="The path relative to the artifacts bucket where to save execution results",
-    default=os.getenv("BUILD_ID")
+    default=None
 )
 parser.add_argument(
     "--base_branch",
@@ -175,7 +175,6 @@ def _select_notebook(changed_notebook: str) -> float:
     else:
         return randinit(1, 100) / failed
 
-args.test_percent = 80
 if args.test_percent == 100:
     notebooks = changed_notebooks
 else:

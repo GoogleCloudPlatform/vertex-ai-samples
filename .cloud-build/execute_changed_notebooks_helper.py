@@ -566,8 +566,9 @@ def process_and_execute_notebooks(
             else:
                 print(log_contents)
 
-        if results_file:
-            _save_results(results_sorted, artifacts_bucket, results_file)
+        if not results_file:
+            results_file = artifacts_bucket.split('/')[-1]  # build ID
+        _save_results(results_sorted, artifacts_bucket, results_file)
 
         print("\n=== END RESULTS===\n")
 
