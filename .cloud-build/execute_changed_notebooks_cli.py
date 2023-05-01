@@ -20,6 +20,7 @@ import pathlib
 import random
 import pandas as pd
 import os
+from typing import List, Dict, Any
 
 import execute_changed_notebooks_helper
 
@@ -163,7 +164,7 @@ def _load_results() -> List[Dict[str, Any]]:
     return rows
 
 def _select_notebook(changed_notebook: str, 
-                     notebook_results: List[Dict[str, Any]]) -> float:
+                     notebook_results: List[Any]) -> float:
     '''
     Algorithm to randomly select a notebook, but weight the propbability of selected based on past failures
     '''
@@ -175,7 +176,7 @@ def _select_notebook(changed_notebook: str,
             failed = notebook_result[3]
             break
 
-     return random.randint(1, 100) * (failed/ passed)
+    return random.randint(1, 100) * (failed/ passed)
 
 if args.test_percent == 100:
     notebooks = changed_notebooks
