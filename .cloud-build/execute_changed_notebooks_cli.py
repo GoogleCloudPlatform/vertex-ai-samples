@@ -164,16 +164,16 @@ def _load_results() -> List[Dict[str, Any]]:
     return rows
 
 def _select_notebook(changed_notebook: str, 
-                     notebook_results: List[Any]) -> float:
+                     notebook_results: List[Dict[str, Any]]) -> float:
     '''
     Algorithm to randomly select a notebook, but weight the propbability of selected based on past failures
     '''
     passed = 1
     failed = 0
     for notebook_result in notebook_results:
-        if notebook_result[0] == changed_notebook:
-            passed = notebook_result[2]
-            failed = notebook_result[3]
+        if notebook_result['notebook'] == changed_notebook:
+            passed = notebook_result['passed']
+            failed = notebook_result['failed']
             break
 
     return random.randint(1, 100) * (failed/ passed)
