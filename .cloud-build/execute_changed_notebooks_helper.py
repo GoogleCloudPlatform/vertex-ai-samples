@@ -567,7 +567,7 @@ def process_and_execute_notebooks(
                 print(log_contents)
 
         if not results_file:
-            results_file = artifacts_bucket.split('/')[-1] + ".csv"  # build ID
+            results_file = "vertex-ai/ci-cd/" + artifacts_bucket.split('/')[-1] + ".csv"  # build ID
         _save_results(results_sorted, artifacts_bucket, results_file)
 
         print("\n=== END RESULTS===\n")

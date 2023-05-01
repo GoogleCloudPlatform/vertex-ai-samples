@@ -55,7 +55,7 @@ parser.add_argument(
     "--test_results",
     type=pathlib.Path,
     help="The path relative to the artifacts bucket where to save execution results",
-    default=RESULTS_FILE
+    default=None
 )
 parser.add_argument(
     "--base_branch",
