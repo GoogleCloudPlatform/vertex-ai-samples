@@ -140,7 +140,7 @@ changed_notebooks = execute_changed_notebooks_helper.get_changed_notebooks(
 )
 
 
-def _load_results() -> list:
+def _load_results() -> List[Dict[str, Any]]:
     '''
     Load accumulated notebook test results
     '''
@@ -150,17 +150,22 @@ def _load_results() -> list:
         df = pd.read_csv(os.path.join(f"gs://{args.artifacts_bucket}", args.test_results))
         df = df.reset_index()
 
+        rows = df[["notebook", "duration", "passed", "failed"]].to_dict('records')
+        '''
         for index, row in df.iterrows():
             rows.append([row["notebook"], row["duration"], row["passed"], row["failed"]])
+        '''
         print(rows)
     except Exception as e:
         print(e)
 
+    # If there are no accumulative results, an empty list is returned
     return rows
 
-def _select_notebook(changed_notebook: str) -> float:
+def _select_notebook(changed_notebook: str, 
+                     notebook_results: List[Dict[str, Any]]) -> float:
     '''
-    Algorithm to randomly select a notebook, but weight the liklihood based on past failures
+    Algorithm to randomly select a notebook, but weight the propbability of selected based on past failures
     '''
     passed = 1
     failed = 0
@@ -170,17 +175,14 @@ def _select_notebook(changed_notebook: str) -> float:
             failed = notebook_result[3]
             break
 
-    if not failed:
-        return random.randint(1, 100) * passed
-    else:
-        return randinit(1, 100) / failed
+     return random.randint(1, 100) * (failed/ passed)
 
 if args.test_percent == 100:
     notebooks = changed_notebooks
 else:
     notebook_results = _load_results()
 
-    notebooks = [changed_notebook for changed_notebook in changed_notebooks if _select_notebook(changed_notebook) < args.test_percent]
+    notebooks = [changed_notebook for changed_notebook in changed_notebooks if _select_notebook(changed_notebook, notebook_results) < args.test_percent]
 
 if args.dry_run:
     print("Dry run ...\n")
