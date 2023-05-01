@@ -351,6 +351,7 @@ def _save_results(results: List[NotebookExecutionResult],
 
     # read in existing prior results data
     print("Reading existing accumulative results ...")
+    print("BUILD", results_file)
     rows = []
     try:
         client = storage.Client()
