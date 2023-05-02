@@ -26,10 +26,11 @@ import csv
 import pathlib
 import re
 import subprocess
+import random
 import pandas as pd
 from google.cloud import storage
 import utils
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from utils import util
 
 import execute_notebook_helper
@@ -84,6 +85,41 @@ class NotebookExecutionResult:
             return f"https://storage.googleapis.com/{self.output_uri[5:]}"
         else:
             return None
+
+def load_results(results_file: str) -> List[Dict[str, Any]]:
+    '''
+    Load accumulated notebook test results
+    '''
+
+    print("Loading existing accumulative results ...")
+    rows = []
+    try:
+        df = pd.read_csv(results_file)
+        df = df.reset_index()
+
+        rows = df[["notebook", "duration", "passed", "failed"]].to_dict('records')
+        print(rows)
+    except Exception as e:
+        print(e)
+
+    # If there are no accumulative results, an empty list is returned
+    return rows
+
+def select_notebook(changed_notebook: str,
+                    notebook_results: List[Dict[str, Any]]) -> float:
+    '''
+    Algorithm to randomly select a notebook, but weight the propbability of selected based on past failures
+    '''
+
+    pass_count = 1
+    fail_count = 0
+    for notebook_result in notebook_results:
+        if notebook_result['notebook'] == changed_notebook:
+            pass_count = notebook_result['passed']
+            fail_count = notebook_result['failed']
+            break
+
+    return random.randint(1, 100) * (fail_count / (pass_count + fail_count))
 
 
 def _process_notebook(

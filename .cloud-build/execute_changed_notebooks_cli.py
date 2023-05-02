@@ -17,10 +17,8 @@
 
 import argparse
 import pathlib
-import random
 import pandas as pd
 import os
-from typing import List, Dict, Any
 
 import execute_changed_notebooks_helper
 
@@ -141,51 +139,15 @@ changed_notebooks = execute_changed_notebooks_helper.get_changed_notebooks(
 )
 
 
-def _load_results() -> List[Dict[str, Any]]:
-    '''
-    Load accumulated notebook test results
-    '''
-
-    results_file = f"gs://{args.artifacts_bucket}/{args.build_id}"
-    if results_file.endswith(".csv"):
-        results_file = results_file + ".csv"
-
-    print("Loading existing accumulative results ...")
-    rows = []
-    try:
-        df = pd.read_csv(results_file)
-        df = df.reset_index()
-
-        rows = df[["notebook", "duration", "passed", "failed"]].to_dict('records')
-        print(rows)
-    except Exception as e:
-        print(e)
-
-    # If there are no accumulative results, an empty list is returned
-    return results_file, rows
-
-def _select_notebook(changed_notebook: str, 
-                     notebook_results: List[Dict[str, Any]]) -> float:
-    '''
-    Algorithm to randomly select a notebook, but weight the propbability of selected based on past failures
-    '''
-
-    pass_count = 1
-    fail_count = 0
-    for notebook_result in notebook_results:
-        if notebook_result['notebook'] == changed_notebook:
-            pass_count = notebook_result['passed']
-            fail_count = notebook_result['failed']
-            break
-
-    return random.randint(1, 100) * (fail_count / (pass_count + fail_count))
-
 if args.test_percent == 100:
     notebooks = changed_notebooks
 else:
-    results_file, notebook_results = _load_results()
+    results_file = f"gs://{args.artifacts_bucket}/{args.build_id}"
+    if not results_file.endswith(".csv"):
+        results_file = results_file + ".csv"
+    notebook_results = execute_changed_notebooks_helper.load_results(results_file)
 
-    notebooks = [changed_notebook for changed_notebook in changed_notebooks if _select_notebook(changed_notebook, notebook_results) < args.test_percent]
+    notebooks = [changed_notebook for changed_notebook in changed_notebooks if execute_changed_notebooks_helper.select_notebook(changed_notebook, notebook_results) < args.test_percent]
 
 if args.dry_run:
     print("Dry run ...\n")
