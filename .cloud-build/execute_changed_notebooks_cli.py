@@ -139,12 +139,13 @@ changed_notebooks = execute_changed_notebooks_helper.get_changed_notebooks(
 )
 
 
+results_file = f"gs://{args.artifacts_bucket}/{args.build_id}"
+if not results_file.endswith(".csv"):
+    results_file = results_file + ".csv"
+
 if args.test_percent == 100:
     notebooks = changed_notebooks
 else:
-    results_file = f"gs://{args.artifacts_bucket}/{args.build_id}"
-    if not results_file.endswith(".csv"):
-        results_file = results_file + ".csv"
     notebook_results = execute_changed_notebooks_helper.load_results(results_file)
 
     notebooks = [changed_notebook for changed_notebook in changed_notebooks if execute_changed_notebooks_helper.select_notebook(changed_notebook, notebook_results) < args.test_percent]
