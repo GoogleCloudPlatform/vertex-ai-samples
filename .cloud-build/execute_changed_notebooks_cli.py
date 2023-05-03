@@ -22,8 +22,6 @@ import os
 
 import execute_changed_notebooks_helper
 
-RESULTS_FILE = "vertex-ai/ci-cd/results.csv"
-
 
 def str2bool(v):
     if isinstance(v, bool):
@@ -54,7 +52,7 @@ parser.add_argument(
     "--build_id",
     type=str,
     help="The build id (which may be a Cloud Build job specific or user explicit.",
-    default=RESULTS_FILE
+    required=True
 )
 parser.add_argument(
     "--base_branch",
