@@ -137,12 +137,13 @@ changed_notebooks = execute_changed_notebooks_helper.get_changed_notebooks(
 )
 
 
-results_file = f"gs://{args.artifacts_bucket}/{args.build_id}.csv"
+results_bucket = f"gs://{args.artifacts_bucket}"
+results_file = f"{args.build_id}.json"
 
 if args.test_percent == 100:
     notebooks = changed_notebooks
 else:
-    notebook_results = execute_changed_notebooks_helper.load_results(results_file)
+    notebook_results = execute_changed_notebooks_helper.load_results(results_bucket, results_file)
 
     notebooks = [changed_notebook for changed_notebook in changed_notebooks if execute_changed_notebooks_helper.select_notebook(changed_notebook, notebook_results, args.test_percent)]
 
@@ -156,7 +157,7 @@ else:
         container_uri=args.container_uri,
         staging_bucket=args.staging_bucket,
         artifacts_bucket=args.artifacts_bucket,
-        results_file=results_file,
+        results_file=results_bucket + '/' + results_file,
         should_parallelize=args.should_parallelize,
         timeout=args.timeout,
         variable_project_id=args.variable_project_id,

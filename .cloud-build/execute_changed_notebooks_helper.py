@@ -22,7 +22,7 @@ import git
 import operator
 import os
 import io
-import csv
+import json
 import pathlib
 import re
 import subprocess
@@ -86,27 +86,29 @@ class NotebookExecutionResult:
         else:
             return None
 
-def load_results(results_file: str) -> List[Dict[str, Any]]:
+def load_results(results_bucket: str,
+                 results_file: str) -> Dict[str, Any]:
     '''
     Load accumulated notebook test results
     '''
 
     print("Loading existing accumulative results ...")
-    rows = []
+    accumulative_results = {}
     try:
-        df = pd.read_csv(results_file)
-        df = df.reset_index()
 
-        rows = df[["notebook", "duration", "passed", "failed"]].to_dict('records')
-        print(rows)
+        storage_client = storage.Client() 
+        bucket = storage_client.get_bucket(results_bucket)
+        blob = bucket.blob(results_file)
+        accumulative_results = json.loads(blob.download_as_string(client=None))
+        print(accumulative_results)
     except Exception as e:
         print(e)
 
-    # If there are no accumulative results, an empty list is returned
-    return rows
+    # If there are no accumulative results, an empty dict is returned
+    return accumulative_results
 
 def select_notebook(changed_notebook: str,
-                    notebook_results: List[Dict[str, Any]],
+                    accumulative_results: Dict[str, Any],
                     test_percent: int) -> bool:
     '''
     Algorithm to randomly select a notebook, but weight the propbability of selected based on past failures
@@ -114,13 +116,14 @@ def select_notebook(changed_notebook: str,
 
     pass_count = 1
     fail_count = 0
-    for notebook_result in notebook_results:
-        if notebook_result['notebook'] == changed_notebook:
-            pass_count = notebook_result['passed']
-            fail_count = notebook_result['failed']
-            break
+    if changed_notebook in accumulative_results:
+        pass_count = accumulative_results[changed_notebook]['passed']
+        fail_count = accumulative_results[changed_notebook]['failed']
+    else:
+        pass_count = 1
+        fail_count = 0
 
-    return (random.randint(1, 100) * (fail_count / (pass_count + fail_count)) < test_percent)
+    return (random.randint(1, 100) * (1 + (fail_count / (pass_count + fail_count))) < test_percent)
 
 
 def _process_notebook(
@@ -388,7 +391,7 @@ def _save_results(results: List[NotebookExecutionResult],
 
     # read in existing prior results data
     print("Reading existing accumulative results ...")
-    rows = []
+    accumulative_results = {}
     try:
         client = storage.Client()
         bucket = client.get_bucket(artifacts_bucket)
@@ -396,54 +399,36 @@ def _save_results(results: List[NotebookExecutionResult],
         blob = blob.download_as_string()
         contents = blob.decode('utf=8')
         contents = io.StringIO(contents)
-
-        header = True
-        for row in csv.reader(contents):
-            if header:
-                header = False
-            else:
-                row[1] = float(row[1])
-                row[2] = int(row[2])
-                row[3] = int(row[3])
-                rows.append(row)
+        accumulative_results = json.dumps(contents)
 
     except Exception as e:
         print('Exception', e)
-    print(rows)
+    print(accumulative_results)
 
 
     print("Updating accumulative results ...")
     for result in results:
-        found = False
-        for row in rows:
-            if row[0] == result.path:
-                found = True
-                row[1] = result.duration.total_seconds()
-                if result.is_pass:
-                    row[2] += 1
-                else:
-                    row[3] += 1
-                print(f"updating {result.path}: {row}")
-                break
-
-        if not found:
+        if result.path in accumulative_results:
+            accumulative_results[result.path]['duration'] = result.duration.total_seconds()
             if result.is_pass:
-                passed = 1
-                failed = 0
+                accumulative_results[result.path]['passed'] += 1
             else:
-                failed = 1
-                passed = 0
-            rows.append([result.path, result.duration.total_seconds(), passed, failed])
+                accumulative_results[result.path]['failed'] += 1
+            print(f"updating {result.path}: {row}")
+        else:
+            accumulative_results[result.path] = {
+                    'duration': result.duration.total_seconds(),
+                    'passed': [ 1 if result.is_pass else 0 ],
+                    'failed': [ 0 if result.is_pass else 1 ]
+                    }
             print(f"adding {result.path}")
 
     print("Saving accumulative results ...")
-    content = "notebook,duration,passed,failed\n"
-    for row in rows:
-        content += str(row).replace('[', '').replace(']', '').replace('"', "").replace("'", '') + '\n'
+    content = json.dumps(accumulative_results)
 
     client = storage.Client()
     bucket = client.get_bucket(artifacts_bucket)
-    bucket.blob(str(results_file)).upload_from_string(content, 'text/csv')
+    bucket.blob(str(results_file)).upload_from_string(content, 'text/json')
 
 
 
