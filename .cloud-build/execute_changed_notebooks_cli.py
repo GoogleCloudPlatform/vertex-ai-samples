@@ -53,7 +53,7 @@ parser.add_argument(
 parser.add_argument(
     "--build_id",
     type=str,
-    help="The build id (which may be cloud run specified or user explicit.",
+    help="The build id (which may be a Cloud Build job specific or user explicit.",
     default=RESULTS_FILE
 )
 parser.add_argument(
@@ -139,16 +139,14 @@ changed_notebooks = execute_changed_notebooks_helper.get_changed_notebooks(
 )
 
 
-results_file = f"gs://{args.artifacts_bucket}/{args.build_id}"
-if not results_file.endswith(".csv"):
-    results_file = results_file + ".csv"
+results_file = f"gs://{args.artifacts_bucket}/{args.build_id}.csv"
 
 if args.test_percent == 100:
     notebooks = changed_notebooks
 else:
     notebook_results = execute_changed_notebooks_helper.load_results(results_file)
 
-    notebooks = [changed_notebook for changed_notebook in changed_notebooks if execute_changed_notebooks_helper.select_notebook(changed_notebook, notebook_results) < args.test_percent]
+    notebooks = [changed_notebook for changed_notebook in changed_notebooks if execute_changed_notebooks_helper.select_notebook(changed_notebook, notebook_results, args.test_percent)]
 
 if args.dry_run:
     print("Dry run ...\n")

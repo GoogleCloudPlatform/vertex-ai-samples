@@ -106,7 +106,8 @@ def load_results(results_file: str) -> List[Dict[str, Any]]:
     return rows
 
 def select_notebook(changed_notebook: str,
-                    notebook_results: List[Dict[str, Any]]) -> float:
+                    notebook_results: List[Dict[str, Any]],
+                    test_percent: int) -> bool:
     '''
     Algorithm to randomly select a notebook, but weight the propbability of selected based on past failures
     '''
@@ -119,7 +120,7 @@ def select_notebook(changed_notebook: str,
             fail_count = notebook_result['failed']
             break
 
-    return random.randint(1, 100) * (fail_count / (pass_count + fail_count))
+    return (random.randint(1, 100) * (fail_count / (pass_count + fail_count)) < test_percent)
 
 
 def _process_notebook(
