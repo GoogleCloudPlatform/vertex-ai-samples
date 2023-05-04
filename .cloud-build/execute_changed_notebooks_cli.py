@@ -142,6 +142,7 @@ results_file = f"{args.build_id}.json"
 
 if args.test_percent == 100:
     notebooks = changed_notebooks
+    accumulative_results = {}
 else:
     accumulative_results = execute_changed_notebooks_helper.load_results(results_bucket, results_file)
 
