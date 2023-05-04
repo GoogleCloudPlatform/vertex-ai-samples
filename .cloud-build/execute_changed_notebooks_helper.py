@@ -71,6 +71,7 @@ class NotebookExecutionResult:
     name: str
     path: str
     duration: datetime.timedelta
+    start_time: datetime.timedelta
     is_pass: bool
     log_url: str
     output_uri: str
@@ -86,7 +87,7 @@ class NotebookExecutionResult:
             return None
 
 def load_results(results_bucket: str,
-                 results_file: str) -> Dict[str, Any]:
+        results_file: str) -> List[NotebookExecutionResult]:
     '''
     Load accumulated notebook test results
     '''
@@ -97,7 +98,8 @@ def load_results(results_bucket: str,
         storage_client = storage.Client() 
         bucket = storage_client.get_bucket(results_bucket)
         blob = bucket.blob(results_file)
-        accumulative_results = json.loads(blob.download_as_string(client=None))
+        json_results = json.loads(blob.download_as_string(client=None))
+        accumulative_results = [NotebookExecutionResult(**result) for result in json_results]
         print(accumulative_results)
     except Exception as e:
         print(e)
@@ -234,6 +236,7 @@ def process_and_execute_notebook(
         name=tag,
         path=notebook,
         duration=datetime.timedelta(seconds=0),
+        start_time=datetime.datetime.now(),
         is_pass=False,
         output_uri=notebook_output_uri,
         log_url="",
@@ -243,7 +246,6 @@ def process_and_execute_notebook(
     )
 
     # TODO: Handle cases where multiple notebooks have the same name
-    time_start = datetime.datetime.now()
     operation = None
     try:
         # Get the python version for running the notebook if specified
@@ -289,7 +291,7 @@ def process_and_execute_notebook(
         # Block and wait for the result
         operation_result = operation.result(timeout=timeout_in_seconds)
 
-        result.duration = datetime.datetime.now() - time_start
+        result.duration = datetime.datetime.now() - result.start_time
         result.is_pass = True
         print(f"{notebook} PASSED in {format_timedelta(result.duration)}.")
 
@@ -311,7 +313,7 @@ def process_and_execute_notebook(
             except Exception as error:
                 result.error_message = str(error)
 
-        result.duration = datetime.datetime.now() - time_start
+        result.duration = datetime.datetime.now() - result.start_time
         result.is_pass = False
 
         print(
