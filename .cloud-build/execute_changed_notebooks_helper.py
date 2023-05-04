@@ -27,7 +27,6 @@ import pathlib
 import re
 import subprocess
 import random
-import pandas as pd
 from google.cloud import storage
 import utils
 from typing import List, Optional, Dict, Any
@@ -95,7 +94,6 @@ def load_results(results_bucket: str,
     print("Loading existing accumulative results ...")
     accumulative_results = {}
     try:
-
         storage_client = storage.Client() 
         bucket = storage_client.get_bucket(results_bucket)
         blob = bucket.blob(results_file)
@@ -114,8 +112,6 @@ def select_notebook(changed_notebook: str,
     Algorithm to randomly select a notebook, but weight the propbability of selected based on past failures
     '''
 
-    pass_count = 1
-    fail_count = 0
     if changed_notebook in accumulative_results:
         pass_count = accumulative_results[changed_notebook]['passed']
         fail_count = accumulative_results[changed_notebook]['failed']
@@ -384,27 +380,11 @@ def get_changed_notebooks(
     return notebooks
 
 def _save_results(results: List[NotebookExecutionResult],
+                  accumulative_results: List[NotebookExecutionResult],
                   artifacts_bucket: str,
                   results_file: str):
 
     artifacts_bucket = artifacts_bucket.replace("gs://", "").split('/')[0]
-
-    # read in existing prior results data
-    print("Reading existing accumulative results ...")
-    accumulative_results = {}
-    try:
-        client = storage.Client()
-        bucket = client.get_bucket(artifacts_bucket)
-        blob = bucket.blob(str(results_file))
-        blob = blob.download_as_string()
-        contents = blob.decode('utf=8')
-        contents = io.StringIO(contents)
-        accumulative_results = json.dumps(contents)
-
-    except Exception as e:
-        print('Exception', e)
-    print(accumulative_results)
-
 
     print("Updating accumulative results ...")
     for result in results:
@@ -414,12 +394,18 @@ def _save_results(results: List[NotebookExecutionResult],
                 accumulative_results[result.path]['passed'] += 1
             else:
                 accumulative_results[result.path]['failed'] += 1
-            print(f"updating {result.path}: {row}")
+            print(f"updating {result.path}")
         else:
+            if result.is_pass:
+                pass_count = 1
+                fail_count = 0
+            else:
+                pass_count = 0
+                fail_count = 1
             accumulative_results[result.path] = {
                     'duration': result.duration.total_seconds(),
-                    'passed': [ 1 if result.is_pass else 0 ],
-                    'failed': [ 0 if result.is_pass else 1 ]
+                    'passed': pass_count,
+                    'failed': fail_count
                     }
             print(f"adding {result.path}")
 
@@ -438,6 +424,7 @@ def process_and_execute_notebooks(
     staging_bucket: str,
     artifacts_bucket: str,
     results_file: str,
+    accumulative_results: List[NotebookExecutionResult],
     should_parallelize: bool,
     timeout: int,
     variable_project_id: str,
@@ -467,6 +454,8 @@ def process_and_execute_notebooks(
             Required. The GCS staging bucket to write executed notebooks to.
         results_file (str):
             Required: The path to the artifacts bucket to save results 
+        accumulative_results (List):
+            Required: The in-memory previous accumulative notebook CI/CD test results.
         variable_project_id (str):
             Required. The value for PROJECT_ID to inject into notebooks.
         variable_region (str):
@@ -587,7 +576,10 @@ def process_and_execute_notebooks(
             else:
                 print(log_contents)
 
-        _save_results(results_sorted, artifacts_bucket, results_file)
+        _save_results(results_sorted, 
+                      accumulative_results,
+                      artifacts_bucket, 
+                      results_file)
 
         print("\n=== END RESULTS===\n")
 

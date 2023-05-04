@@ -137,15 +137,15 @@ changed_notebooks = execute_changed_notebooks_helper.get_changed_notebooks(
 )
 
 
-results_bucket = f"gs://{args.artifacts_bucket}"
+results_bucket = f"{args.artifacts_bucket}"
 results_file = f"{args.build_id}.json"
 
 if args.test_percent == 100:
     notebooks = changed_notebooks
 else:
-    notebook_results = execute_changed_notebooks_helper.load_results(results_bucket, results_file)
+    accumulative_results = execute_changed_notebooks_helper.load_results(results_bucket, results_file)
 
-    notebooks = [changed_notebook for changed_notebook in changed_notebooks if execute_changed_notebooks_helper.select_notebook(changed_notebook, notebook_results, args.test_percent)]
+    notebooks = [changed_notebook for changed_notebook in changed_notebooks if execute_changed_notebooks_helper.select_notebook(changed_notebook, accumulative_results, args.test_percent)]
 
 if args.dry_run:
     print("Dry run ...\n")
@@ -157,7 +157,8 @@ else:
         container_uri=args.container_uri,
         staging_bucket=args.staging_bucket,
         artifacts_bucket=args.artifacts_bucket,
-        results_file=results_bucket + '/' + results_file,
+        results_file=results_file,
+        accumulative_results=accumulative_results,
         should_parallelize=args.should_parallelize,
         timeout=args.timeout,
         variable_project_id=args.variable_project_id,
