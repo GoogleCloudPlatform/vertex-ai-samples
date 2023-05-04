@@ -71,7 +71,7 @@ class NotebookExecutionResult:
     name: str
     path: str
     duration: datetime.timedelta
-    start_time: datetime.timedelta
+    start_time: datetime.datetime
     is_pass: bool
     log_url: str
     output_uri: str
@@ -87,7 +87,7 @@ class NotebookExecutionResult:
             return None
 
 def load_results(results_bucket: str,
-        results_file: str) -> List[NotebookExecutionResult]:
+        results_file: str) -> Dict[str,Any]:
     '''
     Load accumulated notebook test results
     '''
@@ -98,8 +98,7 @@ def load_results(results_bucket: str,
         storage_client = storage.Client() 
         bucket = storage_client.get_bucket(results_bucket)
         blob = bucket.blob(results_file)
-        json_results = json.loads(blob.download_as_string(client=None))
-        accumulative_results = [NotebookExecutionResult(**result) for result in json_results]
+        accumulative_results = json.loads(blob.download_as_string(client=None))
         print(accumulative_results)
     except Exception as e:
         print(e)
@@ -382,7 +381,7 @@ def get_changed_notebooks(
     return notebooks
 
 def _save_results(results: List[NotebookExecutionResult],
-                  accumulative_results: List[NotebookExecutionResult],
+                  accumulative_results: Dict[str,Any],
                   artifacts_bucket: str,
                   results_file: str):
 
@@ -392,6 +391,7 @@ def _save_results(results: List[NotebookExecutionResult],
     for result in results:
         if result.path in accumulative_results:
             accumulative_results[result.path]['duration'] = result.duration.total_seconds()
+            accumulative_results[result.path]['start_time'] = str(result.start_time)
             if result.is_pass:
                 accumulative_results[result.path]['passed'] += 1
             else:
@@ -406,6 +406,7 @@ def _save_results(results: List[NotebookExecutionResult],
                 fail_count = 1
             accumulative_results[result.path] = {
                     'duration': result.duration.total_seconds(),
+                    'start_time': str(result.start_time),
                     'passed': pass_count,
                     'failed': fail_count
                     }
