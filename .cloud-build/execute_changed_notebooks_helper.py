@@ -95,10 +95,8 @@ def load_results(results_bucket: str,
     print("Loading existing accumulative results ...")
     accumulative_results = {}
     try:
-        storage_client = storage.Client() 
-        bucket = storage_client.get_bucket(results_bucket)
-        blob = bucket.blob(results_file)
-        accumulative_results = json.loads(blob.download_as_string(client=None))
+        content = util.download_blob_into_memory(results_bucket, results_file, download_as_text=True)
+        accumulative_results = json.loads(content)
         print(accumulative_results)
     except Exception as e:
         print(e)
