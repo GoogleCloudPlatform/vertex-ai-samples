@@ -17,7 +17,6 @@
 
 import argparse
 import pathlib
-import pandas as pd
 import os
 
 import execute_changed_notebooks_helper
