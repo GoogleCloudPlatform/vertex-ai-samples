@@ -3,12 +3,15 @@ numpy
 jupyter
 nbconvert
 papermill
-pandas
 matplotlib
 tabulate
 google-cloud-aiplatform
 google-cloud-storage
 google-cloud-build
+google-cloud-storage
 ratemate
 GitPython
 tqdm
+fsspec
+pandas
+
