@@ -57,3 +57,4 @@
 /notebooks/community/model_garden/model_garden_pytorch_layoutml_document_qa.ipynb @xiangxu-google
 /notebooks/community/model_garden/model_garden_pytorch_blip2.ipynb @xiangxu-google
 /notebooks/community/model_garden/model_garden_pytorch_detectron2.ipynb @lavraicse
+/notebooks/community/bigquery_ml_inference/bq_ml_with_vision_translation_nlp.ipynb @deaconsmith
