@@ -129,7 +129,7 @@ def select_notebook(changed_notebook: str,
     # Additionally, only test a percentage of these
     should_test_due_to_random_subset = random.uniform(0, 1) < test_percent
 
-    return should_test_due_to_failure && should_test_due_to_random_subset
+    return should_test_due_to_failure and should_test_due_to_random_subset
 
 
 def _process_notebook(
