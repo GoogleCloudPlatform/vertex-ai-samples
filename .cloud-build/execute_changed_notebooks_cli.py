@@ -140,9 +140,11 @@ results_bucket = f"{args.artifacts_bucket}"
 results_file = f"build_results/{args.build_id}.json"
 
 if args.test_percent == 100:
+    print("NO SELECT")
     notebooks = changed_notebooks
     accumulative_results = {}
 else:
+    print("DO SELECTION")
     accumulative_results = execute_changed_notebooks_helper.load_results(results_bucket, results_file)
 
     notebooks = [changed_notebook for changed_notebook in changed_notebooks if execute_changed_notebooks_helper.select_notebook(changed_notebook, accumulative_results, args.test_percent)]
