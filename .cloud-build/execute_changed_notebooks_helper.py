@@ -382,39 +382,30 @@ def get_changed_notebooks(
     return notebooks
 
 def _save_results(results: List[NotebookExecutionResult],
-                  accumulative_results: Dict[str,Any],
                   artifacts_bucket: str,
                   results_file: str):
 
     artifacts_bucket = artifacts_bucket.replace("gs://", "").split('/')[0]
 
-    print("Updating accumulative results ...")
+    print("Updating build results ...")
+    build_results = {}
     for result in results:
-        if result.path in accumulative_results:
-            accumulative_results[result.path]['duration'] = result.duration.total_seconds()
-            accumulative_results[result.path]['start_time'] = str(result.start_time)
-            if result.is_pass:
-                accumulative_results[result.path]['passed'] += 1
-            else:
-                accumulative_results[result.path]['failed'] += 1
-            print(f"updating {result.path}")
+        if result.is_pass:
+            pass_count = 1
+            fail_count = 0
         else:
-            if result.is_pass:
-                pass_count = 1
-                fail_count = 0
-            else:
-                pass_count = 0
-                fail_count = 1
-            accumulative_results[result.path] = {
-                    'duration': result.duration.total_seconds(),
-                    'start_time': str(result.start_time),
-                    'passed': pass_count,
-                    'failed': fail_count
-                    }
+            pass_count = 0
+            fail_count = 1
+        build_results[result.path] = {
+                'duration': result.duration.total_seconds(),
+                'start_time': str(result.start_time),
+                'passed': pass_count,
+                'failed': fail_count
+        }
             print(f"adding {result.path}")
 
     print("Saving accumulative results ...")
-    content = json.dumps(accumulative_results)
+    content = json.dumps(build_results)
 
     client = storage.Client()
     bucket = client.get_bucket(artifacts_bucket)
@@ -428,7 +419,6 @@ def process_and_execute_notebooks(
     staging_bucket: str,
     artifacts_bucket: str,
     results_file: str,
-    accumulative_results: List[NotebookExecutionResult],
     should_parallelize: bool,
     timeout: int,
     variable_project_id: str,
@@ -458,8 +448,6 @@ def process_and_execute_notebooks(
             Required. The GCS staging bucket to write executed notebooks to.
         results_file (str):
             Required: The path to the artifacts bucket to save results 
-        accumulative_results (List):
-            Required: The in-memory previous accumulative notebook CI/CD test results.
         variable_project_id (str):
             Required. The value for PROJECT_ID to inject into notebooks.
         variable_region (str):
@@ -581,7 +569,6 @@ def process_and_execute_notebooks(
                 print(log_contents)
 
         _save_results(results_sorted, 
-                      accumulative_results,
                       artifacts_bucket, 
                       results_file)
 
