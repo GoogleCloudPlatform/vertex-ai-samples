@@ -96,7 +96,7 @@ def load_results(results_bucket: str,
     accumulative_results = {}
     try:
         client = storage.Client()
-        client.bucket_name(results_bucket)
+        client.bucket(results_bucket)
 
         build_results_dir = os.path.dirname(results_file)
         blobs = client.list_blobs(build_results_dir)
