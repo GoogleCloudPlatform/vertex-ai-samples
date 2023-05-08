@@ -402,7 +402,7 @@ def _save_results(results: List[NotebookExecutionResult],
                 'passed': pass_count,
                 'failed': fail_count
         }
-            print(f"adding {result.path}")
+        print(f"adding {result.path}")
 
     print("Saving accumulative results ...")
     content = json.dumps(build_results)
