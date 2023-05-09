@@ -99,14 +99,13 @@ def load_results(results_bucket: str,
         bucket = client.bucket(results_bucket)
 
         build_results_dir = os.path.dirname(results_file)
-        print("TYPE BR", type(build_results_dir))
-        blobs = bucket.list_blobs(build_results_dir)
-        print("AFTER BLOBS")
+        blobs = client.list_blobs(results_bucket, prefix=build_results_dir)
         print("BLOBS type", type(blobs))
         for blob in blobs:
             print("BLOB LOOP")
             content = util.download_blob_into_memory(results_bucket, results_file, download_as_text=True)
             accumulative_results = {**accumulative_results, **json.loads(content)}
+        print("LOOP DONE")
         print(accumulative_results)
     except Exception as e:
         print(e)
