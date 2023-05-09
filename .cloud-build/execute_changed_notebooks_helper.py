@@ -95,6 +95,7 @@ def load_results(results_bucket: str,
     print("Loading existing accumulative results ...")
     accumulative_results = {}
     try:
+        print("RE BUCKET", results_bucket)
         client = storage.Client()
         bucket = client.bucket(results_bucket)
 
