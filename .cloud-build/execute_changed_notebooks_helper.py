@@ -99,6 +99,7 @@ def load_results(results_bucket: str,
         client.bucket(results_bucket)
 
         build_results_dir = os.path.dirname(results_file)
+        print("BUILD RESULTS DIR", build_results_dir)
         blobs = client.list_blobs(build_results_dir)
         for blob in blobs:
             content = util.download_blob_into_memory(results_bucket, results_file, download_as_text=True)
