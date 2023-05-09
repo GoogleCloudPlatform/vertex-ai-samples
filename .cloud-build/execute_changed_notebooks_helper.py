@@ -118,7 +118,6 @@ def select_notebook(changed_notebook: str,
     '''
 
     if changed_notebook in accumulative_results:
-        print("CHANGE FOUND", changed_notebook)
         pass_count = accumulative_results[changed_notebook]['passed']
         fail_count = accumulative_results[changed_notebook]['failed']
     else:
@@ -126,7 +125,6 @@ def select_notebook(changed_notebook: str,
         fail_count = 0
 
     inferred_failure_rate = fail_count / (pass_count + fail_count)
-    print("inferred_failure_rate", inferred_failure_rate)
 
     # If failure rate is high, the chance of testing should be higher
     should_test_due_to_failure = random.uniform(0, 1) < inferred_failure_rate
@@ -134,7 +132,7 @@ def select_notebook(changed_notebook: str,
     # Additionally, only test a percentage of these
     should_test_due_to_random_subset = random.uniform(0, 1) < test_percent
 
-    return should_test_due_to_failure and should_test_due_to_random_subset
+    return should_test_due_to_failure or should_test_due_to_random_subset
 
 
 def _process_notebook(
