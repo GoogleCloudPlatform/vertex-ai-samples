@@ -100,12 +100,9 @@ def load_results(results_bucket: str,
 
         build_results_dir = os.path.dirname(results_file)
         blobs = client.list_blobs(results_bucket, prefix=build_results_dir)
-        print("BLOBS type", type(blobs))
         for blob in blobs:
-            print("BLOB LOOP", blob.name)
             content = util.download_blob_into_memory(results_bucket, blob.name, download_as_text=True)
             accumulative_results = {**accumulative_results, **json.loads(content)}
-        print("LOOP DONE")
         print(accumulative_results)
     except Exception as e:
         print(e)
@@ -121,6 +118,7 @@ def select_notebook(changed_notebook: str,
     '''
 
     if changed_notebook in accumulative_results:
+        print("CHANGE FOUND", changed_notebook)
         pass_count = accumulative_results[changed_notebook]['passed']
         fail_count = accumulative_results[changed_notebook]['failed']
     else:
@@ -128,6 +126,7 @@ def select_notebook(changed_notebook: str,
         fail_count = 0
 
     inferred_failure_rate = fail_count / (pass_count + fail_count)
+    print("inferred_failure_rate", inferred_failure_rate
 
     # If failure rate is high, the chance of testing should be higher
     should_test_due_to_failure = random.uniform(0, 1) < inferred_failure_rate
