@@ -137,9 +137,9 @@ changed_notebooks = execute_changed_notebooks_helper.get_changed_notebooks(
 
 
 results_bucket = f"{args.artifacts_bucket}"
+print("CLI BUCKET", results_bucket
 results_file = f"build_results/{args.build_id}.json"
 
-print(f"PERCENT {args.test_percent}")
 args.test_percent = 90
 if args.test_percent == 100:
     notebooks = changed_notebooks
