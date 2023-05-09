@@ -101,6 +101,8 @@ def load_results(results_bucket: str,
         build_results_dir = os.path.dirname(results_file)
         print("TYPE BR", type(build_results_dir))
         blobs = bucket.list_blobs(build_results_dir)
+        print("AFTER BLOBS")
+        print("BLOBS type", type(blobs))
         for blob in blobs:
             print("BLOB LOOP")
             content = util.download_blob_into_memory(results_bucket, results_file, download_as_text=True)
