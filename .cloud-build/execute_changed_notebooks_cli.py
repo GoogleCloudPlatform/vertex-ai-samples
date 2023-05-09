@@ -143,7 +143,6 @@ if results_bucket.startswith("gs://"):
 results_bucket = results_bucket.split('/')[0]
 results_file = f"build_results/{args.build_id}.json"
 
-args.test_percent = 90
 if args.test_percent == 100:
     notebooks = changed_notebooks
     accumulative_results = {}
