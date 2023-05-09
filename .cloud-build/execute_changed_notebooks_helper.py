@@ -126,7 +126,7 @@ def select_notebook(changed_notebook: str,
         fail_count = 0
 
     inferred_failure_rate = fail_count / (pass_count + fail_count)
-    print("inferred_failure_rate", inferred_failure_rate
+    print("inferred_failure_rate", inferred_failure_rate)
 
     # If failure rate is high, the chance of testing should be higher
     should_test_due_to_failure = random.uniform(0, 1) < inferred_failure_rate
