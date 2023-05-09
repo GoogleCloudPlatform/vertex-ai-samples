@@ -95,7 +95,6 @@ def load_results(results_bucket: str,
     print("Loading existing accumulative results ...")
     accumulative_results = {}
     try:
-        print("RE BUCKET", results_bucket)
         client = storage.Client()
         bucket = client.bucket(results_bucket)
 
@@ -103,8 +102,8 @@ def load_results(results_bucket: str,
         blobs = client.list_blobs(results_bucket, prefix=build_results_dir)
         print("BLOBS type", type(blobs))
         for blob in blobs:
-            print("BLOB LOOP")
-            content = util.download_blob_into_memory(results_bucket, results_file, download_as_text=True)
+            print("BLOB LOOP", blob.name)
+            content = util.download_blob_into_memory(results_bucket, blob.name, download_as_text=True)
             accumulative_results = {**accumulative_results, **json.loads(content)}
         print("LOOP DONE")
         print(accumulative_results)
