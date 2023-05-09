@@ -137,9 +137,10 @@ changed_notebooks = execute_changed_notebooks_helper.get_changed_notebooks(
 
 
 results_bucket = f"{args.artifacts_bucket}"
+# artifacts_bucket may get set by trigger to a full gs:// folder path
 if results_bucket.startswith("gs://"):
     results_bucket = results_bucket[5:]
-results_bucket = results_split('/')[0]
+results_bucket = results_bucket('/')[0]
 print("CLI BUCKET", results_bucket)
 results_file = f"build_results/{args.build_id}.json"
 
