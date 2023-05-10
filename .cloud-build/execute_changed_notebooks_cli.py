@@ -48,6 +48,12 @@ parser.add_argument(
     default=100,
 )
 parser.add_argument(
+    "--test_filter",
+    type=str2bool,
+    help="Whether to filter tests by past pass/fail counts",
+    default=False,
+)
+parser.add_argument(
     "--build_id",
     type=str,
     help="The build id (which may be a Cloud Build job specific or user explicit.",
@@ -143,11 +149,14 @@ if results_bucket.startswith("gs://"):
 results_bucket = results_bucket.split('/')[0]
 results_file = f"build_results/{args.build_id}.json"
 
-if args.test_percent == 100:
+if args.test_percent == 100 and not args.test_filter:
     notebooks = changed_notebooks
     accumulative_results = {}
 else:
-    accumulative_results = execute_changed_notebooks_helper.load_results(results_bucket, results_file)
+    if args.test_filter:
+        accumulative_results = execute_changed_notebooks_helper.load_results(results_bucket, results_file)
+    else:
+        accumulative_results = {}
 
     notebooks = [changed_notebook for changed_notebook in changed_notebooks if execute_changed_notebooks_helper.select_notebook(changed_notebook, accumulative_results, args.test_percent)]
 
