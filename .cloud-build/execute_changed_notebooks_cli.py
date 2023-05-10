@@ -17,7 +17,7 @@
 
 import argparse
 import pathlib
-import random
+import os
 
 import execute_changed_notebooks_helper
 
@@ -46,6 +46,12 @@ parser.add_argument(
     help="The percent of notebooks to be tested (between 1 and 100).",
     required=False,
     default=100,
+)
+parser.add_argument(
+    "--build_id",
+    type=str,
+    help="The build id (which may be a Cloud Build job specific or user explicit.",
+    required=True
 )
 parser.add_argument(
     "--base_branch",
@@ -129,26 +135,35 @@ changed_notebooks = execute_changed_notebooks_helper.get_changed_notebooks(
     base_branch=args.base_branch,
 )
 
+
+results_bucket = f"{args.artifacts_bucket}"
+results_file = f"{args.build_id}.json"
+
 if args.test_percent == 100:
     notebooks = changed_notebooks
+    accumulative_results = {}
 else:
-    notebooks = [changed_notebook for changed_notebook in changed_notebooks if random.randint(1, 100) < args.test_percent]
+    accumulative_results = execute_changed_notebooks_helper.load_results(results_bucket, results_file)
+
+    notebooks = [changed_notebook for changed_notebook in changed_notebooks if execute_changed_notebooks_helper.select_notebook(changed_notebook, accumulative_results, args.test_percent)]
 
 if args.dry_run:
     print("Dry run ...\n")
     for notebook in notebooks:
-        print(f"Would execute: {notebook.path}")
+        print(f"Would execute: {notebook}")
 else:
     execute_changed_notebooks_helper.process_and_execute_notebooks(
         notebooks=notebooks,
         container_uri=args.container_uri,
         staging_bucket=args.staging_bucket,
         artifacts_bucket=args.artifacts_bucket,
+        results_file=results_file,
+        accumulative_results=accumulative_results,
         should_parallelize=args.should_parallelize,
         timeout=args.timeout,
         variable_project_id=args.variable_project_id,
         variable_region=args.variable_region,
         variable_service_account=args.variable_service_account,
         variable_vpc_network=args.variable_vpc_network,
-        private_pool_id=args.private_pool_id,
+        private_pool_id=args.private_pool_id
 )
