@@ -102,7 +102,13 @@ def load_results(results_bucket: str,
         blobs = client.list_blobs(results_bucket, prefix=build_results_dir)
         for blob in blobs:
             content = util.download_blob_into_memory(results_bucket, blob.name, download_as_text=True)
-            accumulative_results = {**accumulative_results, **json.loads(content)}
+            build_results = json.loads(content)
+            for notebook in build_results:
+                if notebook in accumulative_results:
+                    accumulative_results[notebook] += build_results[notebook]
+                else:
+                    accumulative_results[notebook] = build_results[notebook]
+
         print(accumulative_results)
     except Exception as e:
         print(e)
@@ -132,7 +138,7 @@ def select_notebook(changed_notebook: str,
     # Additionally, only test a percentage of these
     should_test_due_to_random_subset = random.uniform(0, 1) < test_percent
 
-    return should_test_due_to_failure or should_test_due_to_random_subset
+    return should_test_due_to_failure and should_test_due_to_random_subset
 
 
 def _process_notebook(
