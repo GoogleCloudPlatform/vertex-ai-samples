@@ -21,11 +21,15 @@ import json
 import git
 import operator
 import os
+import io
+import json
 import pathlib
 import re
 import subprocess
+import random
+from google.cloud import storage
 import utils
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from utils import util
 
 import execute_notebook_helper
@@ -65,7 +69,9 @@ def format_timedelta(delta: datetime.timedelta) -> str:
 @dataclasses.dataclass
 class NotebookExecutionResult:
     name: str
+    path: str
     duration: datetime.timedelta
+    start_time: datetime.datetime
     is_pass: bool
     log_url: str
     output_uri: str
@@ -79,6 +85,40 @@ class NotebookExecutionResult:
             return f"https://storage.googleapis.com/{self.output_uri[5:]}"
         else:
             return None
+
+def load_results(results_bucket: str,
+        results_file: str) -> Dict[str,Any]:
+    '''
+    Load accumulated notebook test results
+    '''
+
+    print("Loading existing accumulative results ...")
+    accumulative_results = {}
+    try:
+        content = util.download_blob_into_memory(results_bucket, results_file, download_as_text=True)
+        accumulative_results = json.loads(content)
+        print(accumulative_results)
+    except Exception as e:
+        print(e)
+
+    # If there are no accumulative results, an empty dict is returned
+    return accumulative_results
+
+def select_notebook(changed_notebook: str,
+                    accumulative_results: Dict[str, Any],
+                    test_percent: int) -> bool:
+    '''
+    Algorithm to randomly select a notebook, but weight the propbability of selected based on past failures
+    '''
+
+    if changed_notebook in accumulative_results:
+        pass_count = accumulative_results[changed_notebook]['passed']
+        fail_count = accumulative_results[changed_notebook]['failed']
+    else:
+        pass_count = 1
+        fail_count = 0
+
+    return (random.randint(1, 100) * (1 + (fail_count / (pass_count + fail_count))) < test_percent)
 
 
 def _process_notebook(
@@ -191,7 +231,9 @@ def process_and_execute_notebook(
 
     result = NotebookExecutionResult(
         name=tag,
+        path=notebook,
         duration=datetime.timedelta(seconds=0),
+        start_time=datetime.datetime.now(),
         is_pass=False,
         output_uri=notebook_output_uri,
         log_url="",
@@ -201,7 +243,6 @@ def process_and_execute_notebook(
     )
 
     # TODO: Handle cases where multiple notebooks have the same name
-    time_start = datetime.datetime.now()
     operation = None
     try:
         # Get the python version for running the notebook if specified
@@ -247,9 +288,10 @@ def process_and_execute_notebook(
         # Block and wait for the result
         operation_result = operation.result(timeout=timeout_in_seconds)
 
-        result.duration = datetime.datetime.now() - time_start
+        result.duration = datetime.datetime.now() - result.start_time
         result.is_pass = True
         print(f"{notebook} PASSED in {format_timedelta(result.duration)}.")
+
     except Exception as error:
         result.error_message = str(error)
 
@@ -268,7 +310,7 @@ def process_and_execute_notebook(
             except Exception as error:
                 result.error_message = str(error)
 
-        result.duration = datetime.datetime.now() - time_start
+        result.duration = datetime.datetime.now() - result.start_time
         result.is_pass = False
 
         print(
@@ -336,12 +378,54 @@ def get_changed_notebooks(
 
     return notebooks
 
+def _save_results(results: List[NotebookExecutionResult],
+                  accumulative_results: Dict[str,Any],
+                  artifacts_bucket: str,
+                  results_file: str):
+
+    artifacts_bucket = artifacts_bucket.replace("gs://", "").split('/')[0]
+
+    print("Updating accumulative results ...")
+    for result in results:
+        if result.path in accumulative_results:
+            accumulative_results[result.path]['duration'] = result.duration.total_seconds()
+            accumulative_results[result.path]['start_time'] = str(result.start_time)
+            if result.is_pass:
+                accumulative_results[result.path]['passed'] += 1
+            else:
+                accumulative_results[result.path]['failed'] += 1
+            print(f"updating {result.path}")
+        else:
+            if result.is_pass:
+                pass_count = 1
+                fail_count = 0
+            else:
+                pass_count = 0
+                fail_count = 1
+            accumulative_results[result.path] = {
+                    'duration': result.duration.total_seconds(),
+                    'start_time': str(result.start_time),
+                    'passed': pass_count,
+                    'failed': fail_count
+                    }
+            print(f"adding {result.path}")
+
+    print("Saving accumulative results ...")
+    content = json.dumps(accumulative_results)
+
+    client = storage.Client()
+    bucket = client.get_bucket(artifacts_bucket)
+    bucket.blob(str(results_file)).upload_from_string(content, 'text/json')
+
+
 
 def process_and_execute_notebooks(
     notebooks: List[str],
     container_uri: str,
     staging_bucket: str,
     artifacts_bucket: str,
+    results_file: str,
+    accumulative_results: List[NotebookExecutionResult],
     should_parallelize: bool,
     timeout: int,
     variable_project_id: str,
@@ -369,6 +453,10 @@ def process_and_execute_notebooks(
             Required. The GCS staging bucket to write source code to.
         artifacts_bucket (str):
             Required. The GCS staging bucket to write executed notebooks to.
+        results_file (str):
+            Required: The path to the artifacts bucket to save results 
+        accumulative_results (List):
+            Required: The in-memory previous accumulative notebook CI/CD test results.
         variable_project_id (str):
             Required. The value for PROJECT_ID to inject into notebooks.
         variable_region (str):
@@ -471,7 +559,7 @@ def process_and_execute_notebooks(
             print("=" * 100)
 
             build_id = results_sorted[0].build_id
-            logs_bucket_name = (results_sorted[0].logs_bucket).removeprefix("gs://")
+            logs_bucket_name = (results_sorted[0].logs_bucket).replace("gs://", "")
             log_file_name = f"log-{build_id}.txt"
 
             log_contents = util.download_blob_into_memory(
@@ -488,6 +576,11 @@ def process_and_execute_notebooks(
                 print(log_contents[match_index:])
             else:
                 print(log_contents)
+
+        _save_results(results_sorted, 
+                      accumulative_results,
+                      artifacts_bucket, 
+                      results_file)
 
         print("\n=== END RESULTS===\n")
 
