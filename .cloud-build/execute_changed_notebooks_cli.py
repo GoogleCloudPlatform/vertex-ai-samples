@@ -147,10 +147,7 @@ if args.test_percent == 100:
     notebooks = changed_notebooks
     accumulative_results = {}
 else:
-    if args.test_filter:
-        accumulative_results = execute_changed_notebooks_helper.load_results(results_bucket, results_file)
-    else:
-        accumulative_results = {}
+    accumulative_results = execute_changed_notebooks_helper.load_results(results_bucket, results_file)
 
     notebooks = [changed_notebook for changed_notebook in changed_notebooks if execute_changed_notebooks_helper.select_notebook(changed_notebook, accumulative_results, args.test_percent)]
 
