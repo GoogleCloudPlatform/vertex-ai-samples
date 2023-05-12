@@ -137,7 +137,11 @@ changed_notebooks = execute_changed_notebooks_helper.get_changed_notebooks(
 
 
 results_bucket = f"{args.artifacts_bucket}"
-results_file = f"{args.build_id}.json"
+# artifacts_bucket may get set by trigger to a full gs:// folder path
+if results_bucket.startswith("gs://"):
+    results_bucket = results_bucket[5:]
+results_bucket = results_bucket.split('/')[0]
+results_file = f"build_results/{args.build_id}.json"
 
 if args.test_percent == 100:
     notebooks = changed_notebooks
@@ -158,7 +162,6 @@ else:
         staging_bucket=args.staging_bucket,
         artifacts_bucket=args.artifacts_bucket,
         results_file=results_file,
-        accumulative_results=accumulative_results,
         should_parallelize=args.should_parallelize,
         timeout=args.timeout,
         variable_project_id=args.variable_project_id,
