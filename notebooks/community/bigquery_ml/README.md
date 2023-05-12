@@ -7,7 +7,7 @@ Learn how to analyze unstructured data within BigQuery using BigQuery's inferenc
 The steps performed include:
 
 - Define pre-trained models for Vision AI, Translation AI and NLP AI in BigQuery ML
-- Cal the Vision API (`ML.ANNOTATE_IMAGE`) to detect text in images stored in Cloud Storage
+- Call the Vision API (`ML.ANNOTATE_IMAGE`) to detect text in images stored in Cloud Storage
   You will need to create an object table in BigQuery to do this
 - Call the Translation API (`ML.TRANSLATE`) to detect the language of text, and translate non-English movie titles to English
 - Call the Natural Language API (`ML.UNDERSTAND_TEXT`) to run sentiment analysis over movie reviews stored in BigQuery
