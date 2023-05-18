@@ -42,3 +42,4 @@
 /pipelines/Train_tabular_models_with_many_frameworks_and_import_to_Vertex_AI_using_Pipelines @Ark-kun
 /experiments/get_started_with_vertex_experiments_autologging.ipynb @inardini
 /experiments/delete_outdated_tensorboard_experiments.ipynb @inardini
+/experiments/get_started_with_custom_training_autologging_local_script.ipynb @inardini
