@@ -1,5 +1,7 @@
 '''
 Viewer for the weekly regression testing of the official notebooks
+
+Cloud Storage location: gs://cloud-build-notebooks-presubmit/build_results/
 '''
 import argparse
 import json
