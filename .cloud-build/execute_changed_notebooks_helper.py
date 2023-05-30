@@ -44,6 +44,8 @@ from utils import NotebookProcessors, util
 WORKER_TIMEOUT_BUFFER_IN_SECONDS: int = 60 * 60
 PYTHON_VERSION = "3.9"  # Set default python version
 
+MAX_RESULTS_AGE: int = (60 * 60) * 24 * 60  # 60 days
+
 
 def format_timedelta(delta: datetime.timedelta) -> str:
     """Formats a timedelta duration to [N days] %H:%M:%S format"""
@@ -86,8 +88,9 @@ class NotebookExecutionResult:
         else:
             return None
 
+
 def load_results(results_bucket: str,
-        results_file: str) -> Dict[str,Any]:
+                 results_file: str) -> Dict[str, Any]:
     '''
     Load accumulated notebook test results
     '''
@@ -101,11 +104,20 @@ def load_results(results_bucket: str,
         build_results_dir = os.path.dirname(results_file)
         blobs = client.list_blobs(results_bucket, prefix=build_results_dir)
         for blob in blobs:
+            time_created = blob.time_created.replace(tzinfo=None)
+            if (datetime.datetime.now().replace(tzinfo=None) - time_created).total_seconds() > MAX_RESULTS_AGE:
+                continue
+
             content = util.download_blob_into_memory(results_bucket, blob.name, download_as_text=True)
-            build_results = json.loads(content)
+
+            try:
+                build_results = json.loads(content)
+            except:
+                continue  # skip corrupted build results files
             for notebook in build_results:
                 if notebook in accumulative_results:
-                    accumulative_results[notebook] += build_results[notebook]
+                    accumulative_results[notebook]['passed'] += build_results[notebook]['passed']
+                    accumulative_results[notebook]['failed'] += build_results[notebook]['failed']
                 else:
                     accumulative_results[notebook] = build_results[notebook]
 
@@ -133,12 +145,17 @@ def select_notebook(changed_notebook: str,
     inferred_failure_rate = fail_count / (pass_count + fail_count)
 
     # If failure rate is high, the chance of testing should be higher
-    should_test_due_to_failure = random.uniform(0, 1) < inferred_failure_rate
+    should_test_due_to_failure = random.uniform(0, 1) <= inferred_failure_rate
 
     # Additionally, only test a percentage of these
-    should_test_due_to_random_subset = random.uniform(0, 1) < test_percent
+    should_test_due_to_random_subset = random.uniform(0, 1) <= test_percent
 
-    return should_test_due_to_failure and should_test_due_to_random_subset
+    if should_test_due_to_failure or should_test_due_to_random_subset:
+        print(f"Selected: {changed_notebook}")
+        return True
+    else:
+        print(f"Not Selected: {changed_notebook}, pass {pass_count}, fail {fail_count}")
+        return False
 
 
 def _process_notebook(
