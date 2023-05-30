@@ -148,10 +148,10 @@ def select_notebook(changed_notebook: str,
     should_test_due_to_failure = random.uniform(0, 1) <= inferred_failure_rate
 
     # Additionally, only test a percentage of these
-    should_test_due_to_random_subset = random.uniform(0, 1) <= test_percent
+    should_test_due_to_random_subset = random.uniform(0, 1) <= (test_percent / 100)
 
     if should_test_due_to_failure or should_test_due_to_random_subset:
-        print(f"Selected: {changed_notebook}")
+        print(f"Selected: {changed_notebook}, {should_test_due_to_failure}, {should_test_due_to_random_subset}")
         return True
     else:
         print(f"Not Selected: {changed_notebook}, pass {pass_count}, fail {fail_count}")
