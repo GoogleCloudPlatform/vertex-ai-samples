@@ -133,12 +133,15 @@ def select_notebook(changed_notebook: str,
     inferred_failure_rate = fail_count / (pass_count + fail_count)
 
     # If failure rate is high, the chance of testing should be higher
-    should_test_due_to_failure = random.uniform(0, 1) < inferred_failure_rate
+    should_test_due_to_failure = random.uniform(0, 1) <= inferred_failure_rate
 
     # Additionally, only test a percentage of these
-    should_test_due_to_random_subset = random.uniform(0, 1) < test_percent
+    should_test_due_to_random_subset = random.uniform(0, 1) <= test_percent
 
-    return should_test_due_to_failure and should_test_due_to_random_subset
+    if should_test_due_to_failure or should_test_due_to_random_subset:
+        print(f"Selected: {changed_notebook}")
+    else:
+        print(f"Not Selected: {changed_notebook}, pass {pass_count}, fail {fail_count}")
 
 
 def _process_notebook(
