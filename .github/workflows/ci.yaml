@@ -22,7 +22,7 @@ jobs:
       run: |
         set +e
 
-        .github/workflows/linter/run_linter.sh -t
+        docker run -v ${PWD}:/setup/app gcr.io/cloud-devrel-public-resources/notebook_linter:latest
         RTN=$?
 
         if [ "$RTN" != "0" ]; then
@@ -30,7 +30,7 @@ jobs:
           echo "Please run the following commands locally from the root directory to attempt to autofix the issues:"
           echo ""
           echo "python3 -m pip install -U -r .github/workflows/linter/requirements.txt"
-          echo ".github/workflows/linter/run_linter.sh"
+          echo "docker run -v ${PWD}:/setup/app gcr.io/cloud-devrel-public-resources/notebook_linter:latest"
           echo ""
           echo "If it can't be autofixed, please fix them manually."
           echo "Then, commit the fixes and push again."
