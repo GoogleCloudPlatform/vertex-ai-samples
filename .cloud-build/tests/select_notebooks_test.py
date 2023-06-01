@@ -11,7 +11,7 @@ def test_load_results():
 
     print(accum)
 
-    assert accum != {}
+    assert len(accum) > 0
 
 def test_select_notebook():
     bucket: str = "cloud-build-notebooks-presubmit"
