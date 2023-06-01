@@ -1,5 +1,4 @@
 import sys
-sys.path.append("..")
 
 from execute_changed_notebooks_helper import (load_results, select_notebook)
 
