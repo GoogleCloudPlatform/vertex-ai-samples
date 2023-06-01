@@ -44,7 +44,8 @@ from utils import NotebookProcessors, util
 WORKER_TIMEOUT_BUFFER_IN_SECONDS: int = 60 * 60
 PYTHON_VERSION = "3.9"  # Set default python version
 
-MAX_RESULTS_AGE: int = (60 * 60) * 24 * 60  # 60 days
+# rolling time window for accumulating build results for selecting notebooks
+MAX_RESULTS_AGE_SECONDS: int = (60 * 60) * 24 * 60  # 60 days
 
 
 def format_timedelta(delta: datetime.timedelta) -> str:
@@ -105,7 +106,7 @@ def load_results(results_bucket: str,
         blobs = client.list_blobs(results_bucket, prefix=build_results_dir)
         for blob in blobs:
             time_created = blob.time_created.replace(tzinfo=None)
-            if (datetime.datetime.now().replace(tzinfo=None) - time_created).total_seconds() > MAX_RESULTS_AGE:
+            if (datetime.datetime.now().replace(tzinfo=None) - time_created).total_seconds() > MAX_RESULTS_AGE_SECONDS:
                 continue
 
             content = util.download_blob_into_memory(results_bucket, blob.name, download_as_text=True)
