@@ -14,5 +14,6 @@ The steps performed include:
 
 ```
 
+&nbsp;&nbsp;&nbsp;Check out the [blog for this notebook](https://cloud.google.com/blog/products/data-analytics/how-simplify-unstructured-data-analytics-using-bigquery-ml-and-vertex-ai).
 &nbsp;&nbsp;&nbsp;Learn more about [BigQuery ML inference engine](https://cloud.google.com/bigquery/docs/reference/standard-sql/inference-overview).
 
