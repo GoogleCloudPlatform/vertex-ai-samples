@@ -238,6 +238,7 @@ class ArtifactRegistryCleanupManager(ResourceCleanupManager):
             repo = line.split(' ')[0]
             if repo.startswith("my-docker-repo"):
                 ret.append(repo)
+
         return ret
 
     def delete(self, resource):
