@@ -227,7 +227,19 @@ class ArtifactRegistryCleanupManager(ResourceCleanupManager):
     vertex_ai_resource = "Artifact Registry"
 
     def list(self) -> Any:
-        return ["my-private-repo"]
+        import subprocess
+
+        result = subprocess.run(["gcloud artifacts repositories list --location=us-central1"], 
+                                shell=True, capture_output=True, text=True)
+
+        ret = []
+        lines = result.stdout.split('\n')[2:]
+        for line in lines:
+            repo = line.split(' ')[0]
+            if repo.startswith("my-docker-repo"):
+                ret.append(repo)
+
+        return ret
 
     def delete(self, resource):
         os.system(f"! gcloud artifacts repositories delete {resource} --location=us-central1")
