@@ -1,10 +1,4 @@
 steps:
-  # Show the gcloud info and check if gcloud exists
-  - name: ${_PYTHON_IMAGE}
-    entrypoint: /bin/sh
-    args:
-    - -c
-    - gcloud config list --quiet
   # Check the Python version
   - name: ${_PYTHON_IMAGE}
     entrypoint: /bin/sh
@@ -20,7 +14,7 @@ steps:
     args:
     - -c
     - python3 -m venv workspace/env
-  # Install Python dependencies and run index generation script
+  # Install Python dependencies and run testing script
   - name: ${_PYTHON_IMAGE}
     entrypoint: /bin/sh
     args:
@@ -28,6 +22,4 @@ steps:
     - |
       . workspace/env/bin/activate &&
       python3 notebooks/notebook_template_review.py --web --title -steps --desc --linkback --notebook-dir=notebooks/official
-    env:
-    - 'IS_TESTING=1'
 timeout: 86400s
