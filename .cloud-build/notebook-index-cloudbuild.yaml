@@ -21,5 +21,8 @@ steps:
     - -c
     - |
       . workspace/env/bin/activate &&
-      python3 notebooks/notebook_template_review.py --web --title -steps --desc --linkback --notebook-dir=notebooks/official
+      python3 notebooks/notebook_template_review.py --web --title -steps --desc --linkback --notebook-dir=notebooks/official >${_GCS_ARTIFACTS_BUCKET}/web.html
+artifacts:
+  objects:
+    location: ${_GCS_ARTIFACTS_BUCKET}/web.html
 timeout: 86400s
