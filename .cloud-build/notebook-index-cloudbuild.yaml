@@ -1,10 +1,4 @@
 steps:
-  # Check the Python version
-  - name: ${_PYTHON_IMAGE}
-    entrypoint: /bin/sh
-    args:
-    - -c
-    - python3 .cloud-build/CheckPythonVersion.py -q
   # Fetch full repo for diff purposes
   - name: gcr.io/cloud-builders/git
     args: [fetch, --unshallow, --quiet]
