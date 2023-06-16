@@ -62,6 +62,8 @@
 /notebooks/community/model_garden/model_garden_pytorch_dolly_v2.ipynb @lavraicse
 /notebooks/community/model_garden/model_garden_pytorch_bart_large_cnn.ipynb @lavraicse
 /notebooks/community/model_garden/model_garden_pytorch_text_to_video_zero_shot.ipynb @bingatgoogle
+/notebooks/community/model_garden/model_garden_pytorch_text_to_video.ipynb @KCFindstr
 /notebooks/community/generative_ai/text_embedding_api_semantic_search_with_scann.ipynb @henrytansetiawan
 /notebooks/community/bigquery_ml_inference/bq_ml_with_vision_translation_nlp.ipynb @deaconsmith
 /notebooks/community/model_garden/model_garden_keras_stable_diffusion.ipynb @genquan9
+/notebooks/community/model_garden/model_garden_pytorch_sam.ipynb @huguensjean
