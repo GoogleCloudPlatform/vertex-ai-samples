@@ -1,8 +1,18 @@
+'''
+READ FIRST BEFORE MAKING CHANGES
+-  Create a convention for resources created from vertex-ai-samples GH. We already have one IIRC
+- Only delete those objects as part of our clean-up script.
+- Don't run any tests on python-docs-samples-tests project, especially ones that affect resources created outside of our purview
+- Add --dry-run option to the clean-up script. This option will just output the list of resources the script will delete instead of actually deleting the resources.
+- Have a larger conversation in DEE before touching any resources that were not created as part of vertex-ai-samples
+'''
+import os
 import abc
 from typing import Any, Type
 
 from google.cloud import aiplatform
 from google.cloud.aiplatform import base
+from google.cloud import storage
 from proto.datetime_helpers import DatetimeWithNanoseconds
 
 # If a resource was updated within this number of seconds, do not delete.
@@ -69,7 +79,7 @@ class VertexAIResourceCleanupManager(ResourceCleanupManager):
     def delete(self, resource):
         resource.delete()
 
-    def get_seconds_since_modification(self, resource: Any) -> bool:
+    def get_seconds_since_modification(self, resource: Any) -> float:
         update_time = resource.update_time
         current_time = DatetimeWithNanoseconds.now(tz=update_time.tzinfo)
         return (current_time - update_time).total_seconds()
@@ -97,8 +107,6 @@ class EndpointResourceCleanupManager(VertexAIResourceCleanupManager):
     vertex_ai_resource = aiplatform.Endpoint
 
     def delete(self, resource):
-        # TODO: Remove this once https://github.com/googleapis/python-aiplatform/issues/1441 is fixed
-        resource._sync_gca_resource()
         for deployed_model_id in [
             models.id for models in resource._gca_resource.deployed_models
         ]:
@@ -120,3 +128,133 @@ class MatchingEngineIndexEndpointResourceCleanupManager(VertexAIResourceCleanupM
     def delete(self, resource):
         resource.undeploy_all()
         resource.delete(force=True)
+
+class FeatureStoreCleanupManager(VertexAIResourceCleanupManager):
+    vertex_ai_resource = aiplatform.Featurestore
+
+    def resource_name(self, resource: Any) -> str:
+        return resource.name
+
+class PipelineJobCleanupManager(VertexAIResourceCleanupManager):
+    vertex_ai_resource = aiplatform.PipelineJob
+
+class TrainingJobCleanupManager(VertexAIResourceCleanupManager):
+    vertex_ai_resource = aiplatform.training_jobs._CustomTrainingJob
+
+    job_types = [
+            aiplatform.AutoMLImageTrainingJob,
+            aiplatform.AutoMLTextTrainingJob,
+            aiplatform.AutoMLTabularTrainingJob,
+            aiplatform.AutoMLVideoTrainingJob,
+            aiplatform.AutoMLForecastingTrainingJob,
+            aiplatform.CustomJob,
+            aiplatform.CustomTrainingJob,
+            aiplatform.CustomContainerTrainingJob,
+            aiplatform.CustomPythonPackageTrainingJob
+    ]
+
+    def list(self) -> Any:
+        return [
+            job
+            for job_type in self.job_types
+            for job in job_type.list()
+        ]
+
+class HyperparameterTuningCleanupManager(VertexAIResourceCleanupManager):
+    vertex_ai_resource = aiplatform.HyperparameterTuningJob
+
+
+class BatchPredictionJobCleanupManager(VertexAIResourceCleanupManager):
+    vertex_ai_resource = aiplatform.BatchPredictionJob
+
+class ExperimentCleanupManager(VertexAIResourceCleanupManager):
+    vertex_ai_resource = aiplatform.Experiment
+
+    @property
+    def type_name(self) -> str:
+        return "Experiment"
+
+    def resource_name(self, resource: Any) -> str:
+        return resource.name
+
+    def get_seconds_since_modification(self, resource: Any) -> float:
+        update_time = resource._metadata_context.update_time
+        current_time = DatetimeWithNanoseconds.now()
+        return float(current_time.timestamp() - update_time.timestamp())
+
+class BucketCleanupManager(ResourceCleanupManager):
+    vertex_ai_resource = storage.bucket.Bucket
+
+    def list(self) -> Any:
+        storage_client = storage.Client()
+        return list(storage_client.list_buckets())
+
+    def delete(self, resource):
+        try:
+            resource.delete(force=True)
+        except Exception as e:
+            print(e)
+
+    @property
+    def type_name(self) -> str:
+        return "Bucket"
+
+    def get_seconds_since_modification(self, resource: Any) -> float:
+        # Bucket has no last_update property, only time created
+        created_time = resource.time_created
+        current_time = DatetimeWithNanoseconds.now()
+        return float(current_time.timestamp() - created_time.timestamp())
+
+    def resource_name(self, resource: Any) -> str:
+        return resource.name
+
+    def is_deletable(self, resource: Any) -> bool:
+        time_difference = self.get_seconds_since_modification(resource)
+
+        if not self.resource_name(resource).startswith('your-bucket-name'):
+            print(f"Skipping '{resource}' not a Vertex AI notebook bucket")
+            return False
+
+        # Check that it wasn't created too recently, to prevent race conditions
+        if time_difference <= RESOURCE_UPDATE_BUFFER_IN_SECONDS:
+            print(
+                f"Skipping '{resource}' due to update_time being '{time_difference}', which is less than '{RESOURCE_UPDATE_BUFFER_IN_SECONDS}'."
+            )
+            return False
+        return True
+
+class ArtifactRegistryCleanupManager(ResourceCleanupManager):
+    vertex_ai_resource = "Artifact Registry"
+
+    def list(self) -> Any:
+        import subprocess
+
+        result = subprocess.run(["gcloud artifacts repositories list --location=us-central1"], 
+                                shell=True, capture_output=True, text=True)
+
+        ret = []
+        lines = result.stdout.split('\n')[2:]
+        for line in lines:
+            repo = line.split(' ')[0]
+            if repo.startswith("my-docker-repo"):
+                ret.append(repo)
+
+        return ret
+
+    def delete(self, resource):
+        os.system(f"! gcloud artifacts repositories delete {resource} --location=us-central1")
+
+    @property
+    def type_name(self) -> str:
+        return "ArtifactRepository"
+
+    def resource_name(self, resource: Any) -> str:
+        return resource
+
+    # delete repository regardless of age
+    def get_seconds_since_modification(self, resource: Any) -> float:
+        return RESOURCE_UPDATE_BUFFER_IN_SECONDS + 1
+    
+    def is_deleteable(self, resource: Any) -> bool:
+        return True
+

@@ -17,6 +17,7 @@
 
 import argparse
 import pathlib
+import os
 
 import execute_changed_notebooks_helper
 
@@ -38,6 +39,19 @@ parser.add_argument(
     type=pathlib.Path,
     help="The path to the file that has newline-limited folders of notebooks that should be tested.",
     required=True,
+)
+parser.add_argument(
+    "--test_percent",
+    type=int,
+    help="The percent of notebooks to be tested (between 1 and 100).",
+    required=False,
+    default=100,
+)
+parser.add_argument(
+    "--build_id",
+    type=str,
+    help="The build id (which may be a Cloud Build job specific or user explicit.",
+    required=True
 )
 parser.add_argument(
     "--base_branch",
@@ -107,24 +121,52 @@ parser.add_argument(
     default=True,
     help="Should run notebooks in parallel.",
 )
+parser.add_argument(
+    "--dry_run",
+    type=str2bool,
+    default=False,
+    help="Dry run for testing - no execution",
+)
 
 args = parser.parse_args()
 
-notebooks = execute_changed_notebooks_helper.get_changed_notebooks(
+changed_notebooks = execute_changed_notebooks_helper.get_changed_notebooks(
     test_paths_file=args.test_paths_file,
     base_branch=args.base_branch,
 )
 
-execute_changed_notebooks_helper.process_and_execute_notebooks(
-    notebooks=notebooks,
-    container_uri=args.container_uri,
-    staging_bucket=args.staging_bucket,
-    artifacts_bucket=args.artifacts_bucket,
-    should_parallelize=args.should_parallelize,
-    timeout=args.timeout,
-    variable_project_id=args.variable_project_id,
-    variable_region=args.variable_region,
-    variable_service_account=args.variable_service_account,
-    variable_vpc_network=args.variable_vpc_network,
-    private_pool_id=args.private_pool_id,
+
+results_bucket = f"{args.artifacts_bucket}"
+# artifacts_bucket may get set by trigger to a full gs:// folder path
+if results_bucket.startswith("gs://"):
+    results_bucket = results_bucket[5:]
+results_bucket = results_bucket.split('/')[0]
+results_file = f"build_results/{args.build_id}.json"
+
+if args.test_percent == 100:
+    notebooks = changed_notebooks
+    accumulative_results = {}
+else:
+    accumulative_results = execute_changed_notebooks_helper.load_results(results_bucket, results_file)
+
+    notebooks = [changed_notebook for changed_notebook in changed_notebooks if execute_changed_notebooks_helper.select_notebook(changed_notebook, accumulative_results, args.test_percent)]
+
+if args.dry_run:
+    print("Dry run ...\n")
+    for notebook in notebooks:
+        print(f"Would execute: {notebook}")
+else:
+    execute_changed_notebooks_helper.process_and_execute_notebooks(
+        notebooks=notebooks,
+        container_uri=args.container_uri,
+        staging_bucket=args.staging_bucket,
+        artifacts_bucket=args.artifacts_bucket,
+        results_file=results_file,
+        should_parallelize=args.should_parallelize,
+        timeout=args.timeout,
+        variable_project_id=args.variable_project_id,
+        variable_region=args.variable_region,
+        variable_service_account=args.variable_service_account,
+        variable_vpc_network=args.variable_vpc_network,
+        private_pool_id=args.private_pool_id
 )
