@@ -234,7 +234,7 @@ def _create_tag(filepath: str) -> str:
     return tag
 
 
-rate_limit = RateLimit(max_count=10, per=60, greedy=True)
+rate_limit = RateLimit(max_count=10, per=60, greedy=False)
 
 
 def process_and_execute_notebook(
