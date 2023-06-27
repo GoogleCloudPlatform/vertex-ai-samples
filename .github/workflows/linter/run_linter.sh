@@ -84,7 +84,7 @@ if [ ${#notebooks[@]} -gt 0 ]; then
                 # python3 -m nbqa black "$notebook" --check
                 # BLACK_RTN=$?
                 echo "Running pyupgrade..."
-                python3 -m nbqa pyupgrade "$notebook"
+                python3 -m nbqa pyupgrade --py310-plus "$notebook"
                 PYUPGRADE_RTN=$?
                 echo "Running isort..."
                 python3 -m nbqa isort "$notebook" --check
