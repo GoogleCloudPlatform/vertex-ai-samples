@@ -43,3 +43,4 @@
 /experiments/get_started_with_vertex_experiments_autologging.ipynb @inardini
 /experiments/delete_outdated_tensorboard_experiments.ipynb @inardini
 /experiments/get_started_with_custom_training_autologging_local_script.ipynb @inardini
+/model_evaluation/custom_tabular_regression_model_evaluation.ipynb @inardini
