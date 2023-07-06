@@ -461,7 +461,7 @@ def process_and_execute_notebooks(
     variable_service_account: str,
     variable_vpc_network: Optional[str] = None,
     private_pool_id: Optional[str] = None,
-    rate_limit_count: Optional[int] = 10,
+    concurrent_notebooks: Optional[int] = 10,
 ):
     """
     Run the notebooks that exist under the folders defined in the test_paths_file.
@@ -492,7 +492,7 @@ def process_and_execute_notebooks(
             Required. Should run notebooks in parallel using a thread pool as opposed to in sequence.
         timeout (str):
             Required. Timeout string according to https://cloud.google.com/build/docs/build-config-file-schema#timeout.
-        rate_limit_count (int): Max number of notebooks per minute to run in parallel.
+        concurrent_notebooks (int): Max number of notebooks per minute to run in parallel.
     """
 
     # Calculate deadline
@@ -505,7 +505,7 @@ def process_and_execute_notebooks(
 
         print(f"Found {len(notebooks)} modified notebooks: {notebooks}")
 
-        rate_limit = RateLimit(max_count=rate_limit_count, per=60, greedy=False)
+        rate_limit = RateLimit(max_count=concurrent_notebooks, per=60, greedy=False)
         if should_parallelize and len(notebooks) > 1:
             print(
                 "Running notebooks in parallel, so no logs will be displayed. Please wait..."
