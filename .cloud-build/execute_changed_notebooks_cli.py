@@ -176,5 +176,5 @@ else:
         variable_service_account=args.variable_service_account,
         variable_vpc_network=args.variable_vpc_network,
         private_pool_id=args.private_pool_id,
-        rate_limit=args.rate_limit
+        rate_limit_count=args.rate_limit
 )
