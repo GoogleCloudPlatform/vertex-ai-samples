@@ -505,12 +505,12 @@ def process_and_execute_notebooks(
 
         print(f"Found {len(notebooks)} modified notebooks: {notebooks}")
 
+        rate_limit = RateLimit(max_count=rate_limit_count, per=60, greedy=False)
         if should_parallelize and len(notebooks) > 1:
             print(
                 "Running notebooks in parallel, so no logs will be displayed. Please wait..."
             )
 
-            rate_limit = RateLimit(max_count=rate_limit_count, per=60, greedy=False)
 
             with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
                 print(f"Max workers: {executor._max_workers}")
@@ -528,7 +528,7 @@ def process_and_execute_notebooks(
                             variable_vpc_network,
                             private_pool_id,
                             deadline,
-                            rate_limit_count,
+                            rate_limit,
                         ),
                         notebooks,
                     )
@@ -546,7 +546,7 @@ def process_and_execute_notebooks(
                     private_pool_id=private_pool_id,
                     deadline=deadline,
                     notebook=notebook,
-                    rate_limit=rate_limit_count,
+                    rate_limit=rate_limit,
                 )
                 for notebook in notebooks
             ]
