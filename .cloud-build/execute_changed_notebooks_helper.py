@@ -234,7 +234,6 @@ def _create_tag(filepath: str) -> str:
     return tag
 
 
-rate_limit = RateLimit(max_count=10, per=60, greedy=False)
 
 
 def process_and_execute_notebook(
@@ -247,6 +246,7 @@ def process_and_execute_notebook(
     variable_vpc_network: Optional[str],
     private_pool_id: Optional[str],
     deadline: datetime.datetime,
+    rate_limit: int,
     notebook: str,
     should_get_tail_logs: bool = False,
 ) -> NotebookExecutionResult:
@@ -461,6 +461,7 @@ def process_and_execute_notebooks(
     variable_service_account: str,
     variable_vpc_network: Optional[str] = None,
     private_pool_id: Optional[str] = None,
+    rate_limit_count: Optional[int] = 10,
 ):
     """
     Run the notebooks that exist under the folders defined in the test_paths_file.
@@ -491,6 +492,7 @@ def process_and_execute_notebooks(
             Required. Should run notebooks in parallel using a thread pool as opposed to in sequence.
         timeout (str):
             Required. Timeout string according to https://cloud.google.com/build/docs/build-config-file-schema#timeout.
+        rate_limit_count (int): Max number of notebooks per minute to run in parallel.
     """
 
     # Calculate deadline
@@ -507,6 +509,9 @@ def process_and_execute_notebooks(
             print(
                 "Running notebooks in parallel, so no logs will be displayed. Please wait..."
             )
+
+            rate_limit = RateLimit(max_count=rate_limit_count, per=60, greedy=False)
+
             with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
                 print(f"Max workers: {executor._max_workers}")
 
@@ -523,6 +528,7 @@ def process_and_execute_notebooks(
                             variable_vpc_network,
                             private_pool_id,
                             deadline,
+                            rate_limit,
                         ),
                         notebooks,
                     )
@@ -540,6 +546,7 @@ def process_and_execute_notebooks(
                     private_pool_id=private_pool_id,
                     deadline=deadline,
                     notebook=notebook,
+                    rate_limit=rate_limit,
                 )
                 for notebook in notebooks
             ]
