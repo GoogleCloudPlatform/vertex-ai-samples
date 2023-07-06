@@ -12,3 +12,4 @@
 /prediction_featurestore_integration @googleapis/vertex-prediction-team
 /vertex_vision_model_garden/model_oss/util @weigary
 /vertex_vision_model_garden/model_oss/diffusers @weigary
+/vertex_vision_model_garden/model_oss/keras @dstnluong-google
