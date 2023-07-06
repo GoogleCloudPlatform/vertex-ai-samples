@@ -528,7 +528,7 @@ def process_and_execute_notebooks(
                             variable_vpc_network,
                             private_pool_id,
                             deadline,
-                            rate_limit,
+                            rate_limit_count,
                         ),
                         notebooks,
                     )
@@ -546,7 +546,7 @@ def process_and_execute_notebooks(
                     private_pool_id=private_pool_id,
                     deadline=deadline,
                     notebook=notebook,
-                    rate_limit=rate_limit,
+                    rate_limit=rate_limit_count,
                 )
                 for notebook in notebooks
             ]
