@@ -36,7 +36,6 @@ import execute_notebook_helper
 import execute_notebook_remote
 import nbformat
 from google.cloud.devtools.cloudbuild_v1.types import BuildOperationMetadata
-from ratemate import RateLimit
 from tabulate import tabulate
 from utils import NotebookProcessors, util
 
@@ -246,11 +245,9 @@ def process_and_execute_notebook(
     variable_vpc_network: Optional[str],
     private_pool_id: Optional[str],
     deadline: datetime.datetime,
-    rate_limit: int,
     notebook: str,
     should_get_tail_logs: bool = False,
 ) -> NotebookExecutionResult:
-    rate_limit.wait()  # wait before creating the task
 
     print(f"Running notebook: {notebook}")
 
@@ -505,14 +502,13 @@ def process_and_execute_notebooks(
 
         print(f"Found {len(notebooks)} modified notebooks: {notebooks}")
 
-        rate_limit = RateLimit(max_count=concurrent_notebooks, per=60, greedy=False)
         if should_parallelize and len(notebooks) > 1:
             print(
                 "Running notebooks in parallel, so no logs will be displayed. Please wait..."
             )
 
 
-            with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=concurrent_notebooks) as executor:
                 print(f"Max workers: {executor._max_workers}")
 
                 notebook_execution_results = list(
@@ -528,7 +524,6 @@ def process_and_execute_notebooks(
                             variable_vpc_network,
                             private_pool_id,
                             deadline,
-                            rate_limit,
                         ),
                         notebooks,
                     )
@@ -546,7 +541,6 @@ def process_and_execute_notebooks(
                     private_pool_id=private_pool_id,
                     deadline=deadline,
                     notebook=notebook,
-                    rate_limit=rate_limit,
                 )
                 for notebook in notebooks
             ]
