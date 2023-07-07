@@ -27,8 +27,8 @@ from PIL import Image
 import torch
 from ts.torch_handler.base_handler import BaseHandler
 
-from google3.cloud.ml.applications.vision.model_garden.model_oss.util import constants
-from google3.cloud.ml.applications.vision.model_garden.model_oss.util import fileutils
+from util import constants
+from util import fileutils
 
 STABLE_DIFFUSION_MODEL = "runwayml/stable-diffusion-v1-5"
 
