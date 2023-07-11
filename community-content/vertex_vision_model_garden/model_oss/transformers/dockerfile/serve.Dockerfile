@@ -4,8 +4,8 @@
 # docker build -f model_oss/transformers/dockerfile/serve.Dockerfile . -t ${YOUR_IMAGE_TAG}
 #
 # To push to gcr:
-# docker tag ${YOUR_IMAGE_TAG} gcr.io/{YOUR_PROJECT}/${YOUR_IMAGE_TAG}
-# docker push gcr.io/{YOUR_PROJECT}/${YOUR_IMAGE_TAG}
+# docker tag ${YOUR_IMAGE_TAG} gcr.io/${YOUR_PROJECT}/${YOUR_IMAGE_TAG}
+# docker push gcr.io/${YOUR_PROJECT}/${YOUR_IMAGE_TAG}
 # Switch to this base image for gpu serve.
 
 FROM pytorch/torchserve:0.7.0-gpu
