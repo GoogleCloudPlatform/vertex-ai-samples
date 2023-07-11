@@ -4,8 +4,8 @@
 # docker build -f model_oss/keras/dockerfile/serve.Dockerfile . -t ${YOUR_IMAGE_TAG}
 #
 # To push to gcr:
-# docker tag ${YOUR_IMAGE_TAG} gcr.io/{YOUR_PROJECT}/${YOUR_IMAGE_TAG}
-# docker push gcr.io/{YOUR_PROJECT}/${YOUR_IMAGE_TAG}
+# docker tag ${YOUR_IMAGE_TAG} gcr.io/${YOUR_PROJECT}/${YOUR_IMAGE_TAG}
+# docker push gcr.io/${YOUR_PROJECT}/${YOUR_IMAGE_TAG}
 
 FROM tensorflow/tensorflow:2.12.0-gpu
 
