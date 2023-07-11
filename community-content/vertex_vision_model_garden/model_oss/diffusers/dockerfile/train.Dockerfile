@@ -4,8 +4,8 @@
 # docker build -f model_oss/diffusers/dockerfile/train.Dockerfile . -t ${YOUR_IMAGE_TAG}
 #
 # To push to gcr:
-# docker tag ${YOUR_IMAGE_TAG} gcr.io/{YOUR_PROJECT}/${YOUR_IMAGE_TAG}
-# docker push gcr.io/{YOUR_PROJECT}/${YOUR_IMAGE_TAG}
+# docker tag ${YOUR_IMAGE_TAG} gcr.io/${YOUR_PROJECT}/${YOUR_IMAGE_TAG}
+# docker push gcr.io/${YOUR_PROJECT}/${YOUR_IMAGE_TAG}
 
 # Base on pytorch-cuda image.
 FROM pytorch/pytorch:1.13.0-cuda11.6-cudnn8-runtime
