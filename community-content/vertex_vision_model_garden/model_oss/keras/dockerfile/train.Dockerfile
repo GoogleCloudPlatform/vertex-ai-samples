@@ -1,7 +1,7 @@
 # Dockerfile for basic training dockers with tfvision.
 #
 # To build:
-# docker build -f docker/keras/train.Dockerfile . -t ${YOUR_IMAGE_TAG}
+# docker build -f model_oss/keras/dockerfile/train.Dockerfile . -t ${YOUR_IMAGE_TAG}
 #
 # To push to gcr:
 # docker tag ${YOUR_IMAGE_TAG} gcr.io/{YOUR_PROJECT}/${YOUR_IMAGE_TAG}
