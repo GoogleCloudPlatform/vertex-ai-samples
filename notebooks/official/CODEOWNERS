@@ -34,7 +34,7 @@
 /workbench/spark/spark_sample_notebook.ipynb @bradmiro
 /workbench/spark/spark_ml.ipynb @bradmiro
 /model_registry/bqml_vertexai_model_registry.ipynb @soheilazangeneh
-/model_evaluation/automl_tabular_classification_model_evaluation.ipynb @soheilazangeneh @inardini
+/model_evaluation/automl_tabular_classification_model_evaluation.ipynb @soheilazangeneh @inardini @kevinbnaughton
 /model_evaluation/automl_tabular_regression_model_evaluation.ipynb @soheilazangeneh
 /tabular_workflows/prophet_on_vertex_pipelines.ipynb @TheMichaelHu
 /model_evaluation/custom_tabular_classification_model_evaluation.ipynb @soheilazangeneh
