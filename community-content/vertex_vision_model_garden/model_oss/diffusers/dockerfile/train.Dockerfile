@@ -4,8 +4,8 @@
 # docker build -f model_oss/diffusers/dockerfile/train.Dockerfile . -t ${YOUR_IMAGE_TAG}
 #
 # To push to gcr:
-# docker tag ${YOUR_IMAGE_TAG} gcr.io/{YOUR_PROJECT}/${YOUR_IMAGE_TAG}
-# docker push gcr.io/{YOUR_PROJECT}/${YOUR_IMAGE_TAG}
+# docker tag ${YOUR_IMAGE_TAG} gcr.io/${YOUR_PROJECT}/${YOUR_IMAGE_TAG}
+# docker push gcr.io/${YOUR_PROJECT}/${YOUR_IMAGE_TAG}
 
 # Base on pytorch-cuda image.
 FROM pytorch/pytorch:1.13.0-cuda11.6-cudnn8-runtime
@@ -31,7 +31,14 @@ RUN pip install Jinja2==3.1.2
 RUN pip install ftfy==6.1.1
 RUN pip install cloudml-hypertune==0.1.0.dev6
 RUN pip install tensorboard==2.12.0
-RUN pip install diffusers==0.17.1
+
+# Install diffusers from main branch source code with a pinned commit.
+RUN git clone --depth 1 --branch v0.18.1 https://github.com/huggingface/diffusers.git
+WORKDIR diffusers
+RUN pip install -e .
+
+# Switch to diffusers examples folder.
+WORKDIR examples
 
 # Config accelerate.
 COPY model_oss/diffusers/train.sh train.sh

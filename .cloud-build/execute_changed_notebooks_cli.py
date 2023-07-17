@@ -124,7 +124,7 @@ parser.add_argument(
 parser.add_argument(
     "--concurrent_notebooks",
     type=int,
-    help="Maximu number of parallel notebook executions per minute",
+    help="Maximum number of parallel notebook executions per minute",
     default=10,
     required=False,
 )

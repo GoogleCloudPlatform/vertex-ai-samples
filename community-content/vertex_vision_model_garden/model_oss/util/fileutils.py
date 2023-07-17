@@ -6,7 +6,7 @@ import os
 from absl import logging
 from google.cloud import storage
 
-from google3.cloud.ml.applications.vision.model_garden.model_oss.util import constants
+from util import constants
 
 
 def download_gcs_file_to_local(gcs_uri: str, local_path: str):

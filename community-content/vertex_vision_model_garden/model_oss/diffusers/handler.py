@@ -4,10 +4,9 @@
 # pylint: disable=logging-fstring-interpolation
 
 import base64
-import io
 import logging
 import os
-from typing import Any, List, Sequence, Tuple
+from typing import Any, List, Tuple
 
 from diffusers import ControlNetModel
 from diffusers import DiffusionPipeline
@@ -21,14 +20,15 @@ from diffusers import StableDiffusionPipeline
 from diffusers import StableDiffusionUpscalePipeline
 from diffusers import TextToVideoZeroPipeline
 from diffusers import UniPCMultistepScheduler
-import imageio
 import numpy as np
 from PIL import Image
 import torch
 from ts.torch_handler.base_handler import BaseHandler
 
-from google3.cloud.ml.applications.vision.model_garden.model_oss.util import constants
-from google3.cloud.ml.applications.vision.model_garden.model_oss.util import fileutils
+from util import constants
+from util import fileutils
+from util import image_format_converter
+from video_util import video_format_converter
 
 STABLE_DIFFUSION_MODEL = "runwayml/stable-diffusion-v1-5"
 
@@ -41,13 +41,6 @@ CONTROLNET = "controlnet"
 CONDITIONED_SUPER_RES = "conditioned-super-res"
 TEXT_TO_VIDEO_ZERO_SHOT = "text-to-video-zero-shot"
 TEXT_TO_VIDEO = "text-to-video"
-
-
-def frames_to_video_bytes(frames: Sequence[np.ndarray], fps: int) -> bytes:
-  images = [Image.fromarray(array) for array in frames]
-  io_obj = io.BytesIO()
-  imageio.mimsave(io_obj, images, format=".mp4", fps=fps)
-  return io_obj.getvalue()
 
 
 class DiffusersHandler(BaseHandler):
@@ -175,18 +168,6 @@ class DiffusersHandler(BaseHandler):
     self.initialized = True
     logging.info("Handler initialization done.")
 
-  def _image_to_base64(self, image: Image.Image) -> str:
-    """Convert a PIL image to a base64 string."""
-    buffer = io.BytesIO()
-    image.save(buffer, format="JPEG")
-    image_str = base64.b64encode(buffer.getvalue()).decode("utf-8")
-    return image_str
-
-  def _base64_to_image(self, image_str: str) -> Image.Image:
-    """Convert a base64 string to a PIL image."""
-    image = Image.open(io.BytesIO(base64.b64decode(image_str)))
-    return image
-
   def preprocess(self, data: Any) -> Tuple[Any, Any, Any]:
     """Preprocess input data."""
     prompts = [item["prompt"] for item in data]
@@ -194,9 +175,14 @@ class DiffusersHandler(BaseHandler):
     mask_images = None
 
     if "image" in data[0]:
-      images = [self._base64_to_image(item["image"]) for item in data]
+      images = [
+          image_format_converter.base64_to_image(item["image"]) for item in data
+      ]
     if "mask_image" in data[0]:
-      mask_images = [self._base64_to_image(item["mask_image"]) for item in data]
+      mask_images = [
+          image_format_converter.base64_to_image(item["mask_image"])
+          for item in data
+      ]
     return prompts, images, mask_images
 
   def inference(self, data: Any, *args, **kwargs) -> List[Image.Image]:
@@ -223,15 +209,13 @@ class DiffusersHandler(BaseHandler):
     elif self.task == TEXT_TO_VIDEO_ZERO_SHOT:
       # For each given prompt, generate a short video.
       # The pipeline doesn't support multiple prompts in one run yet.
-      # vv-docker:google3-begin(internal)
-      # TODO(b/286955587): Improve zero-shot text-to-video by exporting video
-      #   files to customer provided gcs path and tuning the model quality.
-      # vv-docker:google3-end
       videos = []
       for prompt in prompts:
         numpy_arrays = self.pipeline(prompt=prompt).images
         numpy_arrays = [(i * 255).astype("uint8") for i in numpy_arrays]
-        videos.append(frames_to_video_bytes(numpy_arrays, fps=4))
+        videos.append(
+            video_format_converter.frames_to_video_bytes(numpy_arrays, fps=4)
+        )
       return videos
     elif self.task == TEXT_TO_VIDEO:
       predicted_images = np.asarray(self.pipeline(prompt=prompts).frames)
@@ -240,7 +224,8 @@ class DiffusersHandler(BaseHandler):
       # Therefore we need to split the output into different videos.
       predicted_images = np.array_split(predicted_images, len(prompts), axis=2)
       videos = [
-          frames_to_video_bytes(images, fps=8) for images in predicted_images
+          video_format_converter.frames_to_video_bytes(images, fps=8)
+          for images in predicted_images
       ]
       return videos
     else:
@@ -255,7 +240,7 @@ class DiffusersHandler(BaseHandler):
         # This is the video bytes.
         outputs.append(base64.b64encode(prediction).decode("utf-8"))
       else:
-        outputs.append(self._image_to_base64(prediction))
+        outputs.append(image_format_converter.image_to_base64(prediction))
     return outputs
 
 
