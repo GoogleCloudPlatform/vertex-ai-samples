@@ -1,4 +1,4 @@
-# Dockerfile for basic training dockers with tfvision.
+# Dockerfile for basic training dockers with Keras.
 #
 # To build:
 # docker build -f model_oss/keras/dockerfile/train.Dockerfile . -t ${YOUR_IMAGE_TAG}
