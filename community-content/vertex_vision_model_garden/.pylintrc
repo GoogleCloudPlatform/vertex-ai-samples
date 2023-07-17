@@ -1,0 +1,4 @@
+[MASTER]
+
+generated-members=get_concrete_function,cv2.*
+ignored-modules=tensorflow,google.cloud

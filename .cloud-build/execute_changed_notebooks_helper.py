@@ -36,7 +36,6 @@ import execute_notebook_helper
 import execute_notebook_remote
 import nbformat
 from google.cloud.devtools.cloudbuild_v1.types import BuildOperationMetadata
-from ratemate import RateLimit
 from tabulate import tabulate
 from utils import NotebookProcessors, util
 
@@ -234,7 +233,6 @@ def _create_tag(filepath: str) -> str:
     return tag
 
 
-rate_limit = RateLimit(max_count=10, per=60, greedy=False)
 
 
 def process_and_execute_notebook(
@@ -250,7 +248,6 @@ def process_and_execute_notebook(
     notebook: str,
     should_get_tail_logs: bool = False,
 ) -> NotebookExecutionResult:
-    rate_limit.wait()  # wait before creating the task
 
     print(f"Running notebook: {notebook}")
 
@@ -461,6 +458,7 @@ def process_and_execute_notebooks(
     variable_service_account: str,
     variable_vpc_network: Optional[str] = None,
     private_pool_id: Optional[str] = None,
+    concurrent_notebooks: Optional[int] = 10,
 ):
     """
     Run the notebooks that exist under the folders defined in the test_paths_file.
@@ -491,6 +489,7 @@ def process_and_execute_notebooks(
             Required. Should run notebooks in parallel using a thread pool as opposed to in sequence.
         timeout (str):
             Required. Timeout string according to https://cloud.google.com/build/docs/build-config-file-schema#timeout.
+        concurrent_notebooks (int): Max number of notebooks per minute to run in parallel.
     """
 
     # Calculate deadline
@@ -507,7 +506,9 @@ def process_and_execute_notebooks(
             print(
                 "Running notebooks in parallel, so no logs will be displayed. Please wait..."
             )
-            with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
+
+
+            with concurrent.futures.ThreadPoolExecutor(max_workers=concurrent_notebooks) as executor:
                 print(f"Max workers: {executor._max_workers}")
 
                 notebook_execution_results = list(

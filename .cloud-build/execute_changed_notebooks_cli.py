@@ -122,6 +122,13 @@ parser.add_argument(
     help="Should run notebooks in parallel.",
 )
 parser.add_argument(
+    "--concurrent_notebooks",
+    type=int,
+    help="Maximum number of parallel notebook executions per minute",
+    default=10,
+    required=False,
+)
+parser.add_argument(
     "--dry_run",
     type=str2bool,
     default=False,
@@ -168,5 +175,6 @@ else:
         variable_region=args.variable_region,
         variable_service_account=args.variable_service_account,
         variable_vpc_network=args.variable_vpc_network,
-        private_pool_id=args.private_pool_id
+        private_pool_id=args.private_pool_id,
+        concurrent_notebooks=args.concurrent_notebooks,
 )
