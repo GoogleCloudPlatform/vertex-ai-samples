@@ -4,9 +4,10 @@
 # pylint: disable=logging-fstring-interpolation
 
 import base64
+import io
 import logging
 import os
-from typing import Any, List, Tuple
+from typing import Any, List, Sequence, Tuple
 
 from diffusers import ControlNetModel
 from diffusers import DiffusionPipeline
@@ -20,6 +21,7 @@ from diffusers import StableDiffusionPipeline
 from diffusers import StableDiffusionUpscalePipeline
 from diffusers import TextToVideoZeroPipeline
 from diffusers import UniPCMultistepScheduler
+import imageio
 import numpy as np
 from PIL import Image
 import torch
@@ -41,6 +43,13 @@ CONTROLNET = "controlnet"
 CONDITIONED_SUPER_RES = "conditioned-super-res"
 TEXT_TO_VIDEO_ZERO_SHOT = "text-to-video-zero-shot"
 TEXT_TO_VIDEO = "text-to-video"
+
+
+def frames_to_video_bytes(frames: Sequence[np.ndarray], fps: int) -> bytes:
+  images = [Image.fromarray(array) for array in frames]
+  io_obj = io.BytesIO()
+  imageio.mimsave(io_obj, images, format=".mp4", fps=fps)
+  return io_obj.getvalue()
 
 
 class DiffusersHandler(BaseHandler):
@@ -214,7 +223,7 @@ class DiffusersHandler(BaseHandler):
         numpy_arrays = self.pipeline(prompt=prompt).images
         numpy_arrays = [(i * 255).astype("uint8") for i in numpy_arrays]
         videos.append(
-            video_format_converter.frames_to_video_bytes(numpy_arrays, fps=4)
+            frames_to_video_bytes(numpy_arrays, fps=4)
         )
       return videos
     elif self.task == TEXT_TO_VIDEO:
@@ -224,7 +233,7 @@ class DiffusersHandler(BaseHandler):
       # Therefore we need to split the output into different videos.
       predicted_images = np.array_split(predicted_images, len(prompts), axis=2)
       videos = [
-          video_format_converter.frames_to_video_bytes(images, fps=8)
+          frames_to_video_bytes(images, fps=8)
           for images in predicted_images
       ]
       return videos
