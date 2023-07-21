@@ -74,3 +74,4 @@
 /notebooks/community/model_garden/model_garden_keras_stable_diffusion.ipynb @genquan9
 /notebooks/community/model_garden/model_garden_pytorch_sam.ipynb @huguensjean
 /notebooks/community/model_garden/model_garden_pytorch_peft.ipynb @genquan9
+/notebooks/community/model_garden/model_garden_pytorch_openllama_peft.ipynb @genquan9
