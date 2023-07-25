@@ -36,13 +36,15 @@ import execute_notebook_helper
 import execute_notebook_remote
 import nbformat
 from google.cloud.devtools.cloudbuild_v1.types import BuildOperationMetadata
-from ratemate import RateLimit
 from tabulate import tabulate
 from utils import NotebookProcessors, util
 
 # A buffer so that workers finish before the orchestrating job
 WORKER_TIMEOUT_BUFFER_IN_SECONDS: int = 60 * 60
 PYTHON_VERSION = "3.9"  # Set default python version
+
+# rolling time window for accumulating build results for selecting notebooks
+MAX_RESULTS_AGE_SECONDS: int = (60 * 60) * 24 * 60  # 60 days
 
 
 def format_timedelta(delta: datetime.timedelta) -> str:
@@ -86,8 +88,9 @@ class NotebookExecutionResult:
         else:
             return None
 
+
 def load_results(results_bucket: str,
-        results_file: str) -> Dict[str,Any]:
+                 results_file: str) -> Dict[str, Any]:
     '''
     Load accumulated notebook test results
     '''
@@ -95,8 +98,29 @@ def load_results(results_bucket: str,
     print("Loading existing accumulative results ...")
     accumulative_results = {}
     try:
-        content = util.download_blob_into_memory(results_bucket, results_file, download_as_text=True)
-        accumulative_results = json.loads(content)
+        client = storage.Client()
+        bucket = client.bucket(results_bucket)
+
+        build_results_dir = os.path.dirname(results_file)
+        blobs = client.list_blobs(results_bucket, prefix=build_results_dir)
+        for blob in blobs:
+            time_created = blob.time_created.replace(tzinfo=None)
+            if (datetime.datetime.now().replace(tzinfo=None) - time_created).total_seconds() > MAX_RESULTS_AGE_SECONDS:
+                continue
+
+            content = util.download_blob_into_memory(results_bucket, blob.name, download_as_text=True)
+
+            try:
+                build_results = json.loads(content)
+            except:
+                continue  # skip corrupted build results files
+            for notebook in build_results:
+                if notebook in accumulative_results:
+                    accumulative_results[notebook]['passed'] += build_results[notebook]['passed']
+                    accumulative_results[notebook]['failed'] += build_results[notebook]['failed']
+                else:
+                    accumulative_results[notebook] = build_results[notebook]
+
         print(accumulative_results)
     except Exception as e:
         print(e)
@@ -118,7 +142,20 @@ def select_notebook(changed_notebook: str,
         pass_count = 1
         fail_count = 0
 
-    return (random.randint(1, 100) * (1 + (fail_count / (pass_count + fail_count))) < test_percent)
+    inferred_failure_rate = fail_count / (pass_count + fail_count)
+
+    # If failure rate is high, the chance of testing should be higher
+    should_test_due_to_failure = random.uniform(0, 1) <= inferred_failure_rate
+
+    # Additionally, only test a percentage of these
+    should_test_due_to_random_subset = random.uniform(0, 1) <= (test_percent / 100)
+
+    if should_test_due_to_failure or should_test_due_to_random_subset:
+        print(f"Selected: {changed_notebook}, {should_test_due_to_failure}, {should_test_due_to_random_subset}")
+        return True
+    else:
+        print(f"Not Selected: {changed_notebook}, pass {pass_count}, fail {fail_count}")
+        return False
 
 
 def _process_notebook(
@@ -196,7 +233,6 @@ def _create_tag(filepath: str) -> str:
     return tag
 
 
-rate_limit = RateLimit(max_count=10, per=60, greedy=True)
 
 
 def process_and_execute_notebook(
@@ -212,7 +248,6 @@ def process_and_execute_notebook(
     notebook: str,
     should_get_tail_logs: bool = False,
 ) -> NotebookExecutionResult:
-    rate_limit.wait()  # wait before creating the task
 
     print(f"Running notebook: {notebook}")
 
@@ -379,39 +414,30 @@ def get_changed_notebooks(
     return notebooks
 
 def _save_results(results: List[NotebookExecutionResult],
-                  accumulative_results: Dict[str,Any],
                   artifacts_bucket: str,
                   results_file: str):
 
     artifacts_bucket = artifacts_bucket.replace("gs://", "").split('/')[0]
 
-    print("Updating accumulative results ...")
+    print("Updating build results ...")
+    build_results = {}
     for result in results:
-        if result.path in accumulative_results:
-            accumulative_results[result.path]['duration'] = result.duration.total_seconds()
-            accumulative_results[result.path]['start_time'] = str(result.start_time)
-            if result.is_pass:
-                accumulative_results[result.path]['passed'] += 1
-            else:
-                accumulative_results[result.path]['failed'] += 1
-            print(f"updating {result.path}")
+        if result.is_pass:
+            pass_count = 1
+            fail_count = 0
         else:
-            if result.is_pass:
-                pass_count = 1
-                fail_count = 0
-            else:
-                pass_count = 0
-                fail_count = 1
-            accumulative_results[result.path] = {
-                    'duration': result.duration.total_seconds(),
-                    'start_time': str(result.start_time),
-                    'passed': pass_count,
-                    'failed': fail_count
-                    }
-            print(f"adding {result.path}")
+            pass_count = 0
+            fail_count = 1
+        build_results[result.path] = {
+                'duration': result.duration.total_seconds(),
+                'start_time': str(result.start_time),
+                'passed': pass_count,
+                'failed': fail_count
+        }
+        print(f"adding {result.path}")
 
     print("Saving accumulative results ...")
-    content = json.dumps(accumulative_results)
+    content = json.dumps(build_results)
 
     client = storage.Client()
     bucket = client.get_bucket(artifacts_bucket)
@@ -425,7 +451,6 @@ def process_and_execute_notebooks(
     staging_bucket: str,
     artifacts_bucket: str,
     results_file: str,
-    accumulative_results: List[NotebookExecutionResult],
     should_parallelize: bool,
     timeout: int,
     variable_project_id: str,
@@ -433,6 +458,7 @@ def process_and_execute_notebooks(
     variable_service_account: str,
     variable_vpc_network: Optional[str] = None,
     private_pool_id: Optional[str] = None,
+    concurrent_notebooks: Optional[int] = 10,
 ):
     """
     Run the notebooks that exist under the folders defined in the test_paths_file.
@@ -455,8 +481,6 @@ def process_and_execute_notebooks(
             Required. The GCS staging bucket to write executed notebooks to.
         results_file (str):
             Required: The path to the artifacts bucket to save results 
-        accumulative_results (List):
-            Required: The in-memory previous accumulative notebook CI/CD test results.
         variable_project_id (str):
             Required. The value for PROJECT_ID to inject into notebooks.
         variable_region (str):
@@ -465,6 +489,7 @@ def process_and_execute_notebooks(
             Required. Should run notebooks in parallel using a thread pool as opposed to in sequence.
         timeout (str):
             Required. Timeout string according to https://cloud.google.com/build/docs/build-config-file-schema#timeout.
+        concurrent_notebooks (int): Max number of notebooks per minute to run in parallel.
     """
 
     # Calculate deadline
@@ -481,7 +506,9 @@ def process_and_execute_notebooks(
             print(
                 "Running notebooks in parallel, so no logs will be displayed. Please wait..."
             )
-            with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
+
+
+            with concurrent.futures.ThreadPoolExecutor(max_workers=concurrent_notebooks) as executor:
                 print(f"Max workers: {executor._max_workers}")
 
                 notebook_execution_results = list(
@@ -578,7 +605,6 @@ def process_and_execute_notebooks(
                 print(log_contents)
 
         _save_results(results_sorted, 
-                      accumulative_results,
                       artifacts_bucket, 
                       results_file)
 

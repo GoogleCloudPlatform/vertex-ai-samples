@@ -6,6 +6,7 @@ READ FIRST BEFORE MAKING CHANGES
 - Add --dry-run option to the clean-up script. This option will just output the list of resources the script will delete instead of actually deleting the resources.
 - Have a larger conversation in DEE before touching any resources that were not created as part of vertex-ai-samples
 '''
+import os
 import abc
 from typing import Any, Type
 
@@ -220,5 +221,40 @@ class BucketCleanupManager(ResourceCleanupManager):
                 f"Skipping '{resource}' due to update_time being '{time_difference}', which is less than '{RESOURCE_UPDATE_BUFFER_IN_SECONDS}'."
             )
             return False
-
         return True
+
+class ArtifactRegistryCleanupManager(ResourceCleanupManager):
+    vertex_ai_resource = "Artifact Registry"
+
+    def list(self) -> Any:
+        import subprocess
+
+        result = subprocess.run(["gcloud artifacts repositories list --location=us-central1"], 
+                                shell=True, capture_output=True, text=True)
+
+        ret = []
+        lines = result.stdout.split('\n')[2:]
+        for line in lines:
+            repo = line.split(' ')[0]
+            if repo.startswith("my-docker-repo"):
+                ret.append(repo)
+
+        return ret
+
+    def delete(self, resource):
+        os.system(f"! gcloud artifacts repositories delete {resource} --location=us-central1")
+
+    @property
+    def type_name(self) -> str:
+        return "ArtifactRepository"
+
+    def resource_name(self, resource: Any) -> str:
+        return resource
+
+    # delete repository regardless of age
+    def get_seconds_since_modification(self, resource: Any) -> float:
+        return RESOURCE_UPDATE_BUFFER_IN_SECONDS + 1
+    
+    def is_deleteable(self, resource: Any) -> bool:
+        return True
+
