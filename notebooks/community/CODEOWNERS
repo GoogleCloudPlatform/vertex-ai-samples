@@ -44,7 +44,9 @@
 /notebooks/community/feature_store/get_started_vertex_feature_store.ipynb @junkourata
 /notebooks/community/model_garden/model_garden_huggingface_local_inference.ipynb @dstnluong-google
 /notebooks/community/model_garden/model_garden_mediapipe_image_classification.ipynb @schmidt-sebastian
+/notebooks/community/model_garden/model_garden_mediapipe_gesture_recognition.ipynb @schmidt-sebastian
 /notebooks/community/model_garden/model_garden_mediapipe_object_detection.ipynb @schmidt-sebastian
+/notebooks/community/model_garden/model_garden_mediapipe_text_classification.ipynb @schmidt-sebastian
 /notebooks/community/model_garden/model_garden_proprietary_image_classification.ipynb @weigary
 /notebooks/community/model_garden/model_garden_proprietary_image_object_detection.ipynb @weigary
 /notebooks/community/model_garden/model_garden_tfvision_image_classification.ipynb @genquan9
@@ -73,4 +75,9 @@
 /notebooks/community/bigquery_ml_inference/bq_ml_with_vision_translation_nlp.ipynb @deaconsmith
 /notebooks/community/model_garden/model_garden_keras_stable_diffusion.ipynb @genquan9
 /notebooks/community/model_garden/model_garden_pytorch_sam.ipynb @huguensjean
+/notebooks/community/model_garden/model_garden_pytorch_pic2word.ipynb @jismailyan
 /notebooks/community/model_garden/model_garden_pytorch_peft.ipynb @genquan9
+/notebooks/community/model_garden/model_garden_pytorch_openllama_peft.ipynb @genquan9
+/notebooks/community/model_garden/model_garden_pytorch_falcon_instruct_peft.ipynb @genquan9
+/notebooks/community/model_garden/model_garden_movinet_clip_classification.ipynb @KCFindstr
+
