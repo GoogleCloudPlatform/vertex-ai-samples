@@ -14,3 +14,4 @@
 /vertex_vision_model_garden/model_oss/diffusers @weigary
 /vertex_vision_model_garden/model_oss/keras @dstnluong-google
 /vertex_vision_model_garden/model_oss/transformers @dstnluong-google
+/vertex_vision_model_garden/model_oss/pic2word @jismailyan-google
