@@ -15,7 +15,7 @@ import torch
 from torch.utils.data import DataLoader
 from ts.torch_handler.base_handler import BaseHandler
 
-from google3.cloud.ml.applications.vision.model_garden.model_oss.util import fileutils
+from util import fileutils
 
 # The COCO dataset is stored in a publicly accessible bucket.
 _COCO_STORAGE_DIR = "gs://pic2word-bucket/data/coco/"
