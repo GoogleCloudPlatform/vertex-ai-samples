@@ -1,7 +1,7 @@
 # Dockerfile for training dockers with OpenCLIP.
 #
 # To build:
-# docker build -f dockerfile/train.Dockerfile . -t ${YOUR_IMAGE_TAG}
+# docker build -f model_oss/open_clilp/dockerfile/train.Dockerfile . -t ${YOUR_IMAGE_TAG}
 #
 # To push to gcr:
 # docker tag ${YOUR_IMAGE_TAG} gcr.io/${YOUR_PROJECT}/${YOUR_IMAGE_TAG}
