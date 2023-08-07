@@ -4,6 +4,8 @@
 OBJECTIVE_IMAGE_CLASSIFICATION = 'icn'
 OBJECTIVE_IMAGE_OBJECT_DETECTION = 'iod'
 OBJECTIVE_IMAGE_SEGMENTATION = 'isg'
+OBJECTIVE_VIDEO_CLASSIFICATION = 'vcn'
+OBJECTIVE_VIDEO_ACTION_RECOGNITION = 'var'
 
 # Input file types.
 INPUT_FILE_TYPE_CSV = 'csv'
@@ -61,4 +63,11 @@ GCSFUSE_URI_PREFIX = '/gcs/'
 
 LOCAL_EVALUATION_RESULT_DIR = '/tmp/evaluation_result_dir'
 LOCAL_MODEL_DIR = '/tmp/model_dir'
+LOCAL_BASE_MODEL_DIR = '/tmp/base_model_dir'
 LOCAL_DATA_DIR = '/tmp/data'
+
+# PEFT finetuning constants.
+TEXT_TO_IMAGE_LORA = 'text-to-image-lora'
+SEQUENCE_CLASSIFICATION_LORA = 'sequence-classification-lora'
+CAUSAL_LANGUAGE_MODELING_LORA = 'causal-language-modeling-lora'
+INSTRUCT_LORA = 'instruct-lora'

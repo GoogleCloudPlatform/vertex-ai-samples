@@ -15,3 +15,5 @@
 /vertex_vision_model_garden/model_oss/keras @dstnluong-google
 /vertex_vision_model_garden/model_oss/transformers @dstnluong-google
 /vertex_vision_model_garden/model_oss/pic2word @jismailyan-google
+/vertex_vision_model_garden/model_oss/movinet @KCFindstr
+/vertex_vision_model_garden/model_oss/data_converter @KCFindstr
