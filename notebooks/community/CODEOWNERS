@@ -74,6 +74,7 @@
 /notebooks/community/generative_ai/text_embedding_api_semantic_search_with_scann.ipynb @henrytansetiawan
 /notebooks/community/bigquery_ml_inference/bq_ml_with_vision_translation_nlp.ipynb @deaconsmith
 /notebooks/community/model_garden/model_garden_keras_stable_diffusion.ipynb @genquan9
+/notebooks/community/model_garden/model_garden_keras_yolov8.ipynb @@dstnluong-google
 /notebooks/community/model_garden/model_garden_pytorch_sam.ipynb @huguensjean
 /notebooks/community/model_garden/model_garden_pytorch_pic2word.ipynb @jismailyan
 /notebooks/community/model_garden/model_garden_pytorch_peft.ipynb @genquan9
