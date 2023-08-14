@@ -1,4 +1,4 @@
-# These owners will be the default owners for everything in
+/# These owners will be the default owners for everything in
 # the repo. Unless a later match takes precedence,
 # @global-owner1 and @global-owner2 will be requested for
 # review when someone opens a pull request.
@@ -55,6 +55,7 @@
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion.ipynb @xiangxu-google
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_2_1.ipynb @bingatgoogle
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_inpainting.ipynb @xiangxu-google
+/notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_xl_1_0.ipynb @bingatgoogle
 /notebooks/community/model_garden/model_garden_pytorch_instructpix2pix.ipynb @xiangxu-google
 /notebooks/community/model_garden/model_garden_pytorch_controlnet.ipynb @xiangxu-google
 /notebooks/community/model_garden/model_garden_pytorch_blip_image_captioning.ipynb @xiangxu-google
