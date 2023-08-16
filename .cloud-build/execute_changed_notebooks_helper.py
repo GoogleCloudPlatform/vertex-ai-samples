@@ -47,6 +47,22 @@ PYTHON_VERSION = "3.9"  # Set default python version
 MAX_RESULTS_AGE_SECONDS: int = (60 * 60) * 24 * 60  # 60 days
 
 
+import re
+import nbformat
+
+
+def check_regex_in_notebook(notebook_path: str, regex: str):
+    """Checks if the given regex exists in the notebook."""
+    nb = nbformat.read(notebook_path, as_version=4)
+    cells = nb["cells"]
+    for cell in cells:
+        if cell["cell_type"] == "code":
+            match = re.search(regex, cell["source"])
+            if match:
+                return True
+    return False
+
+
 def format_timedelta(delta: datetime.timedelta) -> str:
     """Formats a timedelta duration to [N days] %H:%M:%S format"""
     seconds = int(delta.total_seconds())
@@ -89,11 +105,10 @@ class NotebookExecutionResult:
             return None
 
 
-def load_results(results_bucket: str,
-                 results_file: str) -> Dict[str, Any]:
-    '''
+def load_results(results_bucket: str, results_file: str) -> Dict[str, Any]:
+    """
     Load accumulated notebook test results
-    '''
+    """
 
     print("Loading existing accumulative results ...")
     accumulative_results = {}
@@ -105,10 +120,14 @@ def load_results(results_bucket: str,
         blobs = client.list_blobs(results_bucket, prefix=build_results_dir)
         for blob in blobs:
             time_created = blob.time_created.replace(tzinfo=None)
-            if (datetime.datetime.now().replace(tzinfo=None) - time_created).total_seconds() > MAX_RESULTS_AGE_SECONDS:
+            if (
+                datetime.datetime.now().replace(tzinfo=None) - time_created
+            ).total_seconds() > MAX_RESULTS_AGE_SECONDS:
                 continue
 
-            content = util.download_blob_into_memory(results_bucket, blob.name, download_as_text=True)
+            content = util.download_blob_into_memory(
+                results_bucket, blob.name, download_as_text=True
+            )
 
             try:
                 build_results = json.loads(content)
@@ -116,8 +135,12 @@ def load_results(results_bucket: str,
                 continue  # skip corrupted build results files
             for notebook in build_results:
                 if notebook in accumulative_results:
-                    accumulative_results[notebook]['passed'] += build_results[notebook]['passed']
-                    accumulative_results[notebook]['failed'] += build_results[notebook]['failed']
+                    accumulative_results[notebook]["passed"] += build_results[notebook][
+                        "passed"
+                    ]
+                    accumulative_results[notebook]["failed"] += build_results[notebook][
+                        "failed"
+                    ]
                 else:
                     accumulative_results[notebook] = build_results[notebook]
 
@@ -128,16 +151,17 @@ def load_results(results_bucket: str,
     # If there are no accumulative results, an empty dict is returned
     return accumulative_results
 
-def select_notebook(changed_notebook: str,
-                    accumulative_results: Dict[str, Any],
-                    test_percent: int) -> bool:
-    '''
+
+def select_notebook(
+    changed_notebook: str, accumulative_results: Dict[str, Any], test_percent: int
+) -> bool:
+    """
     Algorithm to randomly select a notebook, but weight the propbability of selected based on past failures
-    '''
+    """
 
     if changed_notebook in accumulative_results:
-        pass_count = accumulative_results[changed_notebook]['passed']
-        fail_count = accumulative_results[changed_notebook]['failed']
+        pass_count = accumulative_results[changed_notebook]["passed"]
+        fail_count = accumulative_results[changed_notebook]["failed"]
     else:
         pass_count = 1
         fail_count = 0
@@ -151,7 +175,9 @@ def select_notebook(changed_notebook: str,
     should_test_due_to_random_subset = random.uniform(0, 1) <= (test_percent / 100)
 
     if should_test_due_to_failure or should_test_due_to_random_subset:
-        print(f"Selected: {changed_notebook}, {should_test_due_to_failure}, {should_test_due_to_random_subset}")
+        print(
+            f"Selected: {changed_notebook}, {should_test_due_to_failure}, {should_test_due_to_random_subset}"
+        )
         return True
     else:
         print(f"Not Selected: {changed_notebook}, pass {pass_count}, fail {fail_count}")
@@ -233,8 +259,6 @@ def _create_tag(filepath: str) -> str:
     return tag
 
 
-
-
 def process_and_execute_notebook(
     container_uri: str,
     staging_bucket: str,
@@ -303,13 +327,26 @@ def process_and_execute_notebook(
             int((deadline - datetime.datetime.now()).total_seconds()), 1
         )
 
+        # Only use private pool if the notebook makes use of the private pool variable
+        private_pool_id_if_used = (
+            private_pool_id
+            if check_regex_in_notebook(
+                notebook_path=notebook,
+                regex=r"VPC_NETWORK =",
+            )
+            else None
+        )
+
+        if private_pool_id_if_used is not None:
+            print("ASdF")
+
         operation = execute_notebook_remote.execute_notebook_remote(
             code_archive_uri=code_archive_uri,
             notebook_uri=notebook,
             notebook_output_uri=notebook_output_uri,
             container_uri=container_uri,
             tag=tag,
-            private_pool_id=private_pool_id,
+            private_pool_id=private_pool_id_if_used,
             private_pool_region=variable_region,
             timeout_in_seconds=timeout_in_seconds,
             python_version=notebook_exec_python_version,
@@ -413,11 +450,12 @@ def get_changed_notebooks(
 
     return notebooks
 
-def _save_results(results: List[NotebookExecutionResult],
-                  artifacts_bucket: str,
-                  results_file: str):
 
-    artifacts_bucket = artifacts_bucket.replace("gs://", "").split('/')[0]
+def _save_results(
+    results: List[NotebookExecutionResult], artifacts_bucket: str, results_file: str
+):
+
+    artifacts_bucket = artifacts_bucket.replace("gs://", "").split("/")[0]
 
     print("Updating build results ...")
     build_results = {}
@@ -429,10 +467,10 @@ def _save_results(results: List[NotebookExecutionResult],
             pass_count = 0
             fail_count = 1
         build_results[result.path] = {
-                'duration': result.duration.total_seconds(),
-                'start_time': str(result.start_time),
-                'passed': pass_count,
-                'failed': fail_count
+            "duration": result.duration.total_seconds(),
+            "start_time": str(result.start_time),
+            "passed": pass_count,
+            "failed": fail_count,
         }
         print(f"adding {result.path}")
 
@@ -441,8 +479,7 @@ def _save_results(results: List[NotebookExecutionResult],
 
     client = storage.Client()
     bucket = client.get_bucket(artifacts_bucket)
-    bucket.blob(str(results_file)).upload_from_string(content, 'text/json')
-
+    bucket.blob(str(results_file)).upload_from_string(content, "text/json")
 
 
 def process_and_execute_notebooks(
@@ -480,7 +517,7 @@ def process_and_execute_notebooks(
         artifacts_bucket (str):
             Required. The GCS staging bucket to write executed notebooks to.
         results_file (str):
-            Required: The path to the artifacts bucket to save results 
+            Required: The path to the artifacts bucket to save results
         variable_project_id (str):
             Required. The value for PROJECT_ID to inject into notebooks.
         variable_region (str):
@@ -507,8 +544,9 @@ def process_and_execute_notebooks(
                 "Running notebooks in parallel, so no logs will be displayed. Please wait..."
             )
 
-
-            with concurrent.futures.ThreadPoolExecutor(max_workers=concurrent_notebooks) as executor:
+            with concurrent.futures.ThreadPoolExecutor(
+                max_workers=concurrent_notebooks
+            ) as executor:
                 print(f"Max workers: {executor._max_workers}")
 
                 notebook_execution_results = list(
@@ -604,9 +642,7 @@ def process_and_execute_notebooks(
             else:
                 print(log_contents)
 
-        _save_results(results_sorted, 
-                      artifacts_bucket, 
-                      results_file)
+        _save_results(results_sorted, artifacts_bucket, results_file)
 
         print("\n=== END RESULTS===\n")
 
