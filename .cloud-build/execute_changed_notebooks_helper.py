@@ -328,17 +328,17 @@ def process_and_execute_notebook(
         )
 
         # Only use private pool if the notebook makes use of the private pool variable
-        private_pool_id_if_used = (
-            private_pool_id
-            if check_regex_in_notebook(
-                notebook_path=notebook,
-                regex=r"VPC_NETWORK =",
-            )
-            else None
+        is_private_pool_required = check_regex_in_notebook(
+            notebook_path=notebook,
+            regex=r"VPC_NETWORK =",
         )
 
-        if private_pool_id_if_used is not None:
-            print("ASdF")
+        if is_private_pool_required and not private_pool_id:
+            raise ValueError(
+                "Private pool is used in notebook but `private_pool_id` is None"
+            )
+
+        private_pool_id_if_used = private_pool_id if is_private_pool_required else None
 
         operation = execute_notebook_remote.execute_notebook_remote(
             code_archive_uri=code_archive_uri,
