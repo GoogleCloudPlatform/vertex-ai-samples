@@ -40,7 +40,7 @@ def execute_notebook_remote(
     private_pool_region: Optional[str],
     tag: Optional[str],
     timeout_in_seconds: Optional[int] = None,
-    python_version: Optional[str] = None
+    python_version: Optional[str] = None,
 ) -> operation.Operation:
     """Create and execute a single notebook on Google Cloud Build"""
     # Load build steps from YAML
@@ -51,17 +51,16 @@ def execute_notebook_remote(
         "_PYTHON_IMAGE": container_uri,
         "_NOTEBOOK_GCS_URI": notebook_uri,
         "_NOTEBOOK_OUTPUT_GCS_URI": notebook_output_uri,
-        "_PYTHON_VERSION" : f"python{python_version}"
+        "_PYTHON_VERSION": f"python{python_version}",
     }
 
     if python_version is not None:
-      substitutions["_PYTHON_VERSION"] = "python" + python_version
+        substitutions["_PYTHON_VERSION"] = "python" + python_version
 
     build = cloudbuild_v1.Build()
 
     options: Optional[client_options.ClientOptions] = None
     if private_pool_id and private_pool_region:
-        # substitutions["_PRIVATE_POOL_NAME"] = private_pool_id
         build.options = cloudbuild_config.get("options")
         build.options.pool = {"name": private_pool_id}
 
