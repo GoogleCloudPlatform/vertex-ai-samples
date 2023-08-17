@@ -117,8 +117,8 @@ parser.add_argument(
     "--should_parallelize",
     type=str2bool,
     nargs="?",
-    const=False,
-    default=False,
+    const=True,
+    default=True,
     help="Should run notebooks in parallel.",
 )
 parser.add_argument(
