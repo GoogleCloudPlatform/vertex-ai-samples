@@ -333,7 +333,9 @@ def process_and_execute_notebook(
             regex=r"VPC_NETWORK =",
         )
 
-        if is_private_pool_required and not private_pool_id:
+        if is_private_pool_required and (
+            not private_pool_id or len(private_pool_id.strip()) == 0
+        ):
             raise ValueError(
                 "Private pool is used in notebook but `private_pool_id` is None"
             )
