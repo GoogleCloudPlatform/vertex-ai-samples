@@ -18,4 +18,5 @@
 /vertex_vision_model_garden/model_oss/open_clip @lydhr
 /vertex_vision_model_garden/model_oss/movinet @KCFindstr
 /vertex_vision_model_garden/model_oss/data_converter @KCFindstr
+/vertex_vision_model_garden/model_oss/peft @weigary
 
