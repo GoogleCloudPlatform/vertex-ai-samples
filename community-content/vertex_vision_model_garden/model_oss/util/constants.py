@@ -1,11 +1,14 @@
 """Vertex vision model garden util constants."""
 
-# Objectives.
+# TfVision Objectives.
 OBJECTIVE_IMAGE_CLASSIFICATION = 'icn'
 OBJECTIVE_IMAGE_OBJECT_DETECTION = 'iod'
 OBJECTIVE_IMAGE_SEGMENTATION = 'isg'
 OBJECTIVE_VIDEO_CLASSIFICATION = 'vcn'
 OBJECTIVE_VIDEO_ACTION_RECOGNITION = 'var'
+
+# PyTorch Models.
+OBJECTIVE_TIMM = 'timm'
 
 # Input file types.
 INPUT_FILE_TYPE_CSV = 'csv'
@@ -66,8 +69,17 @@ LOCAL_MODEL_DIR = '/tmp/model_dir'
 LOCAL_BASE_MODEL_DIR = '/tmp/base_model_dir'
 LOCAL_DATA_DIR = '/tmp/data'
 
+# Huggingface files.
+HF_MODEL_WEIGHTS_SUFFIX = '.bin'
+
 # PEFT finetuning constants.
 TEXT_TO_IMAGE_LORA = 'text-to-image-lora'
 SEQUENCE_CLASSIFICATION_LORA = 'sequence-classification-lora'
 CAUSAL_LANGUAGE_MODELING_LORA = 'causal-language-modeling-lora'
 INSTRUCT_LORA = 'instruct-lora'
+
+# Precision modes for loading model weights.
+PRECISION_MODE_4 = '4bit'
+PRECISION_MODE_8 = '8bit'
+PRECISION_MODE_16 = 'float16'
+PRECISION_MODE_32 = 'float32'

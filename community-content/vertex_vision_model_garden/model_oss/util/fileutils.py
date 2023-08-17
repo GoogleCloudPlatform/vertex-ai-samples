@@ -68,7 +68,9 @@ def download_gcs_file_to_local(gcs_uri: str, local_path: str):
     client.download_blob_to_file(gcs_uri, f)
 
 
-def download_gcs_dir_to_local(gcs_dir: str, local_dir: str):
+def download_gcs_dir_to_local(
+    gcs_dir: str, local_dir: str, skip_hf_model_bin: bool = False
+):
   """Downloads files in a GCS directory to a local directory.
 
   For example:
@@ -79,6 +81,7 @@ def download_gcs_dir_to_local(gcs_dir: str, local_dir: str):
   Arguments:
     gcs_dir: A string of directory path on GCS.
     local_dir: A string of local directory path.
+    skip_hf_model_bin: True to skip downloading HF model bin files.
   """
   if not is_gcs_path(gcs_dir):
     raise ValueError(f'{gcs_dir} is not a GCS path starting with gs://.')
@@ -92,8 +95,16 @@ def download_gcs_dir_to_local(gcs_dir: str, local_dir: str):
     file_path = blob.name[len(prefix) :].strip('/')
     local_file_path = os.path.join(local_dir, file_path)
     os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
-    logging.info('Downloading %s to %s', file_path, local_file_path)
-    blob.download_to_filename(local_file_path)
+    if (
+        file_path.endswith(constants.HF_MODEL_WEIGHTS_SUFFIX)
+        and skip_hf_model_bin
+    ):
+      logging.info('Skip downloading model bin %s', file_path)
+      with open(local_file_path, 'w') as f:
+        f.write(f'{constants.GCS_URI_PREFIX}{bucket_name}/{prefix}/{file_path}')
+    else:
+      logging.info('Downloading %s to %s', file_path, local_file_path)
+      blob.download_to_filename(local_file_path)
 
 
 def upload_local_dir_to_gcs(local_dir: str, gcs_dir: str):
