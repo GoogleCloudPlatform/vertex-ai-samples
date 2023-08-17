@@ -51,7 +51,7 @@ parser.add_argument(
     "--build_id",
     type=str,
     help="The build id (which may be a Cloud Build job specific or user explicit.",
-    required=True
+    required=True,
 )
 parser.add_argument(
     "--base_branch",
@@ -117,8 +117,8 @@ parser.add_argument(
     "--should_parallelize",
     type=str2bool,
     nargs="?",
-    const=True,
-    default=True,
+    const=False,
+    default=False,
     help="Should run notebooks in parallel.",
 )
 parser.add_argument(
@@ -147,16 +147,24 @@ results_bucket = f"{args.artifacts_bucket}"
 # artifacts_bucket may get set by trigger to a full gs:// folder path
 if results_bucket.startswith("gs://"):
     results_bucket = results_bucket[5:]
-results_bucket = results_bucket.split('/')[0]
+results_bucket = results_bucket.split("/")[0]
 results_file = f"build_results/{args.build_id}.json"
 
 if args.test_percent == 100:
     notebooks = changed_notebooks
     accumulative_results = {}
 else:
-    accumulative_results = execute_changed_notebooks_helper.load_results(results_bucket, results_file)
+    accumulative_results = execute_changed_notebooks_helper.load_results(
+        results_bucket, results_file
+    )
 
-    notebooks = [changed_notebook for changed_notebook in changed_notebooks if execute_changed_notebooks_helper.select_notebook(changed_notebook, accumulative_results, args.test_percent)]
+    notebooks = [
+        changed_notebook
+        for changed_notebook in changed_notebooks
+        if execute_changed_notebooks_helper.select_notebook(
+            changed_notebook, accumulative_results, args.test_percent
+        )
+    ]
 
 if args.dry_run:
     print("Dry run ...\n")
@@ -177,4 +185,4 @@ else:
         variable_vpc_network=args.variable_vpc_network,
         private_pool_id=args.private_pool_id,
         concurrent_notebooks=args.concurrent_notebooks,
-)
+    )
