@@ -4,8 +4,8 @@
 # docker build -f model_oss/diffusers/dockerfile/serve.Dockerfile . -t ${YOUR_IMAGE_TAG}
 #
 # To push to gcr:
-# docker tag ${YOUR_IMAGE_TAG} gcr.io/{YOUR_PROJECT}/${YOUR_IMAGE_TAG}
-# docker push gcr.io/{YOUR_PROJECT}/${YOUR_IMAGE_TAG}
+# docker tag ${YOUR_IMAGE_TAG} gcr.io/${YOUR_PROJECT}/${YOUR_IMAGE_TAG}
+# docker push gcr.io/${YOUR_PROJECT}/${YOUR_IMAGE_TAG}
 
 FROM pytorch/torchserve:0.7.0-gpu
 
@@ -34,11 +34,9 @@ RUN pip install absl-py==1.4.0
 RUN apt-get update && apt-get install wget
 RUN wget https://raw.githubusercontent.com/GoogleCloudPlatform/vertex-ai-samples/main/LICENSE
 
-# The latest released diffusers library doesn't include ControlNet yet.
-# Install diffusers from main branch source code but with a pinned commit.
-RUN git clone https://github.com/huggingface/diffusers.git
+# Install diffusers from main branch source code with a pinned commit.
+RUN git clone --depth 1 --branch v0.18.1 https://github.com/huggingface/diffusers.git
 WORKDIR diffusers
-RUN git reset --hard 7ce3fa010a5019ed35d5a89572d3f68646b2a8d9
 RUN pip install -e .
 
 # Copy model artifacts.
