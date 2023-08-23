@@ -44,6 +44,7 @@
 /notebooks/community/feature_store/get_started_vertex_feature_store.ipynb @junkourata
 /notebooks/community/model_garden/model_garden_huggingface_local_inference.ipynb @dstnluong-google
 /notebooks/community/model_garden/model_garden_mediapipe_image_classification.ipynb @schmidt-sebastian
+/notebooks/community/model_garden/model_garden_mediapipe_image_generation.ipynb @schmidt-sebastian
 /notebooks/community/model_garden/model_garden_mediapipe_object_detection.ipynb @schmidt-sebastian
 /notebooks/community/model_garden/model_garden_proprietary_image_classification.ipynb @weigary
 /notebooks/community/model_garden/model_garden_proprietary_image_object_detection.ipynb @weigary
