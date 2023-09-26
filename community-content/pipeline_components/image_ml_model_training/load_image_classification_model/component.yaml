@@ -87,7 +87,7 @@ outputs:
 - {name: image_size_path, type: HeightWidth}
 implementation:
   container:
-    image: us-docker.pkg.dev/vertex-ai/ready-to-go-image-classification/image-components:v0.1
+    image: us-docker.pkg.dev/vertex-ai/ready-to-go-image-classification/image-components:v0.2
     # command is a list of strings (command-line arguments).
     # The YAML language has two syntaxes for lists and you can use either of them.
     # Here we use the "flow syntax" - comma-separated strings inside square brackets.

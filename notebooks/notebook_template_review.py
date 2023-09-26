@@ -1140,31 +1140,44 @@ def add_index(path: str,
             print(f'            {tag.strip()}<br/>\n')
         print('        </td>')
         print('        <td>')
-        print(f'            <b>{title}</b>.\n')
+        print(f'            <b>{title}</b>. ')
         if args.desc:
             desc = replace_cl(desc.replace('`', ''))
-            print(f' {desc}\n')
+            print('<br/>')
+            print(f'            {desc}\n')
+            
             
         if args.linkback and linkbacks:
             num = len(tags)
             for _ in range(num):
                 if linkbacks[_].startswith("vertex-ai"):
-                    print(f' Learn more about <a href="https://cloud.google.com/{linkbacks[_]}." target="_blank">{replace_cl(tags[_])}</a>.\n')
+                    print(f' Learn more about <a href="https://cloud.google.com/{linkbacks[_]}" target="_blank">{replace_cl(tags[_])}</a>.\n')
                 else:
-                    print(f' Learn more about <a href="{linkbacks[_]}." target="_blank">{replace_cl(tags[_])}</a>.\n')
+                    print(f' Learn more about <a href="{linkbacks[_]}" target="_blank">{replace_cl(tags[_])}</a>.\n')
                     
         if args.steps:
-            steps = replace_cl(steps.replace('\n', '<br/>').replace('-', '&nbsp;&nbsp;-').replace('**', '').replace('*', '&nbsp;&nbsp;-').replace('`', ''))
-            print('<br/><br/>' + steps +  '<br/>')
+            print("<devsite-expandable>\n")
+            print('  <p class="showalways">Tutorial steps</p>\n')
+            print('  <ul>\n')
+            
+            if ":" in steps:
+                steps = steps.split(':')[1].replace('*', '').replace('-', '').strip().split('\n')
+            else:
+                steps = []
+              
+            for step in steps:
+                print(f'    <li>{replace_cl(step)}</li>\n')
+            print('  </ul>\n')
+            print("</devsite-expandable>\n")
                     
         print('        </td>')
         print('        <td>')
         if colab_link:
-            print(f'            <a href="{colab_link}" target="_blank">Colab</a><br/>\n')
+            print(f'            <a href="{colab_link}" target="_blank" class="external" track-type="notebookTutorial" track-name="colabLink">Colab</a><br/>\n')
         if git_link:
-            print(f'            <a href="{git_link}" target="_blank">GitHub</a><br/>\n')
+            print(f'            <a href="{git_link}" target="_blank" class="external" track-type="notebookTutorial" track-name="gitHubLink">GitHub</a><br/>\n')
         if workbench_link:
-            print(f'            <a href="{workbench_link}" target="_blank">Vertex AI Workbench</a><br/>\n')
+            print(f'            <a href="{workbench_link}" target="_blank" class="external" track-type="notebookTutorial" track-name="workbenchLink">Vertex AI Workbench</a><br/>\n')
         print('        </td>')
         print('    </tr>\n')
     elif args.repo:
@@ -1227,6 +1240,8 @@ def replace_cl(text : str ) -> str:
         'Vertex AI Prediction': '{{vertex_prediction_name}}',
         'Vertex TensorBoard': '{{vertex_tensorboard_name}}',
         'Vertex AI TensorBoard': '{{vertex_tensorboard_name}}',
+        'TensorBoard': '{{vertex_tensorboard_name}}',
+        'Tensorboard': '{{vertex_tensorboard_name}}',
         'Vertex ML Metadata': '{{vertex_metadata_name}}',
         'Vertex Pipelines': '{{vertex_pipelines_name}}',
         'Vertex AI Pipelines': '{{vertex_pipelines_name}}',
@@ -1252,6 +1267,8 @@ def replace_cl(text : str ) -> str:
         'Vertex AI': '{{vertex_ai_name}}',
         
         'Cloud Storage': '{{storage_name}}',
+        'GCS': '{{storage_name}}',
+        'GCP': '{{gcp_name}}',
         'TensorFlow Enterprise': '{{tf4gcp_name}}',
         'TensorFlow': '{{tensorflow_name}}',
     }
@@ -1307,7 +1324,7 @@ if args.web:
     print('            <th width="80px">Open in</th>')
     print('        </tr>')
     print('    </thead>')
-    print('    <tbody>')
+    print('    <tbody class="list">')
 
 if args.notebook_dir:
     if not os.path.isdir(args.notebook_dir):

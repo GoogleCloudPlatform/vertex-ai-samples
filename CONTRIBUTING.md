@@ -44,12 +44,10 @@ Finally, run this code block to check for errors. Each step will attempt to
 automatically fix any issues. If the fixes can't be performed automatically,
 then you will need to manually address them before submitting your PR.
 
+Note: For official, only submit one notebook per PR.
+
 ```shell
-nbqa black "$notebook"
-nbqa pyupgrade "$notebook"
-nbqa isort "$notebook"
-nbqa flake8 "$notebook" --extend-ignore=W391,E501,F821,E402,F404,W503,E203,E722,W293,W291
-python3 -m tensorflow_docs.tools.nbfmt --remove_outputs "$notebook"
+docker run -v ${PWD}:/setup/app gcr.io/cloud-devrel-public-resources/notebook_linter:latest your_notebook
 ```
 
 ## Code Reviews
