@@ -7,7 +7,7 @@
 # docker tag ${YOUR_IMAGE_TAG} gcr.io/${YOUR_PROJECT}/${YOUR_IMAGE_TAG}
 # docker push gcr.io/${YOUR_PROJECT}/${YOUR_IMAGE_TAG}
 
-FROM gcr.io/automl-migration-test/automl-vision-training-base-v2:latest
+FROM us-docker.pkg.dev/vertex-ai/vertex-vision-model-garden-dockers/tfvision-base-v2:latest
 
 # Copy license.
 RUN wget https://raw.githubusercontent.com/GoogleCloudPlatform/vertex-ai-samples/main/LICENSE
