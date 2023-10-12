@@ -15,7 +15,7 @@
 /ml_metadata @andrewferlitsch
 /model_monitoring @andrewferlitsch
 /tensorboard @zbl94
-/vertexai @jayceeli
+/vertexai @jaycee-li
 
 /bigquery_ml/bqml-online-prediction.ipynb @polong-lin
 /model_monitoring/model_monitoring.ipynb @andrewferlitsch
