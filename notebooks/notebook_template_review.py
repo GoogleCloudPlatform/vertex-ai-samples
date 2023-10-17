@@ -498,7 +498,17 @@ class TitleRule(NotebookRule):
         
         cell = notebook.peek()
         if not cell['source'][0].startswith('# '):
-            ret = notebook.report_error(ErrorCode.ERROR_TITLE_HEADING, "title cell must start with H1 heading")
+            notebook.report_error(ErrorCode.ERROR_TITLE_HEADING, "title cell must start with H1 heading")
+            if not cell['source'][0].startswith('## '):
+                ret = False
+            else:
+                
+                self.title = cell['source'][0][3:].strip()
+                SentenceCaseTWRule().validate(notebook, [self.title])
+
+                # H1 title only
+                if len(cell['source']) == 1:
+                    notebook.pop()
         else:
             self.title = cell['source'][0][2:].strip()
             SentenceCaseTWRule().validate(notebook, [self.title])
