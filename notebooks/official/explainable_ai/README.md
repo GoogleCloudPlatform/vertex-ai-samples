@@ -169,3 +169,20 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Prediction](https://cloud.google.com/vertex-ai/docs/predictions/get-predictions).
 
+
+[Explaining text classification with Vertex Explainable AI](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/explainable_ai/xai_text_classification_feature_attributions.ipynb)
+
+```
+Learn how to configure feature-based explanations using **sampled Shapley method** on a TensorFlow text classification model for online predictions with explanations.
+
+The steps performed include:
+
+- Build and train a TensorFlow text classification model
+- Upload model for deployment
+- Deploy model for online prediction
+- Make online prediction with explanations
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex Explainable AI](https://cloud.google.com/vertex-ai/docs/explainable-ai/overview).
+

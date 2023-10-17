@@ -40,3 +40,51 @@ The steps performed include:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Custom training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
 
+
+[Train a pytorch model with Vertex AI SDK 2.0 and Bigframes](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/sdk/sdk2_bigframes_pytorch.ipynb)
+
+```
+Learn to use `Vertex AI SDK 2.
+
+The steps performed include:
+
+- Initialize a dataframe from a BigQuery table and split the dataset
+- Perform transformations as a Vertex AI remote training.
+- Train the model remotely and evaluate the model locally
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [bigframes](https://cloud.google.com/bigquery/docs/).
+
+
+[Train a scikit-learn model with Vertex AI SDK 2.0 and Bigframes](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/sdk/sdk2_bigframes_sklearn.ipynb)
+
+```
+Learn to use `Vertex AI SDK 2.
+
+The steps performed include:
+
+- Initialize a dataframe from a BigQuery table and split the dataset
+- Perform transformations as a Vertex AI remote training.
+- Train the model remotely and evaluate the model locally
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [bigframes](https://cloud.google.com/bigquery/docs/).
+
+
+[Train a Tensorflow Keras model with Vertex AI SDK 2.0 and Bigframes](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/sdk/sdk2_bigframes_tensorflow.ipynb)
+
+```
+Learn to use `Vertex AI SDK 2.
+
+The steps performed include:
+
+- Initialize a dataframe from a BigQuery table and split the dataset
+- Perform transformations as a Vertex AI remote training.
+- Train the model remotely and evaluate the model locally
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [bigframes](https://cloud.google.com/bigquery/docs/).
+

@@ -93,7 +93,7 @@ The steps performed include:
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI TensorBoard Profiler](https://cloud.google.com/vertex-ai/docs/experiments/tensorboard-profiler).
 
 
-[Get started with Vertex AI Training for XGBoost](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/custom/get_started_vertex_training.ipynb)
+[Get started with Vertex AI Training for XGBoost](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/custom/get_started_vertex_training_xgboost.ipynb)
 
 ```
 Learn how to use `Vertex AI Training` for training a XGBoost custom model.
