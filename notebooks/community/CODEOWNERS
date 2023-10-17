@@ -95,3 +95,4 @@
 /notebooks/community/model_garden/model_garden_pytorch_nllb.ipynb @weigary
 /notebooks/community/model_garden/model_garden_pytorch_mistral.ipynb @RajeshThallam
 /notebooks/community/model_garden/model_garden_pytorch_biomedclip.ipynb @KCFindstr
+/notebooks/community/persistent_resource/00_Persistent_Resource_CLI.ipynb @jbrache
