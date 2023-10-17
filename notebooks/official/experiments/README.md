@@ -74,6 +74,22 @@ The steps performed include:
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI TensorBoard](https://cloud.google.com/vertex-ai/docs/experiments/tensorboard-overview).
 
 
+[Custom training autologging - Local script](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/experiments/get_started_with_custom_training_autologging_local_script.ipynb)
+
+```
+Learn how to autolog paramenters and metrics of an ML experiment running on Vertex AI training by leveraging the integration with Vertex AI Experiments.
+
+The steps performed include:
+
+- Formalize model experiment in a script
+- Run model traning using local script on Vertex AI Training
+- Check out ML experiment parameters and metrics in Vertex AI Experiments
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Experiments](https://cloud.google.com/vertex-ai/docs/experiments/intro-vertex-ai-experiments).
+
+
 [Get started with Vertex AI Experiments](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/experiments/get_started_with_vertex_experiments.ipynb)
 
 ```
@@ -107,7 +123,7 @@ The steps performed include:
 &nbsp;&nbsp;&nbsp;Learn more about [Custom training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
 
 
-[Autologging](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/experiments/autologging.ipynb)
+[Autologging](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/experiments/get_started_with_vertex_experiments_autologging.ipynb)
 
 ```
 Learn how to use `Vertex AI Autologging`.
