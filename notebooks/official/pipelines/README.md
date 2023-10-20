@@ -240,26 +240,6 @@ The steps performed include:
 &nbsp;&nbsp;&nbsp;Learn more about [BigQuery ML components](https://cloud.google.com/vertex-ai/docs/pipelines/bigqueryml-component).
 
 
-[Loan eligibility prediction using `google-cloud-pipeline-components` and Spark ML](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/google_cloud_pipeline_components_dataproc_tabular.ipynb)
-
-```
-Learn how to build a Vertex AI pipeline and train a random-forest model using Spark ML for loan-eligibility classification problem.
-
-The steps performed include:
-
-*   Use the `DataprocPySparkBatchOp` to preprocess data.
-*   Create a Vertex AI dataset resource on the training data.
-*   Train a random forest model using PySpark.
-*   Build a Vertex AI pipeline and run the training job.
-*   Use the Spark serving image in order to deploy a Spark model on Vertex AI Endpoint.
-
-```
-
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
-
-&nbsp;&nbsp;&nbsp;Learn more about [Dataproc components](https://cloud.google.com/vertex-ai/docs/pipelines/dataproc-component).
-
-
 [Model train, upload, and deploy using Google Cloud Pipeline Components](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/google_cloud_pipeline_components_model_train_upload_deploy.ipynb)
 
 ```
@@ -299,6 +279,25 @@ The steps performed include:
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction).
 
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Model components](https://cloud.google.com/vertex-ai/docs/pipelines/model-endpoint-component).
+
+
+[Vertex AI Pipelines with KFP 2.x](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/kfp2_pipeline.ipynb)
+
+```
+Learn to use `Vertex AI Pipelines` and KFP 2.
+
+The steps performed include:
+
+- Create a KFP pipeline:
+    - Create a `BigQuery Dataset` resource.
+    - Export the dataset.
+    - Train an XGBoost `Model` resource.
+    - Create an `Endpoint` resource.
+    - Deploys the `Model` resource to the `Endpoint` resource.
+- Compile the KFP pipeline.
+- Execute the KFP pipeline using `Vertex AI Pipelines`
+
+```
 
 
 [Lightweight Python function-based components, and component I/O](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/pipelines/lightweight_functions_component_io_kfp.ipynb)

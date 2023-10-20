@@ -147,10 +147,6 @@ The steps performed include:
 
 ```
 
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Workbench](https://cloud.google.com/vertex-ai/docs/workbench/introduction).
-
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Training](https://cloud.google.com/vertex-ai/docs/training/custom-training).
-
 
 [Predictive Maintenance using Vertex AI](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/workbench/predictive_maintainance/predictive_maintenance_usecase.ipynb)
 
@@ -242,7 +238,7 @@ The steps performed are:
 
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Workbench](https://cloud.google.com/vertex-ai/docs/workbench/introduction).
 
-&nbsp;&nbsp;&nbsp;Learn more about [Dataproc](https://cloud.google.com/vertex-ai/docs/pipelines/dataproc-component).
+&nbsp;&nbsp;&nbsp;Learn more about [Dataproc Serverless for Spark](https://cloud.google.com/dataproc-serverless/docs/guides/bigquery-connector-spark-example).
 
 
 [SparkML with Dataproc and BigQuery](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/workbench/spark/spark_ml.ipynb)
@@ -270,29 +266,4 @@ The steps performed are:
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Workbench](https://cloud.google.com/vertex-ai/docs/workbench/introduction).
 
 &nbsp;&nbsp;&nbsp;Learn more about [Dataproc](https://cloud.google.com/vertex-ai/docs/pipelines/dataproc-component).
-
-
-[Telecom subscriber churn prediction on Vertex AI](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/workbench/subscriber_churn_prediction/telecom-subscriber-churn-prediction.ipynb)
-
-```
-This tutorial shows you how to do exploratory data analysis, preprocess data, train, deploy and get predictions from a churn prediction model on a tabular churn dataset.
-
-The steps performed include:
-
-- Load data from a Cloud Storage path
-- Perform exploratory data analysis (EDA)
-- Preprocess the data
-- Train a scikit-learn model
-- Evaluate the scikit-learn model
-- Save the model to a Cloud Storage path
-- Create a model and an endpoint in Vertex AI
-- Deploy the trained model to an endpoint
-- Generate predictions and explanations on test data from the hosted model
-- Undeploy the model resource
-
-```
-
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Workbench](https://cloud.google.com/vertex-ai/docs/workbench/introduction).
-
-&nbsp;&nbsp;&nbsp;Learn more about [Vertex Explainable AI](https://cloud.google.com/vertex-ai/docs/explainable-ai/overview).
 

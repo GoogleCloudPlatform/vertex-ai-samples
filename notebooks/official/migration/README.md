@@ -37,7 +37,7 @@ The steps performed include:
 &nbsp;&nbsp;&nbsp;Learn more about [Object detection for image data](https://cloud.google.com/vertex-ai/docs/training-overview#object_detection_for_images).
 
 
-[AutoML Video Object Tracking](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/migration/UJ15 Vertex SDK AutoML Object Tracking.ipynb)
+[AutoML Video Object Tracking](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/migration/sdk-automl-object-tracking-batch-prediction.ipynb)
 
 ```
 Learn to use `AutoML` to train a video model and use `Vertex AI Batch Prediction` to do batch predictions.
@@ -119,7 +119,7 @@ The steps performed include the following:
 &nbsp;&nbsp;&nbsp;Learn more about [Entity extraction for text data](https://cloud.google.com/vertex-ai/docs/training-overview#entity_extraction_for_text).
 
 
-[AutoML Text Sentiment Analysis](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/migration/UJ8 Vertex SDK AutoML Text Sentiment Analysis.ipynb)
+[AutoML Text Sentiment Analysis](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/migration/sdk-automl-text-sentiment-analysis-batch-prediction.ipynb)
 
 ```
 The objective of this notebook is to build a AutoML Text Sentiment Analysis model.
@@ -140,7 +140,7 @@ The steps performed include the following:
 &nbsp;&nbsp;&nbsp;Learn more about [Sentiment analysis for text data](https://cloud.google.com/vertex-ai/docs/training-overview#sentiment_analysis_for_text).
 
 
-[AutoML Video Classification](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/migration/UJ14 Vertex SDK AutoML Video Classification.ipynb)
+[AutoML Video Classification](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/migration/sdk-automl-video-classification-batch-prediction.ipynb)
 
 ```
 Learn to use `AutoML` to train a video model and use `Vertex AI Batch Prediction` to do batch predictions.
