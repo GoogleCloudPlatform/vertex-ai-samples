@@ -45,22 +45,22 @@ The steps performed include:
 [AutoML text classification pipelines using google-cloud-pipeline-components](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/model_evaluation/automl_text_classification_model_evaluation.ipynb)
 
 ```
-Learn how to use `Vertex AI Pipelines` and `Google Cloud Pipeline Components` to build an `AutoML` text classification model.
+Learn how to use `Vertex AI Pipelines` and `Google Cloud Pipeline Components` to build and evaluate an `AutoML` text classification model.
 
 The steps performed include:
 
 - Create a Vertex AI `Dataset`.
-- Train a Automl Text Classification model on the `Dataset` resource.
+- Train an Automl Text Classification model on the `Dataset` resource.
 - Import the trained `AutoML model resource` into the pipeline.
 - Run a `Batch Prediction` job.
-- Evaulate the AutoML model using the `Classification Evaluation Component`.
-- Import the classification metrics to the AutoML model resource.
+- Evaluate the AutoML model using the `Classification Evaluation Component`.
+- Import the evaluation metrics to the AutoML model resource.
 
 ```
 
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Model Evaluation](https://cloud.google.com/vertex-ai/docs/evaluation/introduction).
 
-&nbsp;&nbsp;&nbsp;Learn more about [AutoML Text](https://cloud.google.com/vertex-ai/docs/text-data/classification/prepare-data).
+&nbsp;&nbsp;&nbsp;Learn more about [Classification on text data](https://cloud.google.com/vertex-ai/docs/training-overview#classification_for_text).
 
 
 [Evaluating batch prediction results from AutoML Video classification model](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/model_evaluation/automl_video_classification_model_evaluation.ipynb)
@@ -84,7 +84,7 @@ The steps performed include:
 &nbsp;&nbsp;&nbsp;Learn more about [Classification for video data](https://cloud.google.com/vertex-ai/docs/training-overview#classification_for_videos).
 
 
-[Evaluating BatchPrediction results from a Custom Tabular classification model](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/model_evaluation/custom_tabular_classification_model_evaluation.ipynb)
+[Evaluating BatchPrediction results from a custom tabular classification model](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/model_evaluation/custom_tabular_classification_model_evaluation.ipynb)
 
 ```
 In this tutorial, you train a scikit-learn RandomForest model, save it in Vertex AI Model Registry and learn how to evaluate it through a Vertex AI pipeline job using `google_cloud_pipeline_components`.
