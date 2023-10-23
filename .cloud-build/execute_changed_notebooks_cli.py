@@ -37,7 +37,7 @@ parser = argparse.ArgumentParser(description="Run changed notebooks.")
 parser.add_argument(
     "--test_paths_file",
     type=pathlib.Path,
-    help="The path to the file that has newline-limited folders of notebooks that should be tested.",
+    help="The path to the file that has newline-delimited folders of notebooks that should be tested.",
     required=True,
 )
 parser.add_argument(
@@ -126,6 +126,13 @@ parser.add_argument(
     type=int,
     help="Maximum number of parallel notebook executions per minute",
     default=10,
+    required=False,
+)
+parser.add_argument(
+    "--run_first_file",
+    type=pathlib.Path,
+    help="The path to the file that has newline-delimited of notebooks to run in the first batch",
+    default=None,
     required=False,
 )
 parser.add_argument(
