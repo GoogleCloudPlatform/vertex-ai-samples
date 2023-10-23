@@ -165,6 +165,24 @@ else:
 
     notebooks = [changed_notebook for changed_notebook in changed_notebooks if execute_changed_notebooks_helper.select_notebook(changed_notebook, accumulative_results, args.test_percent)]
 
+run_first = []
+if args.run_first_file:
+    if not os.path.isfile(args.run_first_file):
+        print("Error: file does not exist", args.run_first_file)
+    else:
+        with open(args.run_first_file, 'r') as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                notebook = row[0]
+                run_first.append(notebook)
+
+    for notebook in run_first:
+        if notebook in notebooks:
+            # remove from existing list
+            notebooks.remove(notebook)
+            # add back to the front of the list
+            notebooks.insert(0, notebook)
+
 if args.dry_run:
     print("Dry run ...\n")
     for notebook in notebooks:
