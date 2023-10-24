@@ -15,7 +15,7 @@ steps:
     - -c
     - |
       . workspace/env/bin/activate &&
-      python3 notebooks/notebook_template_review.py --web --title --steps --desc --linkback --notebook-dir=notebooks/official >web.html
+      python3 notebooks/notebook_template_review.py --web --title --steps --desc --linkback --notebook-dir=notebooks/official --skip-file=${_DO_NOT_INDEX_FILE} >web.html
 artifacts:
   objects:
           location: gs://${_GCS_ARTIFACTS_BUCKET}/webdoc
