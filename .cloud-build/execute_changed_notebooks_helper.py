@@ -121,6 +121,7 @@ def load_results(results_bucket: str,
                 else:
                     accumulative_results[notebook] = build_results[notebook]
                     accumulative_results[notebook]['failed_last_run'] = build_results[notebook]['failed']
+                    accumulative_results[notebook]['failed_last_date'] = time_created
 
         print(accumulative_results)
     except Exception as e:
