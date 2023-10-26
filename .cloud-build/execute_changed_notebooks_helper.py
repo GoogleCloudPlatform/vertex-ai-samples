@@ -150,10 +150,11 @@ def select_notebook(changed_notebook: str,
         failed_on_latest_run = 0
         last_time_ran = datetime.datetime.now().replace(tzinfo=None)
 
+    # If notebook has not been ran in a long time, force running it
     if (datetime.datetime.now().replace(tzinfo=None) - last_time_ran).total_seconds() > MAX_AGE_BEFORE_FORCE_RUN:
-        force_run = True
+        should_test_do_to_age = True
     else:
-        force_run = False
+        should_test_do_to_age  = False
 
 
     # if failed on the last time it was ran, select the notebook
@@ -171,7 +172,7 @@ def select_notebook(changed_notebook: str,
     # Additionally, only test a percentage of these
     should_test_due_to_random_subset = random.uniform(0, 1) <= (test_percent / 100)
 
-    if should_test_due_to_failure or should_test_due_to_random_subset:
+    if should_test_due_to_failure or should_test_due_to_random_subset or should_test_do_to_age:
         print(f"Selected: {changed_notebook}, {should_test_due_to_failure}, {should_test_due_to_random_subset}")
         return True
     else:
