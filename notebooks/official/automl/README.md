@@ -49,8 +49,8 @@ The steps performed are:
 - Make a batch prediction with the BigQuery ML model.
 - Create a Vertex AI `Dataset` resource.
 - Train the Vertex AI Forecasting model.
-- View the Model evaluation.
-- Make a batch prediction with the Model.
+- View the Vertex AI Model Evaluation results.
+- Make a batch prediction with the Vertex AI Forecasting model.
 
 ```
 

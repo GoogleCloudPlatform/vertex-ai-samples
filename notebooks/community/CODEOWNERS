@@ -74,6 +74,8 @@
 /notebooks/community/model_garden/model_garden_pytorch_starcoder.ipynb @xcchen1
 /notebooks/community/model_garden/model_garden_jax_vision_transformer.ipynb @lavraicse
 /notebooks/community/model_garden/model_garden_jax_fvlm.ipynb @lavraicse
+/notebooks/community/model_garden/model_garden_jax_dito.ipynb @minwoo33park
+/notebooks/community/model_garden/model_garden_jax_owl_vit_v2.ipynb @minwoo33park
 /notebooks/community/model_garden/model_garden_pytorch_text_to_video_zero_shot.ipynb @bingatgoogle
 /notebooks/community/model_garden/model_garden_pytorch_text_to_video.ipynb @KCFindstr
 /notebooks/community/generative_ai/text_embedding_api_cloud_next_new_models.ipynb @xqr-g
@@ -91,6 +93,10 @@
 /notebooks/community/model_garden/model_garden_pytorch_open_clip.ipynb @lydhr
 /notebooks/community/model_garden/model_garden_pytorch_llama2_peft.ipynb @genquan9
 /notebooks/community/model_garden/model_garden_pytorch_codellama.ipynb @xiangxu-google
+/notebooks/community/model_garden/model_garden_pytorch_nllb.ipynb @weigary
 /notebooks/community/model_garden/model_garden_pytorch_vicuna.ipynb @dstnluong-google
 /notebooks/community/model_garden/model_garden_pytorch_nllb.ipynb @weigary
 /notebooks/community/model_garden/model_garden_pytorch_mistral.ipynb @RajeshThallam
+/notebooks/community/model_garden/model_garden_pytorch_biomedclip.ipynb @KCFindstr
+/notebooks/community/model_garden/model_garden_pytorch_imagebind.ipynb @kathyyu-google
+/notebooks/community/persistent_resource/00_Persistent_Resource_CLI.ipynb @jbrache

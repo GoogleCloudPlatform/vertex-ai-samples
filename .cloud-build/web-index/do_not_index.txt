@@ -1,0 +1,3 @@
+sdk2_remote_training.ipynb
+sdk2_remote_hyperparmeter_tuning.ipynb
+sdk2_remote_predicton.ipynb

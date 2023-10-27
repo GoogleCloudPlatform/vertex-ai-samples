@@ -35,7 +35,7 @@ class RemoveNoExecuteCells(Preprocessor):
 
 
 class UpdateVariablesPreprocessor(Preprocessor):
-    def __init__(self, replacement_map: Dict):
+    def __init__(self, replacement_map: Dict[str, str]):
         self._replacement_map = replacement_map
 
     @staticmethod

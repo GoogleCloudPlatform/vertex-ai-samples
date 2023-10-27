@@ -15,6 +15,38 @@ The steps performed include:
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Feature Store](https://cloud.google.com/vertex-ai/docs/featurestore).
 
 
+[Online feature serving and fetching of BigQuery data with Vertex AI Feature Store](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/feature_store/online_feature_serving_and_fetching_bigquery_data_with_feature_store.ipynb)
+
+```
+Learn how to create and use an online feature store instance to host and serve data in `BigQuery` with `Vertex AI Feature Store` in an end to end workflow of feature values serving and fetching user journey.
+
+The steps performed include:
+
+- Provision an online feature store instance to host and serve data.
+- Register a `BigQuery` view with the online feature store instance and set up the sync job.
+- Use the online server to fetch feature values for online prediction.
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Feature Store](https://cloud.google.com/vertex-ai/docs/featurestore/overview).
+
+
+[Online feature serving and vector retrieval of BigQuery data with Vertex AI Feature Store](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/feature_store/online_feature_serving_and_vector_retrieval_bigquery_data_with_feature_store.ipynb)
+
+```
+Learn how to create and use an online feature store instance to host and serve data in `BigQuery` with `Vertex AI Feature Store` in an end to end workflow of features serving and vector retrieval user journey.
+
+The steps performed include:
+
+- Provision an online feature store instance to host and serve data.
+- Create an online feature store instance to serve a `BigQuery` table.
+- Use the online server to search nearest neighbors.
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Feature Store](https://cloud.google.com/vertex-ai/docs/featurestore/overview).
+
+
 [Using Vertex AI Feature Store with Pandas Dataframe](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/feature_store/sdk-feature-store-pandas.ipynb)
 
 ```
@@ -22,7 +54,8 @@ Learn how to use `Vertex AI Feature Store` with pandas Dataframe.
 
 The steps performed include:
 
-- Ingest Feature values from Pandas DataFrame into Feature Store's Entity types.
+- Create Featurestore, entity types and features.
+- Ingest feature values from Pandas DataFrame into Feature Store's Entity types.
 - Read Entity feature values from Online Feature Store into Pandas DataFrame.
 - Batch serve feature values from your Feature Store into Pandas DataFrame.
 
