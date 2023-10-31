@@ -18,6 +18,7 @@
 import argparse
 import pathlib
 import os
+import csv
 
 import execute_changed_notebooks_helper
 
@@ -182,6 +183,7 @@ if args.run_first_file:
             notebooks.remove(notebook)
             # add back to the front of the list
             notebooks.insert(0, notebook)
+            print(f"Run first: {notebook}")
 
 if args.dry_run:
     print("Dry run ...\n")
