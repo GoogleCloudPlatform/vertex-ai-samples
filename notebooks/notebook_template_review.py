@@ -218,6 +218,7 @@ def parse_dir(directory: str) -> int:
             exit_code += parse_dir(entry.path)
         elif entry.name.endswith('.ipynb'):
             if entry.name in skip_list:
+                print(f"Warning: skipping notebook {entry.name}", file=sys.stderr)
                 continue
             tag = directory.split('/')[-1]
             if tag == 'automl':
@@ -1345,14 +1346,16 @@ if args.web:
 
 if args.skip_file:
     if not os.path.isfile(args.skip_file):
-        print("Error: file does not exist", args.skip_file)
+        print(f"Error: file does not exist: {args.skip_file}", file=sys.stderr)
         exit(1)
     else:
         with open(args.skip_file, 'r') as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                notebook = row[0]
-                skip_list.append(notebook)
+                if len(row) > 0:
+                    notebook = row[0]
+                    skip_list.append(notebook)
+                    print(f"Skip entry {notebook}", file=sys.stderr)
 
 if args.notebook_dir:
     if not os.path.isdir(args.notebook_dir):
@@ -1366,7 +1369,7 @@ elif args.notebook:
     exit_code = parse_notebook(args.notebook, tags=[], linkback=None, rules=rules)
 elif args.notebook_file:
     if not os.path.isfile(args.notebook_file):
-        print("Error: file does not exist", args.notebook_file)
+        print(f"Error: file does not exist {args.notebook_file}", file=sys.stderr)
     else:
         exit_code = 0
         with open(args.notebook_file, 'r') as csvfile:
