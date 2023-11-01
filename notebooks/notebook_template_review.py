@@ -1178,7 +1178,7 @@ def add_index(path: str,
             print('  <ul>\n')
             
             if ":" in steps:
-                steps = steps.split(':')[1].replace('*', '').replace('-', '').strip().split('\n')
+                steps = steps.split(':')[1].replace('*', '').replace('-', '').replace('`', '').strip().split('\n')
             else:
                 steps = []
               
@@ -1265,8 +1265,9 @@ def replace_cl(text : str ) -> str:
         'Vertex AI Data Labeling': '{{vertex_data_labeling_name}}',
         'Vertex AI Experiments': '{{vertex_experiments_name}}',
         'Vertex Experiments': '{{vertex_experiments_name}}',
-        'Vertex AI Matching Engine': '{{vertex_matching_engine_name}}',
-        'Vertex Matching Engine': '{{vertex_matching_engine_name}}',
+        'Vertex AI Matching Engine': '{{vertex_vector_search_name}}',
+        'Vertex Matching Engine': '{{vertex_vector_search_name}}',
+        'Vertex AI Vector Search': '{{vertex_vector_search_name}}',
         'Vertex Model Monitoring': '{{vertex_model_monitoring_name}}',
         'Vertex AI Model Monitoring': '{{vertex_model_monitoring_name}}',
         'Vertex Feature Store': '{{vertex_featurestore_name}}',
