@@ -218,6 +218,7 @@ def parse_dir(directory: str) -> int:
             exit_code += parse_dir(entry.path)
         elif entry.name.endswith('.ipynb'):
             if entry.name in skip_list:
+                print(f"Warning: skipping notebook {entry.name}", file=sys.stderr)
                 continue
             tag = directory.split('/')[-1]
             if tag == 'automl':
@@ -1177,7 +1178,7 @@ def add_index(path: str,
             print('  <ul>\n')
             
             if ":" in steps:
-                steps = steps.split(':')[1].replace('*', '').replace('-', '').strip().split('\n')
+                steps = steps.split(':')[1].replace('*', '').replace('-', '').replace('`', '').strip().split('\n')
             else:
                 steps = []
               
@@ -1264,8 +1265,9 @@ def replace_cl(text : str ) -> str:
         'Vertex AI Data Labeling': '{{vertex_data_labeling_name}}',
         'Vertex AI Experiments': '{{vertex_experiments_name}}',
         'Vertex Experiments': '{{vertex_experiments_name}}',
-        'Vertex AI Matching Engine': '{{vertex_matching_engine_name}}',
-        'Vertex Matching Engine': '{{vertex_matching_engine_name}}',
+        'Vertex AI Matching Engine': '{{vertex_vector_search_name}}',
+        'Vertex Matching Engine': '{{vertex_vector_search_name}}',
+        'Vertex AI Vector Search': '{{vertex_vector_search_name}}',
         'Vertex Model Monitoring': '{{vertex_model_monitoring_name}}',
         'Vertex AI Model Monitoring': '{{vertex_model_monitoring_name}}',
         'Vertex Feature Store': '{{vertex_featurestore_name}}',
@@ -1345,14 +1347,16 @@ if args.web:
 
 if args.skip_file:
     if not os.path.isfile(args.skip_file):
-        print("Error: file does not exist", args.skip_file)
+        print(f"Error: file does not exist: {args.skip_file}", file=sys.stderr)
         exit(1)
     else:
         with open(args.skip_file, 'r') as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                notebook = row[0]
-                skip_list.append(notebook)
+                if len(row) > 0:
+                    notebook = row[0]
+                    skip_list.append(notebook)
+                    print(f"Skip entry {notebook}", file=sys.stderr)
 
 if args.notebook_dir:
     if not os.path.isdir(args.notebook_dir):
@@ -1366,7 +1370,7 @@ elif args.notebook:
     exit_code = parse_notebook(args.notebook, tags=[], linkback=None, rules=rules)
 elif args.notebook_file:
     if not os.path.isfile(args.notebook_file):
-        print("Error: file does not exist", args.notebook_file)
+        print(f"Error: file does not exist {args.notebook_file}", file=sys.stderr)
     else:
         exit_code = 0
         with open(args.notebook_file, 'r') as csvfile:
