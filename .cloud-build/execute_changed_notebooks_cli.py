@@ -165,6 +165,10 @@ else:
     accumulative_results = execute_changed_notebooks_helper.load_results(results_bucket, results_file)
 
     notebooks = [changed_notebook for changed_notebook in changed_notebooks if execute_changed_notebooks_helper.select_notebook(changed_notebook, accumulative_results, args.test_percent)]
+    # cap the number of notebooks to the specified percentage
+    max_notebooks = int((len(changed_notebooks) * args.test_percent))
+    if (len(notebooks) > max_notebooks):
+        notebooks = notebooks[:max_notebooks]
 
 run_first = []
 if args.run_first_file:
