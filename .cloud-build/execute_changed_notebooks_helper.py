@@ -452,11 +452,26 @@ def _save_results(results: List[NotebookExecutionResult],
         else:
             pass_count = 0
             fail_count = 1
+        if result.error_message is None:
+            error_type = ''
+        elif 'INTERNAL' in result.error_message:
+            error_type = 'INTERNAL'
+        elif 'context deadline exceeded' in result.error_message:
+            error_type = 'TIMEOUT'
+        elif 'Quota' in result.error_message:
+            error_type = 'QUOTA'
+        elif 'ServiceUnavailable' in result.error_message:
+            error_type = 'SERVICEUNAVAILABLE'
+        elif 'ModuleNotFoundError' in result.error_message:
+            error_type = 'IMPORT'
+        else:
+            error_type = ''
         build_results[result.path] = {
                 'duration': result.duration.total_seconds(),
                 'start_time': str(result.start_time),
                 'passed': pass_count,
-                'failed': fail_count
+                'failed': fail_count,
+                'error_type': error_type
         }
         print(f"adding {result.path}")
 
