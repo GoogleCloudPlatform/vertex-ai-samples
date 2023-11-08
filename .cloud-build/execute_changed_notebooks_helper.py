@@ -475,7 +475,7 @@ def _save_results(results: List[NotebookExecutionResult],
         }
         print(f"adding {result.path}")
 
-    print("Saving accumulative results ...")
+    print(f"Saving accumulative results to {results_file}, nentries {len(build_results)}")
     content = json.dumps(build_results)
 
     client = storage.Client()
