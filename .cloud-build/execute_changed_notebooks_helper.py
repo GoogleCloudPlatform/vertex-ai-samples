@@ -464,14 +464,23 @@ def _save_results(results: List[NotebookExecutionResult],
             error_type = 'SERVICEUNAVAILABLE'
         elif 'ModuleNotFoundError' in result.error_message:
             error_type = 'IMPORT'
-        else:
+        else if result.is_pass:
             error_type = ''
+        else:
+            error_type = 'undetermined'
+
+        if error_type != '':
+            log = result.log_url
+        else:
+            log = ''
+
         build_results[result.path] = {
                 'duration': result.duration.total_seconds(),
                 'start_time': str(result.start_time),
                 'passed': pass_count,
                 'failed': fail_count,
-                'error_type': error_type
+                'error_type': error_type,
+                'log_url': log_url
         }
         print(f"adding {result.path}")
 
