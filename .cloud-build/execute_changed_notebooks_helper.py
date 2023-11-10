@@ -120,7 +120,7 @@ def load_results(results_bucket: str,
                 if notebook in accumulative_results:
                     accumulative_results[notebook]['passed'] += build_results[notebook]['passed']
                     accumulative_results[notebook]['failed'] += build_results[notebook]['failed']
-                    if accumulative_results[notebook]['last_time_ran'] > time_created:
+                    if accumulative_results[notebook]['last_time_ran'] < time_created:
                         accumulative_results[notebook]['last_time_ran'] = time_created
                 else:
                     accumulative_results[notebook] = build_results[notebook]

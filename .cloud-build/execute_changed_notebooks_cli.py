@@ -166,7 +166,7 @@ else:
 
     notebooks = [changed_notebook for changed_notebook in changed_notebooks if execute_changed_notebooks_helper.select_notebook(changed_notebook, accumulative_results, args.test_percent)]
     # cap the number of notebooks to the specified percentage
-    max_notebooks = int((len(changed_notebooks) * args.test_percent))
+    max_notebooks = int((len(changed_notebooks) * (args.test_percent/100)))
     if (len(notebooks) > max_notebooks):
         notebooks = notebooks[:max_notebooks]
 
