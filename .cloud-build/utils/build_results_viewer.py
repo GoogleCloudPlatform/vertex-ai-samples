@@ -24,7 +24,13 @@ with open(args.file, 'r') as f:
     results = json.load(f)
 
 for item in results.items():
+    notebook = item[0][len("/notebooks/official/")-1:-6]
     if item[1]['passed']:
-        print(f"{item[0]},PASSED")
+        passed = "PASS"
     else:
-        print(f"{item[0]},FAILED")
+        passed = "FAIL"
+    error = item[1]['error_type']
+    if error == '' and passed == "FAIL":
+        error = "undetermined"
+
+    print(f"{notebook:75} {passed} {error}")
