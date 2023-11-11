@@ -470,9 +470,9 @@ def _save_results(results: List[NotebookExecutionResult],
             error_type = 'undetermined'
 
         if error_type != '':
-            log = result.log_url
+            log_url = result.log_url
         else:
-            log = ''
+            log_url = ''
 
         build_results[result.path] = {
                 'duration': result.duration.total_seconds(),
