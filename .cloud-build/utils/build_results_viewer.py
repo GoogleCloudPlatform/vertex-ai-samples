@@ -29,7 +29,9 @@ for item in results.items():
         passed = "PASS"
     else:
         passed = "FAIL"
+      
     error = item[1]['error_type']
+  
     if error == '' and passed == "FAIL":
         error = "undetermined"
 
