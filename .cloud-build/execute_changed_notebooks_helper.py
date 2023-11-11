@@ -464,7 +464,7 @@ def _save_results(results: List[NotebookExecutionResult],
             error_type = 'SERVICEUNAVAILABLE'
         elif 'ModuleNotFoundError' in result.error_message:
             error_type = 'IMPORT'
-        else if result.is_pass:
+        elif result.is_pass:
             error_type = ''
         else:
             error_type = 'undetermined'
