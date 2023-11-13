@@ -32,7 +32,14 @@ for item in results.items():
       
     error = item[1]['error_type']
   
-    if error == '' and passed == "FAIL":
-        error = "undetermined"
+    if passed == "FAIL":
+        if error == '':
+            error = "undetermined"
+        if 'log_url' in item[1]:
+            log_url = item[1]['log_url']
+        else:
+            log_url = ''
+    else:
+        log_url = ''
 
-    print(f"{notebook:75} {passed} {error}")
+    print(f"{notebook:75} {passed} {error:10} {log_url}")

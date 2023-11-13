@@ -454,7 +454,7 @@ def _save_results(results: List[NotebookExecutionResult],
             fail_count = 1
         if result.error_message is None:
             error_type = ''
-        elif 'INTERNAL' in result.error_message:
+        elif '500 Internal' in result.error_message:
             error_type = 'INTERNAL'
         elif 'context deadline exceeded' in result.error_message:
             error_type = 'TIMEOUT'
