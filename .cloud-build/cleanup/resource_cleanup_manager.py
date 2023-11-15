@@ -11,6 +11,7 @@ import abc
 from typing import Any, Type
 
 from google.cloud import aiplatform
+from google.cloud import aiplatform_v1beta1 as v1beta1
 from google.cloud.aiplatform import base
 from google.cloud import storage
 from proto.datetime_helpers import DatetimeWithNanoseconds
@@ -129,18 +130,34 @@ class MatchingEngineIndexEndpointResourceCleanupManager(VertexAIResourceCleanupM
         resource.undeploy_all()
         resource.delete(force=True)
 
-class FeatureStoreCleanupManager(VertexAIResourceCleanupManager):
+class FeatureStoreLegacyCleanupManager(VertexAIResourceCleanupManager):
     # TODO: only deleting legacy
     #    not deleting ingestions jobs
+    #       ingest_from_xxx methods do not return a job ID, there is no list command, aka no python way to delete
     #    not deleting batch serving jobs
+    #       batch_serve_to_xxx methods do not return a job ID, there is no list command, aka no python way to delete
     vertex_ai_resource = aiplatform.Featurestore
-
-    # for FS 2.0
-    # TODO: use _v1beta1, and gapic clients
-    #    delete features, feature groups, feature views, feature online stores
 
     def resource_name(self, resource: Any) -> str:
         return resource.name
+
+
+class FeatureStoreCleanupManager(VertexAIResourceCleanupManager):
+    # for FS 2.0
+    # TODO: use _v1beta1, and gapic clients
+    #    delete features, feature groups, feature views, feature online stores
+    vertex_ai_resource = v1beta1.FeatureOnlineStore
+
+    def resource_name(self, resource: Any) -> str:
+        return resource.name
+
+    def type_name(self) -> str:
+        return "FeatureOnlineStore"
+
+    # TODO: FeatureOnlineStore has no list method
+    def list(self) -> Any:
+        return []
+
 
 class PipelineJobCleanupManager(VertexAIResourceCleanupManager):
     vertex_ai_resource = aiplatform.PipelineJob

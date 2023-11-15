@@ -16,6 +16,7 @@ from resource_cleanup_manager import (
     ResourceCleanupManager,
     MatchingEngineIndexEndpointResourceCleanupManager,
     MatchingEngineIndexResourceCleanupManager,
+    FeatureStoreLegacyCleanupManager,
     FeatureStoreCleanupManager,
     PipelineJobCleanupManager,
     TrainingJobCleanupManager,
@@ -62,6 +63,7 @@ managers: List[ResourceCleanupManager] = [
     ModelResourceCleanupManager(),  # ModelResourceCleanupManager must follow EndpointResourceCleanupManager due to deployed models blocking model deletion.
     MatchingEngineIndexEndpointResourceCleanupManager(),
     MatchingEngineIndexResourceCleanupManager(),
+    FeatureStoreLegacyCleanupManager(),
     FeatureStoreCleanupManager(),
     PipelineJobCleanupManager(),
     TrainingJobCleanupManager(),
