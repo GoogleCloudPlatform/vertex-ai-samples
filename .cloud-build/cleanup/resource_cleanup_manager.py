@@ -130,7 +130,14 @@ class MatchingEngineIndexEndpointResourceCleanupManager(VertexAIResourceCleanupM
         resource.delete(force=True)
 
 class FeatureStoreCleanupManager(VertexAIResourceCleanupManager):
+    # TODO: only deleting legacy
+    #    not deleting ingestions jobs
+    #    not deleting batch serving jobs
     vertex_ai_resource = aiplatform.Featurestore
+
+    # for FS 2.0
+    # TODO: use _v1beta1, and gapic clients
+    #    delete features, feature groups, feature views, feature online stores
 
     def resource_name(self, resource: Any) -> str:
         return resource.name
