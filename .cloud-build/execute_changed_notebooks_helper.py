@@ -458,7 +458,7 @@ def _save_results(results: List[NotebookExecutionResult],
             error_type = 'INTERNAL'
         elif 'context deadline exceeded' in result.error_message:
             error_type = 'TIMEOUT'
-        elif 'Quota' in result.error_message or 'quotas are exceeded' in results.error_message:
+        elif 'Quota' in result.error_message or 'quotas are exceeded' in result.error_message:
             error_type = 'QUOTA'
         elif 'ServiceUnavailable' in result.error_message:
             error_type = 'SERVICEUNAVAILABLE'
