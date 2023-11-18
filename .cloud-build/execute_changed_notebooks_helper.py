@@ -41,6 +41,7 @@ from utils import NotebookProcessors, util
 
 # A buffer so that workers finish before the orchestrating job
 WORKER_TIMEOUT_BUFFER_IN_SECONDS: int = 60 * 60
+
 PYTHON_VERSION = "3.9"  # Set default python version
 
 # rolling time window for accumulating build results for selecting notebooks
@@ -270,7 +271,7 @@ def process_and_execute_notebook(
     private_pool_id: Optional[str],
     deadline: datetime.datetime,
     notebook: str,
-    should_get_tail_logs: bool = False,
+    should_get_tail_logs: bool = True,
 ) -> NotebookExecutionResult:
 
     print(f"Running notebook: {notebook}")
@@ -454,11 +455,11 @@ def _save_results(results: List[NotebookExecutionResult],
             fail_count = 1
         if result.error_message is None:
             error_type = ''
-        elif '500 Internal' in result.error_message:
+        elif '500 Internal' in result.error_message or 'INTERNAL' in result.error_message or 'internal error' in result.error_message:
             error_type = 'INTERNAL'
         elif 'context deadline exceeded' in result.error_message:
             error_type = 'TIMEOUT'
-        elif 'Quota' in result.error_message:
+        elif 'Quota' in result.error_message or 'quotas are exceeded' in result.error_message:
             error_type = 'QUOTA'
         elif 'ServiceUnavailable' in result.error_message:
             error_type = 'SERVICEUNAVAILABLE'
