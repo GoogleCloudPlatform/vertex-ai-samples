@@ -508,6 +508,7 @@ def process_and_execute_notebooks(
     variable_vpc_network: Optional[str] = None,
     private_pool_id: Optional[str] = None,
     concurrent_notebooks: Optional[int] = 10,
+    aiplatform_whl: Optional[str] = None,
 ):
     """
     Run the notebooks that exist under the folders defined in the test_paths_file.
@@ -539,6 +540,7 @@ def process_and_execute_notebooks(
         timeout (str):
             Required. Timeout string according to https://cloud.google.com/build/docs/build-config-file-schema#timeout.
         concurrent_notebooks (int): Max number of notebooks per minute to run in parallel.
+        aiplatform_whl: alternate whl version of Vertex AI SDK to install
     """
 
     # Calculate deadline
