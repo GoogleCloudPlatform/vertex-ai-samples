@@ -199,14 +199,13 @@ efficient training configurations on Vertex AI.
 The lowest cost experiment for each model is marked in **bold** in the last
 column.
 
-
-![vit_benchmarking_table](/images/vit_benchmarking_table.png)
+![vit_benchmarking_table](images/vit_benchmarking_table.png)
 
 The following bar charts summarize the performance visually:
 
-![vit_training_time](/images/vit_training_time.png)
+![vit_training_time](images/vit_training_time.png)
 
-![vit_training_cost](/images/vit_training_cost.png)
+![vit_training_cost](images/vit_training_cost.png)
 
 The following section provides observations and conclusions for these results.
 
