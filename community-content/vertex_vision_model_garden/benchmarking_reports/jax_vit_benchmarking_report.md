@@ -10,11 +10,11 @@ Tao Wang, Software Engineer, Google DeepMind
 
 Alexander Kolesnikov, Research Engineer, Google DeepMind
 
-## Introduction {:#introduction}
+## Introduction
 
 Many repositories now offer both PyTorch and JAX versions of a model. For
-example, [Hugging Face offers many models such as GPT2, BERT][1]{:.external}
-etc. Other examples are [OpenLLaMa][2]{:.external} and [ViT][3]{:.external}
+example, [Hugging Face offers many models such as GPT2, BERT][1]
+etc. Other examples are [OpenLLaMa][2] and [ViT][3]
 models which were first developed in JAX and then their corresponding PyTorch
 versions were made available. **Given both the PyTorch and JAX options for a
 model, it may not be obvious as to which option to choose**. To make such a
@@ -23,7 +23,7 @@ and efficiency for each choice.
 
 Apart from the framework choice, the other choice that one faces on Vertex AI
 training platform is the type and count of the accelerators. Although the
-[Vertex AI pricing table][4]{:.external} lists the price per hour for each
+[Vertex AI pricing table][4] lists the price per hour for each
 machine, **one may not know beforehand about the training speed of JAX and
 PyTorch frameworks for different types and count of the accelerators**.
 
@@ -34,7 +34,7 @@ decision. Such a benchmark will also aid the developers in identifying strength
 and weakness of different choices and then figure out recipes to remove those
 weaknesses if possible.
 
-This blog uses the ViT [classification models][5]{:.external} of varying sizes
+This blog uses the ViT [classification models][5] of varying sizes
 to benchmark the training performance of PyTorch and JAX versions on the Vertex
 AI Platform under different machine configurations. The goal is to:
 
@@ -43,39 +43,39 @@ AI Platform under different machine configurations. The goal is to:
 - Benchmark OSS ViT PyTorch training with A100 GPUs.
 - Benchmark OSS ViT JAX training with A100 GPUs and TPU V3 accelerators.
 
-## Benchmarking setup {:#benchmarking-setup}
+## Benchmarking setup
 
 This section lays out the benchmarking set up for the [PyTorch][6] and [JAX][7]
 frameworks and provides a reasoning for choosing those settings.
 
-### PyTorch GPU {:#pytorch-gpu}
+### PyTorch GPU
 
 #### Machine configuration
 
-We run training jobs on [Vertex AI Custom Training][8]{:.external} using 1
+We run training jobs on [Vertex AI Custom Training][8] using 1
 single node with 8 A100-40GB GPUs.
 
-- Machine type: [a2-highgpu-8g][9]{:.external}
+- Machine type: [a2-highgpu-8g][9]
 - Machine count: 1
-- Accelerator type: [NVIDIA_TESLA_A100 (40GB)][10]{:.external}
+- Accelerator type: [NVIDIA_TESLA_A100 (40GB)][10]
 - Accelerator count: 8
 
 #### Modeling
 
 We benchmark 4 variants of ViT model in different sizes:
 
-- [ViT-L16, 300M params][11]{:.external}
-- [ViT-H14, 630M params][12]{:.external}
-- [ViT-g14, 1B params][13]{:.external}
-- [ViT-G14, 1.8B params][14]{:.external}
+- [ViT-L16, 300M params][11]
+- [ViT-H14, 630M params][12]
+- [ViT-g14, 1B params][13]
+- [ViT-G14, 1.8B params][14]
 
-We use the Huggingface [transformers library][15]{:.external} for ViT L16 and
-H14 variants, and the [TIMM library][16]{:.external} for ViT g14 and G14
+We use the Huggingface [transformers library][15] for ViT L16 and
+H14 variants, and the [TIMM library][16] for ViT g14 and G14
 variants.
 
 #### Dataset
 
-We run training against the [cifar10][17]{:.external} dataset with 50K training
+We run training against the [cifar10][17] dataset with 50K training
 images and 10K test images. To factor out network communication overhead for
 data loading, we copy the whole dataset to the local disk then load data from
 the local disk during training.
@@ -83,15 +83,15 @@ the local disk during training.
 #### Training parameters
 
 - Trainer
-  - We use [PyTorch Lightning][18]{:.external} as the trainer for the
+  - We use [PyTorch Lightning][18] as the trainer for the
     boilerplate data loading and train loop coding.
 - Precision
   - Float16
 - Input resolution
   - 224 x 224
 - Strategy
-  - We use [DDP][19]{:.external} for models which can be entirely loaded to one
-    GPU, use [Deepspeed-ZeRO][20]{:.external} otherwise:
+  - We use [DDP][19] for models which can be entirely loaded to one
+    GPU, use [Deepspeed-ZeRO][20] otherwise:
     - ViT-L16: DDP
     - ViT-H14: DDP
     - ViT-g14: DDP
@@ -103,28 +103,28 @@ the local disk during training.
     - ViT-g14: 16 per GPU
     - ViT-G14: 32 per GPU
 - Compilation
-  - We apply [torch.compile][21]{:.external} to model whenever it's applicable:
+  - We apply [torch.compile][21] to model whenever it's applicable:
     - ViT-L16: torch.compile
     - ViT-H14: torch.compile
     - ViT-g14: torch.compile
     - ViT-G14: N/A
 
-### JAX TPU/GPU {:#jax-tpu/gpu}
+### JAX TPU and GPU
 
 #### Machine configuration
 
 All the TPU and GPU training jobs are run on [Vertex AI Custom
-Training][8]{:.external}. The following machine configurations were used for the
+Training][8]. The following machine configurations were used for the
 TPU and GPU experiments:
 
 **Note**: TPU V3 POD requires multi-host supporting training code. For example,
 a 32 core POD runs on 4 hosts with each host using 8 cores.
 
 **Note**: 8 A100 are similar to TPU V3 32 cores in terms of [Vertex AI
-pricing][4]{:.external}.
+pricing][4].
 
 **Note**: [Each TPU v3 chip has 2 cores which can use 32 GB high-bandwidth
-memory][22]{:.external} (16 GB per core) so total memory for 32 cores is 16x32 =
+memory][22] (16 GB per core) so total memory for 32 cores is 16x32 =
 512 GB. Therefore for the same price, TPUs offer more memory than 8 A100-40GB
 GPUs.
 
@@ -133,24 +133,24 @@ GPUs.
 We decided to use an OSS code repository for model implementation. Using an OSS
 repository helps anyone to independently verify the benchmarking results and
 also relate to the results well. For JAX, we selected the
-[Big Vision][23]{:.external} code repository.
+[Big Vision][23] code repository.
 
 Same as the PyTorch modeling, we benchmark 4 variants of ViT model in different
 sizes:
 
-- [ViT-L16, 300M params][24]{:.external}
-- [ViT-H14, 630M params][24]{:.external}
-- [ViT-g14, 1B params][24]{:.external}
-- [ViT-G14, 1.8B params][24]{:.external}
+- [ViT-L16, 300M params][24]
+- [ViT-H14, 630M params][24]
+- [ViT-g14, 1B params][24]
+- [ViT-G14, 1.8B params][24]
 
-**Note**: The [Big Vision code repo][23]{:.external} has not made the
+**Note**: The [Big Vision code repo][23] has not made the
 checkpoints publicly available for the models larger than the ViT-L16. Therefore
 for the rest of the three variants, the experiments only used random
 initialization for benchmarking the training speed.
 
 #### Dataset
 
-We use training against the [cifar10 TensorFlow dataset][25]{:.external} with
+We use training against the [cifar10 TensorFlow dataset][25] with
 50K training images and 10K test images. This dataset is the same as the one
 used for PyTorch experiments except that it is loaded as a TensorFlow dataset.
 Similar to the PyTorch experiments, we copy the whole dataset to the docker
@@ -175,14 +175,14 @@ image to factor out network communication overhead for data loading.
   - Once a maximum batch-size for 1 A100 GPU was determined, we just scaled it
     linearly for 8 A100 GPUs.
 - Compilation
-  - [jax.jit() compilation][27]{:.external} is used in JAX codes for efficient
+  - [jax.jit() compilation][27] is used in JAX codes for efficient
     execution in XLA.
 - GPU related flags
   - The following flags are set in the dockerfile for the GPU runs.
     - Note: _xla_gpu_enable_pipelined_collectives_ is set to false for the
       ViT-G14 FSDP run.
 
-### Evaluation metric {:#evaluation-metric}
+### Evaluation metric
 
 For both the PyTorch and JAX experiments, the following evaluation metrics are
 collected:
@@ -194,7 +194,7 @@ collected:
 configurations. In addition, these metrics will help one decide the most
 efficient training configurations on Vertex AI.
 
-## Benchmarking results {:#benchmarking-results}
+## Benchmarking results
 
 The lowest cost experiment for each model is marked in **bold** in the last
 column.
@@ -209,7 +209,7 @@ The following bar charts summarize the performance visually:
 
 The following section provides observations and conclusions for these results.
 
-## Observation and Conclusions {:#observation-and}
+## Observation and Conclusions
 
 - Training with JAX TPU V3 POD with 32 cores costs 33% less than the PyTorch GPU
   8 A100-40GBs runs.
@@ -230,7 +230,7 @@ The following section provides observations and conclusions for these results.
 [4]: https://cloud.google.com/vertex-ai/pricing#custom-trained_models
 [5]: https://arxiv.org/abs/2010.11929
 [6]: #pytorch-gpu
-[7]: #jax-tpu/gpu
+[7]: #jax-tpu-and-gpu
 [8]: https://cloud.google.com/vertex-ai/docs/training/overview
 [9]: https://cloud.google.com/vertex-ai/docs/training/configure-compute#machine-types
 [10]: https://cloud.google.com/vertex-ai/docs/training/configure-compute#specifying_gpus
