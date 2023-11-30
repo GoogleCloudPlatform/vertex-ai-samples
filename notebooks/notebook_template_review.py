@@ -1148,7 +1148,7 @@ def add_index(path: str,
     title = title.split(':')[-1].strip()
     title = title[0].upper() + title[1:]
     if args.web:
-        title = replace_cl(title.replace('`', ''))
+        title = replace_cl(replace_backtick(title))
         
         print('    <tr>')
         print('        <td>')
@@ -1159,7 +1159,7 @@ def add_index(path: str,
         print('        <td>')
         print(f'            <b>{title}</b>. ')
         if args.desc:
-            desc = replace_cl(desc.replace('`', ''))
+            desc = replace_cl(replace_backtick(desc))
             print('<br/>')
             print(f'            {desc}\n')
             
@@ -1178,7 +1178,8 @@ def add_index(path: str,
             print('  <ul>\n')
             
             if ":" in steps:
-                steps = steps.split(':')[1].replace('*', '').replace('-', '').replace('`', '').strip().split('\n')
+                steps = replace_backtick(steps)
+                steps = steps.split(':')[1].replace('*', '').replace('-', '').strip().split('\n')
             else:
                 steps = []
               
@@ -1296,6 +1297,21 @@ def replace_cl(text : str ) -> str:
             text = text.replace(key, value)
             
     return text
+
+def replace_backtick(text: str) -> str:
+    backtick = False
+    updated_text = ''
+    for _ in range(len(text)):
+        if text[_] == '`':
+            if not backtick:
+                updated_text += "<code>"
+            else:
+                updated_text += "</code>"
+            backtick = not backtick
+        else:
+            updated_text += text[_]
+
+    return updated_text
 
 
 
