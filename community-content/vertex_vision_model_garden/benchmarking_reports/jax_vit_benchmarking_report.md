@@ -168,7 +168,7 @@ image to factor out network communication overhead for data loading.
   - Used DDP for all models except ViT-G14. ViT-G14 used the FSDP strategy.
 - Batch size
   - We use the max batch size as power of 2 without OOM for each model. The
-    [Benchmarking results][#benchmarking-results] section shows the final
+    [Benchmarking results][26] section shows the final
     batch size for each experiment.
   - Once a maximum batch-size for TPU V3 8 cores was determined, we just scaled
     it linearly for 32 cores.
