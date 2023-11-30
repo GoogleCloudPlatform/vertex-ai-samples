@@ -51,6 +51,7 @@
 /notebooks/community/model_garden/model_garden_mediapipe_image_generation.ipynb @schmidt-sebastian
 /notebooks/community/model_garden/model_garden_mediapipe_object_detection.ipynb @schmidt-sebastian
 /notebooks/community/model_garden/model_garden_mediapipe_text_classification.ipynb @schmidt-sebastian
+/notebooks/community/model_garden/model_garden_openllama_7b_finetune_tutorial.md @weigary
 /notebooks/community/model_garden/model_garden_proprietary_image_classification.ipynb @weigary
 /notebooks/community/model_garden/model_garden_proprietary_image_object_detection.ipynb @weigary
 /notebooks/community/model_garden/model_garden_tfvision_image_classification.ipynb @genquan9
