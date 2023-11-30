@@ -157,7 +157,7 @@ Comparing cost of training the “best” model for batch size 1 vs. batch size 
 
 
 
-A followup question is that since finetuning can be run on a single GPU, should I run on 1 V100 or A100?
+A followup question is that since finetuning can be run on a single GPU, should finetuning be run on 1 V100 or A100?
 
 Setup:
 - num_train_steps=800 / batch_size
