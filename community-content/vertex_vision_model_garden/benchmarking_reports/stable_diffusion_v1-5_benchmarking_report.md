@@ -67,13 +67,13 @@ docker run \
 Many various factors will impact GPU memory usages. In this benchmark, we mainly benchmark with different finetuning algorithms, batch sizes, lora rank, resolution, and then recommended max batch size on different GPUs.
 
 
-![sd_v1-5_peak_gpu_algorithm](images/stable_diffusion_v1-5/sd_v1-5_peak_gpu_algorithm.png)
+![sd_v1-5_peak_gpu_algorithm](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_peak_gpu_algorithm.png)
 
-![sd_v1-5_peak_gpu_batch_size](images/stable_diffusion_v1-5/sd_v1-5_peak_gpu_batch_size.png)
+![sd_v1-5_peak_gpu_batch_size](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_peak_gpu_batch_size.png)
 
-![sd_v1-5_peak_gpu_lora_rank](images/stable_diffusion_v1-5/sd_v1-5_peak_gpu_lora_rank.png)
+![sd_v1-5_peak_gpu_lora_rank](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_peak_gpu_lora_rank.png)
 
-![sd_v1-5_peak_gpu_resolution](images/stable_diffusion_v1-5/sd_v1-5_peak_gpu_resolution.png)
+![sd_v1-5_peak_gpu_resolution](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_peak_gpu_resolution.png)
 
 - LoRA tuning reduced about 47% peak RAM and 42% peak VRAM for GPU memory, compared to full parameter fine tuning.
 - Gradient checkpointing decreases about 1% peak RAM and 31% peak VRAM for GPU memory further, compared without gradient checkpointing.
@@ -99,13 +99,13 @@ Fine tuning speeds and costs are affected by many different factors, such as bat
 - use_lora: True
 - gradient_checkpointing: True
 
-![sd_v1-5_training_speed_batch_size](images/stable_diffusion_v1-5/sd_v1-5_training_speed_batch_size.png)
+![sd_v1-5_training_speed_batch_size](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_training_speed_batch_size.png)
 
-![sd_v1-5_training_speed_lora_rank](images/stable_diffusion_v1-5/sd_v1-5_training_speed_lora_rank.png)
+![sd_v1-5_training_speed_lora_rank](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_training_speed_lora_rank.png)
 
-![sd_v1-5_training_speed_resolution](images/stable_diffusion_v1-5/sd_v1-5_training_speed_resolution.png)
+![sd_v1-5_training_speed_resolution](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_training_speed_resolution.png)
 
-![sd_v1-5_training_cost_max_steps](images/stable_diffusion_v1-5/sd_v1-5_training_cost_max_steps.png)
+![sd_v1-5_training_cost_max_steps](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_training_cost_max_steps.png)
 
 - The fine tuning speed increases with batch sizes, decreases with resolution, but is not affected much by LoRA ranks.
 - The fine tuning speed is about 11 minutes for 1k steps, and costs less than $1 in 1 A100.
@@ -121,9 +121,9 @@ Dreambooth+LoRA
 - Learning rate: 1e-4
 - Batch size: 1
 
-![sd_v1-5_finetuning_quality_subject_fidelity](images/stable_diffusion_v1-5/sd_v1-5_finetuning_quality_subject_fidelity.png)
+![sd_v1-5_finetuning_quality_subject_fidelity](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_finetuning_quality_subject_fidelity.png)
 
-![sd_v1-5_finetuning_quality_prompt_fidelity](images/stable_diffusion_v1-5/sd_v1-5_finetuning_quality_prompt_fidelity.png)
+![sd_v1-5_finetuning_quality_prompt_fidelity](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_finetuning_quality_prompt_fidelity.png)
 
 - Fine tuning with Dreambooth or Dreambooth+LoRA can result in models with comparable performance. The base model produced images of the class rather than the instance.
 - Dreambooth+LoRA is able to achieve the same subject fidelity score as Dreambooth if trained for more epochs.
@@ -132,27 +132,39 @@ Dreambooth+LoRA
 ### Suggested Max Batch Sizes By Resolutions
 We benchmarked and suggested max batch sizes by resolutions on 1 A100 and 1 V100 as below. This is with LoRA and gradient checkpointing enabled.
 
-![sd_v1-5_batch_size_by_resolution](images/stable_diffusion_v1-5/sd_v1-5_batch_size_by_resolution)
+![sd_v1-5_batch_size_by_resolution](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_batch_size_by_resolution.png)
 
 ### Fine Tuning Cost Optimization
 Increasing batch size allows for more images to be considered at each training step for fine tuning. This allows models to be trained in fewer training steps. In this benchmark, we aim to show how batch size can be increased to reduce training costs while still preserving subject and prompt fidelity.
 
 Since the training dataset consists of 5 images, we train with a batch size of 5 and reduce the number of training steps from 400 to 80. Doing so results in a model that has not learned the subject since we’ve decreased the number of training steps. Conceptually, the model is taking a more precise step at each iteration, but it is taking fewer steps. To compensate for this, we increased the learning rate from 5e-6 and observed the best results at 1e-5 for full parameter finetuning.
 
-![sd_v1-5_subject_fidelity_batch_size_5_learning_rate](images/stable_diffusion_v1-5/sd_v1-5_subject_fidelity_batch_size_5_learning_rate)
+![sd_v1-5_subject_fidelity_batch_size_5_learning_rate](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_subject_fidelity_batch_size_5_learning_rate.png)
 
-![sd_v1-5_prompt_fidelity_batch_size_5_learning_rate](images/stable_diffusion_v1-5/sd_v1-5_prompt_fidelity_batch_size_5_learning_rate)
+![sd_v1-5_prompt_fidelity_batch_size_5_learning_rate](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_prompt_fidelity_batch_size_5_learning_rate.png)
 
 Comparing cost of training the “best” model for batch size 1 vs. batch size 5
 
-![sd_v1-5_cost_batch_size](images/stable_diffusion_v1-5_benchmark_report/sd_v1-5_cost_batch_size)
+![sd_v1-5_cost_batch_size](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_cost_batch_size.png)
 
-| Train method | dreambooth |dreambooth | dreambooth-lora | dreambooth-lora
-| Training setup | dreambooth, num_train_steps=400, batch_size=1, lr=5e-6 | dreambooth, num_train_steps=80, batch_size=5, lr=1e-5 | num_train_steps=500, batch_size=1, lr=1e-4 | num_train_steps=50, batch_size=5, lr=1e-3, gc
-| image | ![dog1](images/stable_diffusion_v1-5/sd_v1-5_dog1.png) | ![dog2](images/stable_diffusion_v1-5/sd_v1-5_dog2.png) | ![dog3](images/stable_diffusion_v1-5/sd_v1-5_dog3.png) | ![dog4](images/stable_diffusion_v1-5/sd_v1-5_dog4.png) |
+| Train method | dreambooth |dreambooth | dreambooth-lora | dreambooth-lora |
+|---|---|---|---|---|
+| Training setup | dreambooth, num_train_steps=400, batch_size=1, lr=5e-6 | dreambooth, num_train_steps=80, batch_size=5, lr=1e-5 | num_train_steps=500, batch_size=1, lr=1e-4 | num_train_steps=50, batch_size=5, lr=1e-3, gc | 
+| image | ![dog1](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_dog1.png) | ![dog2](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_dog2.png) | ![dog3](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_dog3.png) | ![dog4](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_dog4.png) |
 | CoCa (prompt fidelity) | 0.12215 | 0.12644 | 0.12856 |0.12566 |
 | DINO (subject fidelity) |0.76531 | 0.74697 |0.78148 | 0.75479|
 | Cost of training on A100 | $0.26 | $0.15 | $0.26 | $0.09 | 
+
+
+
+| Train method| Training parameters| Sample image| CoCa (prompt fidelity)| DINO (subject fidelity) | Cost of training on A100 |
+|---|---|---|---|---|---|
+| dreambooth| dreambooth, num_train_steps=400, batch_size=1, lr=5e-6| ![dog1](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_dog1.png) | 0.12215| 0.76531| $0.26 |
+| dreambooth | dreambooth, num_train_steps=80, batch_size=5,lr=1e-5| ![dog2](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_dog2.png)| 0.12644| 0.74697 | $0.15 |
+| dreambooth-lora| num_train_steps=500, batch_size=1, lr=1e-4, gc|![dog3](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_dog3.png)| 0.12856| 0.78148 | $0.26|
+| dreambooth-lora | num_train_steps=50, batch_size=5, lr=1e-3, gc | ![dog4](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_dog4.png) | 0.12566 | 0.75479 | $0.09 |
+
+
 
 A followup question is that since finetuning can be run on a single GPU, should I run on 1 V100 or A100?
 
@@ -160,7 +172,7 @@ Setup:
 - num_train_steps=800 / batch_size
 - Resolution=512
 
-![sd_v1-5_cost_training_method_batch_size](images/stable_diffusion_v1-5/sd_v1-5_cost_training_method_batch_size)
+![sd_v1-5_cost_training_method_batch_size](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_cost_training_method_batch_size.png)
 - Although V100 has a lower $/hr cost than an A100, the same training setup takes longer. Even given the longer training time, the cost on V100 is still lower.
 - Dreambooth+LoRA enables training with larger batch sizes, however, larger batch sizes will not necessarily mean faster training time.
 - It is possible to fine tune with 1 V100 on 512 resolution with Dreambooth+LoRA.
@@ -174,8 +186,10 @@ We provide two serving dockers in vertex model garden for stable diffusion:
 - pytorch-peft-serve: 
   - us-docker.pkg.dev/vertex-ai/vertex-vision-model-garden-dockers/pytorch-peft-serve
   - This serving docker can serve base stable diffusion models, and base stable diffusion models with fine tuned lora models, and contains optimization for serving.
+
 We run the two serving dockers on T4/V100/A100 to generate 4 512*512 images, and compare the inference speed without network considerations as:
-![sd_v1-5_inference_speed_gpu](images/stable_diffusion_v1-5/sd_v1-5_inference_speed_gpu)
+
+![sd_v1-5_inference_speed_gpu](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_inference_speed_gpu.png)
 The speed up of optimized pytorch-peft-serve is about 2x than current pytorch-diffuser-serve.
 
 ### Serving cost comparison
