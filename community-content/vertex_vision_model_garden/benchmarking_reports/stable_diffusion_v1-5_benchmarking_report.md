@@ -147,15 +147,6 @@ Comparing cost of training the “best” model for batch size 1 vs. batch size 
 
 ![sd_v1-5_cost_batch_size](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_cost_batch_size.png)
 
-| Train method | dreambooth |dreambooth | dreambooth-lora | dreambooth-lora |
-|---|---|---|---|---|
-| Training setup | dreambooth, num_train_steps=400, batch_size=1, lr=5e-6 | dreambooth, num_train_steps=80, batch_size=5, lr=1e-5 | num_train_steps=500, batch_size=1, lr=1e-4 | num_train_steps=50, batch_size=5, lr=1e-3, gc | 
-| image | ![dog1](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_dog1.png) | ![dog2](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_dog2.png) | ![dog3](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_dog3.png) | ![dog4](images/stable_diffusion_v1-5_benchmarking_report/sd_v1-5_dog4.png) |
-| CoCa (prompt fidelity) | 0.12215 | 0.12644 | 0.12856 |0.12566 |
-| DINO (subject fidelity) |0.76531 | 0.74697 |0.78148 | 0.75479|
-| Cost of training on A100 | $0.26 | $0.15 | $0.26 | $0.09 | 
-
-
 
 | Train method| Training parameters| Sample image| CoCa (prompt fidelity)| DINO (subject fidelity) | Cost of training on A100 |
 |---|---|---|---|---|---|
