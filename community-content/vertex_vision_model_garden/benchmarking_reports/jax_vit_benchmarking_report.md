@@ -199,31 +199,14 @@ efficient training configurations on Vertex AI.
 The lowest cost experiment for each model is marked in **bold** in the last
 column.
 
-![plot](images/vit_benchmarking_table.png)
-<img src="images/vit_benchmarking_table.png" alt="NAS infra" width="80%"/>
 
-<figure id = "image-1">
-  <img src = "images/vit_benchmarking_table.png"
-  width = "100%"
-  alt = "">
-  <figcaption><b>Figure 1.</b> Chart</figcaption>
-</figure>
+![vit_benchmarking_table](/images/vit_benchmarking_table.png)
 
 The following bar charts summarize the performance visually:
 
-<figure id = "image-2">
-  <img src = "images/vit_training_time.png"
-  width = "100%"
-  alt = "">
-  <figcaption><b>Figure 2.</b> Chart</figcaption>
-</figure>
+![vit_training_time](/images/vit_training_time.png)
 
-<figure id = "image-3">
-  <img src = "images/vit_training_cost.png"
-  width = "100%"
-  alt = "">
-  <figcaption><b>Figure 3.</b> Chart</figcaption>
-</figure>
+![vit_training_cost](/images/vit_training_cost.png)
 
 The following section provides observations and conclusions for these results.
 
