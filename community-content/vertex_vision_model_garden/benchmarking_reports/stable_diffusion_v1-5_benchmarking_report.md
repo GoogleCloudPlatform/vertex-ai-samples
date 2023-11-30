@@ -88,9 +88,9 @@ This section shows the percentage of trainable parameters, and tuned model sizes
 - LoRA tunes quite a few percent (only 0.1% with LoRA rank=8) of all parameters, and the tuned models are very small (only 3.1MB with LoRA rank=8).
 
 | LoRA Rank | Trainable parameters | Total parameters | Trainable Parameter Percentage | Fine tuned model size (MB) |
-|---|---|---|---|---| 
+|---|---|---|---|---|
 | 4 | 398592 | 859919556 | 0.05% | 1.57 |
-|8 | 797184 | 860318148 | 0.09% | 3.09 | 
+|8 | 797184 | 860318148 | 0.09% | 3.09 |
 | 16 | 1594368| 861115332| 0.19%| 6.13|
 | 32| 3188736| 862709700| 0.37%| 12.21|
 ### Fine Tuning Speed And Costs
@@ -167,14 +167,14 @@ Setup:
 - Although V100 has a lower $/hr cost than an A100, the same training setup takes longer. Even given the longer training time, the cost on V100 is still lower.
 - Dreambooth+LoRA enables training with larger batch sizes, however, larger batch sizes will not necessarily mean faster training time.
 - It is possible to fine tune with 1 V100 on 512 resolution with Dreambooth+LoRA.
-- Dreambooth fine tuning must be run on 1 A100 at 512 resolution. 
+- Dreambooth fine tuning must be run on 1 A100 at 512 resolution.
 
 ## Inference Benchmarks
 We provide two serving dockers in vertex model garden for stable diffusion:
-- pytorch-diffuser-serve: 
+- pytorch-diffuser-serve:
   - us-docker.pkg.dev/vertex-ai/vertex-vision-model-garden-dockers/pytorch-diffusers-serve
   - This serving docker only serves base stable diffusion models and does not contain any optimizations yet.
-- pytorch-peft-serve: 
+- pytorch-peft-serve:
   - us-docker.pkg.dev/vertex-ai/vertex-vision-model-garden-dockers/pytorch-peft-serve
   - This serving docker can serve base stable diffusion models, and base stable diffusion models with fine tuned lora models, and contains optimization for serving.
 
@@ -190,7 +190,7 @@ Pytorch-diffuser-serve (without any optimizations)
 | GPU type|  Time required to generate 4 512x512 images | Machine unit price ($ / hour) | Cost per image ($) |
 |---|---|---|---|
 | T4 | 28.6 | 0.4025| 0.00080 |
-| V100 | 8.8 | 2.852| 0.00174| 
+| V100 | 8.8 | 2.852| 0.00174|
 | A100 | 4.2 | 4.2245 | 0.00123 |
 
 Pytorch-peft-serve (with optimizations)
