@@ -23,4 +23,6 @@
 /vertex_vision_model_garden/model_oss/tfvision @dstnluong-google
 /vertex_vision_model_garden/model_oss/fvlm @minwoo33park
 /vertex_vision_model_garden/model_oss/imagebind @kathyyu-google
+/vertex_vision_model_garden/benchmarking_reports @lavraicse
+
 
