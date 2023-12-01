@@ -1,4 +1,4 @@
-# Tutorial on fine tuning the OpenLLaMA 7B model on Google Cloud Vertex Model Garden
+# Benchmark report on fine tuning the OpenLLaMA 7B model on Google Cloud Vertex Model Garden
 
 ## Introduction
 
@@ -20,7 +20,7 @@ approximate this larger matrix are fine-tuned. QLoRA is an even more
 memory-efficient version of LoRA, where the pretrained model is loaded to GPU
 memory as quantized 4-bit weights, while preserving similar effectiveness to
 LoRA. We also provide simple scripts and parameter settings to reproduce the
-results reported in this tutorial.
+results reported in this report.
 
 In general, there are many factors that affect the performance of fine-tuning
 experiments, such as hardware settings, parameters, cost, and accuracy. It is
