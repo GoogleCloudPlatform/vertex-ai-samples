@@ -26,7 +26,7 @@ Benchmark details are below.
 ### Experiment Setup
 We mainly compare two tuning algorithms:
 - parameter efficient finetuning based on [dreambooth][3] and [LoRA][4] (shorten as Dreambooth+LoRA below)
-- and full parameter fine tuning based on [dreambooth][3] (shorten as Dreambooth below)
+- full parameter fine tuning based on [dreambooth][3] (shorten as Dreambooth below)
 
 And then  report benchmark results on GPU memories, tuning parameters, tuning speeds, costs and accuracy, using the public oxford flowers dataset: [train][5] and [test][6], where the column blip_caption as texts, and column image as images. We also benchmark subject and prompt fidelity using the [dataset][7] from the Dreambooth paper.
 
