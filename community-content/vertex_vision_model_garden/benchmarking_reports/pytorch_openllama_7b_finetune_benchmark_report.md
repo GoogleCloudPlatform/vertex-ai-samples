@@ -1,5 +1,10 @@
 # Benchmark report on fine tuning the OpenLLaMA 7B model on Google Cloud Vertex Model Garden
 
+Gary Wei, Software Engineer, Google Cloud
+Dustin Luong, Software Engineer, Google Cloud
+Changyu Zhu, Software Engineer, Google Cloud
+Genquan Duan, Software Engineer, Google Cloud
+
 ## Introduction
 
 Fine-tuning of LLMs can be non-trivial to find an optimal configuration of
@@ -108,7 +113,7 @@ maximum batch size for different GPUs.
 
 #### Peak GPU memory by batch size (GB)
 
-[chart to be added later]
+<img src="images/openllama_7b_fine_tune_benchmark_report/openllana-7b-peak-gpu-vs-batch-size.png" width="600">
 
 -   The QLoRA can significantly reduce the peak GPU memory usage by ~75%
     compared to LoRA. The peak GPU memory is ~28G for LoRA and ~7G for QLoRA
@@ -121,7 +126,7 @@ maximum batch size for different GPUs.
 
 #### Peak GPU memory by LoRA rank (GB)
 
-[chart to be added later]
+<img src="images/openllama_7b_fine_tune_benchmark_report/openllana-7b-peak-gpu-vs-lora-rank.png" width="600">
 
 -   Peak GPU memories are quite similar for different LoRA ranks for both
     LoRA/QLoRA.
@@ -132,7 +137,7 @@ maximum batch size for different GPUs.
 
 #### Peak GPU memory by max sequence length for LoRA/QLoRA (GB)
 
-[chart to be added later]
+<img src="images/openllama_7b_fine_tune_benchmark_report/openllana-7b-peak-gpu-vs-max-seq-length.png" width="600">
 
 -   The peak GPU increases quickly when max sequence length increases for both
     LoRA/QLoRA, and the increasing rate of LoRA is much faster than QLoRA.
@@ -175,7 +180,7 @@ GPUs, LoRA ranks, and max sequence lengths.
     -   QLoRA tuning speed reduces from ~3 samples per second with LoRA rank as
         8 to ~2.5 samples per second with LoRA rank as 64, slowed down by 17%.
 
-[chart to be added later]
+<img src="images/openllama_7b_fine_tune_benchmark_report/openllana-7b-tune-speed-vs-lora-rank.png" width="600">
 
 -   Longer sequence lengths, slower tuning speed.
     -   LoRA tuning speed reduces from ~5.56 samples per second with max
@@ -185,7 +190,7 @@ GPUs, LoRA ranks, and max sequence lengths.
         sequence length as 256 to ~2.88 samples per second with max sequence
         length as 512 slowed down by ~2.4%.
 
-[chart to be added later]
+<img src="images/openllama_7b_fine_tune_benchmark_report/openllana-7b-tune-speed-lora-qlora.png" width="600">
 
 -   LoRA/QLoRA tuning cost is low generally, while LoRA is even ~40% cheaper
     than QLoRA with the same parameters.
@@ -193,7 +198,7 @@ GPUs, LoRA ranks, and max sequence lengths.
     -   The tuning cost for QLoRA in 500 steps is $6.75 on n1-standard-8 with 1
         V100 GPU, while LoRA could not run because of OOM.
 
-[chart to be added later]
+<img src="images/openllama_7b_fine_tune_benchmark_report/openllana-7b-tune-cost-lora-qlora.png" width="600">
 
 ### Accuracy
 
