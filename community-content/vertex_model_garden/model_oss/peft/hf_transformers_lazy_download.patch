@@ -1,0 +1,131 @@
+diff --git a/src/transformers/modeling_utils.py b/src/transformers/modeling_utils.py
+index 45459ed..32527f4 100644
+--- a/src/transformers/modeling_utils.py
++++ b/src/transformers/modeling_utils.py
+@@ -32,6 +32,8 @@ import torch
+ from packaging import version
+ from torch import Tensor, nn
+ from torch.nn import CrossEntropyLoss
++from huggingface_hub import hf_hub_download
++from google.cloud import storage
+
+ from .activations import get_activation
+ from .configuration_utils import PretrainedConfig
+@@ -442,6 +444,29 @@ def load_state_dict(checkpoint_file: Union[str, os.PathLike]):
+     """
+     Reads a PyTorch checkpoint file, returning properly formatted errors if they arise.
+     """
++    delete_download = False
++    tmp_dir = "/tmp/model"
++    os.makedirs(tmp_dir, exist_ok=True)
++    if isinstance(checkpoint_file, dict):
++        # Download model file from huggingface
++        print(f"==> Download model from HF: {checkpoint_file}")
++        checkpoint_file = hf_hub_download(
++            local_dir=tmp_dir, local_dir_use_symlinks=False, force_download=True, resume_download=True, **checkpoint_file)
++        delete_download = True
++    else:
++        with open(checkpoint_file, "rb") as f:
++            is_gcs_file = (f.read(2) == b"gs")
++        if is_gcs_file:
++            # Download model file from GCS
++            with open(checkpoint_file, "r") as f:
++                gcs_file = f.read()
++            checkpoint_file = os.path.join(tmp_dir, gcs_file.split("/")[-1])
++            print(f"==> Download model from GCS: {gcs_file} to: {checkpoint_file}")
++            client = storage.Client()
++            with open(checkpoint_file, 'wb') as f:
++                client.download_blob_to_file(gcs_file, f)
++            delete_download = True
++
+     if checkpoint_file.endswith(".safetensors") and is_safetensors_available():
+         # Check format of the archive
+         with safe_open(checkpoint_file, framework="pt") as f:
+@@ -455,9 +480,9 @@ def load_state_dict(checkpoint_file: Union[str, os.PathLike]):
+             raise NotImplementedError(
+                 f"Conversion from a {metadata['format']} safetensors archive to PyTorch is not implemented yet."
+             )
+-        return safe_load_file(checkpoint_file)
++        state_dict = safe_load_file(checkpoint_file)
+     try:
+-        return torch.load(checkpoint_file, map_location="cpu")
++        state_dict = torch.load(checkpoint_file, map_location="cpu")
+     except Exception as e:
+         try:
+             with open(checkpoint_file) as f:
+@@ -478,6 +503,10 @@ def load_state_dict(checkpoint_file: Union[str, os.PathLike]):
+                 f"at '{checkpoint_file}'. "
+                 "If you tried to load a PyTorch model from a TF 2.0 checkpoint, please set from_tf=True."
+             )
++    if delete_download:
++        print(f"==> Delete downloaded model: {checkpoint_file}")
++        os.remove(checkpoint_file)
++    return state_dict
+
+
+ def set_initialized_submodules(model, state_dict_keys):
+@@ -3179,7 +3208,10 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin, GenerationMixin, PushToHubMix
+             return mismatched_keys
+
+         if resolved_archive_file is not None:
+-            folder = os.path.sep.join(resolved_archive_file[0].split(os.path.sep)[:-1])
++            if isinstance(resolved_archive_file, str):
++                folder = os.path.sep.join(resolved_archive_file[0].split(os.path.sep)[:-1])
++            else:
++                folder = None
+         else:
+             folder = None
+         if device_map is not None and is_safetensors:
+diff --git a/src/transformers/utils/hub.py b/src/transformers/utils/hub.py
+index ffed743..4b15770 100644
+--- a/src/transformers/utils/hub.py
++++ b/src/transformers/utils/hub.py
+@@ -414,20 +414,34 @@ def cached_file(
+     user_agent = http_user_agent(user_agent)
+     try:
+         # Load from URL or cache if already cached
+-        resolved_file = hf_hub_download(
+-            path_or_repo_id,
+-            filename,
+-            subfolder=None if len(subfolder) == 0 else subfolder,
+-            repo_type=repo_type,
+-            revision=revision,
+-            cache_dir=cache_dir,
+-            user_agent=user_agent,
+-            force_download=force_download,
+-            proxies=proxies,
+-            resume_download=resume_download,
+-            use_auth_token=use_auth_token,
+-            local_files_only=local_files_only,
+-        )
++        if filename.endswith(".bin"):
++            # NOTE: To save disk we do not download bin file eagerly. Do not support safetensors.
++            resolved_file = dict(
++                repo_id=path_or_repo_id,
++                filename=filename,
++                subfolder=None if len(subfolder) == 0 else subfolder,
++                repo_type=repo_type,
++                revision=revision,
++                user_agent=user_agent,
++                proxies=proxies,
++                use_auth_token=use_auth_token,
++            )
++            print(f"--> Apply lazy download to bin file: {resolved_file}")
++        else:
++            resolved_file = hf_hub_download(
++                path_or_repo_id,
++                filename,
++                subfolder=None if len(subfolder) == 0 else subfolder,
++                repo_type=repo_type,
++                revision=revision,
++                cache_dir=cache_dir,
++                user_agent=user_agent,
++                force_download=force_download,
++                proxies=proxies,
++                resume_download=resume_download,
++                use_auth_token=use_auth_token,
++                local_files_only=local_files_only,
++            )
+
+     except RepositoryNotFoundError:
+         raise EnvironmentError(
