@@ -185,4 +185,4 @@ Here are the evaluation results of the best model found by hyperparameter tuning
 
 1. [Benchmark report on fine tuning the OpenLLaMA 7B model on Google Cloud Vertex Model Garden
 ](
-https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/community-content/vertex_vision_model_garden/benchmarking_reports/pytorch_openllama_7b_finetune_benchmark_report.md)
+https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/community-content/vertex_model_garden/benchmarking_reports/pytorch_openllama_7b_finetune_benchmark_report.md)

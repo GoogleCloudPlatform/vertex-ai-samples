@@ -207,7 +207,7 @@ Pytorch-peft-serve (with optimizations)
 
 
 [1]: https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/community/model_garden/model_garden_pytorch_stable_diffusion.ipynb
-[2]: https://github.com/GoogleCloudPlatform/vertex-ai-samples/tree/main/community-content/vertex_vision_model_garden/model_oss
+[2]: https://github.com/GoogleCloudPlatform/vertex-ai-samples/tree/main/community-content/vertex_model_garden/model_oss
 [3]: https://arxiv.org/abs/2208.12242
 [4]: https://arxiv.org/abs/2106.09685
 [5]: https://huggingface.co/datasets/Multimodal-Fatima/OxfordFlowers_train
