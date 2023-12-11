@@ -41,10 +41,13 @@ from utils import NotebookProcessors, util
 
 # A buffer so that workers finish before the orchestrating job
 WORKER_TIMEOUT_BUFFER_IN_SECONDS: int = 60 * 60
+
 PYTHON_VERSION = "3.9"  # Set default python version
 
 # rolling time window for accumulating build results for selecting notebooks
 MAX_RESULTS_AGE_SECONDS: int = (60 * 60) * 24 * 60  # 60 days
+# maximum time since last run to force a run on the current build
+MAX_AGE_BEFORE_FORCE_RUN: int = (60 * 60) * 24 * 30
 
 
 def format_timedelta(delta: datetime.timedelta) -> str:
@@ -118,10 +121,12 @@ def load_results(results_bucket: str,
                 if notebook in accumulative_results:
                     accumulative_results[notebook]['passed'] += build_results[notebook]['passed']
                     accumulative_results[notebook]['failed'] += build_results[notebook]['failed']
+                    if accumulative_results[notebook]['last_time_ran'] < time_created:
+                        accumulative_results[notebook]['last_time_ran'] = time_created
                 else:
                     accumulative_results[notebook] = build_results[notebook]
-                    accumulative_results[notebook]['failed_last_run'] = build_results[notebook]['failed']
-                    accumulative_results[notebook]['failed_last_date'] = time_created
+                    accumulative_results[notebook]['failed_on_latest_run'] = build_results[notebook]['failed']
+                    accumulative_results[notebook]['last_time_ran'] = time_created
 
         print(accumulative_results)
     except Exception as e:
@@ -140,23 +145,37 @@ def select_notebook(changed_notebook: str,
     if changed_notebook in accumulative_results:
         pass_count = accumulative_results[changed_notebook]['passed']
         fail_count = accumulative_results[changed_notebook]['failed']
+        failed_on_latest_run = accumulative_results[changed_notebook]['failed_on_latest_run']
+        last_time_ran = accumulative_results[changed_notebook]['last_time_ran']
     else:
         pass_count = 1
         fail_count = 0
+        failed_on_latest_run = 0
+        last_time_ran = datetime.datetime.now().replace(tzinfo=None)
 
-    # if failed on last run, select the notebook
-    if accumulative_results['failed_last_run']:
+    # If notebook has not been ran in a long time, force running it
+    if (datetime.datetime.now().replace(tzinfo=None) - last_time_ran).total_seconds() > MAX_AGE_BEFORE_FORCE_RUN:
+        should_test_do_to_age = True
+    else:
+        should_test_do_to_age  = False
+
+
+    # if failed on the last time it was ran, select the notebook
+    if failed_on_latest_run:
         inferred_failure_rate = 1
+    # otherwise, calculate the frequency of failure
     else:
         inferred_failure_rate = fail_count / (pass_count + fail_count)
 
     # If failure rate is high, the chance of testing should be higher
     should_test_due_to_failure = random.uniform(0, 1) <= inferred_failure_rate
 
+    #if accumulative_resultsi[changed_notebook]['latest_date_ran']
+
     # Additionally, only test a percentage of these
     should_test_due_to_random_subset = random.uniform(0, 1) <= (test_percent / 100)
 
-    if should_test_due_to_failure or should_test_due_to_random_subset:
+    if should_test_due_to_failure or should_test_due_to_random_subset or should_test_do_to_age:
         print(f"Selected: {changed_notebook}, {should_test_due_to_failure}, {should_test_due_to_random_subset}")
         return True
     else:
@@ -252,7 +271,7 @@ def process_and_execute_notebook(
     private_pool_id: Optional[str],
     deadline: datetime.datetime,
     notebook: str,
-    should_get_tail_logs: bool = False,
+    should_get_tail_logs: bool = True,
 ) -> NotebookExecutionResult:
 
     print(f"Running notebook: {notebook}")
@@ -434,15 +453,39 @@ def _save_results(results: List[NotebookExecutionResult],
         else:
             pass_count = 0
             fail_count = 1
+        if result.error_message is None:
+            error_type = ''
+        elif '500 Internal' in result.error_message or 'INTERNAL' in result.error_message or 'internal error' in result.error_message:
+            error_type = 'INTERNAL'
+        elif 'context deadline exceeded' in result.error_message or 'TIMEOUT' in result.error_message:
+            error_type = 'TIMEOUT'
+        elif 'Quota' in result.error_message or 'quotas are exceeded' in result.error_message:
+            error_type = 'QUOTA'
+        elif 'ServiceUnavailable' in result.error_message:
+            error_type = 'SERVICEUNAVAILABLE'
+        elif 'ModuleNotFoundError' in result.error_message:
+            error_type = 'IMPORT'
+        elif result.is_pass:
+            error_type = ''
+        else:
+            error_type = 'undetermined'
+
+        if error_type != '':
+            log_url = result.log_url
+        else:
+            log_url = ''
+
         build_results[result.path] = {
                 'duration': result.duration.total_seconds(),
                 'start_time': str(result.start_time),
                 'passed': pass_count,
-                'failed': fail_count
+                'failed': fail_count,
+                'error_type': error_type,
+                'log_url': log_url
         }
         print(f"adding {result.path}")
 
-    print("Saving accumulative results ...")
+    print(f"Saving accumulative results to {results_file}, nentries {len(build_results)}")
     content = json.dumps(build_results)
 
     client = storage.Client()
@@ -465,6 +508,7 @@ def process_and_execute_notebooks(
     variable_vpc_network: Optional[str] = None,
     private_pool_id: Optional[str] = None,
     concurrent_notebooks: Optional[int] = 10,
+    aiplatform_whl: Optional[str] = None,
 ):
     """
     Run the notebooks that exist under the folders defined in the test_paths_file.
@@ -496,6 +540,7 @@ def process_and_execute_notebooks(
         timeout (str):
             Required. Timeout string according to https://cloud.google.com/build/docs/build-config-file-schema#timeout.
         concurrent_notebooks (int): Max number of notebooks per minute to run in parallel.
+        aiplatform_whl: alternate whl version of Vertex AI SDK to install
     """
 
     # Calculate deadline

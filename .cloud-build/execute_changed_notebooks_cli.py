@@ -18,6 +18,7 @@
 import argparse
 import pathlib
 import os
+import csv
 
 import execute_changed_notebooks_helper
 
@@ -136,6 +137,13 @@ parser.add_argument(
     required=False,
 )
 parser.add_argument(
+    "--aiplatform_whl",
+    type=str,
+    help="The GCS path to a whl version google-cloud-aiplatform",
+    default=None,
+    required=False,
+)
+parser.add_argument(
     "--dry_run",
     type=str2bool,
     default=False,
@@ -164,6 +172,10 @@ else:
     accumulative_results = execute_changed_notebooks_helper.load_results(results_bucket, results_file)
 
     notebooks = [changed_notebook for changed_notebook in changed_notebooks if execute_changed_notebooks_helper.select_notebook(changed_notebook, accumulative_results, args.test_percent)]
+    # cap the number of notebooks to the specified percentage
+    max_notebooks = int((len(changed_notebooks) * (args.test_percent/100)))
+    if (len(notebooks) > max_notebooks):
+        notebooks = notebooks[:max_notebooks]
 
 run_first = []
 if args.run_first_file:
@@ -182,6 +194,7 @@ if args.run_first_file:
             notebooks.remove(notebook)
             # add back to the front of the list
             notebooks.insert(0, notebook)
+            print(f"Run first: {notebook}")
 
 if args.dry_run:
     print("Dry run ...\n")
@@ -202,4 +215,5 @@ else:
         variable_vpc_network=args.variable_vpc_network,
         private_pool_id=args.private_pool_id,
         concurrent_notebooks=args.concurrent_notebooks,
+        aiplatform_whl=args.aiplatform_whl
 )
