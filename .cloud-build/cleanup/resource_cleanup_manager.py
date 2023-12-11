@@ -12,8 +12,14 @@ from typing import Any, Type
 
 from google.cloud import aiplatform
 from google.cloud.aiplatform import base
+from google.cloud.aiplatform_v1beta1 import (FeatureOnlineStoreAdminServiceClient,
+                                             FeatureOnlineStore)
 from google.cloud import storage
 from proto.datetime_helpers import DatetimeWithNanoseconds
+
+PROJECT_ID = "python-docs-samples-tests"
+REGION = "us-central1"
+API_ENDPOINT = f"{REGION}-aiplatform.googleapis.com"
 
 # If a resource was updated within this number of seconds, do not delete.
 RESOURCE_UPDATE_BUFFER_IN_SECONDS = 60 * 60 * 8
@@ -129,11 +135,50 @@ class MatchingEngineIndexEndpointResourceCleanupManager(VertexAIResourceCleanupM
         resource.undeploy_all()
         resource.delete(force=True)
 
-class FeatureStoreCleanupManager(VertexAIResourceCleanupManager):
+class FeatureStoreLegacyCleanupManager(VertexAIResourceCleanupManager):
+    # TODO: only deleting legacy
+    #    not deleting ingestions jobs
+    #       ingest_from_xxx methods do not return a job ID, there is no list command, aka no python way to delete
+    #    not deleting batch serving jobs
+    #       batch_serve_to_xxx methods do not return a job ID, there is no list command, aka no python way to delete
     vertex_ai_resource = aiplatform.Featurestore
 
     def resource_name(self, resource: Any) -> str:
         return resource.name
+
+    def delete(self, resource):
+        resource.delete(force=True)
+
+
+class FeatureStoreCleanupManager(VertexAIResourceCleanupManager):
+    # for FS 2.0
+    # TODO: use _v1beta1, and gapic clients
+    #    delete features, feature groups, feature views, feature online stores
+    vertex_ai_resource = FeatureOnlineStore
+
+    admin_client = FeatureOnlineStoreAdminServiceClient(
+        client_options={"api_endpoint": API_ENDPOINT}
+    )
+
+    def resource_name(self, resource: Any) -> str:
+        return resource.name
+
+    def type_name(self) -> str:
+        return "FeatureOnlineStore"
+
+    def list(self) -> Any:
+        try:
+            return self.admin_client.list_feature_online_stores(parent=f"projects/{PROJECT_ID}/locations/{REGION}")
+        except Exception as e:
+            print(e)
+            return []
+
+    def delete(self, resource):
+        try:
+            self.admin_client.delete_feature_online_store(name=resource.name, force=True)
+        except Exception as e:
+            print(e)
+
 
 class PipelineJobCleanupManager(VertexAIResourceCleanupManager):
     vertex_ai_resource = aiplatform.PipelineJob

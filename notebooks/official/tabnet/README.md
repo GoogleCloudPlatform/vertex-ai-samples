@@ -35,6 +35,21 @@ The steps performed include:
 &nbsp;&nbsp;&nbsp;Learn more about [Tabular Workflow for TabNet](https://cloud.google.com/vertex-ai/docs/tabular-data/tabular-workflows/tabnet).
 
 
+[Train a TabNet model using Vertex AI Remote Training with Vertex AI SDK 2.0](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tabnet/sdk2_remote_tabnet_training.ipynb)
+
+```
+Learn to use `Vertex AI SDK 2.
+
+The steps performed include:
+
+- Download and split the dataset
+- Ingest the data in a Dataframe and perform transformations.
+- Train a tabular classification model.
+- Train a tabular regression model.
+
+```
+
+
 [Vertex AI TabNet](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/tabnet/tabnet_vertex_tutorial.ipynb)
 
 ```

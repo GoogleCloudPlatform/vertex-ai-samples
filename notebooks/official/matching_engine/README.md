@@ -1,4 +1,21 @@
 
+[Using Vertex AI Multimodal Embeddings and Vector Search](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/matching_engine/sdk_matching_engine_create_multimodal_embeddings.ipynb)
+
+```
+Learn how to encode custom text embeddings, create an  Approximate Nearest Neighbor  index, and query against indexes.
+
+The steps performed include:
+
+* Convert an image dataset to embeddings
+* Create an index
+* Upload embeddings to the index
+* Create an index endpoint
+* Deploy the index to the index endpoint
+* Perform an online query
+
+```
+
+
 [Using Vertex AI Matching Engine for StackOverflow Questions](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/matching_engine/sdk_matching_engine_create_stack_overflow_embeddings.ipynb)
 
 ```
@@ -16,6 +33,27 @@ The steps performed include:
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Matching Engine](https://cloud.google.com/vertex-ai/docs/matching-engine/overview).
 
 
+[Using Vertex AI Vector Search and Vertex AI Embeddings for Text for StackOverflow Questions](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/matching_engine/sdk_matching_engine_create_stack_overflow_embeddings_vertex.ipynb)
+
+```
+Learn how to encode text embeddings, create an Approximate Nearest Neighbor  index, and query against indexes.
+
+The steps performed include:
+
+* Convert a BigQuery dataset to embeddings
+* Create an index
+* Upload embeddings to the index
+* Create an index endpoint
+* Deploy the index to the index endpoint
+* Perform an online query
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Vector Search](https://cloud.google.com/vertex-ai/docs/matching-engine/overview).
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Embeddings for Text](https://cloud.google.com/vertex-ai/docs/generative-ai/embeddings/get-text-embeddings).
+
+
 [Using Vertex AI Matching Engine for Text-to-Image Embeddings](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/matching_engine/sdk_matching_engine_create_text_to_image_embeddings.ipynb)
 
 ```
@@ -31,6 +69,23 @@ The steps performed include:
 ```
 
 &nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Matching Engine](https://cloud.google.com/vertex-ai/docs/matching-engine/overview).
+
+
+[Using Vertex AI Vector Search for Text-to-Image Embeddings](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/matching_engine/sdk_matching_engine_create_text_to_image_embeddings.ipynb)
+
+```
+Learn how to encode custom text embeddings, create an  Approximate Nearest Neighbor  index, and query against indexes.
+
+The steps performed include:
+
+* Create ANN index
+* Create an index endpoint with VPC Network
+* Deploy ANN index
+* Perform online query
+
+```
+
+&nbsp;&nbsp;&nbsp;Learn more about [Vertex AI Vector Search](https://cloud.google.com/vertex-ai/docs/matching-engine/overview).
 
 
 [Create Vertex AI Matching Engine index](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/matching_engine/sdk_matching_engine_for_indexing.ipynb)

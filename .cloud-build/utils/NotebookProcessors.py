@@ -35,7 +35,7 @@ class RemoveNoExecuteCells(Preprocessor):
 
 
 class UpdateVariablesPreprocessor(Preprocessor):
-    def __init__(self, replacement_map: Dict):
+    def __init__(self, replacement_map: Dict[str, str]):
         self._replacement_map = replacement_map
 
     @staticmethod
@@ -98,3 +98,28 @@ class UniqueStringsPreprocessor(Preprocessor):
             executable_cells.append(cell)
         notebook.cells = executable_cells
         return notebook, resources
+
+class VertexAIInstallProprocessor(Preprocessor):
+    def __init__(self, vertex_ai_wheel):
+        self.vertex_ai_wheel = vertex_ai_wheel
+
+    @staticmethod
+    def update_vertex_ai_install(content: str):
+        if "google-cloud-aiplatform" not in content:
+            return content
+        return (
+            f"gsutil cp {self.vertex_ai_wheel} google-cloud-aiplatform.whl\n" + 
+            content.replace("google-cloud-aiplatform\n", "google-cloud-aiplatform.whl\n")
+            .replace("google-cloud-aiplatform ", "google-cloud-aiplatform.whl ")
+        )
+
+    def preprocess(self, notebook, resources=None):
+        executable_cells = []
+        for cell in notebook.cells:
+            if cell.cell_type == "code":
+                cell.source = self.update_vertex_ai_install(
+                    content=cell.source,
+                )
+
+            executable_cells.append(cell)
+        notebook.cells = executable_cells

@@ -1,0 +1,311 @@
+diff --git a/vllm/engine/arg_utils.py b/vllm/engine/arg_utils.py
+index 99fe593..e11246b 100644
+--- a/vllm/engine/arg_utils.py
++++ b/vllm/engine/arg_utils.py
+@@ -1,12 +1,43 @@
+ import argparse
+ import dataclasses
+ from dataclasses import dataclass
++import os
+ from typing import Optional, Tuple
+ 
++from google.cloud import storage
+ from vllm.config import (CacheConfig, ModelConfig, ParallelConfig,
+                          SchedulerConfig)
+ 
+ 
++GCS_PREFIX = "gs://"
++
++
++def is_gcs_path(input_path: str) -> bool:
++    return input_path.startswith(GCS_PREFIX)
++
++
++def download_gcs_dir_to_local(gcs_dir: str, local_dir: str):
++    if os.path.isdir(local_dir):
++        return
++    # gs://bucket_name/dir
++    bucket_name = gcs_dir.split('/')[2]
++    prefix = gcs_dir[len(GCS_PREFIX + bucket_name) :].strip('/')
++    client = storage.Client()
++    blobs = client.list_blobs(bucket_name, prefix=prefix)
++    for blob in blobs:
++        if blob.name[-1] == '/':
++            continue
++        file_path = blob.name[len(prefix) :].strip('/')
++        local_file_path = os.path.join(local_dir, file_path)
++        os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
++        if file_path.endswith(".bin"):
++            with open(local_file_path, 'w') as f:
++                f.write(f'{GCS_PREFIX}{bucket_name}/{prefix}/{file_path}')
++        else:
++            print(f"==> Download {gcs_dir}/{file_path} to {local_file_path}")
++            blob.download_to_filename(local_file_path)
++
++
+ @dataclass
+ class EngineArgs:
+     """Arguments for vLLM engine."""
+@@ -143,6 +174,19 @@ class EngineArgs:
+     def create_engine_configs(
+         self,
+     ) -> Tuple[ModelConfig, CacheConfig, ParallelConfig, SchedulerConfig]:
++        # Preprocess GCS paths.
++        if is_gcs_path(self.tokenizer) and self.tokenizer != self.model:
++            local_dir = "/tmp/gcs_tokenizer"
++            download_gcs_dir_to_local(self.tokenizer, local_dir)
++            self.tokenizer = local_dir
++        if is_gcs_path(self.model):
++            # Download GCS model without bin files.
++            local_dir = "/tmp/gcs_model"
++            download_gcs_dir_to_local(self.model, local_dir)
++            if self.tokenizer == self.model:
++                self.tokenizer = local_dir
++            self.model = local_dir
++
+         # Initialize the configs.
+         model_config = ModelConfig(self.model, self.tokenizer,
+                                    self.tokenizer_mode, self.trust_remote_code,
+diff --git a/vllm/entrypoints/api_server.py b/vllm/entrypoints/api_server.py
+index 58ea2e2..350e209 100644
+--- a/vllm/entrypoints/api_server.py
++++ b/vllm/entrypoints/api_server.py
+@@ -15,6 +15,10 @@ TIMEOUT_KEEP_ALIVE = 5  # seconds.
+ TIMEOUT_TO_PREVENT_DEADLOCK = 1  # seconds.
+ app = FastAPI()
+ 
++# Required by Vertex deployment.
++@app.get("/ping")
++async def ping() -> Response:
++    return Response(status_code=200)
+ 
+ @app.post("/generate")
+ async def generate(request: Request) -> Response:
+@@ -26,6 +30,9 @@ async def generate(request: Request) -> Response:
+     - other fields: the sampling parameters (See `SamplingParams` for details).
+     """
+     request_dict = await request.json()
++    is_on_vertex = "instances" in request_dict
++    if is_on_vertex:
++        request_dict = request_dict["instances"][0]
+     prompt = request_dict.pop("prompt")
+     stream = request_dict.pop("stream", False)
+     sampling_params = SamplingParams(**request_dict)
+@@ -63,7 +70,10 @@ async def generate(request: Request) -> Response:
+     assert final_output is not None
+     prompt = final_output.prompt
+     text_outputs = [prompt + output.text for output in final_output.outputs]
+-    ret = {"text": text_outputs}
++    if is_on_vertex:
++        ret = {"predictions": text_outputs}
++    else:
++        ret = {"text": text_outputs}
+     return JSONResponse(ret)
+ 
+ 
+diff --git a/vllm/model_executor/models/llama.py b/vllm/model_executor/models/llama.py
+index 93ab499..eca1b89 100644
+--- a/vllm/model_executor/models/llama.py
++++ b/vllm/model_executor/models/llama.py
+@@ -85,6 +85,7 @@ class LlamaAttention(nn.Module):
+         hidden_size: int,
+         num_heads: int,
+         num_kv_heads: int,
++        rope_theta: float = 10000,
+     ):
+         super().__init__()
+         self.hidden_size = hidden_size
+@@ -99,6 +100,7 @@ class LlamaAttention(nn.Module):
+         self.q_size = self.num_heads * self.head_dim
+         self.kv_size = self.num_kv_heads * self.head_dim
+         self.scaling = self.head_dim**-0.5
++        self.rope_theta = rope_theta
+ 
+         self.qkv_proj = ColumnParallelLinear(
+             hidden_size,
+@@ -118,6 +120,7 @@ class LlamaAttention(nn.Module):
+         self.attn = PagedAttentionWithRoPE(self.num_heads,
+                                            self.head_dim,
+                                            self.scaling,
++                                           base=self.rope_theta,
+                                            rotary_dim=self.head_dim,
+                                            num_kv_heads=self.num_kv_heads)
+ 
+@@ -143,10 +146,15 @@ class LlamaDecoderLayer(nn.Module):
+     def __init__(self, config: LlamaConfig):
+         super().__init__()
+         self.hidden_size = config.hidden_size
++        try:
++            rope_theta = config.rope_theta
++        except AttributeError:
++            rope_theta = 10000
+         self.self_attn = LlamaAttention(
+             hidden_size=self.hidden_size,
+             num_heads=config.num_attention_heads,
+             num_kv_heads=config.num_key_value_heads,
++            rope_theta=rope_theta,
+         )
+         self.mlp = LlamaMLP(
+             hidden_size=self.hidden_size,
+diff --git a/vllm/model_executor/weight_utils.py b/vllm/model_executor/weight_utils.py
+index a9d899a..57f39b5 100644
+--- a/vllm/model_executor/weight_utils.py
++++ b/vllm/model_executor/weight_utils.py
+@@ -3,13 +3,17 @@ import filelock
+ import glob
+ import json
+ import os
++import time
+ from typing import Iterator, List, Optional, Tuple
+ 
+-from huggingface_hub import snapshot_download
++from google.cloud import storage
++from huggingface_hub import hf_hub_download, snapshot_download
+ import numpy as np
+ import torch
+ from tqdm.auto import tqdm
+ 
++HF_PREFIX = "hf://"
++
+ 
+ class Disabledtqdm(tqdm):
+ 
+@@ -22,60 +26,90 @@ def hf_model_weights_iterator(
+     cache_dir: Optional[str] = None,
+     use_np_cache: bool = False,
+ ) -> Iterator[Tuple[str, torch.Tensor]]:
++    if use_np_cache:
++        raise ValueError("Do not support use_np_cache for lazy download.")
++
+     # Prepare file lock directory to prevent multiple processes from
+     # downloading the same model weights at the same time.
+     lock_dir = cache_dir if cache_dir is not None else "/tmp"
+     lock_file_name = model_name_or_path.replace("/", "-") + ".lock"
+     lock = filelock.FileLock(os.path.join(lock_dir, lock_file_name))
+ 
+-    # Download model weights from huggingface.
+-    is_local = os.path.isdir(model_name_or_path)
+-    if not is_local:
+-        with lock:
+-            hf_folder = snapshot_download(model_name_or_path,
+-                                          allow_patterns="*.bin",
+-                                          cache_dir=cache_dir,
+-                                          tqdm_class=Disabledtqdm)
+-    else:
+-        hf_folder = model_name_or_path
+-
+-    hf_bin_files = [
+-        x for x in glob.glob(os.path.join(hf_folder, "*.bin"))
+-        if not x.endswith("training_args.bin")
+-    ]
+-
+-    if use_np_cache:
+-        # Convert the model weights from torch tensors to numpy arrays for
+-        # faster loading.
+-        np_folder = os.path.join(hf_folder, "np")
+-        os.makedirs(np_folder, exist_ok=True)
+-        weight_names_file = os.path.join(np_folder, "weight_names.json")
+-        with lock:
+-            if not os.path.exists(weight_names_file):
+-                weight_names = []
+-                for bin_file in hf_bin_files:
+-                    state = torch.load(bin_file, map_location="cpu")
+-                    for name, param in state.items():
+-                        param_path = os.path.join(np_folder, name)
+-                        with open(param_path, "wb") as f:
+-                            np.save(f, param.cpu().detach().numpy())
+-                        weight_names.append(name)
+-                with open(weight_names_file, "w") as f:
+-                    json.dump(weight_names, f)
+-
+-        with open(weight_names_file, "r") as f:
+-            weight_names = json.load(f)
+-
+-        for name in weight_names:
+-            param_path = os.path.join(np_folder, name)
+-            with open(param_path, "rb") as f:
+-                param = np.load(f)
+-            yield name, torch.from_numpy(param)
++    bin_files = []
++    if not os.path.isdir(model_name_or_path):
++        try:
++            with lock:
++                index_file = hf_hub_download(repo_id=model_name_or_path,
++                                             filename="pytorch_model.bin.index.json",
++                                             cache_dir=cache_dir)
++        except:
++            print("==> The model is in HF hub with 1 bin file, download it directly.", flush=True)
++            with lock:
++                hf_folder = snapshot_download(repo_id=model_name_or_path,
++                                              allow_patterns="*.bin",
++                                              cache_dir=cache_dir,
++                                              tqdm_class=Disabledtqdm)
++            bin_files = [x for x in glob.glob(os.path.join(hf_folder, "*.bin"))]
++        else:
++            print("==> The model is in HF hub with multiple bin file, do not download it now.", flush=True)
++            with open(index_file, "r") as f:
++                index = json.loads(f.read())
++            bin_filenames = set(index["weight_map"].values())
++            bin_files = [f"{HF_PREFIX}{model_name_or_path}/{bin_filename}" for bin_filename in bin_filenames]
+     else:
+-        for bin_file in hf_bin_files:
+-            state = torch.load(bin_file, map_location="cpu")
+-            for name, param in state.items():
+-                yield name, param
++        print("==> The model is in local disk.", flush=True)
++        bin_files = [x for x in glob.glob(os.path.join(model_name_or_path, "*.bin"))]
++
++    if "training_args.bin" in bin_files:
++        bin_files.remove("training_args.bin")
++    bin_files.sort()
++    print(f"==> Fetched bin files: {bin_files}", flush=True)
++
++    model_dir = "/tmp/model"
++    os.makedirs(model_dir, exist_ok=True)
++    for bin_file in bin_files:
++        delete_download = False
++
++        if os.path.exists(bin_file):
++            if open(bin_file, "rb").read(2) == b"gs":
++                gcs_path = open(bin_file).read()
++                bin_filename = gcs_path.split("/")[-1]
++                local_file = os.path.join(model_dir, bin_filename)
++                with lock:
++                    if not os.path.exists(local_file):
++                        client = storage.Client()
++                        with open(local_file, 'wb') as f:
++                            print(f"==> Download {gcs_path} to {bin_file}", flush=True)
++                            client.download_blob_to_file(gcs_path, f)
++                bin_file = local_file
++                delete_download = True
++        else:
++            assert bin_file.startswith(HF_PREFIX)
++            bin_filename = os.path.basename(bin_file)
++            local_file = os.path.join(model_dir, bin_filename)
++            with lock:
++                if not os.path.exists(local_file):
++                    print(f"==> Download {model_name_or_path}/{bin_filename} to {local_file}", flush=True)
++                    hf_hub_download(repo_id=model_name_or_path,
++                                    filename=bin_filename,
++                                    local_dir=model_dir,
++                                    local_dir_use_symlinks=False,
++                                    force_download=True)
++            bin_file = local_file
++            delete_download = True
++
++        torch.distributed.barrier()
++        print(f"==> Load {bin_file} to memory.", flush=True)
++        state = torch.load(bin_file, map_location="cpu")
++        for name, param in state.items():
++            yield name, param
++        torch.distributed.barrier()
++
++        if delete_download:
++            with lock:
++                if os.path.exists(bin_file):
++                    print(f"==> Delete {bin_file}", flush=True)
++                    os.remove(bin_file)
+ 
+ 
+ def load_tensor_parallel_weights(
+ 

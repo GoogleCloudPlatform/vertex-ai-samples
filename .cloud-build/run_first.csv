@@ -1,0 +1,8 @@
+notebooks/official/pipelines/google_cloud_pipeline_components_automl_text.ipynb
+notebooks/official/generative_ai/rlhf_tune_llm.ipynb
+notebooks/official/generative_ai/tune_peft.ipynb
+notebooks/official/prediction/llm_streaming_prediction.ipynb
+notebooks/official/migration/sdk-automl-text-classification-batch-prediction.ipynb
+notebooks/official/vizier/get_started_vertex_vizier.ipynb
+notebooks/official/workbench/sentiment_analysis/Sentiment_Analysis.ipynb
+notebooks/official/model_monitoring/get_started_with_model_monitoring_automl.ipynb

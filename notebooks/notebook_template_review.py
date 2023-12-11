@@ -6,6 +6,7 @@
         --notebook: review the specified notebook
         --notebook-dir: recursively traverse the directory and review each notebook enocuntered
         --notebook-file: A CSV file with list of notebooks to review.
+        --skip-file: a CSV file with list of notebooks to skip.
         
         # options for error handling
         --errors: Report detected errors.
@@ -52,6 +53,8 @@ parser.add_argument('--notebook', dest='notebook',
                     default=None, type=str, help='Notebook to review')
 parser.add_argument('--notebook-file', dest='notebook_file',
                     default=None, type=str, help='File with list of notebooks to review')
+parser.add_argument('--skip-file', dest='skip_file',
+                    default=None, type=str, help='File with list of notebooks to skip')
 parser.add_argument('--errors', dest='errors', action='store_true', 
                     default=False, help='Report errors')
 parser.add_argument('--errors-csv', dest='errors_csv', action='store_true', 
@@ -178,6 +181,7 @@ class FixCode(Enum):
 
 # globals
 last_tag = ''
+skip_list = []
 
 
 def parse_dir(directory: str) -> int:
@@ -186,7 +190,7 @@ def parse_dir(directory: str) -> int:
         
             directory: The directory path.
             
-        Returns the numbern of errors
+        Returns the number of errors
     """
     exit_code = 0
     
@@ -213,6 +217,9 @@ def parse_dir(directory: str) -> int:
                 continue
             exit_code += parse_dir(entry.path)
         elif entry.name.endswith('.ipynb'):
+            if entry.name in skip_list:
+                print(f"Warning: skipping notebook {entry.name}", file=sys.stderr)
+                continue
             tag = directory.split('/')[-1]
             if tag == 'automl':
                 tag = 'AutoML'
@@ -498,7 +505,17 @@ class TitleRule(NotebookRule):
         
         cell = notebook.peek()
         if not cell['source'][0].startswith('# '):
-            ret = notebook.report_error(ErrorCode.ERROR_TITLE_HEADING, "title cell must start with H1 heading")
+            notebook.report_error(ErrorCode.ERROR_TITLE_HEADING, "title cell must start with H1 heading")
+            if not cell['source'][0].startswith('## '):
+                ret = False
+            else:
+                
+                self.title = cell['source'][0][3:].strip()
+                SentenceCaseTWRule().validate(notebook, [self.title])
+
+                # H1 title only
+                if len(cell['source']) == 1:
+                    notebook.pop()
         else:
             self.title = cell['source'][0][2:].strip()
             SentenceCaseTWRule().validate(notebook, [self.title])
@@ -1131,7 +1148,7 @@ def add_index(path: str,
     title = title.split(':')[-1].strip()
     title = title[0].upper() + title[1:]
     if args.web:
-        title = replace_cl(title.replace('`', ''))
+        title = replace_cl(replace_backtick(title))
         
         print('    <tr>')
         print('        <td>')
@@ -1142,7 +1159,7 @@ def add_index(path: str,
         print('        <td>')
         print(f'            <b>{title}</b>. ')
         if args.desc:
-            desc = replace_cl(desc.replace('`', ''))
+            desc = replace_cl(replace_backtick(desc))
             print('<br/>')
             print(f'            {desc}\n')
             
@@ -1161,6 +1178,7 @@ def add_index(path: str,
             print('  <ul>\n')
             
             if ":" in steps:
+                steps = replace_backtick(steps)
                 steps = steps.split(':')[1].replace('*', '').replace('-', '').strip().split('\n')
             else:
                 steps = []
@@ -1248,8 +1266,9 @@ def replace_cl(text : str ) -> str:
         'Vertex AI Data Labeling': '{{vertex_data_labeling_name}}',
         'Vertex AI Experiments': '{{vertex_experiments_name}}',
         'Vertex Experiments': '{{vertex_experiments_name}}',
-        'Vertex AI Matching Engine': '{{vertex_matching_engine_name}}',
-        'Vertex Matching Engine': '{{vertex_matching_engine_name}}',
+        'Vertex AI Matching Engine': '{{vertex_vector_search_name}}',
+        'Vertex Matching Engine': '{{vertex_vector_search_name}}',
+        'Vertex AI Vector Search': '{{vertex_vector_search_name}}',
         'Vertex Model Monitoring': '{{vertex_model_monitoring_name}}',
         'Vertex AI Model Monitoring': '{{vertex_model_monitoring_name}}',
         'Vertex Feature Store': '{{vertex_featurestore_name}}',
@@ -1278,6 +1297,21 @@ def replace_cl(text : str ) -> str:
             text = text.replace(key, value)
             
     return text
+
+def replace_backtick(text: str) -> str:
+    backtick = False
+    updated_text = ''
+    for _ in range(len(text)):
+        if text[_] == '`':
+            if not backtick:
+                updated_text += "<code>"
+            else:
+                updated_text += "</code>"
+            backtick = not backtick
+        else:
+            updated_text += text[_]
+
+    return updated_text
 
 
 
@@ -1325,6 +1359,20 @@ if args.web:
     print('        </tr>')
     print('    </thead>')
     print('    <tbody class="list">')
+    
+
+if args.skip_file:
+    if not os.path.isfile(args.skip_file):
+        print(f"Error: file does not exist: {args.skip_file}", file=sys.stderr)
+        exit(1)
+    else:
+        with open(args.skip_file, 'r') as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                if len(row) > 0:
+                    notebook = row[0]
+                    skip_list.append(notebook)
+                    print(f"Skip entry {notebook}", file=sys.stderr)
 
 if args.notebook_dir:
     if not os.path.isdir(args.notebook_dir):
@@ -1338,7 +1386,7 @@ elif args.notebook:
     exit_code = parse_notebook(args.notebook, tags=[], linkback=None, rules=rules)
 elif args.notebook_file:
     if not os.path.isfile(args.notebook_file):
-        print("Error: file does not exist", args.notebook_file)
+        print(f"Error: file does not exist {args.notebook_file}", file=sys.stderr)
     else:
         exit_code = 0
         with open(args.notebook_file, 'r') as csvfile:
