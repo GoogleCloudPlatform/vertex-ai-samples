@@ -36,7 +36,10 @@ def run_cleanup_managers(managers: List[ResourceCleanupManager], is_dry_run: boo
 
         print(f"Fetching {type_name}'s...")
         resources = manager.list()
-        print(f"Found {len(resources)} {type_name}'s")
+        try:
+            print(f"Found {len(resources)} {type_name}'s")
+        except Exception as e:
+            print(f"{type_name} {e}")
         for resource in resources:
             try:
                 if not manager.is_deletable(resource):

@@ -146,6 +146,9 @@ class FeatureStoreLegacyCleanupManager(VertexAIResourceCleanupManager):
     def resource_name(self, resource: Any) -> str:
         return resource.name
 
+    def delete(self, resource):
+        resource.delete(force=True)
+
 
 class FeatureStoreCleanupManager(VertexAIResourceCleanupManager):
     # for FS 2.0

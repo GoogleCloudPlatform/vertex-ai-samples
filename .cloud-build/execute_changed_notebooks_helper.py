@@ -41,6 +41,7 @@ from utils import NotebookProcessors, util
 
 # A buffer so that workers finish before the orchestrating job
 WORKER_TIMEOUT_BUFFER_IN_SECONDS: int = 60 * 60
+
 PYTHON_VERSION = "3.9"  # Set default python version
 
 # rolling time window for accumulating build results for selecting notebooks
@@ -454,11 +455,11 @@ def _save_results(results: List[NotebookExecutionResult],
             fail_count = 1
         if result.error_message is None:
             error_type = ''
-        elif '500 Internal' in result.error_message or 'INTERNAL' in result.error_message:
+        elif '500 Internal' in result.error_message or 'INTERNAL' in result.error_message or 'internal error' in result.error_message:
             error_type = 'INTERNAL'
-        elif 'context deadline exceeded' in result.error_message:
+        elif 'context deadline exceeded' in result.error_message or 'TIMEOUT' in result.error_message:
             error_type = 'TIMEOUT'
-        elif 'Quota' in result.error_message or 'quotas are exceeded' in results.error_message:
+        elif 'Quota' in result.error_message or 'quotas are exceeded' in result.error_message:
             error_type = 'QUOTA'
         elif 'ServiceUnavailable' in result.error_message:
             error_type = 'SERVICEUNAVAILABLE'
@@ -507,6 +508,7 @@ def process_and_execute_notebooks(
     variable_vpc_network: Optional[str] = None,
     private_pool_id: Optional[str] = None,
     concurrent_notebooks: Optional[int] = 10,
+    aiplatform_whl: Optional[str] = None,
 ):
     """
     Run the notebooks that exist under the folders defined in the test_paths_file.
@@ -538,6 +540,7 @@ def process_and_execute_notebooks(
         timeout (str):
             Required. Timeout string according to https://cloud.google.com/build/docs/build-config-file-schema#timeout.
         concurrent_notebooks (int): Max number of notebooks per minute to run in parallel.
+        aiplatform_whl: alternate whl version of Vertex AI SDK to install
     """
 
     # Calculate deadline

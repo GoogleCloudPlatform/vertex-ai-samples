@@ -137,6 +137,13 @@ parser.add_argument(
     required=False,
 )
 parser.add_argument(
+    "--aiplatform_whl",
+    type=str,
+    help="The GCS path to a whl version google-cloud-aiplatform",
+    default=None,
+    required=False,
+)
+parser.add_argument(
     "--dry_run",
     type=str2bool,
     default=False,
@@ -208,4 +215,5 @@ else:
         variable_vpc_network=args.variable_vpc_network,
         private_pool_id=args.private_pool_id,
         concurrent_notebooks=args.concurrent_notebooks,
+        aiplatform_whl=args.aiplatform_whl
 )
