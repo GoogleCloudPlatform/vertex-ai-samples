@@ -1,4 +1,4 @@
 google-cloud-bigquery==2.20.0
 tensorflow==2.7.2
-pillow==10.0.1
+pillow==10.2.0
 tf-agents==0.8.0
