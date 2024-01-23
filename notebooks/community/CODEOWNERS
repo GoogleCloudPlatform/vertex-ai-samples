@@ -106,6 +106,7 @@
 /notebooks/community/model_garden/model_garden_pytorch_llama2_deployment.ipynb @genquan9
 /notebooks/community/model_garden/model_garden_pytorch_llama2_peft_finetuning.ipynb @genquan9
 /notebooks/community/model_garden/model_garden_pytorch_llama2_quantization.ipynb @dstnluong-google
+/notebooks/community/model_garden/model_garden_pytorch_llama2_peft_hyperparameter_tuning.ipynb @KCFindstr
 /notebooks/community/model_garden/model_garden_pytorch_llama2_evaluation.ipynb @kathyyu-google
 /notebooks/community/model_garden/model_garden_pytorch_llama2_rlhf_tuning.ipynb @genquan9
 /notebooks/community/model_garden/model_garden_pytorch_wizard_coder.ipynb @KCFindstr
