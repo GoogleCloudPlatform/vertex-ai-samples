@@ -34,6 +34,8 @@ INSTRUCT_LORA = "instruct-lora"
 _NUM_INFERENCE_STEPS = 25
 _MAX_LENGTH_DEFAULT = 200
 _TOP_K_DEFAULT = 10
+_TOP_P_DEFAULT = 1.0
+_TEMPERATURE_DEFAULT = 1.0
 
 
 class PeftHandler(BaseHandler):
@@ -193,19 +195,26 @@ class PeftHandler(BaseHandler):
     # Assumes that the parameters are same in one request. We parse the
     # parameters from the first instance for all instances in one request.
     max_length = _MAX_LENGTH_DEFAULT
+    max_new_tokens = None
     top_k = _TOP_K_DEFAULT
+    top_p = _TOP_P_DEFAULT
+    temperature = _TEMPERATURE_DEFAULT
 
     prompts = [item["prompt"] for item in data]
     if "max_length" in data[0]:
       max_length = data[0]["max_length"]
     if "top_k" in data[0]:
       top_k = data[0]["top_k"]
+    if "top_p" in data[0]:
+      top_p = data[0]["top_p"]
+    if "temperature" in data[0]:
+      temperature = data[0]["temperature"]
 
-    return prompts, max_length, top_k
+    return prompts, max_length, max_new_tokens, top_k, top_p, temperature
 
   def inference(self, data: Any, *args, **kwargs) -> List[Image.Image]:
     """Runs the inference."""
-    prompts, max_length, top_k = data
+    prompts, max_length, max_new_tokens, top_k, top_p, temperature = data
     logging.debug(
         f"Inference prompts={prompts}, max_length={max_length}, top_k={top_k}."
     )
@@ -226,8 +235,11 @@ class PeftHandler(BaseHandler):
       predicted_results = self.pipeline(
           prompts,
           max_length=max_length,
+          max_new_tokens=max_new_tokens,
           do_sample=True,
+          temperature=temperature,
           top_k=top_k,
+          top_p=top_p,
           num_return_sequences=1,
           eos_token_id=self.tokenizer.eos_token_id,
       )
