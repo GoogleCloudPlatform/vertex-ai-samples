@@ -1,5 +1,5 @@
 absl-py==1.1.0
-fastapi==0.75.2
+fastapi==0.109.1
 uvicorn==0.18.2
 timm==0.5.4
 smart_open==6.0.0
