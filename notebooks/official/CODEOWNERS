@@ -38,7 +38,7 @@
 /model_registry/bqml_vertexai_model_registry.ipynb @soheilazangeneh
 /model_evaluation/automl_tabular_classification_model_evaluation.ipynb @soheilazangeneh
 /model_evaluation/automl_tabular_regression_model_evaluation.ipynb @soheilazangeneh
-/tabular_workflows/automl_forecasting_bqml_arima_plus_comparison.ipynb @TheMichaelHu
+/tabular_workflows/bqml_arima_plus.ipynb @TheMichaelHu
 /tabular_workflows/prophet_on_vertex_pipelines.ipynb @TheMichaelHu
 /model_evaluation/custom_tabular_classification_model_evaluation.ipynb @soheilazangeneh
 /sdk/SDK_FBProphet_Forecasting_Online.ipynb @brianchunkang
