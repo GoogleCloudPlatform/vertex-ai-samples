@@ -25,5 +25,5 @@
 /vertex_model_garden/model_oss/imagebind @kathyyu-google
 /vertex_model_garden/model_oss/llava @py4
 /vertex_model_garden/benchmarking_reports @lavraicse
-
+/vertex_model_garden/model_oss/autogluon @lavraicse
 
