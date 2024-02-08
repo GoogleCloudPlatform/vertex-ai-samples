@@ -28,7 +28,6 @@
 /managed_notebooks @GoogleCloudPlatform/notebooks-team
 /pipelines/google_cloud_pipeline_components_bqml_text.ipynb @inardini
 /pipelines/google_cloud_pipelines_dataproc_tabular @inardini
-/automl/automl_forecasting_bqml_arima_plus_comparison.ipynb @TheMichaelHu
 /automl/automl_tabular_on_vertex_pipelines.ipynb @helinwang
 /automl/automl_forecasting_on_vertex_pipelines.ipynb @geraint0923
 /custom/custom_training_tensorboard_profiler.ipynb @gericdong
@@ -39,6 +38,7 @@
 /model_registry/bqml_vertexai_model_registry.ipynb @soheilazangeneh
 /model_evaluation/automl_tabular_classification_model_evaluation.ipynb @soheilazangeneh
 /model_evaluation/automl_tabular_regression_model_evaluation.ipynb @soheilazangeneh
+/tabular_workflows/bqml_arima_plus.ipynb @TheMichaelHu
 /tabular_workflows/prophet_on_vertex_pipelines.ipynb @TheMichaelHu
 /model_evaluation/custom_tabular_classification_model_evaluation.ipynb @soheilazangeneh
 /sdk/SDK_FBProphet_Forecasting_Online.ipynb @brianchunkang
