@@ -48,3 +48,4 @@
 /experiments/get_started_with_custom_training_autologging_local_script.ipynb @inardini
 /model_evaluation/model_based_llm_evaluation/autosxs_llm_evaluation_for_summarization_task.ipynb @sipingh
 /model_evaluation/model_based_llm_evaluation/autosxs_check_alignment_against_human_preference_data.ipynb @sipingh
+/feature_store/vertex_ai_feature_store_based_llm_grounding_tutorial.ipynb @jwortz
