@@ -45,6 +45,7 @@
 /notebooks/community/pipelines/google_cloud_pipeline_components_ready_to_go_text_classification_pipeline.ipynb @Narwhalprime
 /notebooks/community/feature_store/get_started_vertex_feature_store.ipynb @junkourata
 /notebooks/community/model_garden/model_garden_huggingface_local_inference.ipynb @dstnluong-google
+/notebooks/community/model_garden/model_garden_jax_stable_diffusion_xl.ipynb @weigary
 /notebooks/community/model_garden/model_garden_mediapipe_face_stylizer.pynb @schmidt-sebastian
 /notebooks/community/model_garden/model_garden_mediapipe_gesture_recognition.ipynb @schmidt-sebastian
 /notebooks/community/model_garden/model_garden_mediapipe_image_classification.ipynb @schmidt-sebastian
@@ -61,6 +62,8 @@
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_2_1.ipynb @bingatgoogle
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_inpainting.ipynb @xiangxu-google
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_xl_1_0.ipynb @bingatgoogle
+/notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_xl_lcm.ipynb @weigary
+/notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_xl_lora.ipynb @weigary
 /notebooks/community/model_garden/model_garden_pytorch_instructpix2pix.ipynb @xiangxu-google
 /notebooks/community/model_garden/model_garden_pytorch_controlnet.ipynb @xiangxu-google
 /notebooks/community/model_garden/model_garden_pytorch_blip_image_captioning.ipynb @xiangxu-google
