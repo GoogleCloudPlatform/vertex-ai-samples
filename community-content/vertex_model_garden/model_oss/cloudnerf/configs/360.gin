@@ -1,0 +1,25 @@
+# The provided content is a configuration file for the ZipNeRF
+# PyTorch implementation.
+
+# Sets the name of the experiment to 'test'.
+Config.exp_name = 'test'
+# Specifies the dataset loader, in this case, 'llff' for light field.
+Config.dataset_loader = 'llff'
+# Defines the near and far clipping planes for the camera view.
+Config.near = 0.2
+Config.far = 1e6
+# Image downsampling.
+Config.factor = 4
+
+# For the model configurations.
+Model.raydist_fn = 'power_transformation'
+Model.opaque_background = True
+
+# Disables the computation of density normals and RGB values, and sets
+# the grid level dimension to 1 for PropMLP.
+PropMLP.disable_density_normals = True
+PropMLP.disable_rgb = True
+PropMLP.grid_level_dim = 1
+
+# Disable density normals for NerfMLP
+NerfMLP.disable_density_normals = True
