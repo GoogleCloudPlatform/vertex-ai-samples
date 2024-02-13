@@ -1238,8 +1238,8 @@ def replace_cl(text : str ) -> str:
         #'AutoML Tabular Workflow': '{{automl_name}} Tabular Workflow',
         #'AutoML Tables': '{{automl_tables_name}}',
         #'AutoML Tabular': '{{automl_tables_name}}',
-        #'AutoML Vision': '{automl_vision_name}}',
-        #'AutoML Image': '{automl_vision_name}}',
+        #'AutoML Vision': '{{automl_vision_name}}',
+        #'AutoML Image': '{{automl_vision_name}}',
         'AutoML': '{{automl_name}}',
         
         'BigQuery ML': '{{bigqueryml_name}}',
