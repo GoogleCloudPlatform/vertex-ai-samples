@@ -60,6 +60,7 @@
 /notebooks/community/model_garden/model_garden_tfvision_image_segmentation.ipynb @genquan9
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion.ipynb @xiangxu-google
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_2_1.ipynb @bingatgoogle
+/notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_custom.ipynb @weigary
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_inpainting.ipynb @xiangxu-google
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_xl_1_0.ipynb @bingatgoogle
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_xl_lcm.ipynb @weigary
