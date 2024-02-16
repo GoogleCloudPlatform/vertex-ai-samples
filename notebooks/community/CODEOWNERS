@@ -119,3 +119,5 @@
 /notebooks/community/model_garden/model_garden_pytorch_wizard_lm.ipynb @KCFindstr
 /notebooks/community/model_garden/model_garden_pytorch_llava.ipynb @py4
 /notebooks/community/model_garden/model_garden_pytorch_lama.ipynb @dstnluong-google
+/notebooks/community/model_garden/model_garden_pytorch_mistral_peft_tuning.ipynb @KCFindstr
+/notebooks/community/model_garden/model_garden_pytorch_mixtral_peft_tuning.ipynb @KCFindstr
