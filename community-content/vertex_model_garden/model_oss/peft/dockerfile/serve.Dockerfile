@@ -83,7 +83,7 @@ EXPOSE ${mng_port}
 
 # Set environments.
 ENV TASK "causal-language-modeling-lora"
-ENV BASE_MODEL_ID "openlm-research/open_llama_7b"
+ENV MODEL_ID "openlm-research/open_llama_7b"
 ENV PRECISION_LOADING_MODE "float16"
 ENV FINETUNED_LORA_MODEL_PATH ""
 
