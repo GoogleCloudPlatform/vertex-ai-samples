@@ -16,6 +16,7 @@
 /model_monitoring @andrewferlitsch
 /tensorboard @zbl94
 /vertex_ai_sdk @jaycee-li
+/experiments @lakeyk
 
 /bigquery_ml/bqml-online-prediction.ipynb @polong-lin
 /model_monitoring/model_monitoring.ipynb @andrewferlitsch
@@ -48,3 +49,4 @@
 /experiments/get_started_with_custom_training_autologging_local_script.ipynb @inardini
 /model_evaluation/model_based_llm_evaluation/autosxs_llm_evaluation_for_summarization_task.ipynb @sipingh
 /model_evaluation/model_based_llm_evaluation/autosxs_check_alignment_against_human_preference_data.ipynb @sipingh
+/ray_on_vertex_ai/get_started_with_pytorch_rov.ipynb @inardini
