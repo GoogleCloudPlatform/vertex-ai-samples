@@ -16,6 +16,7 @@
 /model_monitoring @andrewferlitsch
 /tensorboard @zbl94
 /vertex_ai_sdk @jaycee-li
+/experiments @lakeyk
 
 /bigquery_ml/bqml-online-prediction.ipynb @polong-lin
 /model_monitoring/model_monitoring.ipynb @andrewferlitsch
