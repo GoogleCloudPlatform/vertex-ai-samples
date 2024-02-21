@@ -1,0 +1,24 @@
+--find-links https://download.pytorch.org/whl/torch_stable.html
+
+torch==2.0.1+cu118
+numpy==1.26.1
+absl_py==2.0.0
+accelerate==0.24.0
+gin_config==0.5.0
+imageio==2.31.6
+imageio-ffmpeg==0.4.9
+matplotlib==3.8.0
+mediapy==1.1.9
+ninja==1.11.1.1
+opencv_contrib_python==4.8.1.78
+opencv_python==4.8.1.78
+Pillow==10.2.0
+rawpy==0.18.1
+scipy==1.11.3
+scikit-image==0.22.0
+scikit-learn==1.3.2
+tensorboard==2.15.0
+tensorboardX==2.6.2.2
+tqdm==4.66.1
+trimesh==4.0.1
+xatlas==0.0.8
