@@ -128,3 +128,4 @@
 /notebooks/community/model_garden/model_garden_gemma_finetuning_on_vertex.ipynb @KCFindstr
 /notebooks/community/model_garden/model_garden_pytorch_gemma_peft_finetuning_hf.ipynb @KCFindstr
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_deployment_1_5.ipynb @weigary
+/notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_gradio.ipynb @weigary
