@@ -1247,6 +1247,8 @@ def replace_cl(text : str ) -> str:
         'Vertex Model': '{{vertex_ai_name}} model',
         'Vertex Endpoint': '{{vertex_ai_name}} endpoint',
         'Vertex Model Registry': '{{vertex_model_registry_name}}',
+        'model registry': '{{vertex_model_registry_name_short}}',
+        'Model Registry': '{{vertex_model_registry_name_short}}',
         'Vertex AI Model Registry': '{{vertex_model_registry_name}}',
         'Vertex Training': '{{vertex_training_name}}',
         'Vertex AI Training': '{{vertex_training_name}}',
