@@ -2,7 +2,7 @@
 
 from argparse import Namespace  # pylint: disable=g-importing-member
 import os
-from typing import Any
+from typing import Any, List
 
 from absl import logging
 from data import CustomFolder
@@ -25,7 +25,7 @@ _COCO_DATASET_NAME = "coco"
 _MODEL_NAME = "ViT-L/14"
 _LOCAL_QUERY_PATH = "./query/"
 _IMAGE_OUTPUT_LOCAL_DIR = "demo_out/images"
-_OUTPUT_LOCAL_DIR = "/demo_out/"
+_OUTPUT_LOCAL_DIR = "./demo_out/"
 _DATA_DIR = "data"
 _CHECKPOINT_DIR = "checkpoint/pic2word_model.pt"
 _REQUEST_PROMPTS = "prompts"
@@ -33,6 +33,7 @@ _REQUEST_OUTPUT_STORAGE_DIR = "output_storage_dir"
 _REQUEST_IMAGE_PATH = "image_path"
 _REQUEST_IMAGE_FILE_NAME = "image_file_name"
 _RESPONSE_MSG = "Successfully retrieved images."
+_PICKLE_DIR_PATH = "gs://pic2word-bucket/pickle/"
 
 
 class ModelHandler(BaseHandler):
@@ -49,6 +50,8 @@ class ModelHandler(BaseHandler):
   def initialize(self, context: Any):
     """Initialize."""
     logging.info("Initializing pic2word.")
+    # Download pickle file for COCO
+    fileutils.download_gcs_dir_to_local(_PICKLE_DIR_PATH, "./data")
 
     # Download COCO dataset. The model looks for this folder specifically
     # during image retrieval to generate a response for each request.
@@ -157,11 +160,11 @@ class ModelHandler(BaseHandler):
         _IMAGE_OUTPUT_LOCAL_DIR, self.output_storage_dir
     )
 
-  def handle(self, data: Any, context: Any) -> str:  # pylint: disable=unused-argument
+  def handle(self, data: Any, context: Any) -> List[str]:  # pylint: disable=unused-argument
     """Runs preprocess, inference, and post-processing."""
     logging.info("Received Pic2Word inference request")
     model_input = self.preprocess(data)
     self.inference(model_input)
     self.postprocess()
     logging.info("Done handling input.")
-    return _RESPONSE_MSG
+    return [_RESPONSE_MSG]

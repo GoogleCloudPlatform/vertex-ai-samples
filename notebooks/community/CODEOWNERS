@@ -39,6 +39,7 @@
 /notebooks/community/vision/image_warehouse_sdk.ipynb @bingwang @zhangxiaotian
 /notebooks/community/vision/video_warehouse_sdk.ipynb @zhangxiaotian
 /notebooks/community/vizier/conversions_vertex_vizier_and_open_source_vizier.ipynb @halio-g
+/notebooks/community/exploratory_data_analysis/eda_with_r_and_biqquery.ipynb @alokpattani
 /notebooks/community/experiments/vertex_ai_model_experimentation.ipynb @inardini @asobran
 /notebooks/community/pipelines/google_cloud_pipeline_components_bqml_pipeline_anomaly_detection.ipynb @inardini
 /notebooks/community/pipelines/google_cloud_pipeline_components_cloud_natural_language_pipeline.ipynb @Narwhalprime
@@ -126,3 +127,5 @@
 /notebooks/community/model_garden/model_garden_gemma_deployment_on_vertex.ipynb @kathyyu-google
 /notebooks/community/model_garden/model_garden_gemma_finetuning_on_vertex.ipynb @KCFindstr
 /notebooks/community/model_garden/model_garden_pytorch_gemma_peft_finetuning_hf.ipynb @KCFindstr
+/notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_deployment_1_5.ipynb @weigary
+/notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_gradio.ipynb @weigary
