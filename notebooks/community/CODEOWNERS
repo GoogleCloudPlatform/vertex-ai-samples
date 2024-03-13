@@ -45,7 +45,7 @@
 /notebooks/community/pipelines/google_cloud_pipeline_components_cloud_natural_language_pipeline.ipynb @Narwhalprime
 /notebooks/community/pipelines/google_cloud_pipeline_components_ready_to_go_text_classification_pipeline.ipynb @Narwhalprime
 /notebooks/community/feature_store/get_started_vertex_feature_store.ipynb @junkourata
-/notebooks/community/model_garden/model_garden_claude_3_intro.ipynb @huythngo
+/notebooks/community/model_garden/model_garden_claude_3_intro.ipynb @huyngo-google
 /notebooks/community/model_garden/model_garden_huggingface_local_inference.ipynb @dstnluong-google
 /notebooks/community/model_garden/model_garden_jax_stable_diffusion_xl.ipynb @weigary
 /notebooks/community/model_garden/model_garden_mediapipe_face_stylizer.pynb @schmidt-sebastian
