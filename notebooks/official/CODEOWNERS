@@ -35,7 +35,7 @@
 /custom/custom_training_tensorboard_profiler.ipynb @gericdong
 /custom/get_started_with_vertex_endpoint_and_shared_vm.ipynb @andrewferlitsch
 /generative_ai/text_embedding_new_api.ipynb @xqr-g
-/generative_ai/anthropic_claude_3_intro.ipynb @xqr-g
+/generative_ai/anthropic_claude_3_intro.ipynb @huyngo-google
 /workbench/spark/spark_sample_notebook.ipynb @bradmiro
 /workbench/spark/spark_ml.ipynb @bradmiro
 /model_registry/bqml_vertexai_model_registry.ipynb @soheilazangeneh
