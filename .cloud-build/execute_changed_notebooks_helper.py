@@ -238,7 +238,7 @@ def _get_notebook_python_version(notebook_path: str) -> str:
 
             # Look for the python version specification pattern
             re_match = re.search(
-                "python version = (\d\.\d)", markdown, flags=re.IGNORECASE
+                "python version = (\d+\.\d+)", markdown, flags=re.IGNORECASE
             )
             if re_match:
                 # get the version number
