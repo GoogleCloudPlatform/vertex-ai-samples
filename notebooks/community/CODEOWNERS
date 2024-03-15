@@ -123,7 +123,7 @@
 /notebooks/community/model_garden/model_garden_pytorch_lama.ipynb @dstnluong-google
 /notebooks/community/model_garden/model_garden_pytorch_mistral_peft_tuning.ipynb @KCFindstr
 /notebooks/community/model_garden/model_garden_pytorch_mixtral_peft_tuning.ipynb @KCFindstr
-/notebooks/community/model_garden/model_garden_gemma_deployment_on_gke.ipynb @kathyyu-google
+/notebooks/community/model_garden/model_garden_gemma_deployment_on_gke.ipynb @vilobhmm
 /notebooks/community/model_garden/model_garden_gemma_deployment_on_vertex.ipynb @kathyyu-google
 /notebooks/community/model_garden/model_garden_gemma_finetuning_on_vertex.ipynb @KCFindstr
 /notebooks/community/model_garden/model_garden_pytorch_gemma_peft_finetuning_hf.ipynb @KCFindstr
