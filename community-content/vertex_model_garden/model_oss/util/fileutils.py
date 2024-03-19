@@ -232,10 +232,13 @@ def download_video_from_gcs_to_local(video_file_path: str) -> Tuple[str, str]:
   """
   _, local_video_file_name = os.path.split(video_file_path)
   file_extension = os.path.splitext(video_file_path)[1]
-  remote_video_file_name = local_video_file_name.replace(
-      file_extension, '_overlay.mp4'
-  )
-  local_file_path = generate_tmp_path(os.path.splitext(video_file_path)[1])
+  if file_extension:
+    remote_video_file_name = local_video_file_name.replace(
+        file_extension, '_overlay.mp4'
+    )
+  else:
+    remote_video_file_name = local_video_file_name + '_overlay.mp4'
+  local_file_path = generate_tmp_path(file_extension)
   logging.info('Downloading %s to %s...', video_file_path, local_file_path)
   download_gcs_file_to_local(video_file_path, local_file_path)
   return local_file_path, remote_video_file_name
@@ -251,7 +254,10 @@ def get_output_video_file(video_output_file_path: str) -> str:
     str: Local video output file path.
   """
   file_extension = os.path.splitext(video_output_file_path)[1]
-  out_local_video_file_name = video_output_file_path.replace(
-      file_extension, '_overlay' + file_extension
-  )
+  if file_extension:
+    out_local_video_file_name = video_output_file_path.replace(
+        file_extension, '_overlay' + file_extension
+    )
+  else:
+    out_local_video_file_name = video_output_file_path + '_overlay'
   return out_local_video_file_name
