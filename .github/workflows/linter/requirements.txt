@@ -6,5 +6,5 @@ black==24.3.0
 pyupgrade==3.15.2
 isort==5.13.2
 flake8==7.0.0
-nbqa==1.8.4
+nbqa==1.8.5
 
