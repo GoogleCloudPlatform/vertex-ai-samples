@@ -123,12 +123,14 @@
 /notebooks/community/model_garden/model_garden_pytorch_llava.ipynb @py4
 /notebooks/community/model_garden/model_garden_pytorch_lama.ipynb @dstnluong-google
 /notebooks/community/model_garden/model_garden_pytorch_mistral_peft_tuning.ipynb @KCFindstr
+/notebooks/community/model_garden/model_garden_pytorch_mistral_deployment.ipynb @KCFindstr
 /notebooks/community/model_garden/model_garden_pytorch_mixtral_peft_tuning.ipynb @KCFindstr
+/notebooks/community/model_garden/model_garden_pytorch_mixtral_deployment.ipynb @KCFindstr
 /notebooks/community/model_garden/model_garden_gemma_deployment_on_gke.ipynb @vilobhmm
 /notebooks/community/model_garden/model_garden_gemma_deployment_on_vertex.ipynb @kathyyu-google
 /notebooks/community/model_garden/model_garden_gemma_finetuning_on_vertex.ipynb @KCFindstr
 /notebooks/community/model_garden/model_garden_pytorch_gemma_peft_finetuning_hf.ipynb @KCFindstr
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_deployment_1_5.ipynb @weigary
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_gradio.ipynb @weigary
-notebooks/community/model_garden/model_garden_pytorch_sd_2_1_finetuning_dreambooth.ipynb @weigary
-notebooks/community/model_garden/model_garden_pytorch_sd_2_1_deployment.ipynb @weigary
+/notebooks/community/model_garden/model_garden_pytorch_sd_2_1_finetuning_dreambooth.ipynb @weigary
+/notebooks/community/model_garden/model_garden_pytorch_sd_xl_finetuning_dreambooth_lora.ipynb @weigary
