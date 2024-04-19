@@ -1,6 +1,6 @@
 
 
-[Online feature serving and fetching of BigQuery data with Vertex AI Feature Store](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/feature_store/online_feature_serving_and_fetching_bigquery_data_with_feature_store.ipynb)
+[Online feature serving and fetching of BigQuery data with Vertex AI Feature Store](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/feature_store/online_feature_serving_and_fetching_bigquery_data_with_feature_store_optimized.ipynb)
 
 ```
 Learn how to create and use an online feature store instance to host and serve data in `BigQuery` with `Vertex AI Feature Store` in an end to end workflow of feature values serving and fetching user journey.
