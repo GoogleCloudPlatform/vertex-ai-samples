@@ -54,3 +54,4 @@
 /ray_on_vertex_ai/get_started_with_pytorch_rov.ipynb @inardini
 /training/tpuv5e_gemma_peft_finetuning_and_serving.ipynb @brianchunkang
 /training/tpuv5e_llama2_pytorch_finetuning_and_serving.ipynb @brianchunkang @chiefkarlin
+/ray_on_vertex_ai/get_started_with_gemma_rov.ipynb @inardini
