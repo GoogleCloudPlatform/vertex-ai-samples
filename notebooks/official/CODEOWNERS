@@ -53,3 +53,4 @@
 /model_evaluation/model_based_llm_evaluation/autosxs_check_alignment_against_human_preference_data.ipynb @sipingh
 /ray_on_vertex_ai/get_started_with_pytorch_rov.ipynb @inardini
 /training/tpuv5e_gemma_peft_finetuning_and_serving.ipynb @brianchunkang
+/training/tpuv5e_llama2_pytorch_finetuning_and_serving.ipynb @brianchunkang @chiefkarlin
