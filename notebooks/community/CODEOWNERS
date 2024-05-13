@@ -49,6 +49,8 @@
 /notebooks/community/model_garden/model_garden_codegemma_deployment_on_vertex.ipynb @minwoo33park
 /notebooks/community/model_garden/model_garden_e5.ipynb @pouiscakes
 /notebooks/community/model_garden/model_garden_huggingface_local_inference.ipynb @dstnluong-google
+/notebooks/community/model_garden/model_garden_jax_paligemma_deployment.ipynb @minwoo33park
+/notebooks/community/model_garden/model_garden_jax_paligemma_finetuning.ipynb @minwoo33park
 /notebooks/community/model_garden/model_garden_jax_stable_diffusion_xl.ipynb @weigary
 /notebooks/community/model_garden/model_garden_mediapipe_face_stylizer.pynb @schmidt-sebastian
 /notebooks/community/model_garden/model_garden_mediapipe_gesture_recognition.ipynb @schmidt-sebastian
