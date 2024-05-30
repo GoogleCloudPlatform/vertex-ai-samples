@@ -141,3 +141,5 @@
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_gradio.ipynb @weigary
 /notebooks/community/model_garden/model_garden_pytorch_sd_2_1_finetuning_dreambooth.ipynb @weigary
 /notebooks/community/model_garden/model_garden_pytorch_sd_xl_finetuning_dreambooth_lora.ipynb @weigary
+/notebooks/community/model_garden/model_garden_timesfm_deployment_on_vertex.ipynb @siriuz42
+
