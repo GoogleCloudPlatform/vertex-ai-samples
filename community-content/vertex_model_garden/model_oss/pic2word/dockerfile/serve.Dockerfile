@@ -6,6 +6,7 @@ ENV infer_port=7080
 ENV mng_port=7081
 ENV model_name="pic2word"
 ENV PATH="/home/model-server/:${PATH}"
+ENV PYTHONPATH="$PYTHONPATH:/home/model-server/composed_image_retrieval:/home/model-server/composed_image_retrieval/src:/home/model-server"
 
 # Copy license.
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -84,6 +85,7 @@ RUN pip uninstall dataclasses -y
 
 # Copy model artifacts.
 COPY model_oss/pic2word/handler.py /home/model-server/handler.py
+COPY model_oss/util/ /home/model-server/util/
 
 # Create torchserve configuration file.
 RUN echo \

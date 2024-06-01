@@ -36,15 +36,21 @@
 /notebooks/community/ml_ops/stage3/get_started_with_dataflow_flex_template_component.ipynb @wintwoo
 /notebooks/community/vertex-ai-samples/notebooks/community/model_registry/vertex_ai_model_registry_bqml_custom_model_versioning.ipynb @inardini
 /notebooks/community/vertex-ai-samples/notebooks/community/model_registry/vertex_ai_model_registry_automl_model_versioning.ipynb @inardini
+/notebooks/community/vision/video_warehouse_curl.ipynb @zhangxiaotian @liangyz
 /notebooks/community/vision/image_warehouse_sdk.ipynb @bingwang @zhangxiaotian
 /notebooks/community/vision/video_warehouse_sdk.ipynb @zhangxiaotian
 /notebooks/community/vizier/conversions_vertex_vizier_and_open_source_vizier.ipynb @halio-g
+/notebooks/community/exploratory_data_analysis/eda_with_r_and_biqquery.ipynb @alokpattani
 /notebooks/community/experiments/vertex_ai_model_experimentation.ipynb @inardini @asobran
 /notebooks/community/pipelines/google_cloud_pipeline_components_bqml_pipeline_anomaly_detection.ipynb @inardini
 /notebooks/community/pipelines/google_cloud_pipeline_components_cloud_natural_language_pipeline.ipynb @Narwhalprime
 /notebooks/community/pipelines/google_cloud_pipeline_components_ready_to_go_text_classification_pipeline.ipynb @Narwhalprime
 /notebooks/community/feature_store/get_started_vertex_feature_store.ipynb @junkourata
+/notebooks/community/model_garden/model_garden_codegemma_deployment_on_vertex.ipynb @minwoo33park
+/notebooks/community/model_garden/model_garden_e5.ipynb @pouiscakes
 /notebooks/community/model_garden/model_garden_huggingface_local_inference.ipynb @dstnluong-google
+/notebooks/community/model_garden/model_garden_jax_paligemma_deployment.ipynb @minwoo33park
+/notebooks/community/model_garden/model_garden_jax_paligemma_finetuning.ipynb @minwoo33park
 /notebooks/community/model_garden/model_garden_jax_stable_diffusion_xl.ipynb @weigary
 /notebooks/community/model_garden/model_garden_mediapipe_face_stylizer.pynb @schmidt-sebastian
 /notebooks/community/model_garden/model_garden_mediapipe_gesture_recognition.ipynb @schmidt-sebastian
@@ -60,10 +66,13 @@
 /notebooks/community/model_garden/model_garden_tfvision_image_segmentation.ipynb @genquan9
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion.ipynb @xiangxu-google
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_2_1.ipynb @bingatgoogle
+/notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_custom.ipynb @weigary
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_inpainting.ipynb @xiangxu-google
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_xl_1_0.ipynb @bingatgoogle
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_xl_lcm.ipynb @weigary
+/notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_xl_lightning.ipynb @xcchen1
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_xl_lora.ipynb @weigary
+/notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_xl_turbo.ipynb @weigary
 /notebooks/community/model_garden/model_garden_pytorch_instructpix2pix.ipynb @xiangxu-google
 /notebooks/community/model_garden/model_garden_pytorch_controlnet.ipynb @xiangxu-google
 /notebooks/community/model_garden/model_garden_pytorch_blip_image_captioning.ipynb @xiangxu-google
@@ -113,8 +122,23 @@
 /notebooks/community/model_garden/model_garden_pytorch_llama2_peft_hyperparameter_tuning.ipynb @KCFindstr
 /notebooks/community/model_garden/model_garden_pytorch_llama2_evaluation.ipynb @kathyyu-google
 /notebooks/community/model_garden/model_garden_pytorch_llama2_rlhf_tuning.ipynb @genquan9
+/notebooks/community/model_garden/model_garden_pytorch_llama3_deployment.ipynb @kathyyu-google
+/notebooks/community/model_garden/model_garden_pytorch_llama3_finetuning.ipynb @kathyyu-google
 /notebooks/community/model_garden/model_garden_pytorch_wizard_coder.ipynb @KCFindstr
 /notebooks/community/model_registry/get_started_with_vertex_ai_deployer.ipynb angelmontero@ @inardini
 /notebooks/community/model_garden/model_garden_pytorch_wizard_lm.ipynb @KCFindstr
 /notebooks/community/model_garden/model_garden_pytorch_llava.ipynb @py4
 /notebooks/community/model_garden/model_garden_pytorch_lama.ipynb @dstnluong-google
+/notebooks/community/model_garden/model_garden_pytorch_mistral_peft_tuning.ipynb @KCFindstr
+/notebooks/community/model_garden/model_garden_pytorch_mistral_deployment.ipynb @KCFindstr
+/notebooks/community/model_garden/model_garden_pytorch_mixtral_peft_tuning.ipynb @KCFindstr
+/notebooks/community/model_garden/model_garden_pytorch_mixtral_deployment.ipynb @KCFindstr
+/notebooks/community/model_garden/model_garden_gemma_deployment_on_gke.ipynb @vilobhmm
+/notebooks/community/model_garden/model_garden_gemma_deployment_on_vertex.ipynb @kathyyu-google
+/notebooks/community/model_garden/model_garden_gemma_finetuning_on_vertex.ipynb @KCFindstr
+/notebooks/community/model_garden/model_garden_pytorch_gemma_peft_finetuning_hf.ipynb @KCFindstr
+/notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_deployment_1_5.ipynb @weigary
+/notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_gradio.ipynb @weigary
+/notebooks/community/model_garden/model_garden_pytorch_sd_2_1_finetuning_dreambooth.ipynb @weigary
+/notebooks/community/model_garden/model_garden_pytorch_sd_xl_finetuning_dreambooth_lora.ipynb @weigary
+/notebooks/community/model_garden/model_garden_timesfm_deployment_on_vertex.ipynb @siriuz42
