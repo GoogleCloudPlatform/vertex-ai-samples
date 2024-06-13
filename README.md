@@ -2,13 +2,17 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-Welcome to the Google Cloud [Vertex AI](https://cloud.google.com/vertex-ai/docs/) sample repository.
+**Welcome to the Google Cloud Vertex AI Sample Repository!**
+
+This repository contains notebooks, code samples, sample apps, and other resources that demonstrate how to use, develop and manage machine learning and generative AI workflows using Google Cloud Vertex AI.
 
 ## Overview
 
-This repository contains notebooks, code samples, sample apps, and other resources that demonstrate how to use, develop and manage machine learning workflows using Google Cloud Vertex AI.
+[Vertex AI](https://cloud.google.com/vertex-ai) is a fully-managed, unified AI development platform for building and using generative AI. This repository is designed to help you get started with Vertex AI. Whether you're new to Vertex AI or an experienced ML practitioner, you'll find valuable resources here.
 
-For more Vertex AI Generative AI notebook samples, please visit the Google Cloud [Generative AI](https://github.com/GoogleCloudPlatform/generative-ai) GitHub repository.
+Explore, learn, and contribute to this repository to unleash the full potential of machine learning on Google Cloud!
+
+For more Vertex AI Generative AI notebook samples, please visit the Vertex AI [Generative AI](https://github.com/GoogleCloudPlatform/generative-ai) GitHub repository.
 
 
 ## Repository structure
