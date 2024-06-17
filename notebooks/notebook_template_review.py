@@ -111,6 +111,7 @@ class ErrorCode(Enum):
     ERROR_LINK_GIT_BAD = 7,
     ERROR_LINK_COLAB_BAD = 8,
     ERROR_LINK_WORKBENCH_BAD = 9,
+    ERROR_LINK_COLAB_ENTERPRISE_BAD = 102,
 
     # Overview cells
     #   Overview cell required
@@ -320,7 +321,8 @@ def parse_notebook(path: str,
                   objective.steps, 
                   links.git_link, 
                   links.colab_link, 
-                  links.workbench_link
+                  links.colab_enterprise_link, 
+                  links.workbench_link,
         )
         
     if args.fix:
@@ -535,6 +537,7 @@ class LinksRule(NotebookRule):
 
         self.git_link = None
         self.colab_link = None
+        self.colab_enterprise_link = None
         self.workbench_link = None
         source = ''
         ret = True
@@ -565,6 +568,17 @@ class LinksRule(NotebookRule):
                         cell['source'][ix] = fix_link
                     else:
                         ret = notebook.report_error(ErrorCode.ERROR_LINK_COLAB_BAD, f"bad Colab link: {self.colab_link}")
+            
+            if '<a href="https://console.cloud.google.com/vertex-ai/colab/' in line:
+                self.colab_enterprise_link = line.strip()[9:-2].replace('" target="_blank', '').replace('" target=\'_blank', '')
+                modified_notebook_path = notebook.path.replace("/", "%2F")
+                derived_link = os.path.join('https://console.cloud.google.com/vertex-ai/colab/import/https:%2F%2Fraw.githubusercontent.com%2FGoogleCloudPlatform%2Fvertex-ai-samples%2Fmain%2F', modified_notebook_path)
+                if self.workbench_link != derived_link:
+                    if notebook.report_fix(FixCode.FIX_BAD_LINK, f"fixed Colab Enterprise link: {derived_link}"):
+                        fix_link = f"<a href=\"{derived_link}\" target='_blank'>\n"
+                        cell['source'][ix] = fix_link
+                    else:
+                        ret = notebook.report_error(ErrorCode.ERROR_LINK_COLAB_ENTERPRISE_BAD, f"bad Colab Enterprise link: {self.colab_enterprise_link}")
 
             if '<a href="https://console.cloud.google.com/vertex-ai/workbench/' in line:
                 self.workbench_link = line.strip()[9:-2].replace('" target="_blank', '').replace('" target=\'_blank', '')
@@ -581,7 +595,7 @@ class LinksRule(NotebookRule):
         if 'View on GitHub' not in source or not self.git_link:
             ret = notebook.report_error(ErrorCode.ERROR_LINK_GIT_MISSING, 'Missing link for GitHub')
         if 'Run in Colab' not in source or not self.colab_link:
-            ret = notebook.report_error(ErrorCode.ERROR_LINK_COLAB_MISSING, 'Missing link for Colab')    
+            ret = notebook.report_error(ErrorCode.ERROR_LINK_COLAB_MISSING, 'Missing link for Colab')  
         if 'Open in Vertex AI Workbench' not in source or not self.workbench_link:
             ret = notebook.report_error(ErrorCode.ERROR_LINK_WORKBENCH_MISSING, 'Missing link for Workbench')
         
@@ -1120,6 +1134,7 @@ def add_index(path: str,
               steps: str, 
               git_link: str, 
               colab_link: str, 
+              colab_enterprise_link: str,
               workbench_link: str
              ):
     """
@@ -1133,6 +1148,7 @@ def add_index(path: str,
         steps: The steps specified by the notebook
         git_link: The link to the notebook in the git repo
         colab_link: Link to launch notebook in Colab
+        colab_enterpise_link: Link to launch notebook in Colab Enterprise
         workbench_link: Link to launch notebook in Workbench
         linkbacks: The linkbacks per tag
     """
@@ -1188,6 +1204,8 @@ def add_index(path: str,
         print('        <td>')
         if colab_link:
             print(f'            <a href="{colab_link}" target="_blank" class="external" track-type="notebookTutorial" track-name="colabLink">Colab</a><br/>\n')
+        if colab_enterprise_link:
+            print(f'            <a href="{colab_enterprise_link}" target="_blank" class="external" track-type="notebookTutorial" track-name="colabEnterpriseLink">Colab Enterprise</a><br/>\n')
         if git_link:
             print(f'            <a href="{git_link}" target="_blank" class="external" track-type="notebookTutorial" track-name="gitHubLink">GitHub</a><br/>\n')
         if workbench_link:
