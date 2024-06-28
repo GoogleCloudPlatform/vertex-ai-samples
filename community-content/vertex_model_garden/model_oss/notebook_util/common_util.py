@@ -372,6 +372,7 @@ def get_resource_id(accelerator_type: str, is_for_training: bool) -> str:
       "NVIDIA_TESLA_V100": "custom_model_training_nvidia_v100_gpus",
       "NVIDIA_L4": "custom_model_training_nvidia_l4_gpus",
       "NVIDIA_TESLA_A100": "custom_model_training_nvidia_a100_gpus",
+      "NVIDIA_A100_80GB": "custom_model_training_nvidia_a100_80gb_gpus",
       "NVIDIA_TESLA_T4": "custom_model_training_nvidia_t4_gpus",
       "TPU_V5e": "custom_model_training_tpu_v5e",
       "TPU_V3": "custom_model_training_tpu_v3",
@@ -380,6 +381,7 @@ def get_resource_id(accelerator_type: str, is_for_training: bool) -> str:
       "NVIDIA_TESLA_V100": "custom_model_serving_nvidia_v100_gpus",
       "NVIDIA_L4": "custom_model_serving_nvidia_l4_gpus",
       "NVIDIA_TESLA_A100": "custom_model_serving_nvidia_a100_gpus",
+      "NVIDIA_A100_80GB": "custom_model_serving_nvidia_a100_80gb_gpus",
       "NVIDIA_TESLA_T4": "custom_model_serving_nvidia_t4_gpus",
       "TPU_V5e": "custom_model_serving_tpu_v5e",
   }
