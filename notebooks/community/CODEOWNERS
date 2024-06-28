@@ -134,6 +134,7 @@
 /notebooks/community/model_garden/model_garden_pytorch_mixtral_deployment.ipynb @KCFindstr
 /notebooks/community/model_garden/model_garden_gemma_deployment_on_gke.ipynb @vilobhmm
 /notebooks/community/model_garden/model_garden_gemma_deployment_on_vertex.ipynb @kathyyu-google
+/notebooks/community/model_garden/model_garden_gemma2_deployment_on_vertex.ipynb @kathyyu-google
 /notebooks/community/model_garden/model_garden_gemma_finetuning_on_vertex.ipynb @KCFindstr
 /notebooks/community/model_garden/model_garden_pytorch_gemma_peft_finetuning_hf.ipynb @KCFindstr
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_deployment_1_5.ipynb @weigary

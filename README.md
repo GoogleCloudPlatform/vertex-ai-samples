@@ -62,7 +62,7 @@ To get started using Vertex AI, you must have a Google Cloud project.
       <a href="notebooks/official/automl"><code>automl/</code></a>
     </td>
     <td>
-      Learn how to train and make predictions on AutoML models
+      Train and make predictions on AutoML models
     </td>
     <td><a href="notebooks/official/automl/">Sample notebooks</a></td>
   </tr>
@@ -71,7 +71,7 @@ To get started using Vertex AI, you must have a Google Cloud project.
       <a href="notebooks/official/custom"><code>custom/</code></a>
     </td>
     <td>
-      Learn how to create, deploy and serve custom  models on Vertex AI
+      Create, deploy and serve custom  models on Vertex AI
     </td>
     <td><a href="notebooks/official/custom/">Sample notebooks</a></td>
   </tr>
@@ -80,9 +80,36 @@ To get started using Vertex AI, you must have a Google Cloud project.
       <a href="notebooks/official/prediction"><code>prediction/</code></a>
     </td>
     <td>
-      Learn how to build, train and deploy models using prebuilt containers for custom training and prediction.
+      Build, train and deploy models using prebuilt containers for custom training and prediction.
     </td>
     <td><a href="notebooks/official/prediction/">Sample notebooks</a></td>
+  </tr>
+  <tr>
+    <td>
+      <a href="notebooks/official/feature_store"><code>Feature Store/</code></a>
+    </td>
+    <td>
+      Set up and manage online serving using Vertex AI Feature Store.
+    </td>
+    <td><a href="notebooks/official/feature_store/">Sample notebooks</a></td>
+  </tr>
+  <tr>
+    <td>
+      <a href="notebooks/official/explainable_ai"><code>Explainable AI/</code></a>
+    </td>
+    <td>
+      Use Vertex Explainable AI's feature-based and example-based explanations to explain how or why a model produced a specific prediction.
+    </td>
+    <td><a href="notebooks/official/explainable_ai/">Sample notebooks</a></td>
+  </tr>
+  <tr>
+    <td>
+      <a href="notebooks/official/pipelines"><code>Pipelines/</code></a>
+    </td>
+    <td>
+      Use `Vertex AI Pipelines` and `Google Cloud Pipeline Components` to build, tune, or deploy a custom model.
+    </td>
+    <td><a href="notebooks/official/pipeline/">Sample notebooks</a></td>
   </tr>
 </table>
 <!-- markdownlint-enable MD033 -->
