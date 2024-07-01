@@ -27,6 +27,7 @@
 /training/xgboost_data_parallel_training_on_cpu_using_dask.ipynb @halio-g
 /feature_store/gapic-feature-store.ipynb @diemtvu
 /feature_store/vertex_ai_feature_store_feature_view_service_agents.ipynb @ethan-gordon
+/feature_store/vertex_ai_feature_store_iam_policy.ipynb @ethan-gordon
 /managed_notebooks @GoogleCloudPlatform/notebooks-team
 /pipelines/google_cloud_pipeline_components_bqml_text.ipynb @inardini
 /pipelines/google_cloud_pipelines_dataproc_tabular @inardini
@@ -54,3 +55,4 @@
 /ray_on_vertex_ai/get_started_with_pytorch_rov.ipynb @inardini
 /training/tpuv5e_gemma_peft_finetuning_and_serving.ipynb @brianchunkang
 /training/tpuv5e_llama2_pytorch_finetuning_and_serving.ipynb @brianchunkang @chiefkarlin
+/prediction/get_started_with_psc_private_endpoint.ipynb @tianjiaoliu
