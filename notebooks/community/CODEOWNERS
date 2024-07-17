@@ -116,6 +116,7 @@
 /notebooks/community/model_garden/model_garden_pytorch_biomedclip.ipynb @KCFindstr
 /notebooks/community/model_garden/model_garden_pytorch_imagebind.ipynb @kathyyu-google
 /notebooks/community/persistent_resource/00_persistent_resource_getting_started_cli.ipynb @jbrache
+/notebooks/community/persistent_resource/00_persistent_resource_getting_started_sdk.ipynb @jbrache
 /notebooks/community/model_garden/model_garden_pytorch_llama2_deployment.ipynb @genquan9
 /notebooks/community/model_garden/model_garden_pytorch_llama2_peft_finetuning.ipynb @genquan9
 /notebooks/community/model_garden/model_garden_pytorch_llama2_quantization.ipynb @dstnluong-google
