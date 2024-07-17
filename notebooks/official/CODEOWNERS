@@ -2,7 +2,7 @@
 # the repo. Unless a later match takes precedence,
 # @global-owner1 and @global-owner2 will be requested for
 # review when someone opens a pull request.
-* @GoogleCloudPlatform/vertex-ai-samples-contributors  @GoogleCloudPlatform/caiis-tw
+* @GoogleCloudPlatform/vertex-ai-samples-contributors @GoogleCloudPlatform/caiis-tw
 
 # matching_engine folder
 /matching_engine @shenzhimo2 @ivanmkc
@@ -56,3 +56,4 @@
 /training/tpuv5e_gemma_peft_finetuning_and_serving.ipynb @brianchunkang
 /training/tpuv5e_llama2_pytorch_finetuning_and_serving.ipynb @brianchunkang @chiefkarlin
 /prediction/get_started_with_psc_private_endpoint.ipynb @tianjiaoliu
+/generative_ai/mistralai_intro.ipynb @sujituk
