@@ -147,3 +147,6 @@
 /notebooks/community/model_garden/model_garden_pytorch_sd_xl_finetuning_dreambooth_lora.ipynb @weigary
 /notebooks/community/model_garden/model_garden_pytorch_sd_2_1_local_finetuning_dreambooth.ipynb @weigary
 /notebooks/community/model_garden/model_garden_timesfm_deployment_on_vertex.ipynb @siriuz42
+/notebooks/community/model_garden/model_garden_llama_guard_deployment.ipynb @kathyyu-google
+/notebooks/community/model_garden/model_garden_rag.ipynb @kathyyu-google
+/notebooks/community/model_garden/synthetic_data_generation_using_llama3_1.ipynb @xiangxu-google
