@@ -127,6 +127,7 @@
 /notebooks/community/model_garden/model_garden_pytorch_llama3_finetuning.ipynb @kathyyu-google
 /notebooks/community/model_garden/model_garden_pytorch_llama3_1_deployment.ipynb @xiangxu-google
 /notebooks/community/model_garden/model_garden_pytorch_llama3_1_finetuning.ipynb @wrzhao-work
+/notebooks/community/model_garden/model_garden_pytorch_qwen2_deployment.ipynb @rayandasoriya
 /notebooks/community/model_garden/model_garden_pytorch_wizard_coder.ipynb @KCFindstr
 /notebooks/community/model_registry/get_started_with_vertex_ai_deployer.ipynb angelmontero@ @inardini
 /notebooks/community/model_garden/model_garden_pytorch_wizard_lm.ipynb @KCFindstr
