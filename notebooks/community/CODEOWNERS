@@ -116,6 +116,7 @@
 /notebooks/community/model_garden/model_garden_pytorch_biomedclip.ipynb @KCFindstr
 /notebooks/community/model_garden/model_garden_pytorch_imagebind.ipynb @kathyyu-google
 /notebooks/community/persistent_resource/00_persistent_resource_getting_started_cli.ipynb @jbrache
+/notebooks/community/persistent_resource/00_persistent_resource_getting_started_sdk.ipynb @jbrache
 /notebooks/community/model_garden/model_garden_pytorch_llama2_deployment.ipynb @genquan9
 /notebooks/community/model_garden/model_garden_pytorch_llama2_peft_finetuning.ipynb @genquan9
 /notebooks/community/model_garden/model_garden_pytorch_llama2_quantization.ipynb @dstnluong-google
@@ -124,6 +125,8 @@
 /notebooks/community/model_garden/model_garden_pytorch_llama2_rlhf_tuning.ipynb @genquan9
 /notebooks/community/model_garden/model_garden_pytorch_llama3_deployment.ipynb @kathyyu-google
 /notebooks/community/model_garden/model_garden_pytorch_llama3_finetuning.ipynb @kathyyu-google
+/notebooks/community/model_garden/model_garden_pytorch_llama3_1_deployment.ipynb @xiangxu-google
+/notebooks/community/model_garden/model_garden_pytorch_llama3_1_finetuning.ipynb @wrzhao-work
 /notebooks/community/model_garden/model_garden_pytorch_wizard_coder.ipynb @KCFindstr
 /notebooks/community/model_registry/get_started_with_vertex_ai_deployer.ipynb angelmontero@ @inardini
 /notebooks/community/model_garden/model_garden_pytorch_wizard_lm.ipynb @KCFindstr
@@ -142,4 +145,10 @@
 /notebooks/community/model_garden/model_garden_pytorch_stable_diffusion_gradio.ipynb @weigary
 /notebooks/community/model_garden/model_garden_pytorch_sd_2_1_finetuning_dreambooth.ipynb @weigary
 /notebooks/community/model_garden/model_garden_pytorch_sd_xl_finetuning_dreambooth_lora.ipynb @weigary
+/notebooks/community/model_garden/model_garden_pytorch_sd_2_1_local_finetuning_dreambooth.ipynb @weigary
 /notebooks/community/model_garden/model_garden_timesfm_deployment_on_vertex.ipynb @siriuz42
+/notebooks/community/model_garden/model_garden_llama_guard_deployment.ipynb @kathyyu-google
+/notebooks/community/model_garden/model_garden_rag.ipynb @kathyyu-google
+/notebooks/community/model_garden/synthetic_data_generation_using_llama3_1.ipynb @xiangxu-google
+/notebooks/community/model_garden/model_garden_autosxs_evaluation_llama3_1.ipynb @inardini
+/notebooks/community/model_garden/model_garden_openai_api_llama3_1.ipynb @inardini
