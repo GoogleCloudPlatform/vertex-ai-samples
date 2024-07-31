@@ -1,6 +1,6 @@
 --find-links https://download.pytorch.org/whl/torch_stable.html
 
-torch==2.0.1+cu118
+torch==2.2.0
 numpy==1.26.1
 absl_py==2.0.0
 accelerate==0.24.0

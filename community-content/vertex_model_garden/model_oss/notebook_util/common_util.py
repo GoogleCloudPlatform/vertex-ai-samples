@@ -231,22 +231,6 @@ def download_image(url: str) -> str:
   return Image.open(io.BytesIO(response.content))
 
 
-def resize_image(image: Any, new_width: int = 1000) -> Any:
-    """Resizes an image to a certain width.
-
-    Args:
-      image: The image which has to be resized.
-      new_width: New width of the image.
-
-    Returns:
-      New resized image.
-    """
-    width, height = image.size
-    new_height = int(height * new_width / width)
-    new_img = image.resize((new_width, new_height))
-    return new_img
-
-
 def load_img(path: str) -> Any:
   """Reads image from path and return PIL.Image instance.
 
@@ -389,6 +373,7 @@ def get_resource_id(accelerator_type: str, is_for_training: bool) -> str:
       "NVIDIA_L4": "custom_model_training_nvidia_l4_gpus",
       "NVIDIA_TESLA_A100": "custom_model_training_nvidia_a100_gpus",
       "NVIDIA_A100_80GB": "custom_model_training_nvidia_a100_80gb_gpus",
+      "NVIDIA_H100_80GB": "custom_model_training_nvidia_h100_gpus",
       "NVIDIA_TESLA_T4": "custom_model_training_nvidia_t4_gpus",
       "TPU_V5e": "custom_model_training_tpu_v5e",
       "TPU_V3": "custom_model_training_tpu_v3",
@@ -398,6 +383,7 @@ def get_resource_id(accelerator_type: str, is_for_training: bool) -> str:
       "NVIDIA_L4": "custom_model_serving_nvidia_l4_gpus",
       "NVIDIA_TESLA_A100": "custom_model_serving_nvidia_a100_gpus",
       "NVIDIA_A100_80GB": "custom_model_serving_nvidia_a100_80gb_gpus",
+      "NVIDIA_H100_80GB": "custom_model_serving_nvidia_h100_gpus",
       "NVIDIA_TESLA_T4": "custom_model_serving_nvidia_t4_gpus",
       "TPU_V5e": "custom_model_serving_tpu_v5e",
   }
