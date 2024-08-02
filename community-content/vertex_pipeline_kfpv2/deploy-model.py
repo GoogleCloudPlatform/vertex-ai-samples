@@ -22,12 +22,26 @@ def deploy_model(
     )
 
 
+@dsl.component(base_image='python:3.8',packages_to_install=['google-cloud-aiplatform==1.36.0'])
+def delete_endpoint(
+    endpoint_id: str,
+):
+    from google.cloud import aiplatform
+
+    endpoint = aiplatform.Endpoint(endpoint_id)
+    endpoint.undeploy_all()
+    endpoint.delete()
+
+
 @dsl.pipeline(name='deploy-model')
 def pipeline_deploy_model():
     project = "projects/990000000009/locations/us-west1"
     model_id = project + "/models/1100000000000000001"
     endpoint_id = project + "/endpoints/2200000000000000002"
     deploy_model(model_id, endpoint_id, "n1-standard-2", 1, 1)
+
+    # After serving predictions, recycling computing resources
+    delete_endpoint(endpoint_id)
 
 
 if __name__ == "__main__":
