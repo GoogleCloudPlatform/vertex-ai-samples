@@ -85,7 +85,9 @@ def get_job_name_with_datetime(prefix: str) -> str:
   Returns:
     A job name.
   """
-  return prefix + datetime.datetime.now().strftime("_%Y%m%d_%H%M%S")
+  now = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+  job_name = f"{prefix}-{now}".replace("_", "-")
+  return job_name
 
 
 def create_job_name(prefix: str) -> str:
@@ -99,7 +101,7 @@ def create_job_name(prefix: str) -> str:
   """
   user = os.environ.get("USER")
   now = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-  job_name = f"{prefix}-{user}-{now}"
+  job_name = f"{prefix}-{user}-{now}".replace("_", "-")
   return job_name
 
 
