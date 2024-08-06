@@ -10,6 +10,7 @@
 /pipeline_components @Ark-kun
 /pipeline_components/image_ml_model_training @lakeyk
 /prediction_featurestore_integration @googleapis/vertex-prediction-team
+/vertex_model_garden/model_oss/notebook_util @minwoo33park
 /vertex_model_garden/model_oss/util @weigary
 /vertex_model_garden/model_oss/diffusers @weigary
 /vertex_model_garden/model_oss/keras @dstnluong-google
