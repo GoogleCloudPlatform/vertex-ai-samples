@@ -1305,9 +1305,9 @@ def replace_cl(text : str ) -> str:
         'Vertex AI Workbench': '{{vertex_workbench_name}}',
         #'Vertex SDK': '{{vertex_sdk_name}}',
         #'Vertex AI SDK': '{{vertex_sdk_name}}',
-        'Vertex AI': '{{vertex_ai_name}}',
-        'Vertex AI batch prediction': '{{vertex_ai_name}} {{batch_prediction_name}}',
         'Vertex AI SDK for Python': '{{vertex_sdk_python}}',
+        'Vertex AI batch prediction': '{{vertex_ai_name}} {{batch_prediction_name}}',
+        'Vertex AI': '{{vertex_ai_name}}',
         'Ray on Vertex AI': '{{ray_vertex_ai_name}}',
         'Google Cloud console': '{{console_name}}',
         
