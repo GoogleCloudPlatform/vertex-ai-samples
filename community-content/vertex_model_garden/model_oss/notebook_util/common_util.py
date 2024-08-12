@@ -325,6 +325,105 @@ def get_prediction_instances(test_filepath: str, new_width: int = -1) -> Any:
   return instances
 
 
+def vqa_predict(
+    endpoint: Any,
+    question_prompts: Sequence[str],
+    image: Any,
+    language_code: str = "en",
+    new_width: int = 1000,
+) -> Sequence[str]:
+  """Predicts the answer to a question about an image using an Endpoint."""
+  # Resize and convert image to base64 string.
+  resized_image = resize_image(image, new_width)
+  resized_image_base64 = image_to_base64(resized_image)
+
+  instances = []
+  if question_prompts:
+    # Format question prompt
+    question_prompt_format = "answer {} {}\n"
+    for question_prompt in question_prompts:
+      if question_prompt:
+        instances.append({
+            "prompt": question_prompt_format.format(
+                language_code, question_prompt
+            ),
+            "image": resized_image_base64,
+        })
+  else:
+    instances.append({
+        "image": resized_image_base64,
+    })
+
+  response = endpoint.predict(instances=instances)
+  return [pred.get("response") for pred in response.predictions]
+
+
+def caption_predict(
+    endpoint: Any,
+    caption_prompt: str,
+    language_code: str,
+    image: Any,
+    new_width: int = 1000,
+) -> str:
+  """Predicts a caption for a given image using an Endpoint."""
+  # Resize and convert image to base64 string.
+  resized_image = resize_image(image, new_width)
+  resized_image_base64 = image_to_base64(resized_image)
+
+  instance = {"image": resized_image_base64}
+
+  if caption_prompt:
+    # Format caption prompt
+    caption_prompt_format = "caption {} {}\n"
+    instance["prompt"] = caption_prompt_format.format(
+        language_code, caption_prompt
+    )
+
+  instances = [instance]
+  response = endpoint.predict(instances=instances)
+  return response.predictions[0].get("response")
+
+
+def ocr_predict(
+    endpoint: Any,
+    ocr_prompt: str,
+    image: Any,
+    new_width: int = 1000,
+) -> str:
+  """Extracts text from a given image using an Endpoint."""
+  # Resize and convert image to base64 string.
+  resized_image = resize_image(image, new_width)
+  resized_image_base64 = image_to_base64(resized_image)
+
+  instance = {"image": resized_image_base64}
+  if ocr_prompt:
+    instance["prompt"] = ocr_prompt
+  instances = [instance]
+
+  response = endpoint.predict(instances=instances)
+  return response.predictions[0].get("response")
+
+
+def detect_predict(
+    endpoint: Any,
+    detect_prompt: str,
+    image: Any,
+    new_width: int = 1000,
+) -> str:
+  """Predicts the answer to a question about an image using an Endpoint."""
+  # Resize and convert image to base64 string.
+  resized_image = resize_image(image, new_width)
+  resized_image_base64 = image_to_base64(resized_image)
+
+  instance = {"image": resized_image_base64}
+  if detect_prompt:
+    instance["prompt"] = detect_prompt
+  instances = [instance]
+
+  response = endpoint.predict(instances=instances)
+  return response.predictions[0].get("response")
+
+
 def get_quota(project_id: str, region: str, resource_id: str) -> int:
   """Returns the quota for a resource in a region.
 
