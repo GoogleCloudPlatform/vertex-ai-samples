@@ -474,18 +474,23 @@ def get_quota(project_id: str, region: str, resource_id: str) -> int:
   return -1
 
 
-def get_resource_id(accelerator_type: str, is_for_training: bool) -> str:
+def get_resource_id(
+    accelerator_type: str,
+    is_for_training: bool,
+    is_restricted_image: bool = False,
+) -> str:
   """Returns the resource id for a given accelerator type and the use case.
 
   Args:
     accelerator_type: The accelerator type.
     is_for_training: Whether the resource is used for training. Set false for
       serving use case.
+    is_restricted_image: Whether the image is hosted in `vertex-ai-restricted`.
 
   Returns:
     The resource id.
   """
-  training_accelerator_map = {
+  default_training_accelerator_map = {
       "NVIDIA_TESLA_V100": "custom_model_training_nvidia_v100_gpus",
       "NVIDIA_L4": "custom_model_training_nvidia_l4_gpus",
       "NVIDIA_TESLA_A100": "custom_model_training_nvidia_a100_gpus",
@@ -494,6 +499,9 @@ def get_resource_id(accelerator_type: str, is_for_training: bool) -> str:
       "NVIDIA_TESLA_T4": "custom_model_training_nvidia_t4_gpus",
       "TPU_V5e": "custom_model_training_tpu_v5e",
       "TPU_V3": "custom_model_training_tpu_v3",
+  }
+  restricted_image_training_accelerator_map = {
+      "NVIDIA_A100_80GB": "restricted_image_training_nvidia_a100_80gb_gpus",
   }
   serving_accelerator_map = {
       "NVIDIA_TESLA_V100": "custom_model_serving_nvidia_v100_gpus",
@@ -505,6 +513,11 @@ def get_resource_id(accelerator_type: str, is_for_training: bool) -> str:
       "TPU_V5e": "custom_model_serving_tpu_v5e",
   }
   if is_for_training:
+    training_accelerator_map = (
+        restricted_image_training_accelerator_map
+        if is_restricted_image
+        else default_training_accelerator_map
+    )
     if accelerator_type in training_accelerator_map:
       return training_accelerator_map[accelerator_type]
     else:
@@ -526,9 +539,12 @@ def check_quota(
     accelerator_type: str,
     accelerator_count: int,
     is_for_training: bool,
+    is_restricted_image: bool = False,
 ):
   """Checks if the project and the region has the required quota."""
-  resource_id = get_resource_id(accelerator_type, is_for_training)
+  resource_id = get_resource_id(
+      accelerator_type, is_for_training, is_restricted_image
+  )
   quota = get_quota(project_id, region, resource_id)
   quota_request_instruction = (
       "Either use "
@@ -548,4 +564,3 @@ def check_quota(
         f"Quota not enough for {resource_id} in {region}: {quota} <"
         f" {accelerator_count}. {quota_request_instruction}"
     )
-
