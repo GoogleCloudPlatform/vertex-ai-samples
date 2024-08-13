@@ -360,9 +360,9 @@ def vqa_predict(
 
 def caption_predict(
     endpoint: Any,
-    caption_prompt: str,
     language_code: str,
     image: Any,
+    caption_prompt: bool = False,
     new_width: int = 1000,
 ) -> str:
   """Predicts a caption for a given image using an Endpoint."""
@@ -374,10 +374,8 @@ def caption_predict(
 
   if caption_prompt:
     # Format caption prompt
-    caption_prompt_format = "caption {} {}\n"
-    instance["prompt"] = caption_prompt_format.format(
-        language_code, caption_prompt
-    )
+    caption_prompt_format = "caption {}\n"
+    instance["prompt"] = caption_prompt_format.format(language_code)
 
   instances = [instance]
   response = endpoint.predict(instances=instances)
