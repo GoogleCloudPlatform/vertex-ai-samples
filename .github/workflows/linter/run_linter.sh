@@ -58,7 +58,7 @@ done
 # Only check notebooks in test folders modified in this pull request.
 # Note: Use process substitution to persist the data in the array
 if [ ${#notebooks[@]} -eq 0 ]; then
-    echo "Checking for changed notebooked using git"
+    echo "Checking for changed notebooks using git"
     while read -r file || [ -n "$line" ]; do
         notebooks+=("$file")
     done < <(git diff --name-only main... | grep '\.ipynb$')

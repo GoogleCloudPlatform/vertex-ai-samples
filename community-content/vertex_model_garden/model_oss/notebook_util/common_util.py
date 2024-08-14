@@ -85,7 +85,9 @@ def get_job_name_with_datetime(prefix: str) -> str:
   Returns:
     A job name.
   """
-  return prefix + datetime.datetime.now().strftime("_%Y%m%d_%H%M%S")
+  now = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+  job_name = f"{prefix}-{now}".replace("_", "-")
+  return job_name
 
 
 def create_job_name(prefix: str) -> str:
@@ -99,7 +101,7 @@ def create_job_name(prefix: str) -> str:
   """
   user = os.environ.get("USER")
   now = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-  job_name = f"{prefix}-{user}-{now}"
+  job_name = f"{prefix}-{user}-{now}".replace("_", "-")
   return job_name
 
 
@@ -232,19 +234,19 @@ def download_image(url: str) -> str:
 
 
 def resize_image(image: Any, new_width: int = 1000) -> Any:
-    """Resizes an image to a certain width.
+  """Resizes an image to a certain width.
 
-    Args:
-      image: The image which has to be resized.
-      new_width: New width of the image.
+  Args:
+    image: The image which has to be resized.
+    new_width: New width of the image.
 
-    Returns:
-      New resized image.
-    """
-    width, height = image.size
-    new_height = int(height * new_width / width)
-    new_img = image.resize((new_width, new_height))
-    return new_img
+  Returns:
+    New resized image.
+  """
+  width, height = image.size
+  new_height = int(height * new_width / width)
+  new_img = image.resize((new_width, new_height))
+  return new_img
 
 
 def load_img(path: str) -> Any:
@@ -323,6 +325,103 @@ def get_prediction_instances(test_filepath: str, new_width: int = -1) -> Any:
   return instances
 
 
+def vqa_predict(
+    endpoint: Any,
+    question_prompts: Sequence[str],
+    image: Any,
+    language_code: str = "en",
+    new_width: int = 1000,
+) -> Sequence[str]:
+  """Predicts the answer to a question about an image using an Endpoint."""
+  # Resize and convert image to base64 string.
+  resized_image = resize_image(image, new_width)
+  resized_image_base64 = image_to_base64(resized_image)
+
+  instances = []
+  if question_prompts:
+    # Format question prompt
+    question_prompt_format = "answer {} {}\n"
+    for question_prompt in question_prompts:
+      if question_prompt:
+        instances.append({
+            "prompt": question_prompt_format.format(
+                language_code, question_prompt
+            ),
+            "image": resized_image_base64,
+        })
+  else:
+    instances.append({
+        "image": resized_image_base64,
+    })
+
+  response = endpoint.predict(instances=instances)
+  return [pred.get("response") for pred in response.predictions]
+
+
+def caption_predict(
+    endpoint: Any,
+    language_code: str,
+    image: Any,
+    caption_prompt: bool = False,
+    new_width: int = 1000,
+) -> str:
+  """Predicts a caption for a given image using an Endpoint."""
+  # Resize and convert image to base64 string.
+  resized_image = resize_image(image, new_width)
+  resized_image_base64 = image_to_base64(resized_image)
+
+  instance = {"image": resized_image_base64}
+
+  if caption_prompt:
+    # Format caption prompt
+    caption_prompt_format = "caption {}\n"
+    instance["prompt"] = caption_prompt_format.format(language_code)
+
+  instances = [instance]
+  response = endpoint.predict(instances=instances)
+  return response.predictions[0].get("response")
+
+
+def ocr_predict(
+    endpoint: Any,
+    ocr_prompt: str,
+    image: Any,
+    new_width: int = 1000,
+) -> str:
+  """Extracts text from a given image using an Endpoint."""
+  # Resize and convert image to base64 string.
+  resized_image = resize_image(image, new_width)
+  resized_image_base64 = image_to_base64(resized_image)
+
+  instance = {"image": resized_image_base64}
+  if ocr_prompt:
+    instance["prompt"] = ocr_prompt
+  instances = [instance]
+
+  response = endpoint.predict(instances=instances)
+  return response.predictions[0].get("response")
+
+
+def detect_predict(
+    endpoint: Any,
+    detect_prompt: str,
+    image: Any,
+    new_width: int = 1000,
+) -> str:
+  """Predicts the answer to a question about an image using an Endpoint."""
+  # Resize and convert image to base64 string.
+  resized_image = resize_image(image, new_width)
+  resized_image_base64 = image_to_base64(resized_image)
+
+  instance = {"image": resized_image_base64}
+  if detect_prompt:
+    instance["prompt"] = detect_prompt
+  instances = [instance]
+
+  response = endpoint.predict(instances=instances)
+  return response.predictions[0].get("response")
+
+
 def get_quota(project_id: str, region: str, resource_id: str) -> int:
   """Returns the quota for a resource in a region.
 
@@ -373,35 +472,50 @@ def get_quota(project_id: str, region: str, resource_id: str) -> int:
   return -1
 
 
-def get_resource_id(accelerator_type: str, is_for_training: bool) -> str:
+def get_resource_id(
+    accelerator_type: str,
+    is_for_training: bool,
+    is_restricted_image: bool = False,
+) -> str:
   """Returns the resource id for a given accelerator type and the use case.
 
   Args:
     accelerator_type: The accelerator type.
     is_for_training: Whether the resource is used for training. Set false for
       serving use case.
+    is_restricted_image: Whether the image is hosted in `vertex-ai-restricted`.
 
   Returns:
     The resource id.
   """
-  training_accelerator_map = {
+  default_training_accelerator_map = {
       "NVIDIA_TESLA_V100": "custom_model_training_nvidia_v100_gpus",
       "NVIDIA_L4": "custom_model_training_nvidia_l4_gpus",
       "NVIDIA_TESLA_A100": "custom_model_training_nvidia_a100_gpus",
       "NVIDIA_A100_80GB": "custom_model_training_nvidia_a100_80gb_gpus",
+      "NVIDIA_H100_80GB": "custom_model_training_nvidia_h100_gpus",
       "NVIDIA_TESLA_T4": "custom_model_training_nvidia_t4_gpus",
       "TPU_V5e": "custom_model_training_tpu_v5e",
       "TPU_V3": "custom_model_training_tpu_v3",
+  }
+  restricted_image_training_accelerator_map = {
+      "NVIDIA_A100_80GB": "restricted_image_training_nvidia_a100_80gb_gpus",
   }
   serving_accelerator_map = {
       "NVIDIA_TESLA_V100": "custom_model_serving_nvidia_v100_gpus",
       "NVIDIA_L4": "custom_model_serving_nvidia_l4_gpus",
       "NVIDIA_TESLA_A100": "custom_model_serving_nvidia_a100_gpus",
       "NVIDIA_A100_80GB": "custom_model_serving_nvidia_a100_80gb_gpus",
+      "NVIDIA_H100_80GB": "custom_model_serving_nvidia_h100_gpus",
       "NVIDIA_TESLA_T4": "custom_model_serving_nvidia_t4_gpus",
       "TPU_V5e": "custom_model_serving_tpu_v5e",
   }
   if is_for_training:
+    training_accelerator_map = (
+        restricted_image_training_accelerator_map
+        if is_restricted_image
+        else default_training_accelerator_map
+    )
     if accelerator_type in training_accelerator_map:
       return training_accelerator_map[accelerator_type]
     else:
@@ -423,9 +537,12 @@ def check_quota(
     accelerator_type: str,
     accelerator_count: int,
     is_for_training: bool,
+    is_restricted_image: bool = False,
 ):
   """Checks if the project and the region has the required quota."""
-  resource_id = get_resource_id(accelerator_type, is_for_training)
+  resource_id = get_resource_id(
+      accelerator_type, is_for_training, is_restricted_image
+  )
   quota = get_quota(project_id, region, resource_id)
   quota_request_instruction = (
       "Either use "
