@@ -69,6 +69,12 @@ _LORA_DROPOUT = flags.DEFINE_float(
     ' https://huggingface.co/docs/peft/task_guides/token-classification-lora.',
 )
 
+_TARGET_MODULES = flags.DEFINE_list(
+    'target_modules',
+    constants.CAUSAL_LANGUAGE_MODELING_LORA_TARGET_MODULES,
+    'The comma separated list of target modules for LoRa training.',
+)
+
 _WARMUP_STEPS = flags.DEFINE_integer(
     'warmup_steps',
     10,
@@ -151,6 +157,7 @@ def main(_) -> None:
         lora_rank=_LORA_RANK.value,
         lora_alpha=_LORA_ALPHA.value,
         lora_dropout=_LORA_DROPOUT.value,
+        target_modules=_TARGET_MODULES.value,
         warmup_steps=_WARMUP_STEPS.value,
         max_steps=_MAX_STEPS.value,
         learning_rate=_LEARNING_RATE.value,
@@ -164,6 +171,7 @@ def main(_) -> None:
         lora_rank=_LORA_RANK.value,
         lora_alpha=_LORA_ALPHA.value,
         lora_dropout=_LORA_DROPOUT.value,
+        target_modules=_TARGET_MODULES.value,
         warmup_ratio=_WARMUP_RATIO.value,
         max_steps=_MAX_STEPS.value,
         max_seq_length=_MAX_SEQ_LENGTH.value,
