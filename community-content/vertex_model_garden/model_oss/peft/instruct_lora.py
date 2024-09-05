@@ -9,6 +9,8 @@ from transformers import AutoTokenizer
 from transformers import BitsAndBytesConfig
 from transformers import TrainingArguments
 from trl import SFTTrainer
+from typing import List
+from util import constants
 
 
 def finetune_instruct(
@@ -18,6 +20,7 @@ def finetune_instruct(
     lora_rank: int = 64,
     lora_alpha: int = 16,
     lora_dropout: float = 0.1,
+    target_modules: List[str] = constants.INSTRUCT_LORA_TARGET_MODULES,
     warmup_ratio: int = 0.03,
     max_steps: int = 10,
     max_seq_length: int = 512,
@@ -50,12 +53,7 @@ def finetune_instruct(
       r=lora_rank,
       bias="none",
       task_type="CAUSAL_LM",
-      target_modules=[
-          "query_key_value",
-          "dense",
-          "dense_h_to_4h",
-          "dense_4h_to_h",
-      ],
+      target_modules=target_modules,
   )
 
   per_device_train_batch_size = 4

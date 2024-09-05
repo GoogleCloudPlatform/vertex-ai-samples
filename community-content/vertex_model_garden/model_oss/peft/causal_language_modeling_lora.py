@@ -12,6 +12,7 @@ from transformers import AutoModelForCausalLM
 from transformers import AutoTokenizer
 from transformers import BitsAndBytesConfig
 from transformers import TrainingArguments
+from typing import List
 from util import constants
 
 
@@ -23,6 +24,7 @@ def finetune_causal_language_modeling(
     lora_rank: int = 16,
     lora_alpha: int = 32,
     lora_dropout: float = 0.05,
+    target_modules: List[str] = constants.CAUSAL_LANGUAGE_MODELING_LORA_TARGET_MODULES,
     warmup_steps: int = 10,
     max_steps: int = 10,
     learning_rate: float = 2e-4,
@@ -101,7 +103,7 @@ def finetune_causal_language_modeling(
   config = LoraConfig(
       r=lora_rank,
       lora_alpha=lora_alpha,
-      target_modules=["q_proj", "v_proj"],
+      target_modules=target_modules,
       lora_dropout=lora_dropout,
       bias="none",
       task_type="CAUSAL_LM",
