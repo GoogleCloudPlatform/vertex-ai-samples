@@ -77,6 +77,16 @@ TEXT_TO_IMAGE_LORA = 'text-to-image-lora'
 SEQUENCE_CLASSIFICATION_LORA = 'sequence-classification-lora'
 CAUSAL_LANGUAGE_MODELING_LORA = 'causal-language-modeling-lora'
 INSTRUCT_LORA = 'instruct-lora'
+CAUSAL_LANGUAGE_MODELING_LORA_TARGET_MODULES = [
+  "q_proj",
+  "v_proj",
+]
+INSTRUCT_LORA_TARGET_MODULES = [
+    "query_key_value",
+    "dense",
+    "dense_h_to_4h",
+    "dense_4h_to_h",
+]
 
 # Precision modes for loading model weights.
 PRECISION_MODE_4 = '4bit'
