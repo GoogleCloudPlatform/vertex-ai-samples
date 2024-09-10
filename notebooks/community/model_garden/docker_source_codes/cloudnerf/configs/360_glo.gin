@@ -1,0 +1,21 @@
+# The provided content is a configuration file for Generative
+# Latent Optimization (GLO) vectors in the Pytorch implemnetation of ZipNeRF.
+
+# Specifies the dataset loader, in this case, 'llff' for light field.
+Config.dataset_loader = 'llff'
+# Defines the near and far clipping planes for the camera view.
+Config.near = 0.2
+Config.far = 1e6
+# Image downsampling.
+Config.factor = 4
+
+# For the model configurations.
+Model.raydist_fn = 'power_transformation'
+Model.num_glo_features = 128
+Model.opaque_background = True
+
+PropMLP.disable_density_normals = True
+PropMLP.disable_rgb = True
+PropMLP.grid_level_dim = 1
+
+NerfMLP.disable_density_normals = True
