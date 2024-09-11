@@ -18,6 +18,7 @@ GCSFUSE_URI_PREFIX = "/gcs/"
 LOCAL_BASE_MODEL_DIR = "/tmp/base_model_dir"
 LOCAL_TEMPLATE_DIR = "/tmp/template_dir"
 _TEMPLATE_DIRNAME = "templates"
+_VERTEX_AI_NOTEBOOK_CONTENT_DIR = "/content"
 _VERTEX_AI_SAMPLES_GITHUB_REPO_NAME = "vertex-ai-samples"
 # TODO(dasoriya): Update the template directory after discussing with everyone.
 _VERTEX_AI_SAMPLES_GITHUB_TEMPLATE_DIR = (
@@ -250,15 +251,12 @@ def _github_template_path(template: str) -> str:
   Returns:
     The path to the template in the Vertex AI Samples GitHub repo.
   """
-  print(os.path.dirname(__file__))
-  template_path_in_git = os.path.join(
-      "/content",
+  return os.path.join(
+      _VERTEX_AI_NOTEBOOK_CONTENT_DIR,
       _VERTEX_AI_SAMPLES_GITHUB_REPO_NAME,
       _VERTEX_AI_SAMPLES_GITHUB_TEMPLATE_DIR,
       template + ".json",
   )
-  print(template_path_in_git)
-  return template_path_in_git
 
 
 def _get_dataset(
