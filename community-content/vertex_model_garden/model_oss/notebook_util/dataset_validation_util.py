@@ -250,12 +250,14 @@ def _github_template_path(template: str) -> str:
   Returns:
     The path to the template in the Vertex AI Samples GitHub repo.
   """
-  return os.path.join(
+  template_path_in_git = os.path.join(
       os.path.dirname(__file__),
       _VERTEX_AI_SAMPLES_GITHUB_REPO_NAME,
       _VERTEX_AI_SAMPLES_GITHUB_TEMPLATE_DIR,
       template + ".json",
   )
+print(template_path_in_git)
+return template_path_in_git
 
 
 def _get_dataset(
