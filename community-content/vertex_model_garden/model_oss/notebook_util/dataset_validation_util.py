@@ -385,7 +385,7 @@ def validate_dataset_with_template(
         f"Template file {template} does not exist. To validate the"
         " dataset, please provide a valid GCS path for the template or a valid"
         " template name from"
-        " https://github.com/GoogleCloudPlatform/{_VERTEX_AI_SAMPLES_GITHUB_REPO_NAME}}/tree/main/{_VERTEX_AI_SAMPLES_GITHUB_TEMPLATE_DIR}."
+        f" https://github.com/GoogleCloudPlatform/{_VERTEX_AI_SAMPLES_GITHUB_REPO_NAME}/tree/main/{_VERTEX_AI_SAMPLES_GITHUB_TEMPLATE_DIR}."
     )
 
   _get_dataset(dataset_name, split, num_proc).map(
