@@ -252,7 +252,7 @@ def _github_template_path(template: str) -> str:
   """
   print(os.path.dirname(__file__))
   template_path_in_git = os.path.join(
-      os.path.dirname(__file__),
+      "/content",
       _VERTEX_AI_SAMPLES_GITHUB_REPO_NAME,
       _VERTEX_AI_SAMPLES_GITHUB_TEMPLATE_DIR,
       template + ".json",
