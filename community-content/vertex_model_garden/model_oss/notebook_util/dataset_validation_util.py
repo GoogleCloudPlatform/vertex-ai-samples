@@ -256,8 +256,8 @@ def _github_template_path(template: str) -> str:
       _VERTEX_AI_SAMPLES_GITHUB_TEMPLATE_DIR,
       template + ".json",
   )
-print(template_path_in_git)
-return template_path_in_git
+  print(template_path_in_git)
+  return template_path_in_git
 
 
 def _get_dataset(
