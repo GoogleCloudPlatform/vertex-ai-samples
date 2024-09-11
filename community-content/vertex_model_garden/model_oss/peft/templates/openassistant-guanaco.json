@@ -1,0 +1,7 @@
+{
+  "description": "Template for openassistant-guanaco dataset.",
+  "source": "https://huggingface.co/datasets/timdettmers/openassistant-guanaco",
+  "prompt_input": "{text}",
+  "instruction_separator": "### Human:",
+  "response_separator": "### Assistant:"
+}
