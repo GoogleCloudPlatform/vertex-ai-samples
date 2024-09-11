@@ -18,6 +18,11 @@ GCSFUSE_URI_PREFIX = "/gcs/"
 LOCAL_BASE_MODEL_DIR = "/tmp/base_model_dir"
 LOCAL_TEMPLATE_DIR = "/tmp/template_dir"
 _TEMPLATE_DIRNAME = "templates"
+_VERTEX_AI_SAMPLES_GITHUB_REPO_NAME = "vertex-ai-samples"
+# TODO(dasoriya): Update the template directory after discussing with everyone.
+_VERTEX_AI_SAMPLES_GITHUB_TEMPLATE_DIR = (
+    "community-content/vertex_model_garden/model_oss/peft/templates"
+)
 _DESCRIPTION_KEY = "description"
 _SOURCE_KEY = "source"
 _PROMPT_INPUT_KEY = "prompt_input"
@@ -236,6 +241,23 @@ def _get_split_string(
   return split
 
 
+def _github_template_path(template: str) -> str:
+  """Generates the path to the template in the Vertex AI Samples GitHub repo.
+
+  Args:
+    template: Name of the template.
+
+  Returns:
+    The path to the template in the Vertex AI Samples GitHub repo.
+  """
+  return os.path.join(
+      os.path.dirname(__file__),
+      _VERTEX_AI_SAMPLES_GITHUB_REPO_NAME,
+      _VERTEX_AI_SAMPLES_GITHUB_TEMPLATE_DIR,
+      template + ".json",
+  )
+
+
 def _get_dataset(
     dataset_name: str,
     split: str,
@@ -356,10 +378,14 @@ def validate_dataset_with_template(
 
   if is_gcs_path(template):
     template_path = download_gcs_uri_to_local(template, LOCAL_TEMPLATE_DIR)
+  elif os.path.isfile(_github_template_path(template)):
+    template_path = _github_template_path(template)
   else:
     raise ValueError(
         f"Template file {template} does not exist. To validate the"
-        " dataset, please provide a valid GCS path for the template."
+        " dataset, please provide a valid GCS path for the template or a valid"
+        " template name from"
+        " https://github.com/GoogleCloudPlatform/{_VERTEX_AI_SAMPLES_GITHUB_REPO_NAME}}/tree/main/{_VERTEX_AI_SAMPLES_GITHUB_TEMPLATE_DIR}."
     )
 
   _get_dataset(dataset_name, split, num_proc).map(
@@ -370,9 +396,9 @@ def validate_dataset_with_template(
       )
   )
 
-  logging.info(
-      "Dataset %s is compatible with the %s template.",
-      dataset_name,
-      template,
+  print(
+      "Dataset {} is compatible with the {} template.".format(
+          dataset_name, template
+      )
   )
 
