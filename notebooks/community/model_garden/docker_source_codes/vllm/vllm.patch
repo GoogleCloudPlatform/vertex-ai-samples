@@ -1,0 +1,794 @@
+diff --git a/pyproject.toml b/pyproject.toml
+deleted file mode 100644
+index b197256..0000000
+--- a/pyproject.toml
++++ /dev/null
+@@ -1,34 +0,0 @@
+-[build-system]
+-# Should be mirrored in requirements-build.txt
+-requires = [
+-    "ninja",
+-    "packaging",
+-    "setuptools >= 49.4.0",
+-    "torch == 2.1.2",
+-    "wheel",
+-]
+-build-backend = "setuptools.build_meta"
+-
+-[tool.ruff.lint]
+-select = [
+-    # pycodestyle
+-    "E",
+-    # Pyflakes
+-    "F",
+-    # pyupgrade
+-    # "UP",
+-    # flake8-bugbear
+-    "B",
+-    # flake8-simplify
+-    "SIM",
+-    # isort
+-    # "I",
+-]
+-ignore = [
+-    # star imports
+-    "F405", "F403",
+-    # lambda expression assignment
+-    "E731",
+-    # line too long, handled by black formatting
+-    "E501",
+-]
+diff --git a/requirements.txt b/requirements.txt
+index 92ba0a7..3506a73 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -5,9 +5,7 @@ pandas  # Required for Ray data.
+ pyarrow  # Required for Ray data.
+ sentencepiece  # Required for LLaMA tokenizer.
+ numpy
+-torch == 2.1.2
+ transformers >= 4.36.0  # Required for Mixtral.
+-xformers == 0.0.23.post1  # Required for CUDA 12.1.
+ fastapi
+ uvicorn[standard]
+ pydantic == 1.10.13  # Required for OpenAI server.
+diff --git a/setup.py b/setup.py
+index 811d494..6e0ac70 100644
+--- a/setup.py
++++ b/setup.py
+@@ -12,7 +12,7 @@ from torch.utils.cpp_extension import BuildExtension, CUDAExtension, CUDA_HOME,
+ 
+ ROOT_DIR = os.path.dirname(__file__)
+ 
+-MAIN_CUDA_VERSION = "12.1"
++MAIN_CUDA_VERSION = "11.8"
+ 
+ # Supported NVIDIA GPU architectures.
+ NVIDIA_SUPPORTED_ARCHS = {"7.0", "7.5", "8.0", "8.6", "8.9", "9.0"}
+@@ -123,10 +123,11 @@ def get_torch_arch_list() -> Set[str]:
+     arch_list = torch_arch_list.intersection(valid_archs)
+     # If none of the specified architectures are valid, raise an error.
+     if not arch_list:
+-        raise RuntimeError(
++        print(
+             "None of the CUDA/ROCM architectures in `TORCH_CUDA_ARCH_LIST` env "
+             f"variable ({env_arch_list}) is supported. "
+             f"Supported CUDA/ROCM architectures are: {valid_archs}.")
++        return None
+     invalid_arch_list = torch_arch_list - valid_archs
+     if invalid_arch_list:
+         warnings.warn(
+diff --git a/vllm/engine/arg_utils.py b/vllm/engine/arg_utils.py
+index 7e58069..6791248 100644
+--- a/vllm/engine/arg_utils.py
++++ b/vllm/engine/arg_utils.py
+@@ -5,6 +5,78 @@ from typing import Optional, Tuple
+ 
+ from vllm.config import (CacheConfig, ModelConfig, ParallelConfig,
+                          SchedulerConfig)
++from vllm.logger import init_logger
++import os
++from google.cloud import storage
++import boto3
++
++logger = init_logger(__name__)
++GCS_PREFIX = "gs://"
++S3_PREFIX = "s3://"
++
++
++def is_s3_path(input_path: str) -> bool:
++    return input_path.startswith(S3_PREFIX)
++
++
++def download_s3_dir_to_local(s3_dir: str, local_dir: str):
++    if os.path.isdir(local_dir):
++        return
++    # s3://bucket_name/dir
++    bucket_name = s3_dir.split('/')[2]
++    prefix = s3_dir[len(S3_PREFIX + bucket_name) :].strip('/')
++
++    access_key_id = os.environ['AWS_ACCESS_KEY_ID']
++    secret_key = os.environ['AWS_SECRET_ACCESS_KEY']
++    client = boto3.client(
++        's3',
++        aws_access_key_id=access_key_id,
++        aws_secret_access_key=secret_key,
++    )
++    blobs = client.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
++    if not blobs:
++        raise ValueError(f"No blobs found in {s3_dir}")
++    for blob in blobs['Contents']:
++        name = blob['Key']
++        if name[-1] == '/':
++            continue
++        file_path = name[len(prefix) :].strip('/')
++        local_file_path = os.path.join(local_dir, file_path)
++        os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
++        if file_path.endswith(".bin") or file_path.endswith(".safetensors"):
++            with open(local_file_path, 'w') as f:
++                f.write(f'{S3_PREFIX}{bucket_name}/{prefix}/{file_path}')
++        else:
++            print(f"==> Download {s3_dir}/{file_path} to {local_file_path}")
++            client.download_file(bucket_name, name, local_file_path)
++
++
++def is_gcs_path(input_path: str) -> bool:
++    return input_path.startswith(GCS_PREFIX)
++
++
++def download_gcs_dir_to_local(gcs_dir: str, local_dir: str):
++    if os.path.isdir(local_dir):
++        return
++    # gs://bucket_name/dir
++    bucket_name = gcs_dir.split('/')[2]
++    prefix = gcs_dir[len(GCS_PREFIX + bucket_name) :].strip('/')
++    client = storage.Client()
++    blobs = client.list_blobs(bucket_name, prefix=prefix)
++    if not blobs:
++        raise ValueError(f"No blobs found in {gcs_dir}")
++    for blob in blobs:
++        if blob.name[-1] == '/':
++            continue
++        file_path = blob.name[len(prefix) :].strip('/')
++        local_file_path = os.path.join(local_dir, file_path)
++        os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
++        if file_path.endswith(".bin") or file_path.endswith(".safetensors"):
++            with open(local_file_path, 'w') as f:
++                f.write(f'{GCS_PREFIX}{bucket_name}/{prefix}/{file_path}')
++        else:
++            print(f"==> Download {gcs_dir}/{file_path} to {local_file_path}")
++            blob.download_to_filename(local_file_path)
+ 
+ 
+ @dataclass
+@@ -37,6 +109,14 @@ class EngineArgs:
+     max_context_len_to_capture: int = 8192
+ 
+     def __post_init__(self):
++        if not self.model:
++            self.model = os.environ.get("AIP_STORAGE_URI", "")
++            logger.info(
++                f"Load self.model from AIP_STORAGE_URI: {self.model}."
++            )
++        if not self.model:
++            raise ValueError("self.model is must be set.")
++
+         if self.tokenizer is None:
+             self.tokenizer = self.model
+ 
+@@ -52,7 +132,7 @@ class EngineArgs:
+         parser.add_argument(
+             '--model',
+             type=str,
+-            default='facebook/opt-125m',
++            default=None,
+             help='name or path of the huggingface model to use')
+         parser.add_argument(
+             '--tokenizer',
+@@ -212,9 +292,39 @@ class EngineArgs:
+         engine_args = cls(**{attr: getattr(args, attr) for attr in attrs})
+         return engine_args
+ 
++    def process_gcs(self):
++        # Download GCS tokenizer.
++        if is_gcs_path(self.tokenizer) and self.tokenizer != self.model:
++            local_dir = "/tmp/gcs_tokenizer"
++            download_gcs_dir_to_local(self.tokenizer, local_dir)
++            self.tokenizer = local_dir
++        # Download GCS model without bin files.
++        if is_gcs_path(self.model):
++            local_dir = "/tmp/gcs_model"
++            download_gcs_dir_to_local(self.model, local_dir)
++            if self.tokenizer == self.model:
++                self.tokenizer = local_dir
++            self.model = local_dir
++
++    def process_s3(self):
++        # Download S3 tokenizer.
++        if is_s3_path(self.tokenizer) and self.tokenizer != self.model:
++            local_dir = "/tmp/s3_tokenizer"
++            download_s3_dir_to_local(self.tokenizer, local_dir)
++            self.tokenizer = local_dir
++        # Download S3 model without bin files.
++        if is_s3_path(self.model):
++            local_dir = "/tmp/s3_model"
++            download_s3_dir_to_local(self.model, local_dir)
++            if self.tokenizer == self.model:
++                self.tokenizer = local_dir
++            self.model = local_dir
++
+     def create_engine_configs(
+         self,
+     ) -> Tuple[ModelConfig, CacheConfig, ParallelConfig, SchedulerConfig]:
++        self.process_gcs()
++        self.process_s3()
+         model_config = ModelConfig(self.model, self.tokenizer,
+                                    self.tokenizer_mode, self.trust_remote_code,
+                                    self.download_dir, self.load_format,
+diff --git a/vllm/engine/async_llm_engine.py b/vllm/engine/async_llm_engine.py
+index d854a20..158b5fe 100644
+--- a/vllm/engine/async_llm_engine.py
++++ b/vllm/engine/async_llm_engine.py
+@@ -377,9 +377,8 @@ class AsyncLLMEngine:
+                     shortened_token_ids = shortened_token_ids[:self.
+                                                               max_log_len]
+             logger.info(f"Received request {request_id}: "
+-                        f"prompt: {shortened_prompt!r}, "
+-                        f"sampling params: {sampling_params}, "
+-                        f"prompt token ids: {shortened_token_ids}.")
++                        f"prompt len: {len(shortened_prompt)}, "
++                        f"sampling params: {sampling_params}.")
+ 
+         if not self.is_running:
+             if self.start_engine_loop:
+diff --git a/vllm/entrypoints/api_server.py b/vllm/entrypoints/api_server.py
+index 6910b32..d5bbe34 100644
+--- a/vllm/entrypoints/api_server.py
++++ b/vllm/entrypoints/api_server.py
+@@ -1,4 +1,5 @@
+ import argparse
++import copy
+ import json
+ from typing import AsyncGenerator
+ 
+@@ -10,13 +11,27 @@ from vllm.engine.arg_utils import AsyncEngineArgs
+ from vllm.engine.async_llm_engine import AsyncLLMEngine
+ from vllm.sampling_params import SamplingParams
+ from vllm.utils import random_uuid
++from vllm.entrypoints.openai.api_server import init_openai_api_server, create_chat_completion
++from vllm.entrypoints.openai.protocol import ChatCompletionRequest
++from vllm.logger import init_logger
+ 
++logger = init_logger(__name__)
+ TIMEOUT_KEEP_ALIVE = 5  # seconds.
+ TIMEOUT_TO_PREVENT_DEADLOCK = 1  # seconds.
+ app = FastAPI()
+ engine = None
+ 
+ 
++# Required by Vertex deployment.
++@app.get("/ping")
++async def ping() -> Response:
++    return Response(status_code=200)
++
++def format_output(prompt: str, output: str):
++    output = output.strip("\n")
++    return f"Prompt:\n{prompt.strip()}\nOutput:\n{output}"
++
++
+ @app.get("/health")
+ async def health() -> Response:
+     """Health check."""
+@@ -33,8 +48,16 @@ async def generate(request: Request) -> Response:
+     - other fields: the sampling parameters (See `SamplingParams` for details).
+     """
+     request_dict = await request.json()
++    is_chat_completion = request_dict.get("@requestFormat", "") == "chatCompletions"
++    if is_chat_completion:
++        chat_completion_request = ChatCompletionRequest(**request_dict)
++        return await create_chat_completion(chat_completion_request, request)
++    is_on_vertex = "instances" in request_dict
++    if is_on_vertex:
++        request_dict = request_dict["instances"][0]
+     prompt = request_dict.pop("prompt")
+     stream = request_dict.pop("stream", False)
++    raw_response = request_dict.pop("raw_response", False)
+     sampling_params = SamplingParams(**request_dict)
+     request_id = random_uuid()
+ 
+@@ -42,12 +65,33 @@ async def generate(request: Request) -> Response:
+ 
+     # Streaming case
+     async def stream_results() -> AsyncGenerator[bytes, None]:
++        prior_request_output = None
+         async for request_output in results_generator:
+             prompt = request_output.prompt
+-            text_outputs = [
+-                prompt + output.text for output in request_output.outputs
+-            ]
+-            ret = {"text": text_outputs}
++            text_outputs = []
++            for i, output in enumerate(request_output.outputs):
++                if prior_request_output is not None:
++                    prior_output = prior_request_output.outputs[i]
++                    text_output = output.text[len(prior_output.text):]
++                else:
++                    text_output = output.text
++                text_outputs.append(text_output)
++            ret = {"predictions": text_outputs}
++            if raw_response:
++                output_token_counts = []
++                for i, output in enumerate(request_output.outputs):
++                    if prior_request_output is not None:
++                        prior_output = prior_request_output.outputs[i]
++                        output_token_count = len(output.token_ids) - len(prior_output.token_ids)
++                    else:
++                        output_token_count = len(output.token_ids)
++                    output_token_counts.append(output_token_count)
++                cumulative_logprobs = [output.cumulative_logprob for output in request_output.outputs]
++                ret.update({
++                    "output_token_counts": output_token_counts,
++                    "cumulative_logprobs": cumulative_logprobs
++                })
++            prior_request_output = copy.deepcopy(request_output)
+             yield (json.dumps(ret) + "\0").encode("utf-8")
+ 
+     if stream:
+@@ -63,24 +107,40 @@ async def generate(request: Request) -> Response:
+         final_output = request_output
+ 
+     assert final_output is not None
+-    prompt = final_output.prompt
+-    text_outputs = [prompt + output.text for output in final_output.outputs]
+-    ret = {"text": text_outputs}
++    if raw_response:
++        text_outputs = [output.text for output in final_output.outputs]
++        output_token_counts = [len(output.token_ids) for output in final_output.outputs]
++        cumulative_logprobs = [output.cumulative_logprob for output in final_output.outputs]
++        ret = {
++            "predictions": text_outputs,
++            "output_token_counts": output_token_counts,
++            "cumulative_logprobs": cumulative_logprobs
++        }
++    else:
++        prompt = final_output.prompt
++        text_outputs = [format_output(prompt, output.text) for output in final_output.outputs]
++        ret = {"predictions": text_outputs}
+     return JSONResponse(ret)
+ 
+ 
+ if __name__ == "__main__":
++    logger.info("Starting API server...")
+     parser = argparse.ArgumentParser()
+     parser.add_argument("--host", type=str, default=None)
+     parser.add_argument("--port", type=int, default=8000)
+     parser.add_argument("--ssl-keyfile", type=str, default=None)
+     parser.add_argument("--ssl-certfile", type=str, default=None)
++    parser.add_argument("--chat-template", type=str, default=None)
++    parser.add_argument("--response-role", type=str, default="assistant")
+     parser = AsyncEngineArgs.add_cli_args(parser)
+     args = parser.parse_args()
+ 
+     engine_args = AsyncEngineArgs.from_cli_args(args)
+     engine = AsyncLLMEngine.from_engine_args(engine_args)
+ 
++    logger.info("Initializing OpenAI API server...")
++    init_openai_api_server(args, engine)
++
+     uvicorn.run(app,
+                 host=args.host,
+                 port=args.port,
+diff --git a/vllm/entrypoints/openai/api_server.py b/vllm/entrypoints/openai/api_server.py
+index be5f419..0cda03e 100644
+--- a/vllm/entrypoints/openai/api_server.py
++++ b/vllm/entrypoints/openai/api_server.py
+@@ -37,65 +37,10 @@ from vllm.utils import random_uuid
+ TIMEOUT_KEEP_ALIVE = 5  # seconds
+ 
+ logger = init_logger(__name__)
+-served_model = None
+-app = fastapi.FastAPI()
+ engine = None
+ response_role = None
+-
+-
+-def parse_args():
+-    parser = argparse.ArgumentParser(
+-        description="vLLM OpenAI-Compatible RESTful API server.")
+-    parser.add_argument("--host", type=str, default=None, help="host name")
+-    parser.add_argument("--port", type=int, default=8000, help="port number")
+-    parser.add_argument("--allow-credentials",
+-                        action="store_true",
+-                        help="allow credentials")
+-    parser.add_argument("--allowed-origins",
+-                        type=json.loads,
+-                        default=["*"],
+-                        help="allowed origins")
+-    parser.add_argument("--allowed-methods",
+-                        type=json.loads,
+-                        default=["*"],
+-                        help="allowed methods")
+-    parser.add_argument("--allowed-headers",
+-                        type=json.loads,
+-                        default=["*"],
+-                        help="allowed headers")
+-    parser.add_argument("--served-model-name",
+-                        type=str,
+-                        default=None,
+-                        help="The model name used in the API. If not "
+-                        "specified, the model name will be the same as "
+-                        "the huggingface name.")
+-    parser.add_argument("--chat-template",
+-                        type=str,
+-                        default=None,
+-                        help="The file path to the chat template, "
+-                        "or the template in single-line form "
+-                        "for the specified model")
+-    parser.add_argument("--response-role",
+-                        type=str,
+-                        default="assistant",
+-                        help="The role name to return if "
+-                        "`request.add_generation_prompt=true`.")
+-    parser.add_argument("--ssl-keyfile",
+-                        type=str,
+-                        default=None,
+-                        help="The file path to the SSL key file")
+-    parser.add_argument("--ssl-certfile",
+-                        type=str,
+-                        default=None,
+-                        help="The file path to the SSL cert file")
+-
+-    parser = AsyncEngineArgs.add_cli_args(parser)
+-    return parser.parse_args()
+-
+-
+-app.add_middleware(MetricsMiddleware)  # Trace HTTP server metrics
+-app.add_route("/metrics", metrics)  # Exposes HTTP metrics
+-
++max_model_len = None
++tokenizer = None
+ 
+ def create_error_response(status_code: HTTPStatus,
+                           message: str) -> JSONResponse:
+@@ -123,21 +68,10 @@ def load_chat_template(args, tokenizer):
+         logger.warning("No chat template provided. Chat API will not work.")
+ 
+ 
+-@app.exception_handler(RequestValidationError)
+ async def validation_exception_handler(_, exc):
+     return create_error_response(HTTPStatus.BAD_REQUEST, str(exc))
+ 
+ 
+-async def check_model(request) -> Optional[JSONResponse]:
+-    if request.model == served_model:
+-        return
+-    ret = create_error_response(
+-        HTTPStatus.NOT_FOUND,
+-        f"The model `{request.model}` does not exist.",
+-    )
+-    return ret
+-
+-
+ async def check_length(
+     request: Union[ChatCompletionRequest, CompletionRequest],
+     prompt: Optional[str] = None,
+@@ -165,23 +99,11 @@ async def check_length(
+         return input_ids, None
+ 
+ 
+-@app.get("/health")
+ async def health() -> Response:
+     """Health check."""
+     return Response(status_code=200)
+ 
+ 
+-@app.get("/v1/models")
+-async def show_available_models():
+-    """Show available models. Right now we only have one model."""
+-    model_cards = [
+-        ModelCard(id=served_model,
+-                  root=served_model,
+-                  permission=[ModelPermission()])
+-    ]
+-    return ModelList(data=model_cards)
+-
+-
+ def create_logprobs(
+     token_ids: List[int],
+     top_logprobs: Optional[List[Optional[Dict[int, float]]]] = None,
+@@ -217,7 +139,6 @@ def create_logprobs(
+     return logprobs
+ 
+ 
+-@app.post("/v1/chat/completions")
+ async def create_chat_completion(request: ChatCompletionRequest,
+                                  raw_request: Request):
+     """Completion API similar to OpenAI's API.
+@@ -229,12 +150,8 @@ async def create_chat_completion(request: ChatCompletionRequest,
+         - function_call (Users should implement this by themselves)
+         - logit_bias (to be supported by vLLM engine)
+     """
+-    error_check_ret = await check_model(request)
+-    if error_check_ret is not None:
+-        return error_check_ret
+ 
+     if request.logit_bias is not None and len(request.logit_bias) > 0:
+-        # TODO: support logit_bias in vLLM engine.
+         return create_error_response(HTTPStatus.BAD_REQUEST,
+                                      "logit_bias is not currently supported")
+ 
+@@ -438,7 +355,6 @@ async def create_chat_completion(request: ChatCompletionRequest,
+         return await completion_full_generator()
+ 
+ 
+-@app.post("/v1/completions")
+ async def create_completion(request: CompletionRequest, raw_request: Request):
+     """Completion API similar to OpenAI's API.
+ 
+@@ -451,10 +367,6 @@ async def create_completion(request: CompletionRequest, raw_request: Request):
+         - logit_bias (to be supported by vLLM engine)
+     """
+ 
+-    error_check_ret = await check_model(request)
+-    if error_check_ret is not None:
+-        return error_check_ret
+-
+     # OpenAI API supports echoing the prompt when max_tokens is 0.
+     echo_without_generation = request.echo and request.max_tokens == 0
+ 
+@@ -464,7 +376,6 @@ async def create_completion(request: CompletionRequest, raw_request: Request):
+                                      "suffix is not currently supported")
+ 
+     if request.logit_bias is not None and len(request.logit_bias) > 0:
+-        # TODO: support logit_bias in vLLM engine.
+         return create_error_response(HTTPStatus.BAD_REQUEST,
+                                      "logit_bias is not currently supported")
+ 
+@@ -481,7 +392,6 @@ async def create_completion(request: CompletionRequest, raw_request: Request):
+             use_token_ids = True
+             prompt = request.prompt
+         elif isinstance(first_element, (str, list)):
+-            # TODO: handles multiple prompt case in list[list[int]]
+             if len(request.prompt) > 1:
+                 return create_error_response(
+                     HTTPStatus.BAD_REQUEST,
+@@ -713,45 +623,24 @@ async def create_completion(request: CompletionRequest, raw_request: Request):
+     return response
+ 
+ 
+-if __name__ == "__main__":
+-    args = parse_args()
+-
+-    app.add_middleware(
+-        CORSMiddleware,
+-        allow_origins=args.allowed_origins,
+-        allow_credentials=args.allow_credentials,
+-        allow_methods=args.allowed_methods,
+-        allow_headers=args.allowed_headers,
+-    )
+-
++def init_openai_api_server(args, arg_engine):
+     logger.info(f"args: {args}")
+ 
+-    if args.served_model_name is not None:
+-        served_model = args.served_model_name
+-    else:
+-        served_model = args.model
+-
++    global response_role
+     response_role = args.response_role
+ 
+-    engine_args = AsyncEngineArgs.from_cli_args(args)
+-    engine = AsyncLLMEngine.from_engine_args(engine_args)
++    global engine
++    engine = arg_engine
++
+     engine_model_config = asyncio.run(engine.get_model_config())
++
++    global max_model_len
+     max_model_len = engine_model_config.max_model_len
+ 
+     # A separate tokenizer to map token IDs to strings.
++    global tokenizer
+     tokenizer = get_tokenizer(
+         engine_model_config.tokenizer,
+         tokenizer_mode=engine_model_config.tokenizer_mode,
+         trust_remote_code=engine_model_config.trust_remote_code)
+     load_chat_template(args, tokenizer)
+-
+-    # Register labels for metrics
+-    add_global_metrics_labels(model_name=engine_args.model)
+-
+-    uvicorn.run(app,
+-                host=args.host,
+-                port=args.port,
+-                log_level="info",
+-                timeout_keep_alive=TIMEOUT_KEEP_ALIVE,
+-                ssl_keyfile=args.ssl_keyfile,
+-                ssl_certfile=args.ssl_certfile)
+diff --git a/vllm/model_executor/weight_utils.py b/vllm/model_executor/weight_utils.py
+index 365c847..eeb9c75 100644
+--- a/vllm/model_executor/weight_utils.py
++++ b/vllm/model_executor/weight_utils.py
+@@ -286,3 +286,181 @@ def initialize_dummy_weights(
+     for param in model.state_dict().values():
+         if torch.is_floating_point(param):
+             param.data.uniform_(low, high)
++
++
++import time
++import boto3
++from google.cloud import storage
++from huggingface_hub import hf_hub_download
++
++HF_PREFIX = "hf://"
++MODEL_DIR = "/tmp/vllm_model"
++
++
++def prepare_hf_model_weights_on_the_fly(
++    model_name_or_path: str,
++    cache_dir: Optional[str] = None,
++    use_safetensors: bool = False,
++    fall_back_to_pt: bool = True,
++    revision: Optional[str] = None,
++) -> Tuple[List[str], bool]:
++    logger.info("Loading weights on the fly.")
++    lock = get_lock(model_name_or_path, cache_dir)
++
++    hf_weights_files = []
++    if use_safetensors:
++        logger.info("Looking for .safetensors files")
++        index_filename = "model.safetensors.index.json"
++        allow_patterns = "*.safetensors"
++    else:
++        logger.info("Looking for .bin files")
++        index_filename = "pytorch_model.bin.index.json"
++        allow_patterns = "*.bin"
++    if not os.path.isdir(model_name_or_path):
++        try:
++            with lock:
++                index_file = hf_hub_download(repo_id=model_name_or_path,
++                                             filename=index_filename,
++                                             cache_dir=cache_dir)
++        except:
++            logger.info("The model is in HF hub with 1 file, download it directly.")
++            with lock:
++                hf_folder = snapshot_download(repo_id=model_name_or_path,
++                                              allow_patterns=allow_patterns,
++                                              cache_dir=cache_dir,
++                                              tqdm_class=Disabledtqdm)
++            hf_weights_files = [x for x in glob.glob(os.path.join(hf_folder, allow_patterns))]
++        else:
++            logger.info("The model is in HF hub with multiple files, do not download it now.")
++            with open(index_file, "r") as f:
++                index = json.loads(f.read())
++            weight_filenames = set(index["weight_map"].values())
++            hf_weights_files = [f"{HF_PREFIX}{model_name_or_path}/{weight_filename}" for weight_filename in weight_filenames]
++    else:
++        logger.info("The model is possibly in local disk.")
++        hf_weights_files = [x for x in glob.glob(os.path.join(model_name_or_path, allow_patterns))]
++
++    if not use_safetensors:
++        # Exclude files that are not needed for inference.
++        # https://github.com/huggingface/transformers/blob/v4.34.0/src/transformers/trainer.py#L227-L233
++        blacklist = [
++            "training_args.bin",
++            "optimizer.bin",
++            "optimizer.pt",
++            "scheduler.pt",
++            "scaler.pt",
++        ]
++        hf_weights_files = [
++            f for f in hf_weights_files
++            if not any(f.endswith(x) for x in blacklist)
++        ]
++    hf_weights_files.sort()
++
++    if not hf_weights_files and use_safetensors:
++        return prepare_hf_model_weights_on_the_fly(model_name_or_path,
++                                        cache_dir=cache_dir,
++                                        use_safetensors=False,
++                                        fall_back_to_pt=False,
++                                        revision=revision)
++    if not hf_weights_files:
++        raise RuntimeError(f"No weight files found in {model_name_or_path}")
++    logger.info(f"Fetched weight files: {hf_weights_files}")
++    return hf_weights_files, use_safetensors
++
++
++def hf_model_weights_iterator_download_on_the_fly(
++    model_name_or_path: str,
++    cache_dir: Optional[str] = None,
++    load_format: str = "auto",
++    revision: Optional[str] = None,
++    fall_back_to_pt: Optional[bool] = True,
++) -> Iterator[Tuple[str, torch.Tensor]]:
++    lock = get_lock(model_name_or_path, cache_dir)
++    hf_weights_files, use_safetensors = prepare_hf_model_weights_on_the_fly(
++            model_name_or_path=model_name_or_path,
++            cache_dir=cache_dir,
++            use_safetensors=True,
++            fall_back_to_pt=fall_back_to_pt,
++            revision=revision)
++    os.makedirs(MODEL_DIR, exist_ok=True)
++    for hf_weight_file in hf_weights_files:
++        delete_download = False
++
++        if os.path.exists(hf_weight_file):
++            prefix = open(hf_weight_file, "rb").read(2)
++            # Download from GCS.
++            if prefix == b"gs":
++                gcs_path = open(hf_weight_file).read()
++                hf_weight_filename = gcs_path.split("/")[-1]
++                local_file = os.path.join(MODEL_DIR, hf_weight_filename)
++                with lock:
++                    if not os.path.exists(local_file):
++                        client = storage.Client()
++                        with open(local_file, 'wb') as f:
++                            logger.info(f"Download {gcs_path} to {hf_weight_file}")
++                            client.download_blob_to_file(gcs_path, f)
++                hf_weight_file = local_file
++                delete_download = True
++            # Download from S3.
++            elif prefix == b"s3":
++                s3_path = open(hf_weight_file).read()
++                hf_weight_filename = s3_path.split("/")[-1]
++                local_file = os.path.join(MODEL_DIR, hf_weight_filename)
++
++                bucket_name = s3_path.split('/')[2]
++                obj_key = s3_path.split(bucket_name)[1][1:]
++                with lock:
++                    if not os.path.exists(local_file):
++                        access_key_id = os.environ['AWS_ACCESS_KEY_ID']
++                        secret_key = os.environ['AWS_SECRET_ACCESS_KEY']
++                        client = boto3.client(
++                            's3',
++                            aws_access_key_id=access_key_id,
++                            aws_secret_access_key=secret_key,
++)
++                        with open(local_file, 'wb') as f:
++                            logger.info(f"Download {s3_path} to {hf_weight_file}")
++                            client.download_fileobj(bucket_name, obj_key, f)
++                hf_weight_file = local_file
++                delete_download = True
++
++        else:
++            # Download from HF.
++            assert hf_weight_file.startswith(HF_PREFIX)
++            hf_weight_filename = os.path.basename(hf_weight_file)
++            local_file = os.path.join(MODEL_DIR, hf_weight_filename)
++            with lock:
++                if not os.path.exists(local_file):
++                    logger.info(f"Download {model_name_or_path}/{hf_weight_filename} to {local_file}")
++                    hf_hub_download(repo_id=model_name_or_path,
++                                    filename=hf_weight_filename,
++                                    local_dir=MODEL_DIR,
++                                    local_dir_use_symlinks=False,
++                                    force_download=True)
++            hf_weight_file = local_file
++            delete_download = True
++
++        if use_safetensors:
++            with safe_open(hf_weight_file, framework="pt") as f:
++                for name in f.keys():
++                    param = f.get_tensor(name)
++                    yield name, param
++                torch.distributed.barrier()
++        else:
++            torch.distributed.barrier()
++            logger.info(f"Load {hf_weight_file} to memory.")
++            state = torch.load(hf_weight_file, map_location="cpu")
++            for name, param in state.items():
++                yield name, param
++            del state
++            torch.cuda.empty_cache()
++            torch.distributed.barrier()
++
++        if delete_download:
++            with lock:
++                if os.path.exists(hf_weight_file):
++                    logger.info(f"Delete {hf_weight_file}")
++                    os.remove(hf_weight_file)
++
++
++hf_model_weights_iterator = hf_model_weights_iterator_download_on_the_fly
