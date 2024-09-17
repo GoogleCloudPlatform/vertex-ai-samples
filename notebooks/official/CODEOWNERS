@@ -4,8 +4,8 @@
 # review when someone opens a pull request.
 * @GoogleCloudPlatform/vertex-ai-samples-contributors @GoogleCloudPlatform/caiis-tw
 
-# matching_engine folder
-/matching_engine @shenzhimo2 @ivanmkc
+# vector_search folder
+/vector_search @shenzhimo2 @ivanmkc
 
 /tabnet/tabnet_vertex_tutorial.ipynb @longtle
 
