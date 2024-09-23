@@ -1,21 +1,4 @@
 
-[Online prediction with BigQuery ML](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/bigquery_ml/bqml-online-prediction.ipynb)
-
-```
-In this tutorial, you fetch the required data from a public BigQuery dataset and prepare it for training.
-
-The steps performed include:
-
-- Query and fetch the data from the public BigQuery dataset.
-- Prepare the data for training.
-- Train a churn classification model using BigQuery ML.
-- Save the trained model to Vertex AI Model Registry.
-- Deploy the model to a Vertex AI Endpoint.
-- Make online prediction requests to the endpoint.
-
-```
-
-
 [Get started with BigQuery ML Training](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/bigquery_ml/get_started_with_bqml_training.ipynb)
 
 ```
