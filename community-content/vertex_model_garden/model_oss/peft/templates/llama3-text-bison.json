@@ -1,0 +1,7 @@
+{
+  "description": "Template used by Llama 3, accepting text-bison format.",
+  "source": "https://cloud.google.com/vertex-ai/generative-ai/docs/models/tune-text-models-supervised#dataset-format",
+  "prompt_input": "\n\n<|start_header_id|>user<|end_header_id|>\n\n{input_text}<|eot_id|>\n\n<|start_header_id|>assistant<|end_header_id|>\n\n{output_text}<|eot_id|>",
+  "instruction_separator": "<|start_header_id|>user<|end_header_id|>\n\n",
+  "response_separator": "<|start_header_id|>assistant<|end_header_id|>\n\n"
+}
