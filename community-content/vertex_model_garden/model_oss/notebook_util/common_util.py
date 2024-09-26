@@ -583,4 +583,3 @@ def check_quota(
         f"Quota not enough for {resource_id} in {region}: {quota} <"
         f" {accelerator_count}. {quota_request_instruction}"
     )
-
