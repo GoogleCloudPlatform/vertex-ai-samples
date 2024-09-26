@@ -20,6 +20,7 @@
 /vertex_model_garden/model_oss/movinet @KCFindstr
 /vertex_model_garden/model_oss/data_converter @KCFindstr
 /vertex_model_garden/model_oss/peft @weigary
+/vertex_model_garden/model_oss/peft/templates @rayandasoriya
 /vertex_model_garden/model_oss/lm-evaluation-harness @kathyyu-google
 /vertex_model_garden/model_oss/tfvision @dstnluong-google
 /vertex_model_garden/model_oss/fvlm @minwoo33park
