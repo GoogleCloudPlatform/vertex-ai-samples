@@ -476,6 +476,7 @@ def get_resource_id(
     accelerator_type: str,
     is_for_training: bool,
     is_restricted_image: bool = False,
+    is_dynamic_workload_scheduler: bool = False,
 ) -> str:
   """Returns the resource id for a given accelerator type and the use case.
 
@@ -484,45 +485,61 @@ def get_resource_id(
     is_for_training: Whether the resource is used for training. Set false for
       serving use case.
     is_restricted_image: Whether the image is hosted in `vertex-ai-restricted`.
+    is_dynamic_workload_scheduler: Whether the resource is used with Dynamic
+      Workload Scheduler.
 
   Returns:
     The resource id.
   """
+  accelerator_suffix_map = {
+      "NVIDIA_TESLA_V100": "nvidia_v100_gpus",
+      "NVIDIA_L4": "nvidia_l4_gpus",
+      "NVIDIA_TESLA_A100": "nvidia_a100_gpus",
+      "NVIDIA_A100_80GB": "nvidia_a100_80gb_gpus",
+      "NVIDIA_H100_80GB": "nvidia_h100_gpus",
+      "NVIDIA_TESLA_T4": "nvidia_t4_gpus",
+      "TPU_V5e": "tpu_v5e",
+      "TPU_V3": "tpu_v3",
+  }
   default_training_accelerator_map = {
-      "NVIDIA_TESLA_V100": "custom_model_training_nvidia_v100_gpus",
-      "NVIDIA_L4": "custom_model_training_nvidia_l4_gpus",
-      "NVIDIA_TESLA_A100": "custom_model_training_nvidia_a100_gpus",
-      "NVIDIA_A100_80GB": "custom_model_training_nvidia_a100_80gb_gpus",
-      "NVIDIA_H100_80GB": "custom_model_training_nvidia_h100_gpus",
-      "NVIDIA_TESLA_T4": "custom_model_training_nvidia_t4_gpus",
-      "TPU_V5e": "custom_model_training_tpu_v5e",
-      "TPU_V3": "custom_model_training_tpu_v3",
+      key: f"custom_model_training_{accelerator_suffix_map[key]}"
+      for key in accelerator_suffix_map
+  }
+  dws_training_accelerator_map = {
+      key: f"custom_model_training_preemptible_{accelerator_suffix_map[key]}"
+      for key in accelerator_suffix_map
   }
   restricted_image_training_accelerator_map = {
       "NVIDIA_A100_80GB": "restricted_image_training_nvidia_a100_80gb_gpus",
   }
   serving_accelerator_map = {
-      "NVIDIA_TESLA_V100": "custom_model_serving_nvidia_v100_gpus",
-      "NVIDIA_L4": "custom_model_serving_nvidia_l4_gpus",
-      "NVIDIA_TESLA_A100": "custom_model_serving_nvidia_a100_gpus",
-      "NVIDIA_A100_80GB": "custom_model_serving_nvidia_a100_80gb_gpus",
-      "NVIDIA_H100_80GB": "custom_model_serving_nvidia_h100_gpus",
-      "NVIDIA_TESLA_T4": "custom_model_serving_nvidia_t4_gpus",
-      "TPU_V5e": "custom_model_serving_tpu_v5e",
+      key: f"custom_model_serving_{accelerator_suffix_map[key]}"
+      for key in accelerator_suffix_map
   }
+
   if is_for_training:
+    if is_restricted_image and is_dynamic_workload_scheduler:
+      raise ValueError(
+          "Dynamic Workload Scheduler does not work for restricted image"
+          " training."
+      )
     training_accelerator_map = (
         restricted_image_training_accelerator_map
         if is_restricted_image
         else default_training_accelerator_map
     )
     if accelerator_type in training_accelerator_map:
-      return training_accelerator_map[accelerator_type]
+      if is_dynamic_workload_scheduler:
+        return dws_training_accelerator_map[accelerator_type]
+      else:
+        return training_accelerator_map[accelerator_type]
     else:
       raise ValueError(
           f"Could not find accelerator type: {accelerator_type} for training."
       )
   else:
+    if is_dynamic_workload_scheduler:
+      raise ValueError("Dynamic Workload Scheduler does not work for serving.")
     if accelerator_type in serving_accelerator_map:
       return serving_accelerator_map[accelerator_type]
     else:
@@ -538,10 +555,14 @@ def check_quota(
     accelerator_count: int,
     is_for_training: bool,
     is_restricted_image: bool = False,
+    is_dynamic_workload_scheduler: bool = False,
 ):
   """Checks if the project and the region has the required quota."""
   resource_id = get_resource_id(
-      accelerator_type, is_for_training, is_restricted_image
+      accelerator_type,
+      is_for_training=is_for_training,
+      is_restricted_image=is_restricted_image,
+      is_dynamic_workload_scheduler=is_dynamic_workload_scheduler,
   )
   quota = get_quota(project_id, region, resource_id)
   quota_request_instruction = (
@@ -562,3 +583,4 @@ def check_quota(
         f"Quota not enough for {resource_id} in {region}: {quota} <"
         f" {accelerator_count}. {quota_request_instruction}"
     )
+

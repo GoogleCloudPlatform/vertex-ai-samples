@@ -1,0 +1,7 @@
+{
+  "description": "Template used by openai completion.",
+  "source": "https://platform.openai.com/docs/api-reference/fine-tuning/completions-input",
+  "prompt_input": "\n\n<|start_header_id|>user<|end_header_id|>\n\n{prompt}<|eot_id|>\n\n<|start_header_id|>assistant<|end_header_id|>\n\n{completion}<|eot_id|>",
+  "instruction_separator": "<|start_header_id|>user<|end_header_id|>\n\n",
+  "response_separator": "<|start_header_id|>assistant<|end_header_id|>\n\n"
+}

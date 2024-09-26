@@ -1,0 +1,7 @@
+{
+  "description": "A shorter template to experiment with.",
+  "source": "https://github.com/tloen/alpaca-lora/blob/main/templates/alpaca_short.json",
+  "prompt_input": "### Instruction:\n{instruction}\n\n### Input:\n{input}\n\n### Response:\n",
+  "prompt_no_input": "### Instruction:\n{instruction}\n\n### Response:\n",
+  "response_separator": "### Response:"
+}
