@@ -72,15 +72,39 @@ class PeftHandler(BaseHandler):
         "PRECISION_LOADING_MODE", constants.PRECISION_MODE_16
     )
     self.task = os.environ.get("TASK", CAUSAL_LANGUAGE_MODELING_LORA)
-    self.base_model_id = os.environ.get("BASE_MODEL_ID", None)
-    self.model_id = self.base_model_id
-    if not self.base_model_id:
-      self.model_id = os.environ.get("MODEL_ID", "")
+    trust_remote_code = os.environ.get("TRUST_REMOTE_CODE", None)
+    if trust_remote_code == "false":
+      self.trust_remote_code = False
+    else:
+      self.trust_remote_code = True
+
+    # If present, the path of the model in the container.
+    aip_storage_dir = os.environ.get("AIP_STORAGE_DIR", None)
+
+    # If present, the URI of the model in a google owned GCS bucket.
+    aip_storage_uri = os.environ.get("AIP_STORAGE_URI", None)
+
+    model_id = os.environ.get("MODEL_ID", None)
+    base_model_id = os.environ.get("BASE_MODEL_ID", None)
+
+    self.model_id = None
+    if aip_storage_dir:
+      self.model_id = aip_storage_dir
+      logging.info(f"Loaded base model from AIP_STORAGE_DIR: {self.model_id}.")
+    elif aip_storage_uri:
+      self.model_id = aip_storage_uri
+      logging.info(f"Loaded base model from AIP_STORAGE_URI: {self.model_id}.")
+    elif model_id:
+      self.model_id = model_id
+      logging.info(f"Loaded base model from MODEL_ID: {self.model_id}.")
+    elif base_model_id:
+      # Note: BASE_MODEL_ID has been unified with MODEL_ID.
+      # MODEL_ID should be used whenever possible.
+      self.model_id = base_model_id
+      logging.info(f"Loaded base model from BASE_MODEL_ID: {self.model_id}.")
+
     self.quantization = os.environ.get("QUANTIZATION", None)
-    logging.info(f"Load base model id from MODEL_ID:{self.model_id}.")
-    if not self.model_id:
-      self.model_id = os.environ.get("AIP_STORAGE_URI", "")
-      logging.info(f"Load base model id from AIP_STORAGE_URI: {self.model_id}.")
+
     if not self.model_id:
       raise ValueError("Base model id is must be set.")
     if fileutils.is_gcs_path(self.model_id):
@@ -101,8 +125,7 @@ class PeftHandler(BaseHandler):
 
     logging.info(
         f"Using task:{self.task}, base model:{self.model_id}, lora model:"
-        f" {self.finetuned_lora_model_path}, and precision"
-        f" {self.precision_mode}."
+        f" {self.finetuned_lora_model_path}, precision {self.precision_mode}."
     )
 
     self.pipeline = None
@@ -145,11 +168,18 @@ class PeftHandler(BaseHandler):
     elif (
         self.task == CAUSAL_LANGUAGE_MODELING_LORA or self.task == INSTRUCT_LORA
     ):
-      tokenizer = AutoTokenizer.from_pretrained(self.model_id)
+      tokenizer = AutoTokenizer.from_pretrained(
+          self.model_id,
+          trust_remote_code=self.trust_remote_code,
+      )
+
       logging.debug("Initialized the tokenizer.")
       if self.task == CAUSAL_LANGUAGE_MODELING_LORA:
         if self.quantization == constants.AWQ:
-          model = AutoAWQForCausalLM.from_quantized(self.model_id)
+          model = AutoAWQForCausalLM.from_quantized(
+              self.model_id,
+              trust_remote_code=self.trust_remote_code,
+          )
         elif self.quantization == constants.GPTQ or not self.quantization:
           if self.precision_mode == constants.PRECISION_MODE_32:
             model = AutoModelForCausalLM.from_pretrained(
@@ -157,6 +187,7 @@ class PeftHandler(BaseHandler):
                 return_dict=True,
                 torch_dtype=torch.float32,
                 device_map="auto",
+                trust_remote_code=self.trust_remote_code,
             )
           elif self.precision_mode == constants.PRECISION_MODE_16B:
             model = AutoModelForCausalLM.from_pretrained(
@@ -164,6 +195,7 @@ class PeftHandler(BaseHandler):
                 return_dict=True,
                 torch_dtype=torch.bfloat16,
                 device_map="auto",
+                trust_remote_code=self.trust_remote_code,
             )
           elif self.precision_mode == constants.PRECISION_MODE_16:
             model = AutoModelForCausalLM.from_pretrained(
@@ -171,6 +203,7 @@ class PeftHandler(BaseHandler):
                 return_dict=True,
                 torch_dtype=torch.float16,
                 device_map="auto",
+                trust_remote_code=self.trust_remote_code,
             )
           elif self.precision_mode == constants.PRECISION_MODE_8:
             quantization_config = BitsAndBytesConfig(
@@ -182,6 +215,7 @@ class PeftHandler(BaseHandler):
                 torch_dtype=torch.float16,
                 device_map="auto",
                 quantization_config=quantization_config,
+                trust_remote_code=self.trust_remote_code,
             )
           else:
             quantization_config = BitsAndBytesConfig(
@@ -195,6 +229,7 @@ class PeftHandler(BaseHandler):
                 device_map="auto",
                 torch_dtype=torch.bfloat16,
                 quantization_config=quantization_config,
+                trust_remote_code=self.trust_remote_code,
             )
         else:
           raise ValueError(f"Invalid QUANTIZATION value: {self.quantization}")
@@ -203,14 +238,14 @@ class PeftHandler(BaseHandler):
           model = AutoModelForCausalLM.from_pretrained(
               self.model_id,
               torch_dtype=torch.bfloat16,
-              trust_remote_code=True,
+              trust_remote_code=self.trust_remote_code,
               device_map="auto",
           )
         except:  # pylint: disable=bare-except
           model = AutoModelForCausalLM.from_pretrained(
               self.model_id,
               torch_dtype=torch.bfloat16,
-              trust_remote_code=True,
+              trust_remote_code=self.trust_remote_code,
               device_map="auto",
           )
       logging.debug("Initialized the base model.")

@@ -1,7 +1,9 @@
 """Sequence classification with LoRA models."""
 
-# pylint: disable=g-importing-member
+from typing import Sequence
 
+from absl import app
+from absl import flags
 from datasets import load_dataset
 import evaluate
 from peft import get_peft_model
@@ -13,6 +15,71 @@ from tqdm import tqdm
 from transformers import AutoModelForSequenceClassification
 from transformers import AutoTokenizer
 from transformers import get_linear_schedule_with_warmup
+
+from util import dataset_validation_util
+
+
+_PRETRAINED_MODEL_ID = flags.DEFINE_string(
+    "pretrained_model_id",
+    None,
+    "The pretrained model id. Supported models can be causal language modeling"
+    " models from https://github.com/huggingface/peft/tree/main. Note, there"
+    " might be different paddings for different models. This tool assumes the"
+    " pretrained_model_id contains model name, and then choose proper padding"
+    " methods. e.g. it must contain `llama` for `Llama2 models`.",
+)
+
+_OUTPUT_DIR = flags.DEFINE_string(
+    "output_dir",
+    None,
+    "The output directory.",
+)
+
+_DATASET_NAME = flags.DEFINE_string(
+    "dataset_name",
+    None,
+    "The dataset name in huggingface.",
+)
+
+_LORA_RANK = flags.DEFINE_integer(
+    "lora_rank",
+    16,
+    "The rank of the update matrices, expressed in int. Lower rank results in"
+    " smaller update matrices with fewer trainable parameters, referring to"
+    " https://huggingface.co/docs/peft/conceptual_guides/lora.",
+)
+
+_LORA_ALPHA = flags.DEFINE_integer(
+    "lora_alpha",
+    32,
+    "LoRA scaling factor, referring to"
+    " https://huggingface.co/docs/peft/conceptual_guides/lora.",
+)
+
+_LORA_DROPOUT = flags.DEFINE_float(
+    "lora_dropout",
+    0.05,
+    "dropout probability of the LoRA layers, referring to"
+    " https://huggingface.co/docs/peft/task_guides/token-classification-lora.",
+)
+
+_NUM_EPOCHS = flags.DEFINE_integer(
+    "num_epochs",
+    None,
+    "The number of training epochs.",
+)
+
+_BATCH_SIZE = flags.DEFINE_integer(
+    "batch_size",
+    32,
+    "The batch size.",
+)
+
+_LEARNING_RATE = flags.DEFINE_float(
+    "learning_rate",
+    2e-4,
+    "The learning rate after the potential warmup period.",
+)
 
 
 def finetune_sequence_classification(
@@ -131,3 +198,32 @@ def finetune_sequence_classification(
     print(f"epoch {epoch}:", eval_metric)
 
   model.save_pretrained(output_dir)
+
+
+def main(unused_argv: Sequence[str]) -> None:
+  if dataset_validation_util.is_gcs_path(_PRETRAINED_MODEL_ID.value):
+    pretrained_model_id = dataset_validation_util.download_gcs_uri_to_local(
+        _PRETRAINED_MODEL_ID.value
+    )
+  else:
+    pretrained_model_id = _PRETRAINED_MODEL_ID.value
+  pretrained_model_path = dataset_validation_util.force_gcs_fuse_path(
+      pretrained_model_id
+  )
+  output_dir = dataset_validation_util.force_gcs_fuse_path(_OUTPUT_DIR.value)
+
+  finetune_sequence_classification(
+      pretrained_model_id=pretrained_model_path,
+      dataset_name=_DATASET_NAME.value,
+      output_dir=output_dir,
+      lora_rank=_LORA_RANK.value,
+      lora_alpha=_LORA_ALPHA.value,
+      lora_dropout=_LORA_DROPOUT.value,
+      num_epochs=int(_NUM_EPOCHS.value),
+      batch_size=_BATCH_SIZE.value,
+      learning_rate=_LEARNING_RATE.value,
+  )
+
+
+if __name__ == "__main__":
+  app.run(main)
