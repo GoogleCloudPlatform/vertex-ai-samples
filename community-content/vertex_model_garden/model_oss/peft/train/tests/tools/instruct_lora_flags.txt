@@ -1,0 +1,50 @@
+# api_name, impl_name, value_type
+
+
+#                    eval related and etc.
+config_file, config_file, str
+task, task, str
+pretrained_model_id, pretrained_model_id, str
+train_dataset, dataset_name, str
+train_split_name, train_split_name, str
+template, template, str
+instruct_column, instruct_column_in_dataset, str
+ckpt_dir, output_dir, str
+merged_model_dir, merge_base_and_lora_output_dir, str
+logging_dir, logging_output_dir, str
+per_device_batch_size, per_device_train_batch_size, int
+gradient_accumulation_steps, gradient_accumulation_steps, int
+lora_rank, lora_rank, int
+lora_alpha, lora_alpha, int
+lora_dropout, lora_dropout, float
+max_steps, max_steps, int
+num_epochs, num_epochs, float
+max_seq_length, max_seq_length, int
+learning_rate, learning_rate, float
+lr_scheduler_type, lr_scheduler_type, str
+load_precision, precision_mode, str
+train_precision, train_precision, str
+gradient_checkpointing, enable_gradient_checkpointing, bool
+example_packing, use_example_packing, bool
+attn_implementation, attn_implementation, str
+optimizer, optimizer, str
+warmup_ratio, warmup_ratio, float
+report_to, report_to, str
+save_steps, save_steps, int
+logging_steps, logging_steps, int
+huggingface_access_token, huggingface_access_token, str
+eval_dataset, eval_dataset_path, str
+eval_instruct_column, eval_column, str
+eval_template, eval_template, str
+eval_split_name, eval_split, str
+eval_steps, eval_steps, int
+eval_tasks, eval_tasks, str
+eval_metric_name, eval_metric_name, str
+completion_only, completion_only, bool
+max_grad_norm, max_grad_norm, float
+logger_level, logger_level, str
+benchmark_out_file, benchmark_out_file, str
+tuning_data_stats_file, tuning_data_stats_file, str
+enable_peft, enable_peft, bool
+merge_model_precision_mode, merge_model_precision_mode, str
+target_modules, target_modules, str

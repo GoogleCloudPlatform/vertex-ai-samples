@@ -1,7 +1,0 @@
-{
-  "description": "Template used by openai chat.",
-  "source": "https://platform.openai.com/docs/api-reference/fine-tuning/chat-input",
-  "chat_template": "{% set loop_messages = messages %}{% set content = '' %}{% for message in loop_messages %}{% set content = content ~ '\n\n<|start_header_id|>' ~ message.role ~ '<|end_header_id|>\n\n' %}{% if message.content is string %}{% set content = content ~ message.content|trim ~ '<|eot_id|>' %}{% else %}{% set content = content ~ message.content|join(' ', attribute='text')|trim ~ '<|eot_id|>' %}{% endif %}{% if loop.index0 == 0 %}{% set content = bos_token ~ content %}{% endif %}{{ content }}{% endfor %}{% if add_generation_prompt %}{{ '<|start_header_id|>assistant<|end_header_id|>\n\n' }}{% endif %}",
-  "instruction_separator": "<|start_header_id|>user<|end_header_id|>\n\n",
-  "response_separator": "<|start_header_id|>assistant<|end_header_id|>\n\n"
-}

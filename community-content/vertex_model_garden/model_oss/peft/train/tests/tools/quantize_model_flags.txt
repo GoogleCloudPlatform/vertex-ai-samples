@@ -1,0 +1,15 @@
+# api_name, impl_name, value_type
+task, task, str
+pretrained_model_id, pretrained_model_id, str
+quantization_method, quantization_method, str
+quantization_precision_mode, quantization_precision_mode, str
+quantization_dataset_name, quantization_dataset_name, str
+text_column_in_quantization_dataset, text_column_in_quantization_dataset, str
+quantization_output_dir, quantization_output_dir, str
+device_map, device_map, str
+max_memory, max_memory, str
+group_size, group_size, int
+desc_act, desc_act, bool
+damp_percent, damp_percent, float
+cache_examples_on_gpu, cache_examples_on_gpu, bool
+awq_version, awq_version, str

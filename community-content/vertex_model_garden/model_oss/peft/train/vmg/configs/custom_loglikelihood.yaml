@@ -1,0 +1,18 @@
+group:
+- vertex
+task: custom_loglikelihood
+dataset_path: json
+dataset_name: null
+output_type: loglikelihood
+training_split: null
+validation_split: null
+test_split: test
+doc_to_text: "Request: {{prompt}}\nResponse:"
+doc_to_target: " {{ground_truth}}"
+metric_list:
+- metric: perplexity
+  aggregation: perplexity
+  higher_is_better: false
+- metric: acc
+  aggregation: mean
+  higher_is_better: true
