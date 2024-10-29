@@ -1,4 +1,9 @@
 {
-  "extends": ["config:base"],
-  "ignorePaths": ["notebooks", "community-content"]
+  "extends": [
+    "config:recommended"
+  ],
+  "ignorePaths": [
+    "notebooks",
+    "community-content"
+  ]
 }
