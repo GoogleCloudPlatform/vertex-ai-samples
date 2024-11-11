@@ -230,7 +230,7 @@ def download_image(url: str) -> str:
     base64 encoded image.
   """
   response = requests.get(url)
-  return Image.open(io.BytesIO(response.content))
+  return Image.open(io.BytesIO(response.content))  # pytype: disable=bad-return-type  # pillow-102-upgrade
 
 
 def resize_image(image: Any, new_width: int = 1000) -> Any:
@@ -420,6 +420,41 @@ def detect_predict(
 
   response = endpoint.predict(instances=instances)
   return response.predictions[0].get("response")
+
+
+def copy_model_artifacts(
+    model_id: str,
+    model_source: str,
+    model_destination: str,
+) -> None:
+  """Copies model artifacts from model_source to model_destination.
+
+  model_source and model_destination should be GCS path.
+
+  Args:
+    model_id: The model id.
+    model_source: The source of the model artifact.
+    model_destination: The destination of the model artifact.
+  """
+  if not model_source.startswith(GCS_URI_PREFIX):
+    raise ValueError(
+        f"{model_source} is not a GCS path starting with {GCS_URI_PREFIX}."
+    )
+  if not model_destination.startswith(GCS_URI_PREFIX):
+    raise ValueError(
+        f"{model_destination} is not a GCS path starting with {GCS_URI_PREFIX}."
+    )
+  model_source = f"{model_source}/{model_id}"
+  model_destination = f"{model_destination}/{model_id}"
+  print("Copying model artifact from ", model_source, " to ", model_destination)
+  subprocess.check_output([
+      "gcloud",
+      "storage",
+      "cp",
+      "-r",
+      model_source,
+      model_destination,
+  ])
 
 
 def get_quota(project_id: str, region: str, resource_id: str) -> int:
