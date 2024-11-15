@@ -1,0 +1,10 @@
+version: 2
+updates:
+
+  # Ignore model garden dockerfiles:
+  - package-ecosystem: "npm"
+    directory: "/community-content/vertex_model_garden"
+    schedule:
+      interval: "monthly"
+    ignore:
+      - dependency-name: "*"
