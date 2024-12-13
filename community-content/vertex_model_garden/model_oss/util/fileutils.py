@@ -10,7 +10,7 @@ import uuid
 from absl import logging
 from google.cloud import storage
 
-from google3.cloud.ml.applications.vision.model_garden.model_oss.util import constants
+from util import constants
 
 
 _GCS_CLIENT = None
