@@ -7,7 +7,7 @@ from PIL import Image
 import tensorflow as tf
 import yaml
 
-from google3.cloud.ml.applications.vision.model_garden.model_oss.util import image_format_converter
+from util import image_format_converter
 
 
 def convert_list_to_label_map(
