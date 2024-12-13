@@ -20,3 +20,11 @@ def get_trial_id_from_environment() -> str:
         _ENVIRONMENT_VARIABLE_FOR_TRIAL_ID,
     )
   return os.environ.get(_ENVIRONMENT_VARIABLE_FOR_TRIAL_ID, '0')
+
+
+def maybe_append_trial_id(path: str) -> str:
+  """Appends trial_N to path if running in a Hyperparameter Tuning Job."""
+  trial_id = os.environ.get(_ENVIRONMENT_VARIABLE_FOR_TRIAL_ID)
+  if trial_id is None:
+    return path
+  return os.path.join(path, f'trial_{trial_id}')

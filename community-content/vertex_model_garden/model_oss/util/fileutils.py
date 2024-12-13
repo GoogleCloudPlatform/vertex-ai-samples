@@ -1,16 +1,27 @@
 """Fileutil lib to copy files between gcs and local."""
 
-import glob
+import fnmatch
 import os
 import pathlib
 import shutil
-from typing import Tuple
+from typing import List, Optional, Tuple
 import uuid
 
 from absl import logging
 from google.cloud import storage
 
-from util import constants
+from google3.cloud.ml.applications.vision.model_garden.model_oss.util import constants
+
+
+_GCS_CLIENT = None
+
+
+def _get_gcs_client() -> storage.Client:
+  """Gets the default GCS client."""
+  global _GCS_CLIENT
+  if _GCS_CLIENT is None:
+    _GCS_CLIENT = storage.Client()
+  return _GCS_CLIENT
 
 
 def generate_tmp_path(extension: str = '') -> str:
@@ -34,6 +45,16 @@ def force_gcs_fuse_path(gcs_uri: str) -> str:
     )
   else:
     return gcs_uri
+
+
+def force_gcs_path(uri: str) -> str:
+  """Converts /gcs/ uris to their gs:// equivalents. No-op for other uris."""
+  if uri.startswith(constants.GCSFUSE_URI_PREFIX):
+    return uri.replace(
+        constants.GCSFUSE_URI_PREFIX, constants.GCS_URI_PREFIX, 1
+    )
+  else:
+    return uri
 
 
 def download_gcs_file_to_local_dir(gcs_uri: str, local_dir: str):
@@ -62,15 +83,47 @@ def download_gcs_file_to_local(gcs_uri: str, local_path: str):
     raise ValueError(
         f'{gcs_uri} is not a GCS path starting with {constants.GCS_URI_PREFIX}.'
     )
-  client = storage.Client()
+  client = _get_gcs_client()
   os.makedirs(os.path.dirname(local_path), exist_ok=True)
   with open(local_path, 'wb') as f:
     client.download_blob_to_file(gcs_uri, f)
 
 
+def download_gcs_file_list_to_local(
+    gcs_uri_list: List[str], local_dir: str
+) -> List[str]:
+  """Downloads a list of GCS files to a local directory.
+
+  Args:
+    gcs_uri_list: A list of GCS file paths.
+    local_dir: Local directory in which the GCS files are saved.
+
+  Returns:
+    The local file paths corresponding to the input GCS file paths.
+
+  Raises:
+    ValueError: An input file path is not a GCS path.
+  """
+  local_paths = []
+  for gcs_uri in gcs_uri_list:
+    if not is_gcs_path(gcs_uri):
+      raise ValueError(
+          f'{gcs_uri} is not a GCS path starting with'
+          f' {constants.GCS_URI_PREFIX}.'
+      )
+    local_path = os.path.join(local_dir, gcs_uri.replace('gs://', ''))
+    download_gcs_file_to_local(gcs_uri, local_path)
+    local_paths.append(local_path)
+  return local_paths
+
+
 def download_gcs_dir_to_local(
-    gcs_dir: str, local_dir: str, skip_hf_model_bin: bool = False
-):
+    gcs_dir: str,
+    local_dir: str,
+    skip_hf_model_bin: bool = False,
+    allow_patterns: Optional[List[str]] = None,
+    log: bool = True,
+) -> None:
   """Downloads files in a GCS directory to a local directory.
 
   For example:
@@ -78,16 +131,21 @@ def download_gcs_dir_to_local(
     gs://bucket/foo/a -> /tmp/bar/a
     gs://bucket/foo/b/c -> /tmp/bar/b/c
 
-  Arguments:
+  Args:
     gcs_dir: A string of directory path on GCS.
     local_dir: A string of local directory path.
     skip_hf_model_bin: True to skip downloading HF model bin files.
+    allow_patterns: A list of allowed patterns. If provided, only files matching
+      one or more patterns are downloaded.
+    log: True to log each downloaded file.
   """
   if not is_gcs_path(gcs_dir):
     raise ValueError(f'{gcs_dir} is not a GCS path starting with gs://.')
   bucket_name = gcs_dir.split('/')[2]
-  prefix = gcs_dir[len(constants.GCS_URI_PREFIX + bucket_name) :].strip('/')
-  client = storage.Client()
+  prefix = (
+      gcs_dir[len(constants.GCS_URI_PREFIX + bucket_name) :].strip('/') + '/'
+  )
+  client = _get_gcs_client()
   blobs = client.list_blobs(bucket_name, prefix=prefix)
   for blob in blobs:
     if blob.name[-1] == '/':
@@ -95,16 +153,46 @@ def download_gcs_dir_to_local(
     file_path = blob.name[len(prefix) :].strip('/')
     local_file_path = os.path.join(local_dir, file_path)
     os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
+    if allow_patterns and all(
+        [not fnmatch.fnmatch(file_path, p) for p in allow_patterns]
+    ):
+      continue
     if (
         file_path.endswith(constants.HF_MODEL_WEIGHTS_SUFFIX)
         and skip_hf_model_bin
     ):
-      logging.info('Skip downloading model bin %s', file_path)
+      if log:
+        logging.info('Skip downloading model bin %s', file_path)
       with open(local_file_path, 'w') as f:
-        f.write(f'{constants.GCS_URI_PREFIX}{bucket_name}/{prefix}/{file_path}')
+        f.write(f'{constants.GCS_URI_PREFIX}{bucket_name}/{prefix}{file_path}')
     else:
-      logging.info('Downloading %s to %s', file_path, local_file_path)
+      if log:
+        logging.info('Downloading %s to %s', file_path, local_file_path)
       blob.download_to_filename(local_file_path)
+
+
+def _get_relative_paths(base_dir: str) -> List[str]:
+  """Gets relative paths of all files in a local base directory."""
+  path = pathlib.Path(base_dir)
+  relative_paths = []
+  for local_file in path.rglob('*'):
+    if os.path.isfile(local_file):
+      relative_path = os.path.relpath(local_file, base_dir)
+      relative_paths.append(relative_path)
+  return relative_paths
+
+
+def _upload_local_files_to_gcs(
+    relative_paths: List[str], local_dir: str, gcs_dir: str
+):
+  """Uploads local files to gcs."""
+  bucket_name = gcs_dir.split('/')[2]
+  blob_dir = '/'.join(gcs_dir.split('/')[3:])
+  client = _get_gcs_client()
+  bucket = client.bucket(bucket_name)
+  for relative_path in relative_paths:
+    blob = bucket.blob(os.path.join(blob_dir, relative_path))
+    blob.upload_from_filename(os.path.join(local_dir, relative_path))
 
 
 def upload_local_dir_to_gcs(local_dir: str, gcs_dir: str):
@@ -112,26 +200,16 @@ def upload_local_dir_to_gcs(local_dir: str, gcs_dir: str):
 
   For example:
     upload_local_dir_to_gcs(/tmp/bar, gs://bucket/foo)
-    gs://bucket/foo/a -> /tmp/bar/a
-    gs://bucket/foo/b/c -> /tmp/bar/b/c
+    /tmp/bar/a -> gs://bucket/foo/a
+    /tmp/bar/b/c -> gs://bucket/foo/b/c
 
   Arguments:
     local_dir: A string of local directory path.
     gcs_dir: A string of directory path on GCS.
   """
-  bucket_name = gcs_dir.split('/')[2]
-  blob_dir = '/'.join(gcs_dir.split('/')[3:])
-  client = storage.Client()
-  bucket = client.bucket(bucket_name)
-  for local_file in glob.glob(local_dir + '/**'):
-    if os.path.isfile(local_file):
-      logging.info(
-          'Uploading %s to %s',
-          local_file,
-          os.path.join(constants.GCS_URI_PREFIX, bucket_name, blob_dir),
-      )
-      blob = bucket.blob(os.path.join(blob_dir, os.path.basename(local_file)))
-      blob.upload_from_filename(local_file)
+  # Relative paths of all files in local_dir.
+  relative_paths = _get_relative_paths(local_dir)
+  _upload_local_files_to_gcs(relative_paths, local_dir, gcs_dir)
 
 
 def upload_file_to_gcs_path(
@@ -155,7 +233,7 @@ def upload_file_to_gcs_path(
   if not source_path_obj.exists():
     raise RuntimeError(f'Source path does not exist: {source_path}')
 
-  storage_client = storage.Client()
+  storage_client = _get_gcs_client()
   source_file_path = source_path
   destination_file_uri = destination_uri
   logging.info('Uploading "%s" to "%s"', source_file_path, destination_file_uri)
@@ -174,7 +252,9 @@ def is_gcs_path(input_path: str) -> bool:
   Returns:
       True if the input path is a GCS path, False otherwise.
   """
-  return input_path.startswith(constants.GCS_URI_PREFIX)
+  return input_path is not None and input_path.startswith(
+      constants.GCS_URI_PREFIX
+  )
 
 
 def release_text_assets(
@@ -232,13 +312,10 @@ def download_video_from_gcs_to_local(video_file_path: str) -> Tuple[str, str]:
   """
   _, local_video_file_name = os.path.split(video_file_path)
   file_extension = os.path.splitext(video_file_path)[1]
-  if file_extension:
-    remote_video_file_name = local_video_file_name.replace(
-        file_extension, '_overlay.mp4'
-    )
-  else:
-    remote_video_file_name = local_video_file_name + '_overlay.mp4'
-  local_file_path = generate_tmp_path(file_extension)
+  remote_video_file_name = local_video_file_name.replace(
+      file_extension, '_overlay.mp4'
+  )
+  local_file_path = generate_tmp_path(os.path.splitext(video_file_path)[1])
   logging.info('Downloading %s to %s...', video_file_path, local_file_path)
   download_gcs_file_to_local(video_file_path, local_file_path)
   return local_file_path, remote_video_file_name
@@ -254,10 +331,28 @@ def get_output_video_file(video_output_file_path: str) -> str:
     str: Local video output file path.
   """
   file_extension = os.path.splitext(video_output_file_path)[1]
-  if file_extension:
-    out_local_video_file_name = video_output_file_path.replace(
-        file_extension, '_overlay' + file_extension
-    )
-  else:
-    out_local_video_file_name = video_output_file_path + '_overlay'
+  out_local_video_file_name = video_output_file_path.replace(
+      file_extension, '_overlay' + file_extension
+  )
   return out_local_video_file_name
+
+
+def write_first_party_model_metadata(
+    output_path: str, required_container_uri: str
+) -> None:
+  """Write Vertex internal model metadata for first party artifacts."""
+  model_metadata_fname = 'model_metadata.jsonl'
+  if len(required_container_uri) > 126:
+    raise ValueError(f'Docker URI exceeds 126 chars: {required_container_uri}')
+  payload = '\n{}{}'.format(  # serialized proto
+      chr(len(required_container_uri)),
+      required_container_uri,
+  )
+  os.makedirs(output_path, exist_ok=True)
+  output_dirs = [output_path]
+  if output_path.startswith('/gcs'):
+    # include all parent dirs, except "/", "/gcs"
+    output_dirs.extend([str(p) for p in pathlib.Path(output_path).parents][:-2])
+  for output_dir in output_dirs:
+    with open(os.path.join(output_dir, model_metadata_fname), 'w') as f:
+      f.write(payload)
