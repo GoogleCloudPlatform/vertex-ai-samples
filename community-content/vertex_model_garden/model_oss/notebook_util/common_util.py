@@ -528,6 +528,7 @@ def get_resource_id(
   """
   accelerator_suffix_map = {
       "NVIDIA_TESLA_V100": "nvidia_v100_gpus",
+      "NVIDIA_TESLA_P100": "nvidia_p100_gpus",
       "NVIDIA_L4": "nvidia_l4_gpus",
       "NVIDIA_TESLA_A100": "nvidia_a100_gpus",
       "NVIDIA_A100_80GB": "nvidia_a100_80gb_gpus",
@@ -618,3 +619,4 @@ def check_quota(
         f"Quota not enough for {resource_id} in {region}: {quota} <"
         f" {accelerator_count}. {quota_request_instruction}"
     )
+

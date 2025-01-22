@@ -22,6 +22,8 @@ _VERTEX_AI_SAMPLES_GITHUB_REPO_NAME = "vertex-ai-samples"
 _VERTEX_AI_SAMPLES_GITHUB_TEMPLATE_DIR = (
     "community-content/vertex_model_garden/model_oss/peft/templates"
 )
+_MODELS_REQUIRING_PAD_TOKEN = ("llama", "falcon", "mistral", "mixtral")
+_MODELS_REQUIRING_EOS_TOEKN = ("gemma-2b", "gemma-7b")
 _DESCRIPTION_KEY = "description"
 _SOURCE_KEY = "source"
 _PROMPT_INPUT_KEY = "prompt_input"
@@ -152,57 +154,6 @@ def get_instruction_separator(
 
 
 def _format_template_fn(
-    template: str,
-    input_column: str,
-    tokenizer: transformers.PreTrainedTokenizer | None = None,
-) -> Callable[[Dict[str, str]], Dict[str, str]]:
-  """Formats a dataset example according to a template.
-
-  Args:
-    template: Name of the JSON template file under `templates/` or GCS path to
-      the template file.
-    input_column: The input column in the dataset to be used or updated by the
-      template. If it does not exist, the template's `prompt_no_input` will be
-      used, and the input_column will be created.
-    tokenizer: The tokenizer to use for chat_template templates.
-
-  Returns:
-    A function that formats data according to the template.
-  """
-  template_json = get_template(template)
-
-  if _CHAT_TEMPLATE_KEY not in template_json:
-
-    def format_fn(example: Dict[str, str]) -> Dict[str, str]:
-      format_dict = {key: value for key, value in example.items()}
-      format_str = (
-          template_json[_PROMPT_INPUT_KEY]
-          if format_dict.get(input_column)
-          else template_json[_PROMPT_NO_INPUT_KEY]
-      )
-      return {input_column: format_str.format(**format_dict)}
-
-    return format_fn
-  elif (
-      _PROMPT_INPUT_KEY in template_json
-      or _PROMPT_NO_INPUT_KEY in template_json
-  ):
-    raise ValueError(
-        "chat_template templates do not support input/no_input templates."
-    )
-  else:
-    if tokenizer is None:
-      raise ValueError("A tokenizer is required for chat_template templates.")
-    # Assign HuggingFace jinja template.
-    tokenizer.chat_template = template_json[_CHAT_TEMPLATE_KEY]
-    return lambda example: {
-        input_column: tokenizer.apply_chat_template(
-            example[input_column], tokenize=False, add_generation_prompt=False
-        )
-    }
-
-
-def _format_template_fn_notebook(
     template: str,
     input_column: str,
     tokenizer: transformers.PreTrainedTokenizer | None = None,
@@ -366,6 +317,104 @@ def _get_dataset(
   return datasets.load_dataset(dataset_name, split=split, num_proc=num_proc)
 
 
+def should_add_pad_token(model_id: str) -> bool:
+  """Returns whether the model requires adding a special pad token.
+
+  Args:
+    model_id: The name of the model.
+
+  Returns:
+    True if the model requires adding a special pad token, False otherwise.
+  """
+  return any(s.lower() in model_id.lower() for s in _MODELS_REQUIRING_PAD_TOKEN)
+
+
+def should_add_eos_token(model_id: str) -> bool:
+  """Returns whether the model requires adding a special eos token.
+
+  Args:
+    model_id: The name of the model.
+
+  Returns:
+    True if the model requires adding a special eos token, False otherwise.
+  """
+  return any(m in model_id for m in _MODELS_REQUIRING_EOS_TOEKN)
+
+
+def load_tokenizer(
+    pretrained_model_id: str,
+    padding_side: str | None = None,
+    access_token: str | None = None,
+) -> transformers.AutoTokenizer:
+  """Loads tokenizer based on `pretrained_model_id`.
+
+  Args:
+    pretrained_model_id: The name of the pretrained model.
+    padding_side: The side to pad the input on.
+    access_token: The access token to use for the tokenizer.
+
+  Returns:
+    The tokenizer.
+  """
+  tokenizer_kwargs = {}
+  if should_add_eos_token(pretrained_model_id):
+    tokenizer_kwargs["add_eos_token"] = True
+  if padding_side:
+    tokenizer_kwargs["padding_side"] = padding_side
+
+  with accelerate.PartialState().local_main_process_first():
+    tokenizer = transformers.AutoTokenizer.from_pretrained(
+        pretrained_model_id,
+        trust_remote_code=False,
+        use_fast=True,
+        token=access_token,
+        **tokenizer_kwargs,
+    )
+
+  if should_add_pad_token(pretrained_model_id):
+    tokenizer.add_special_tokens({"pad_token": "[PAD]"})
+
+  return tokenizer
+
+
+def get_filtered_dataset(
+    dataset: Any,
+    input_column: str,
+    max_seq_length: int,
+    tokenizer: transformers.PreTrainedTokenizer,
+) -> Any:
+  """Returns the dataset by removing examples that are longer than max_seq_length.
+
+  Args:
+    dataset: The dataset to filter.
+    input_column: The input column in the dataset to be used.
+    max_seq_length: The maximum sequence length.
+    tokenizer: The tokenizer.
+  """
+  actual_dataset_length = len(dataset)
+  filtered_dataset = dataset.filter(
+      lambda x: len(tokenizer(x[input_column])["input_ids"]) <= max_seq_length
+  )
+  filtered_dataset_length = len(filtered_dataset)
+  if actual_dataset_length != filtered_dataset_length:
+    examples_removed_percent = (
+        (actual_dataset_length - filtered_dataset_length)
+        * 100
+        / actual_dataset_length
+    )
+    logging.info(
+        "(%.2f%%) of examples token length is <= max-seq-length(%d); (%.2f%%) >"
+        " max-seq-length. Filtering out %d example(s) which are longer than"
+        " max-seq-length.",
+        100 - examples_removed_percent,
+        max_seq_length,
+        examples_removed_percent,
+        actual_dataset_length - filtered_dataset_length,
+    )
+
+  return filtered_dataset
+
+
 def load_dataset_with_template(
     dataset_name: str,
     split: str,
@@ -407,6 +456,7 @@ def validate_dataset_with_template(
     input_column: str,
     template: str,
     tokenizer: transformers.PreTrainedTokenizer | None = None,
+    max_seq_length: int | None = None,
     use_multiprocessing: bool = False,
     validate_percentage_of_dataset: int | None = None,
     validate_k_rows_of_dataset: int | None = None,
@@ -428,6 +478,7 @@ def validate_dataset_with_template(
     template: Name of the JSON template file under `templates/` or GCS path to
       the template file.
     tokenizer: The tokenizer to use for chat_template templates.
+    max_seq_length: The maximum sequence length.
     use_multiprocessing: If True, it will use multiprocessing to load the
       dataset.
     validate_percentage_of_dataset: The percentage of the dataset to load.
@@ -470,14 +521,21 @@ def validate_dataset_with_template(
         f" https://github.com/GoogleCloudPlatform/{_VERTEX_AI_SAMPLES_GITHUB_REPO_NAME}/tree/main/{_VERTEX_AI_SAMPLES_GITHUB_TEMPLATE_DIR}."
     )
 
-  _get_dataset(dataset_name, split, num_proc).map(
-      _format_template_fn_notebook(
+  dataset = _get_dataset(dataset_name, split, num_proc).map(
+      _format_template_fn(
           template_path,
           input_column=input_column,
           tokenizer=tokenizer,
       )
   )
 
+  if tokenizer is not None:
+    get_filtered_dataset(
+        dataset=dataset,
+        input_column=input_column,
+        max_seq_length=max_seq_length,
+        tokenizer=tokenizer,
+    )
   print(
       "Dataset {} is compatible with the {} template.".format(
           os.path.basename(dataset_name), os.path.basename(template)
