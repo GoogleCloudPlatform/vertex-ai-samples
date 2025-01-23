@@ -20,7 +20,7 @@ LOCAL_TEMPLATE_DIR = "/tmp/template_dir"
 _TEMPLATE_DIRNAME = "templates"
 _VERTEX_AI_SAMPLES_GITHUB_REPO_NAME = "vertex-ai-samples"
 _VERTEX_AI_SAMPLES_GITHUB_TEMPLATE_DIR = (
-    "community-content/vertex_model_garden/model_oss/peft/templates"
+    "community-content/vertex_model_garden/model_oss/peft/train/vmg/templates"
 )
 _MODELS_REQUIRING_PAD_TOKEN = ("llama", "falcon", "mistral", "mixtral")
 _MODELS_REQUIRING_EOS_TOEKN = ("gemma-2b", "gemma-7b")
