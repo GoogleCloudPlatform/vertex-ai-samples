@@ -28,6 +28,7 @@
 /feature_store/gapic-feature-store.ipynb @diemtvu
 /feature_store/vertex_ai_feature_store_feature_view_service_agents.ipynb @ethan-gordon
 /feature_store/vertex_ai_feature_store_iam_policy.ipynb @ethan-gordon
+/feature_store/vertex_ai_feature_store_update_feature_monitor_feature_group_iam_and_service_agent.ipynb @ethan-gordon
 /managed_notebooks @GoogleCloudPlatform/notebooks-team
 /pipelines/google_cloud_pipeline_components_bqml_text.ipynb @inardini
 /pipelines/google_cloud_pipelines_dataproc_tabular @inardini
