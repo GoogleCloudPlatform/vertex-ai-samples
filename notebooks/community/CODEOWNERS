@@ -156,3 +156,5 @@
 /notebooks/community/model_garden/model_garden_autosxs_evaluation_llama3_1.ipynb @inardini
 /notebooks/community/model_garden/model_garden_openai_api_llama3_1.ipynb @inardini
 /notebooks/community/model_garden/model_garden_phi3_deployment.ipynb @yashikagandhi
+/notebooks/community/model_garden/model_garden_phi3_deployment.ipynb @yashikagandhi
+/notebooks/community/model_garden/model_garden_pytorch_tulu3_deployment.ipynb @paulu-google
