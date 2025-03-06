@@ -31,7 +31,7 @@ class ValidateDatasetWithTemplateTest(test_util.TestBase):
       dict(
           testcase_name="out_of_range_rows",
           validate_top_k_rows=100000,
-          expected_result=1,
+          expected_result=0,
       ),
   )
   def test_validate_dataset_with_template_top_k_rows(
@@ -40,8 +40,8 @@ class ValidateDatasetWithTemplateTest(test_util.TestBase):
       expected_result,
   ):
     self.task_cmd_builder.dataset_name = "timdettmers/openassistant-guanaco"
-    self.task_cmd_builder.train_split_name = "train"
-    self.task_cmd_builder.instruct_column_in_dataset = "text"
+    self.task_cmd_builder.train_split = "train"
+    self.task_cmd_builder.train_column = "text"
     self.task_cmd_builder.template = (
         "gs://cloud-nas-260507-tmp-20240724/openassistant-guanaco.json"
     )
@@ -79,8 +79,8 @@ class ValidateDatasetWithTemplateTest(test_util.TestBase):
       expected_result,
   ):
     self.task_cmd_builder.dataset_name = "timdettmers/openassistant-guanaco"
-    self.task_cmd_builder.train_split_name = "train"
-    self.task_cmd_builder.instruct_column_in_dataset = "text"
+    self.task_cmd_builder.train_split = "train"
+    self.task_cmd_builder.train_column = "text"
     self.task_cmd_builder.template = (
         "gs://cloud-nas-260507-tmp-20240724/openassistant-guanaco.json"
     )
@@ -91,6 +91,32 @@ class ValidateDatasetWithTemplateTest(test_util.TestBase):
     self.task_cmd_builder.use_multiprocessing = True
     result = self.run_cmd()
     self.assertEqual(result, expected_result)
+
+  @parameterized.named_parameters(
+      dict(
+          testcase_name="small_max_seq_length",
+          max_seq_length=10,
+      ),
+      dict(
+          testcase_name="large_max_seq_length",
+          max_seq_length=1024,
+      ),
+  )
+  def test_validate_dataset_with_template_max_seq_length(
+      self,
+      max_seq_length,
+  ):
+    self.task_cmd_builder.dataset_name = "timdettmers/openassistant-guanaco"
+    self.task_cmd_builder.train_split = "train"
+    self.task_cmd_builder.train_column = "text"
+    self.task_cmd_builder.template = (
+        "gs://cloud-nas-260507-tmp-20240724/openassistant-guanaco.json"
+    )
+    self.task_cmd_builder.max_seq_length = max_seq_length
+    self.task_cmd_builder.validate_k_rows_of_dataset = None
+    self.task_cmd_builder.use_multiprocessing = True
+    result = self.run_cmd()
+    self.assertEqual(result, 0)
 
   @parameterized.named_parameters(
       dict(
@@ -204,8 +230,8 @@ class ValidateDatasetWithTemplateTest(test_util.TestBase):
       expected_result,
   ):
     self.task_cmd_builder.dataset_name = dataset_name
-    self.task_cmd_builder.train_split_name = split
-    self.task_cmd_builder.instruct_column_in_dataset = input_column
+    self.task_cmd_builder.train_split = split
+    self.task_cmd_builder.train_column = input_column
     self.task_cmd_builder.template = template
     self.task_cmd_builder.validate_percentage_of_dataset = (
         validate_percentage_of_dataset
@@ -311,8 +337,8 @@ class ValidateDatasetWithTemplateTest(test_util.TestBase):
       expected_result,
   ):
     self.task_cmd_builder.dataset_name = dataset_name
-    self.task_cmd_builder.train_split_name = "train"
-    self.task_cmd_builder.instruct_column_in_dataset = "text"
+    self.task_cmd_builder.train_split = "train"
+    self.task_cmd_builder.train_column = "text"
     self.task_cmd_builder.template = template
     self.task_cmd_builder.validate_percentage_of_dataset = (
         validate_percentage_of_dataset

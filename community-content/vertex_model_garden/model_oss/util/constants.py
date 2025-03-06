@@ -90,12 +90,11 @@ TEXT_TO_IMAGE_DREAMBOOTH_LORA = 'text-to-image-dreambooth-lora'
 TEXT_TO_IMAGE_DREAMBOOTH_LORA_SDXL = 'text-to-image-dreambooth-lora-sdxl'
 SEQUENCE_CLASSIFICATION_LORA = 'sequence-classification-lora'
 MERGE_CAUSAL_LANGUAGE_MODEL_LORA = 'merge-causal-language-model-lora'
-QUANTIZE_MODEL = 'quantize-model'
 INSTRUCT_LORA = 'instruct-lora'
 VALIDATE_DATASET_WITH_TEMPLATE = 'validate-dataset-with-template'
+RUN_TESTS = 'test'
 DEFAULT_TEXT_COLUMN_IN_DATASET = 'quote'
-DEFAULT_TEXT_COLUMN_IN_QUANTIZATION_DATASET = 'text'
-DEFAULT_INSTRUCT_COLUMN_IN_DATASET = 'text'
+DEFAULT_TRAIN_COLUMN = 'text'
 
 FINAL_CHECKPOINT_DIRNAME = 'checkpoint-final'
 
@@ -113,13 +112,17 @@ PRECISION_MODE_16 = 'float16'
 PRECISION_MODE_16B = 'bfloat16'
 PRECISION_MODE_32 = 'float32'
 
-# Quantization modes.
-GPTQ = 'gptq'
-AWQ = 'awq'
+ROUGE_VARIANTS = ('rouge1', 'rouge2', 'rougeL', 'rougeLsum')
 
-# AWQ versions.
-GEMM = 'GEMM'
-GEMV = 'GEMV'
+# Supported HF evaluation metrics.
+SUPPORTED_HF_EVAL_METRICS = (
+    'perplexity',
+    'bleu',
+    'google_bleu',
+) + ROUGE_VARIANTS
+
+# Supported evaluation metrics.
+SUPPORTED_EVAL_METRICS = ('loss',) + SUPPORTED_HF_EVAL_METRICS
 
 # Environment variable keys.
 PRIVATE_BUCKET_ENV_KEY = 'AIP_PRIVATE_BUCKET_NAME'

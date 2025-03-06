@@ -57,6 +57,23 @@ def force_gcs_path(uri: str) -> str:
     return uri
 
 
+def download_gcs_file_to_memory(gcs_uri: str) -> bytes:
+  """Downloads a gcs file to in memory.
+
+  Args:
+    gcs_uri: A string of GCS uri.
+
+  Returns:
+    The content of the gcs file in byte format.
+  """
+  bucket = gcs_uri.split('/')[2]
+  file_path = gcs_uri[len(constants.GCS_URI_PREFIX + bucket + '/') :]
+  client = _get_gcs_client()
+  bucket = client.bucket(bucket)
+  blob = bucket.blob(file_path)
+  return blob.download_as_bytes()
+
+
 def download_gcs_file_to_local_dir(gcs_uri: str, local_dir: str):
   """Download a gcs file to a local dir.
 
@@ -335,24 +352,3 @@ def get_output_video_file(video_output_file_path: str) -> str:
       file_extension, '_overlay' + file_extension
   )
   return out_local_video_file_name
-
-
-def write_first_party_model_metadata(
-    output_path: str, required_container_uri: str
-) -> None:
-  """Write Vertex internal model metadata for first party artifacts."""
-  model_metadata_fname = 'model_metadata.jsonl'
-  if len(required_container_uri) > 126:
-    raise ValueError(f'Docker URI exceeds 126 chars: {required_container_uri}')
-  payload = '\n{}{}'.format(  # serialized proto
-      chr(len(required_container_uri)),
-      required_container_uri,
-  )
-  os.makedirs(output_path, exist_ok=True)
-  output_dirs = [output_path]
-  if output_path.startswith('/gcs'):
-    # include all parent dirs, except "/", "/gcs"
-    output_dirs.extend([str(p) for p in pathlib.Path(output_path).parents][:-2])
-  for output_dir in output_dirs:
-    with open(os.path.join(output_dir, model_metadata_fname), 'w') as f:
-      f.write(payload)

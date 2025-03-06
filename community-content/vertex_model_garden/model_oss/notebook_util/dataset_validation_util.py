@@ -541,4 +541,3 @@ def validate_dataset_with_template(
           os.path.basename(dataset_name), os.path.basename(template)
       )
   )
-
