@@ -8,7 +8,7 @@ class QuantizeModelCommandBuilder:
 
   def __init__(self):
     self._task = None
-    self._pretrained_model_id = None
+    self._pretrained_model_name_or_path = None
     self._quantization_method = None
     self._quantization_precision_mode = None
     self._quantization_dataset_name = None
@@ -31,12 +31,12 @@ class QuantizeModelCommandBuilder:
     self._task = val
 
   @property
-  def pretrained_model_id(self):
-    return self._pretrained_model_id
+  def pretrained_model_name_or_path(self):
+    return self._pretrained_model_name_or_path
 
-  @pretrained_model_id.setter
-  def pretrained_model_id(self, val: str):
-    self._pretrained_model_id = val
+  @pretrained_model_name_or_path.setter
+  def pretrained_model_name_or_path(self, val: str):
+    self._pretrained_model_name_or_path = val
 
   @property
   def quantization_method(self):

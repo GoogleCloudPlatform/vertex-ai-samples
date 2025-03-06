@@ -19,14 +19,15 @@ from transformers import get_linear_schedule_with_warmup
 from util import dataset_validation_util
 
 
-_PRETRAINED_MODEL_ID = flags.DEFINE_string(
-    "pretrained_model_id",
+_PRETRAINED_MODEL_NAME_OR_PATH = flags.DEFINE_string(
+    "pretrained_model_name_or_path",
     None,
-    "The pretrained model id. Supported models can be causal language modeling"
-    " models from https://github.com/huggingface/peft/tree/main. Note, there"
-    " might be different paddings for different models. This tool assumes the"
-    " pretrained_model_id contains model name, and then choose proper padding"
-    " methods. e.g. it must contain `llama` for `Llama2 models`.",
+    "The pretrained model name or path. Supported models can be causal language"
+    " modeling models from https://github.com/huggingface/peft/tree/main. Note,"
+    " there might be different paddings for different models. This tool assumes"
+    " the pretrained_model_name_or_path contains model name, and then choose"
+    " proper padding methods. e.g. it must contain `llama` for `Llama2"
+    " models`.",
 )
 
 _OUTPUT_DIR = flags.DEFINE_string(
@@ -63,8 +64,8 @@ _LORA_DROPOUT = flags.DEFINE_float(
     " https://huggingface.co/docs/peft/task_guides/token-classification-lora.",
 )
 
-_NUM_EPOCHS = flags.DEFINE_integer(
-    "num_epochs",
+_NUM_TRAIN_EPOCHS = flags.DEFINE_integer(
+    "num_train_epochs",
     None,
     "The number of training epochs.",
 )
@@ -83,13 +84,13 @@ _LEARNING_RATE = flags.DEFINE_float(
 
 
 def finetune_sequence_classification(
-    pretrained_model_id: str,
+    pretrained_model_name_or_path: str,
     dataset_name: str,
     output_dir: str,
     lora_rank: int = 8,
     lora_alpha: int = 16,
     lora_dropout: float = 0.1,
-    num_epochs: int = 20,
+    num_train_epochs: int = 20,
     batch_size: int = 32,
     learning_rate: float = 3e-4,
 ) -> None:
@@ -104,13 +105,13 @@ def finetune_sequence_classification(
       lora_alpha=lora_alpha,
       lora_dropout=lora_dropout,
   )
-  if any(k in pretrained_model_id for k in ("gpt", "opt", "bloom")):
+  if any(k in pretrained_model_name_or_path for k in ("gpt", "opt", "bloom")):
     padding_side = "left"
   else:
     padding_side = "right"
 
   tokenizer = AutoTokenizer.from_pretrained(
-      pretrained_model_id, padding_side=padding_side
+      pretrained_model_name_or_path, padding_side=padding_side
   )
   if getattr(tokenizer, "pad_token_id") is None:
     tokenizer.pad_token_id = tokenizer.eos_token_id
@@ -156,7 +157,7 @@ def finetune_sequence_classification(
   )
 
   model = AutoModelForSequenceClassification.from_pretrained(
-      pretrained_model_id, return_dict=True
+      pretrained_model_name_or_path, return_dict=True
   )
   model = get_peft_model(model, peft_config)
   model.print_trainable_parameters()
@@ -166,12 +167,12 @@ def finetune_sequence_classification(
   # Instantiate scheduler
   lr_scheduler = get_linear_schedule_with_warmup(
       optimizer=optimizer,
-      num_warmup_steps=0.06 * (len(train_dataloader) * num_epochs),
-      num_training_steps=(len(train_dataloader) * num_epochs),
+      num_warmup_steps=0.06 * (len(train_dataloader) * num_train_epochs),
+      num_training_steps=(len(train_dataloader) * num_train_epochs),
   )
 
   model.to(device)
-  for epoch in range(num_epochs):
+  for epoch in range(num_train_epochs):
     model.train()
     for _, batch in enumerate(tqdm(train_dataloader)):
       batch.to(device)
@@ -201,25 +202,27 @@ def finetune_sequence_classification(
 
 
 def main(unused_argv: Sequence[str]) -> None:
-  if dataset_validation_util.is_gcs_path(_PRETRAINED_MODEL_ID.value):
-    pretrained_model_id = dataset_validation_util.download_gcs_uri_to_local(
-        _PRETRAINED_MODEL_ID.value
+  if dataset_validation_util.is_gcs_path(_PRETRAINED_MODEL_NAME_OR_PATH.value):
+    pretrained_model_name_or_path = (
+        dataset_validation_util.download_gcs_uri_to_local(
+            _PRETRAINED_MODEL_NAME_OR_PATH.value
+        )
     )
   else:
-    pretrained_model_id = _PRETRAINED_MODEL_ID.value
+    pretrained_model_name_or_path = _PRETRAINED_MODEL_NAME_OR_PATH.value
   pretrained_model_path = dataset_validation_util.force_gcs_fuse_path(
-      pretrained_model_id
+      pretrained_model_name_or_path
   )
   output_dir = dataset_validation_util.force_gcs_fuse_path(_OUTPUT_DIR.value)
 
   finetune_sequence_classification(
-      pretrained_model_id=pretrained_model_path,
+      pretrained_model_name_or_path=pretrained_model_path,
       dataset_name=_DATASET_NAME.value,
       output_dir=output_dir,
       lora_rank=_LORA_RANK.value,
       lora_alpha=_LORA_ALPHA.value,
       lora_dropout=_LORA_DROPOUT.value,
-      num_epochs=int(_NUM_EPOCHS.value),
+      num_train_epochs=int(_NUM_TRAIN_EPOCHS.value),
       batch_size=_BATCH_SIZE.value,
       learning_rate=_LEARNING_RATE.value,
   )

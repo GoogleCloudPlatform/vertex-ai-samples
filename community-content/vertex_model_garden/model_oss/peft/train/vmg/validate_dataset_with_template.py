@@ -17,15 +17,15 @@ _DATASET_NAME = flags.DEFINE_string(
     required=True,
 )
 
-_TRAIN_SPLIT_NAME = flags.DEFINE_string(
-    'train_split_name',
+_TRAIN_SPLIT = flags.DEFINE_string(
+    'train_split',
     'train',
     'The train split name.',
 )
 
-_INSTRUCT_COLUMN_IN_DATASET = flags.DEFINE_string(
-    'instruct_column_in_dataset',
-    constants.DEFAULT_INSTRUCT_COLUMN_IN_DATASET,
+_TRAIN_COLUMN = flags.DEFINE_string(
+    'train_column',
+    constants.DEFAULT_TRAIN_COLUMN,
     'The instruct column in dataset.',
 )
 
@@ -36,6 +36,12 @@ _TEMPLATE = flags.DEFINE_string(
     ' under `templates` folder, without `.json` extension, e.g. `alpaca`, or a'
     ' Cloud Storage URI to a JSON file.',
     required=True,
+)
+
+_MAX_SEQ_LENGTH = flags.DEFINE_integer(
+    'max_seq_length',
+    None,
+    'The maximum sequence length.',
 )
 
 _VALIDATE_PERCENTAGE_OF_DATASET = flags.DEFINE_integer(
@@ -64,9 +70,10 @@ def main(unused_argv: Sequence[str]) -> None:
 
   dataset_validation_util.validate_dataset_with_template(
       dataset_name=_DATASET_NAME.value,
-      split=_TRAIN_SPLIT_NAME.value,
-      input_column=_INSTRUCT_COLUMN_IN_DATASET.value,
+      split=_TRAIN_SPLIT.value,
+      input_column=_TRAIN_COLUMN.value,
       template=_TEMPLATE.value,
+      max_seq_length=_MAX_SEQ_LENGTH.value,
       use_multiprocessing=_USE_MULTIPROCESSING.value,
       validate_percentage_of_dataset=_VALIDATE_PERCENTAGE_OF_DATASET.value,
       validate_k_rows_of_dataset=_VALIDATE_K_ROWS_OF_DATASET.value,

@@ -31,7 +31,7 @@ dependencies:
 - pip:
   - --extra-index-url https://download.pytorch.org/whl/cu121
   - absl-py==2.1.0
-  - accelerate==0.33.0  # Needed for fp8
+  - accelerate==0.34.2  # Needed for fp8
   - datasets==2.19.2
   - fbgemm-gpu==0.8.0+cu121  # Needed for fp8
   - kfp==2.5.0
@@ -39,5 +39,5 @@ dependencies:
   - protobuf==3.20.3
   - pynvml==11.5.3
   - torch==2.4.0+cu121  # Needed for fp8
-  - transformers==4.43.1
-  - trl==0.9.6
+  - transformers==4.47.1
+  - trl==0.11.2

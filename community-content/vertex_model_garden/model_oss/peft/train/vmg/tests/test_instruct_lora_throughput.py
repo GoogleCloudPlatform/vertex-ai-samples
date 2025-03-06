@@ -43,9 +43,9 @@ class TrainerThroughputTest(test_util.TestBase):
     self.task_cmd_builder.attn_implementation = 'flash_attention_2'
     self.task_cmd_builder.example_packing = True
     self.task_cmd_builder.train_dataset = 'mlabonne/guanaco-llama2-1k'
-    self.task_cmd_builder.train_split_name = 'train'
-    self.task_cmd_builder.instruct_column = 'text'
-    self.task_cmd_builder.template = 'openassistant-guanaco'
+    self.task_cmd_builder.train_split = 'train'
+    self.task_cmd_builder.train_column = 'text'
+    self.task_cmd_builder.train_template = 'openassistant-guanaco'
     self.task_cmd_builder.ckpt_dir = '/tmp/adapter'
     self.task_cmd_builder.logging_dir = '/tmp/logs'
 
@@ -54,23 +54,23 @@ class TrainerThroughputTest(test_util.TestBase):
     if ret != 0:
       with open(self.task_cmd_builder.benchmark_out_file, 'a') as f:
         max_seq_length = self.task_cmd_builder.max_seq_length
-        f.write(f'{max_seq_length/1024.0:.1f}k | failed | n/a\n')
+        f.write(f'{max_seq_length/1024.0:.1f} | failed | n/a\n')
     return ret
 
   @parameterized.product(
       model_name=[
-          'llama3-70b-hf',
+          'llama3.1-8b-hf',
           'llama3.1-70b-hf',
           'Mistral-7B-v0.1',
           'Mixtral-8x7B-v0.1',
-          'Gemma2-9b-it',
+          'gemma-2-9b-it',
       ],
       precision=['4bit', '8bit', 'bfloat16'],
       max_seq_length=list(range(4 * 1024, 24 * 1024 + 1, 4 * 1024)),
   )
   def test_model_single_gpu(self, model_name, precision, max_seq_length):
-    self.task_cmd_builder.pretrained_model_id = (
-        test_util.get_pretrained_model_id(model_name)
+    self.task_cmd_builder.pretrained_model_name_or_path = (
+        test_util.get_pretrained_model_name_or_path(model_name)
     )
     self.task_cmd_builder.max_seq_length = max_seq_length
     self.task_cmd_builder.load_precision = precision
@@ -78,29 +78,29 @@ class TrainerThroughputTest(test_util.TestBase):
         self.test_suite_output_dir, f'bm_{model_name}_{precision}.txt'
     )
 
-    self.docker_builder.add_env_var('CUDA_VISIBLE_DEVICES', '0')
+    self.command_builder.add_env_var('CUDA_VISIBLE_DEVICES', '0')
 
     self.assertEqual(self.run_cmd_and_handle_failure(), 0)
 
   @parameterized.product(
       model_name=[
-          'llama3-70b-hf',
+          'llama3.1-8b-hf',
           'llama3.1-70b-hf',
           'Mistral-7B-v0.1',
           'Mixtral-8x7B-v0.1',
-          'Gemma2-9b-it',
+          'gemma-2-9b-it',
       ],
       precision=['4bit', '8bit', 'bfloat16'],
       max_seq_length=list(range(4 * 1024, 24 * 1024 + 1, 4 * 1024)),
       num_gpus=[8],
-      config=['deepspeed_zero2', 'deepspeed_zero3'],
+      config=['deepspeed_zero2'],
   )
   def test_model_multi_gpu_deepspeed(
       self, model_name, precision, max_seq_length, num_gpus, config
   ):
     self.assertTrue(num_gpus == 4 or num_gpus == 8)
-    self.task_cmd_builder.pretrained_model_id = (
-        test_util.get_pretrained_model_id(model_name)
+    self.task_cmd_builder.pretrained_model_name_or_path = (
+        test_util.get_pretrained_model_name_or_path(model_name)
     )
     self.task_cmd_builder.max_seq_length = max_seq_length
     self.task_cmd_builder.load_precision = precision
@@ -112,14 +112,14 @@ class TrainerThroughputTest(test_util.TestBase):
     self.task_cmd_builder.config_file = (
         f'vertex_vision_model_garden_peft/{config}_{num_gpus}gpu.yaml'
     )
-    self.docker_builder.add_env_var(
+    self.command_builder.add_env_var(
         'CUDA_VISIBLE_DEVICES', ','.join([str(x) for x in range(0, num_gpus)])
     )
 
     self.assertEqual(self.run_cmd_and_handle_failure(), 0)
 
   @parameterized.product(
-      model_name=['llama3.1-70b-hf'],
+      model_name=['llama3.1-8b-hf', 'llama3.1-70b-hf'],
       precision=['4bit', '8bit', 'bfloat16'],
       max_seq_length=list(range(4 * 1024, 24 * 1024 + 1, 4 * 1024)),
       num_gpus=[8],
@@ -127,8 +127,8 @@ class TrainerThroughputTest(test_util.TestBase):
   def test_model_multi_gpu_fsdp_lora(
       self, model_name, precision, max_seq_length, num_gpus
   ):
-    self.task_cmd_builder.pretrained_model_id = (
-        test_util.get_pretrained_model_id(model_name)
+    self.task_cmd_builder.pretrained_model_name_or_path = (
+        test_util.get_pretrained_model_name_or_path(model_name)
     )
     self.task_cmd_builder.max_seq_length = max_seq_length
     self.task_cmd_builder.load_precision = precision
@@ -140,14 +140,97 @@ class TrainerThroughputTest(test_util.TestBase):
         'vertex_vision_model_garden_peft/llama_fsdp_8gpu.yaml'
     )
 
-    self.docker_builder.add_env_var(
+    self.command_builder.add_env_var(
         'CUDA_VISIBLE_DEVICES', ','.join([str(x) for x in range(0, num_gpus)])
     )
 
     self.assertEqual(self.run_cmd_and_handle_failure(), 0)
 
   @parameterized.product(
-      model_name=['llama3.1-70b-hf'],
+      model_name=['llama3.1-8b-hf', 'llama3.1-70b-hf'],
+      precision=['4bit', 'bfloat16'],
+      max_seq_length=list(range(4 * 1024, 24 * 1024 + 1, 4 * 1024)),
+      config=['deepspeed_zero2', 'fsdp'],
+  )
+  def test_peft_train_image_automated_test_llama(
+      self, model_name, precision, max_seq_length, config
+  ):
+    num_gpus = 8
+    self.task_cmd_builder.pretrained_model_name_or_path = (
+        test_util.get_pretrained_model_name_or_path(model_name)
+    )
+    self.task_cmd_builder.max_seq_length = max_seq_length
+    self.task_cmd_builder.load_precision = precision
+    benchmark_out_file = os.path.join(
+        self.test_suite_output_dir,
+        f'bm_{config}_{num_gpus}gpu_{model_name}_{precision}.txt',
+    )
+    self.task_cmd_builder.benchmark_out_file = benchmark_out_file
+    if config == 'fsdp':
+      self.task_cmd_builder.config_file = (
+          f'vertex_vision_model_garden_peft/llama_{config}_{num_gpus}gpu.yaml'
+      )
+    else:
+      self.task_cmd_builder.config_file = (
+          f'vertex_vision_model_garden_peft/{config}_{num_gpus}gpu.yaml'
+      )
+
+    self.command_builder.add_env_var(
+        'CUDA_VISIBLE_DEVICES', ','.join([str(x) for x in range(0, num_gpus)])
+    )
+    self.run_cmd_and_handle_failure()
+    if test_util.is_gpu_h100():
+      self.assertEqual(
+          test_util.check_benchmark_results(
+              benchmark_out_file, 'llama', 10.0, max_seq_length
+          ),
+          True,
+      )
+
+  @parameterized.product(
+      model_name=['gemma-2-2b-it', 'gemma-2-9b-it', 'gemma-2-27b-it'],
+      precision=['4bit', 'bfloat16'],
+      max_seq_length=list(range(4 * 1024, 24 * 1024 + 1, 4 * 1024)),
+      config=['deepspeed_zero2', 'deepspeed_zero3', 'fsdp'],
+  )
+  def test_peft_train_image_automated_test_gemma(
+      self, model_name, precision, max_seq_length, config
+  ):
+    num_gpus = 8
+    self.task_cmd_builder.pretrained_model_name_or_path = (
+        test_util.get_pretrained_model_name_or_path(model_name)
+    )
+    self.task_cmd_builder.attn_implementation = 'eager'
+    self.task_cmd_builder.max_seq_length = max_seq_length
+    self.task_cmd_builder.load_precision = precision
+    benchmark_out_file = os.path.join(
+        self.test_suite_output_dir,
+        f'bm_{config}_{num_gpus}gpu_{model_name}_{precision}.txt',
+    )
+    self.task_cmd_builder.benchmark_out_file = benchmark_out_file
+    if config == 'fsdp':
+      self.task_cmd_builder.config_file = (
+          f'vertex_vision_model_garden_peft/gemma2_{config}_{num_gpus}gpu.yaml'
+      )
+    else:
+      self.task_cmd_builder.config_file = (
+          f'vertex_vision_model_garden_peft/{config}_{num_gpus}gpu.yaml'
+      )
+
+    self.command_builder.add_env_var(
+        'CUDA_VISIBLE_DEVICES', ','.join([str(x) for x in range(0, num_gpus)])
+    )
+    self.run_cmd_and_handle_failure()
+    if test_util.is_gpu_h100():
+      self.assertEqual(
+          test_util.check_benchmark_results(
+              benchmark_out_file, 'gemma', 10.0, max_seq_length
+          ),
+          True,
+      )
+
+  @parameterized.product(
+      model_name=['llama3.1-8b-hf', 'llama3.1-70b-hf'],
       precision=['bfloat16'],
       max_seq_length=list(range(4 * 1024, 24 * 1024 + 1, 4 * 1024)),
       num_gpus=[8],
@@ -155,8 +238,8 @@ class TrainerThroughputTest(test_util.TestBase):
   def test_model_multi_gpu_fsdp_full_finetuning(
       self, model_name, precision, max_seq_length, num_gpus
   ):
-    self.task_cmd_builder.pretrained_model_id = (
-        test_util.get_pretrained_model_id(model_name)
+    self.task_cmd_builder.pretrained_model_name_or_path = (
+        test_util.get_pretrained_model_name_or_path(model_name)
     )
     self.task_cmd_builder.max_seq_length = max_seq_length
     self.task_cmd_builder.load_precision = precision
@@ -169,7 +252,7 @@ class TrainerThroughputTest(test_util.TestBase):
     )
     self.task_cmd_builder.enable_peft = False
 
-    self.docker_builder.add_env_var(
+    self.command_builder.add_env_var(
         'CUDA_VISIBLE_DEVICES', ','.join([str(x) for x in range(0, num_gpus)])
     )
 

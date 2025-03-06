@@ -23,6 +23,14 @@ RUN wget https://raw.githubusercontent.com/GoogleCloudPlatform/vertex-ai-samples
 ENV PIP_ROOT_USER_ACTION=ignore
 RUN pip install --upgrade pip
 
+# Remove packages that are not needed and are causing conflicts.
+# dataproc_jupyter_plugin was installed as a part of pytorch-cu121.2-2.py310
+# container which we don't need. It depends on ibis-framework and bigframes.
+# The package and its dependencies request lower versions of pyarrow/pydantic
+# than deepspeed/datasets. So, dataproc_jupyter_plugin conflicts with
+# deepspeed/datasets.
+RUN pip uninstall -y dataproc_jupyter_plugin ibis-framework bigframes
+
 # Prefer to install with requirement file as much as possible for reasons
 # described in b/355034754.
 COPY model_oss/peft/train/vmg/dockerfile/requirements.txt /tmp/requirements.txt
@@ -58,15 +66,12 @@ WORKDIR /diffusers/examples
 
 RUN mkdir -p ./vertex_vision_model_garden_peft/
 COPY model_oss/peft/train/vmg/configs/* ./vertex_vision_model_garden_peft/
-# custom `lm_eval` task.
-ARG LM_EVAL_DIR=$(python -c 'import site; print(site.getsitepackages()[0])')/lm_eval
-RUN mkdir -p $LM_EVAL_DIR/tasks/vertex && \
-  mv ./vertex_vision_model_garden_peft/custom_loglikelihood.yaml $LM_EVAL_DIR/tasks/vertex/
 COPY model_oss/peft/train/vmg/*.py ./vertex_vision_model_garden_peft/train/vmg/
 COPY model_oss/peft/train/vmg/templates /diffusers/examples/util/templates
 COPY model_oss/util /diffusers/examples/util
 COPY model_oss/notebook_util/dataset_validation_util.py /diffusers/examples/util
-COPY model_oss/peft/train/tests/*.py ./vertex_vision_model_garden_peft/tests/
+COPY model_oss/peft/train/vmg/tests/*.py ./vertex_vision_model_garden_peft/tests/
+COPY model_oss/peft/train/test_utils/test_util.py ./vertex_vision_model_garden_peft/tests/
 
 RUN chmod a+rwX -R /diffusers/examples/
 ENV PYTHONPATH /diffusers/examples/

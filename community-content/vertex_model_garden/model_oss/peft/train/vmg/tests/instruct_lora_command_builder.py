@@ -3,16 +3,18 @@
 # DO NOT MODIFY: this file is auto-generated
 # See go/vmg-oss-peft-tests#command-builder-genpy
 
+
 class InstructLoraCommandBuilder:
 
   def __init__(self):
     self._config_file = None
     self._task = None
-    self._pretrained_model_id = None
-    self._dataset_name = None
-    self._train_split_name = None
-    self._template = None
-    self._instruct_column_in_dataset = None
+    self._gcs_rsync_interval_secs = None
+    self._pretrained_model_name_or_path = None
+    self._train_dataset = None
+    self._train_split = None
+    self._train_template = None
+    self._train_column = None
     self._output_dir = None
     self._merge_base_and_lora_output_dir = None
     self._logging_output_dir = None
@@ -22,14 +24,14 @@ class InstructLoraCommandBuilder:
     self._lora_alpha = None
     self._lora_dropout = None
     self._max_steps = None
-    self._num_epochs = None
+    self._num_train_epochs = None
     self._max_seq_length = None
     self._learning_rate = None
     self._lr_scheduler_type = None
     self._precision_mode = None
     self._train_precision = None
-    self._enable_gradient_checkpointing = None
-    self._use_example_packing = None
+    self._gradient_checkpointing = None
+    self._example_packing = None
     self._attn_implementation = None
     self._optimizer = None
     self._warmup_ratio = None
@@ -37,14 +39,14 @@ class InstructLoraCommandBuilder:
     self._save_steps = None
     self._logging_steps = None
     self._huggingface_access_token = None
-    self._eval_dataset_path = None
+    self._eval_dataset = None
     self._eval_column = None
     self._eval_template = None
     self._eval_split = None
     self._eval_steps = None
-    self._eval_tasks = None
     self._eval_metric_name = None
-    self._completion_only = None
+    self._metric_for_best_model = None
+    self._input_masking = None
     self._max_grad_norm = None
     self._logger_level = None
     self._benchmark_out_file = None
@@ -52,6 +54,7 @@ class InstructLoraCommandBuilder:
     self._enable_peft = None
     self._merge_model_precision_mode = None
     self._target_modules = None
+    self._unnamed_args = None
 
   @property
   def config_file(self):
@@ -70,44 +73,52 @@ class InstructLoraCommandBuilder:
     self._task = val
 
   @property
-  def pretrained_model_id(self):
-    return self._pretrained_model_id
+  def gcs_rsync_interval_secs(self):
+    return self._gcs_rsync_interval_secs
 
-  @pretrained_model_id.setter
-  def pretrained_model_id(self, val: str):
-    self._pretrained_model_id = val
+  @gcs_rsync_interval_secs.setter
+  def gcs_rsync_interval_secs(self, val: str):
+    self._gcs_rsync_interval_secs = val
+
+  @property
+  def pretrained_model_name_or_path(self):
+    return self._pretrained_model_name_or_path
+
+  @pretrained_model_name_or_path.setter
+  def pretrained_model_name_or_path(self, val: str):
+    self._pretrained_model_name_or_path = val
 
   @property
   def train_dataset(self):
-    return self._dataset_name
+    return self._train_dataset
 
   @train_dataset.setter
   def train_dataset(self, val: str):
-    self._dataset_name = val
+    self._train_dataset = val
 
   @property
-  def train_split_name(self):
-    return self._train_split_name
+  def train_split(self):
+    return self._train_split
 
-  @train_split_name.setter
-  def train_split_name(self, val: str):
-    self._train_split_name = val
-
-  @property
-  def template(self):
-    return self._template
-
-  @template.setter
-  def template(self, val: str):
-    self._template = val
+  @train_split.setter
+  def train_split(self, val: str):
+    self._train_split = val
 
   @property
-  def instruct_column(self):
-    return self._instruct_column_in_dataset
+  def train_template(self):
+    return self._train_template
 
-  @instruct_column.setter
-  def instruct_column(self, val: str):
-    self._instruct_column_in_dataset = val
+  @train_template.setter
+  def train_template(self, val: str):
+    self._train_template = val
+
+  @property
+  def train_column(self):
+    return self._train_column
+
+  @train_column.setter
+  def train_column(self, val: str):
+    self._train_column = val
 
   @property
   def ckpt_dir(self):
@@ -182,12 +193,12 @@ class InstructLoraCommandBuilder:
     self._max_steps = val
 
   @property
-  def num_epochs(self):
-    return self._num_epochs
+  def num_train_epochs(self):
+    return self._num_train_epochs
 
-  @num_epochs.setter
-  def num_epochs(self, val: float):
-    self._num_epochs = val
+  @num_train_epochs.setter
+  def num_train_epochs(self, val: float):
+    self._num_train_epochs = val
 
   @property
   def max_seq_length(self):
@@ -231,19 +242,19 @@ class InstructLoraCommandBuilder:
 
   @property
   def gradient_checkpointing(self):
-    return self._enable_gradient_checkpointing
+    return self._gradient_checkpointing
 
   @gradient_checkpointing.setter
   def gradient_checkpointing(self, val: bool):
-    self._enable_gradient_checkpointing = val
+    self._gradient_checkpointing = val
 
   @property
   def example_packing(self):
-    return self._use_example_packing
+    return self._example_packing
 
   @example_packing.setter
   def example_packing(self, val: bool):
-    self._use_example_packing = val
+    self._example_packing = val
 
   @property
   def attn_implementation(self):
@@ -303,18 +314,18 @@ class InstructLoraCommandBuilder:
 
   @property
   def eval_dataset(self):
-    return self._eval_dataset_path
+    return self._eval_dataset
 
   @eval_dataset.setter
   def eval_dataset(self, val: str):
-    self._eval_dataset_path = val
+    self._eval_dataset = val
 
   @property
-  def eval_instruct_column(self):
+  def eval_column(self):
     return self._eval_column
 
-  @eval_instruct_column.setter
-  def eval_instruct_column(self, val: str):
+  @eval_column.setter
+  def eval_column(self, val: str):
     self._eval_column = val
 
   @property
@@ -326,11 +337,11 @@ class InstructLoraCommandBuilder:
     self._eval_template = val
 
   @property
-  def eval_split_name(self):
+  def eval_split(self):
     return self._eval_split
 
-  @eval_split_name.setter
-  def eval_split_name(self, val: str):
+  @eval_split.setter
+  def eval_split(self, val: str):
     self._eval_split = val
 
   @property
@@ -342,14 +353,6 @@ class InstructLoraCommandBuilder:
     self._eval_steps = val
 
   @property
-  def eval_tasks(self):
-    return self._eval_tasks
-
-  @eval_tasks.setter
-  def eval_tasks(self, val: str):
-    self._eval_tasks = val
-
-  @property
   def eval_metric_name(self):
     return self._eval_metric_name
 
@@ -358,12 +361,20 @@ class InstructLoraCommandBuilder:
     self._eval_metric_name = val
 
   @property
-  def completion_only(self):
-    return self._completion_only
+  def metric_for_best_model(self):
+    return self._metric_for_best_model
 
-  @completion_only.setter
-  def completion_only(self, val: bool):
-    self._completion_only = val
+  @metric_for_best_model.setter
+  def metric_for_best_model(self, val: str):
+    self._metric_for_best_model = val
+
+  @property
+  def input_masking(self):
+    return self._input_masking
+
+  @input_masking.setter
+  def input_masking(self, val: bool):
+    self._input_masking = val
 
   @property
   def max_grad_norm(self):
@@ -421,9 +432,22 @@ class InstructLoraCommandBuilder:
   def target_modules(self, val: str):
     self._target_modules = val
 
-  def build_cmd(self) -> str:
+  @property
+  def unnamed_args(self):
+    return self._unnamed_args
+
+  @unnamed_args.setter
+  def unnamed_args(self, val: list):
+    self._unnamed_args = val
+
+  def build_cmd(self) -> list[str]:
     cmd = []
+    args = ''
     for k, v in self.__dict__.items():
+      if k == '_unnamed_args' and v is not None:
+        args += ' '.join(v)
+        continue
       if v is not None:
         cmd.append(f'--{k[1:]}={v}')
+    cmd.append(f'{args}')
     return cmd

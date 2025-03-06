@@ -5,23 +5,27 @@
 --extra-index-url https://huggingface.github.io/autogptq-index/whl/cu118/
 
 # keep sorted
-accelerate==0.31.0
+accelerate==0.34.2
 auto_gptq==0.7.1+cu118
-autoawq==0.2.5
+autoawq==0.2.8
 bitsandbytes==0.43.2
 cloudml-hypertune==0.1.0.dev6
-datasets==2.19.2
-deepspeed==0.14.4
+datasets==2.20.0
+deepspeed==0.15.2
 diffusers==0.25.1
+evaluate==0.4.3
 fsspec==2024.3.1
 gcsfs==2024.3.1
-lm_eval==0.4.3
 ninja==1.11.1 # Needed to avoid `ninja 1.11.1.1 is not supported on this platform` error
+nltk==3.9.1
 optimum==1.17.1
 peft==0.12.0
 pynvml==11.5.3
+rouge_score==0.1.2
 torch==2.2.2+cu118
 torchvision==0.17.2+cu118
-transformers==4.43.1
-trl==0.9.6
+transformers==4.47.1
+trl==0.11.2
 wandb==0.17.1
+ydata-profiling==4.7.0 # Upgrade the version from 4.6.0 to 4.7.0 to fix the old `pydantic` package error.
+psutil==6.0.0

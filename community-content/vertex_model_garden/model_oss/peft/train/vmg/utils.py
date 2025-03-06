@@ -1,23 +1,21 @@
 """Common libraries for PEFT."""
 
+from collections.abc import Mapping, Sequence
 import dataclasses
 import datetime
 import gc
-import multiprocessing as mp
 import os
-import subprocess
-from typing import Any, Dict, Optional, Sequence
+from typing import Any
 
 from absl import logging
 import accelerate
 from accelerate import DistributedType
 from accelerate import PartialState
-from google.protobuf import json_format
-from kfp.pipeline_spec import pipeline_spec_pb2
 import numpy as np
 import peft
 from peft import PeftModel
 from peft import prepare_model_for_kbit_training
+import psutil
 import pynvml
 import torch
 import transformers
@@ -25,208 +23,27 @@ from transformers import AutoModelForCausalLM
 from transformers import AutoTokenizer
 from transformers import BitsAndBytesConfig
 from transformers import FbgemmFp8Config
-from transformers.integrations import is_deepspeed_zero3_enabled
 import trl
 
 from util import dataset_validation_util
 from util import constants
-from util import fileutils
 
 
-_MODELS_REQUIRING_PAD_TOKEN = ("llama", "falcon", "mistral", "mixtral")
-_MODELS_REQUIRING_EOS_TOEKN = ("gemma-2b", "gemma-7b")
 _LLAMA_3_1_405B_MODEL_ID = "Meta-Llama-3.1-405B"
 _LOCAL_MERGED_MODEL_DIR = "/tmp/merged_model"
-
-
-
-class GcsOrLocalDirectory(os.PathLike):
-  """A class to represent a directory with upload support if GCS path is given.
-
-  This class is used to represent a directory. It can be used for a temporary
-  local directory and for uploading files to the GCS directory later if the
-  given path is a GCS directory. If the given path is a local directory, a call
-  to gcs_dir attribute will raise an error. This class has multi-node and
-  multi-process support with accelerate.
-
-  Attributes:
-    local_dir: The local directory to store the files.
-    gcs_dir: The path to the GCS directory.
-  """
-
-  def __init__(
-      self,
-      path: str,
-      check_empty: bool = False,
-      upload_from_all_nodes: bool = False,
-  ):
-    """Initializes the GcsOrLocalDirectory.
-
-    Args:
-      path: The path to the directory.
-      check_empty: If True, check if the GCS directory is empty. No-op for local
-        directory.
-      upload_from_all_nodes: If True, upload the local directory to GCS from all
-        nodes.
-    """
-    if len(path) > 1:
-      path = path.rstrip("/")
-
-    self._upload_from_all_nodes = upload_from_all_nodes
-
-    if path.startswith(constants.GCS_URI_PREFIX) or path.startswith(
-        constants.GCSFUSE_URI_PREFIX
-    ):
-      self._is_gcs_path = True
-      self._local_dir = _get_local_dir_from_gcs_dir(path)
-      self._gcs_dir = fileutils.force_gcs_path(path)
-      os.makedirs(self.local_dir, exist_ok=True)
-
-      with PartialState().main_process_first():
-        if (
-            check_empty
-            and PartialState().is_main_process
-            and not _is_gcs_dir_empty(self._gcs_dir)
-        ):
-          raise ValueError(f"{self._gcs_dir} needs to be empty.")
-    else:
-      self._is_gcs_path = False
-      self._local_dir = path
-      self._gcs_dir = path
-
-  def __fspath__(self) -> str:
-    return self.local_dir
-
-  @property
-  def local_dir(self) -> str:
-    return self._local_dir
-
-  @property
-  def gcs_dir(self) -> str:
-    """Returns the GCS directory path.
-
-    Returns:
-      The GCS directory path.
-
-    Raises:
-      ValueError: If the path is not a GCS path.
-    """
-    if not self._is_gcs_path:
-      raise ValueError(f"{self._gcs_dir} is not a GCS path.")
-    return self._gcs_dir
-
-  def upload_to_gcs(
-      self,
-      skip_if_exists: bool = True,
-      force_upload: bool = False,
-  ):
-    """Uploads the local directory to GCS."""
-    if not self._is_gcs_path:
-      logging.info(
-          "Not uploading to GCS since %s is not a GCS path.", self.local_dir
-      )
-      return
-
-    if not os.listdir(self.local_dir):
-      logging.info("Not uploading to GCS since %s is empty.", self.local_dir)
-      return
-
-    target = os.path.dirname(self.gcs_dir) + "/"
-    # Avoid race condition uploading the same file from multiple processes.
-    with PartialState().main_process_first():
-      if not PartialState().is_local_main_process:
-        # Non local main processes don't upload.
-        pass
-      elif self._upload_from_all_nodes or PartialState().is_main_process:
-        logging.info("Uploading %s to %s...", self.local_dir, target)
-        cmd = [
-            "gsutil",
-            "-m",
-            "cp",
-            "-r",
-        ]
-        if skip_if_exists:
-          cmd.append("-n")
-        if force_upload:
-          cmd.append("-f")
-        cmd.extend([self.local_dir, target])
-        subprocess.check_output(cmd)
-        logging.info("%s uploaded.", self.local_dir)
-
-
-def _get_local_dir_from_gcs_dir(path: str) -> str:
-  return os.path.join(
-      constants.LOCAL_OUTPUT_DIR,
-      dataset_validation_util.force_gcs_fuse_path(path)[1:],
-  )
-
-
-def _is_gcs_dir_empty(path: str) -> bool:
-  """Checks if a GCS directory is empty.
-
-  Args:
-    path: The GCS directory path.
-
-  Returns:
-    True if the directory is empty.
-
-  Raises:
-    subprocess.CalledProcessError: If the gsutil command failure reason is not
-      because the dir is empty.
-  """
-  path = path.rstrip("/") + "/"
-  try:
-    subprocess.check_output(["gsutil", "ls", path], stderr=subprocess.STDOUT)
-  except subprocess.CalledProcessError as e:
-    if (
-        str(e.output, encoding="utf-8")
-        == "CommandException: One or more URLs matched no objects.\n"
-    ):
-      return True
-    else:
-      logging.info(str(e.output, encoding="utf-8"))
-      raise
-  else:
-    return False
-
-
-def load_tokenizer(
-    pretrained_model_id: str,
-    padding_side: Optional[str] = None,
-    access_token: Optional[str] = None,
-) -> AutoTokenizer:
-  """Loads tokenizer based on `pretrained_model_id`."""
-  tokenizer_kwargs = {}
-  if should_add_eos_token(pretrained_model_id):
-    tokenizer_kwargs["add_eos_token"] = True
-  if padding_side:
-    tokenizer_kwargs["padding_side"] = padding_side
-
-  with PartialState().local_main_process_first():
-    tokenizer = AutoTokenizer.from_pretrained(
-        pretrained_model_id,
-        trust_remote_code=False,
-        use_fast=True,
-        token=access_token,
-        **tokenizer_kwargs,
-    )
-
-  if should_add_pad_token(pretrained_model_id):
-    tokenizer.add_special_tokens({"pad_token": "[PAD]"})
-
-  return tokenizer
+_GEMMA2_MODEL = "gemma-2"
 
 
 def load_model(
-    pretrained_model_id: str,
+    pretrained_model_name_or_path: str,
     tokenizer: AutoTokenizer,
     precision_mode: str = None,
-    enable_gradient_checkpointing: bool = False,
-    gradient_checkpointing_kwargs: Optional[Dict[str, Any]] = None,
-    access_token: Optional[str] = None,
-    attn_implementation: Optional[str] = None,
-    train_precision: Optional[str] = None,
-    device_map: Optional[str] = None,
+    gradient_checkpointing: bool = False,
+    gradient_checkpointing_kwargs: Mapping[str, Any] | None = None,
+    access_token: str | None = None,
+    attn_implementation: str | None = None,
+    train_precision: str | None = None,
+    device_map: str | None = None,
     is_training: bool = True,
 ) -> AutoModelForCausalLM:
   """Loads models from the local dir if specified or from huggingface."""
@@ -304,25 +121,37 @@ def load_model(
     raise ValueError(f"Invalid precision mode: {precision_mode}")
   logging.info("using torch_type=%s", torch_dtype)
 
+  model_kwargs = {
+      "use_cache": not gradient_checkpointing,
+      "device_map": device_map,
+      "torch_dtype": torch_dtype,
+      "quantization_config": quantization_config,
+      "trust_remote_code": True,
+      "token": access_token,
+      "attn_implementation": attn_implementation,
+  }
+  if _GEMMA2_MODEL in pretrained_model_name_or_path:
+    # The cache_implementation for Gemma 2 is set to hybrid by default. This
+    # param is only supported by Gemma 2. The default 'hybrid' value causes an
+    # issue when use_cache is set to False. So we have to use 'None' in such
+    # cases.
+    # https://github.com/huggingface/transformers/commit/238b13478df209ab534f2195a397dc64a3930883
+    model_kwargs["cache_implementation"] = (
+        None if gradient_checkpointing else "hybrid"
+    )
+
   model = AutoModelForCausalLM.from_pretrained(
-      pretrained_model_id,
-      use_cache=not enable_gradient_checkpointing,
-      device_map=device_map,
-      torch_dtype=torch_dtype,
-      quantization_config=quantization_config,
-      trust_remote_code=True,
-      token=access_token,
-      attn_implementation=attn_implementation,
+      pretrained_model_name_or_path, **model_kwargs
   )
 
   if precision_mode in (constants.PRECISION_MODE_4, constants.PRECISION_MODE_8):
     model = prepare_model_for_kbit_training(
         model,
-        use_gradient_checkpointing=enable_gradient_checkpointing,
+        use_gradient_checkpointing=gradient_checkpointing,
         gradient_checkpointing_kwargs=gradient_checkpointing_kwargs,
     )
 
-  if enable_gradient_checkpointing:
+  if gradient_checkpointing:
     model.gradient_checkpointing_enable(
         gradient_checkpointing_kwargs=gradient_checkpointing_kwargs
     )
@@ -345,8 +174,10 @@ def load_model(
     # https://stackoverflow.com/a/77408076
     model.config.use_cache = False
 
-  if should_add_pad_token(pretrained_model_id):
-    model.resize_token_embeddings(len(tokenizer))
+  if dataset_validation_util.should_add_pad_token(
+      pretrained_model_name_or_path
+  ):
+    model.resize_token_embeddings(len(tokenizer), mean_resizing=False)
     if is_training:
       # The following is needed since we added a new token that needs to be
       # learned.
@@ -357,22 +188,24 @@ def load_model(
 
 
 def _merge_causal_language_model_with_lora_internal(
-    pretrained_model_id: str,
+    pretrained_model_name_or_path: str,
     merge_precision_mode: str,
     finetuned_lora_model_dir: str,
     merged_model_output_dir: str,
-    access_token: Optional[str] = None,
+    access_token: str | None = None,
 ) -> None:
   """Internal function to merges the base model with the lora adapter."""
   logging.info("loading tokenizer...")
-  tokenizer = load_tokenizer(pretrained_model_id)
+  tokenizer = dataset_validation_util.load_tokenizer(
+      pretrained_model_name_or_path
+  )
 
   # Note: merging peft adapter requires loading model in 16 bits, so merging
   # is done on CPU on purpose in case one GPU cannot hold the base model.
-  logging.info("loading model %s...", pretrained_model_id)
+  logging.info("loading model %s...", pretrained_model_name_or_path)
   device_map = "cpu"
   model = load_model(
-      pretrained_model_id=pretrained_model_id,
+      pretrained_model_name_or_path=pretrained_model_name_or_path,
       tokenizer=tokenizer,
       precision_mode=merge_precision_mode,
       access_token=access_token,
@@ -402,42 +235,12 @@ def _merge_causal_language_model_with_lora_internal(
   )
 
 
-def merge_causal_language_model_with_lora_fsdp(
-    pretrained_model_id: str,
-    merge_precision_mode: str,
-    finetuned_lora_model_dir: str,
-    merged_model_output_dir: str,
-    access_token: Optional[str] = None,
-) -> None:
-  """Merges the base model with the lora adapter for FSDP.
-
-  Only the main process should call this function.
-
-  Args:
-    pretrained_model_id: Predefined base model name or path to directory
-      containing model checkpoints.
-    merge_precision_mode: Precision mode for saving model weights.
-    finetuned_lora_model_dir: Path to directory containing PEFT-finetuned model
-      weights.
-    merged_model_output_dir: Path to directory to save the merged model.
-    access_token: Access token for accessing the model.
-  """
-  assert PartialState().is_main_process
-  _merge_causal_language_model_with_lora_internal(
-      pretrained_model_id=pretrained_model_id,
-      merge_precision_mode=merge_precision_mode,
-      finetuned_lora_model_dir=finetuned_lora_model_dir,
-      merged_model_output_dir=merged_model_output_dir,
-      access_token=access_token,
-  )
-
-
 def merge_causal_language_model_with_lora(
-    pretrained_model_id: str,
+    pretrained_model_name_or_path: str,
     precision_mode: str,
     finetuned_lora_model_dir: str,
     merged_model_output_dir: str,
-    access_token: Optional[str] = None,
+    access_token: str | None = None,
 ) -> None:
   """Merges the base model with the lora adapter."""
 
@@ -452,39 +255,13 @@ def merge_causal_language_model_with_lora(
 
   if PartialState().is_main_process:
     logging.info("Starting merging job...")
-    # When deepspeed Zero3 is enabled, users are not allowed to specify
-    # `device_map` when loading the model (even on CPU).
-    #
-    # To work-around this, we kick off another process (from the
-    # is_main_process) and set up the environment to avoid using Deepspeed when
-    # doing the merging.
-    if is_deepspeed_zero3_enabled():
-      ctx = mp.get_context("spawn")
-      os.environ["ACCELERATE_USE_DEEPSPEED"] = "false"
-      merge_job = ctx.Process(
-          target=_merge_causal_language_model_with_lora_internal,
-          args=(
-              pretrained_model_id,
-              merge_precision_mode,
-              finetuned_lora_model_dir,
-              local_merged_model_dir,
-          ),
-          kwargs={
-              "access_token": access_token,
-          },
-      )
-      merge_job.start()
-      merge_job.join()
-      os.environ["ACCELERATE_USE_DEEPSPEED"] = "true"
-    else:
-      _merge_causal_language_model_with_lora_internal(
-          pretrained_model_id=pretrained_model_id,
-          merge_precision_mode=merge_precision_mode,
-          finetuned_lora_model_dir=finetuned_lora_model_dir,
-          merged_model_output_dir=local_merged_model_dir,
-          access_token=access_token,
-      )
-
+    _merge_causal_language_model_with_lora_internal(
+        pretrained_model_name_or_path=pretrained_model_name_or_path,
+        merge_precision_mode=merge_precision_mode,
+        finetuned_lora_model_dir=finetuned_lora_model_dir,
+        merged_model_output_dir=local_merged_model_dir,
+        access_token=access_token,
+    )
     logging.info("merging job is done")
 
   # Wait for all processes to sync here.
@@ -492,7 +269,7 @@ def merge_causal_language_model_with_lora(
 
   if precision_mode == constants.PRECISION_MODE_FP8:
     convert_model_to_fp8(
-        pretrained_model_name_or_path=pretrained_model_id,
+        pretrained_model_name_or_path=pretrained_model_name_or_path,
         merged_model_output_dir=local_merged_model_dir,
         quantized_model_output_dir=merged_model_output_dir,
         access_token=access_token,
@@ -503,7 +280,7 @@ def convert_model_to_fp8(
     pretrained_model_name_or_path: str,
     merged_model_output_dir: str,
     quantized_model_output_dir: str,
-    access_token: Optional[str] = None,
+    access_token: str | None = None,
 ) -> None:
   """Converts the model to fp8.
 
@@ -567,70 +344,6 @@ def force_gc():
   torch.cuda.empty_cache()
 
 
-def should_add_pad_token(model_id: str) -> bool:
-  """Returns whether the model requires adding a special pad token."""
-  return any(s.lower() in model_id.lower() for s in _MODELS_REQUIRING_PAD_TOKEN)
-
-
-def should_add_eos_token(model_id: str) -> bool:
-  """Returns whether the model requires adding a special eos token."""
-  return any(m in model_id for m in _MODELS_REQUIRING_EOS_TOEKN)
-
-
-def write_kfp_outputs(
-    executor_input: str, output_artifacts: Dict[str, str]
-) -> None:
-  """Writes KFP outputs given a dict of output artifact names and URIs."""
-  # Only the main process writes to avoid race condition.
-  if PartialState().is_main_process:
-    executor_input = json_format.Parse(
-        executor_input, pipeline_spec_pb2.ExecutorInput()
-    )
-    outputs = executor_input.outputs
-    # set all artifacts
-    for name, uri in output_artifacts.items():
-      artifact_list = outputs.artifacts.get(name)
-      if not artifact_list or not artifact_list.artifacts:
-        raise ValueError(f"Artifact name={name} does not exist.")
-      artifact_list.artifacts[0].uri = uri
-
-    # write output file
-    executor_output = pipeline_spec_pb2.ExecutorOutput(
-        artifacts=outputs.artifacts
-    )
-    os.makedirs(os.path.dirname(outputs.output_file), exist_ok=True)
-    with open(outputs.output_file, "w") as f:
-      f.write(json_format.MessageToJson(executor_output, indent=None))
-
-  # Wait for the main process to finish before moving on to the next task.
-  PartialState().wait_for_everyone()
-
-
-def upload_local_dir_to_gcs(local_dir: str, gcs_path: str):
-  """Uploads local dir to GCS."""
-
-  if PartialState().is_main_process:
-    logging.info("uploading %s to %s...", local_dir, gcs_path)
-    subprocess.check_output([
-        "gsutil",
-        "-m",
-        "cp",
-        "-r",
-        local_dir,
-        gcs_path,
-    ])
-    logging.info("%s uploaded.", local_dir)
-
-  PartialState().wait_for_everyone()
-
-
-def write_first_party_model_metadata(output_dir: str, docker_uri: str) -> None:
-  """Multi-process friendly version of fileutils.write_first_party_model_metadata."""
-  if PartialState().is_main_process:
-    fileutils.write_first_party_model_metadata(output_dir, docker_uri)
-  PartialState().wait_for_everyone()
-
-
 @dataclasses.dataclass
 class GpuStats:
   """Holds information about GPU usage stats.
@@ -683,7 +396,7 @@ def gpu_stats() -> GpuStats:
   return GpuStats(mem_used_smi, occupied, unused, smi_diff, util)
 
 
-def gpu_stats_str(stats: Optional[GpuStats] = None) -> str:
+def gpu_stats_str(stats: GpuStats | None = None) -> str:
   if stats is None:
     stats = gpu_stats()
   total, occupied, unused, smi_diff, util = stats
@@ -691,6 +404,75 @@ def gpu_stats_str(stats: Optional[GpuStats] = None) -> str:
       f"GPU memory: {total:.2f}({occupied=:.2f}, {unused=:.2f},"
       f" {smi_diff=:.2f}) GB. Utilization: {util:.2f}%"
   )
+
+
+@dataclasses.dataclass
+class CpuStats:
+  """Holds information about CPU usage stats."""
+
+  # Total CPU virtual memory i.e. virtual memory allocated + unallocated.
+  total_virtual_mem: float
+  # CPU virtual memory available for use.
+  unallocated_virtual_mem: float
+  # CPU virtual memory already used.
+  allocated_virtual_mem: float
+  # Total CPU swap memory i.e. swap memory allocated + unallocated.
+  total_swap_mem: float
+  # CPU swap memory available for use.
+  unallocated_swap_mem: float
+  # CPU swap memory already used.
+  allocated_swap_mem: float
+  # CPU utilization percentage.
+  utilization: float
+
+
+def cpu_stats() -> CpuStats:
+  """Reports CPU memory usage and utilization."""
+
+  # https://psutil.readthedocs.io/en/latest/#memory
+  gb = 1024.0**3
+  vmem = psutil.virtual_memory()
+  vmem_total = vmem.total / gb
+  vmem_available = vmem.available / gb
+  vmem_used = vmem_total - vmem_available
+  smem = psutil.swap_memory()
+  swap_total = smem.total / gb
+  swap_free = smem.free / gb
+  swap_used = smem.used / gb
+  # https://psutil.readthedocs.io/en/latest/#psutil.cpu_percent
+  cpu_util = psutil.cpu_percent(interval=1e-6)
+  return CpuStats(
+      total_virtual_mem=vmem_total,
+      unallocated_virtual_mem=vmem_available,
+      allocated_virtual_mem=vmem_used,
+      total_swap_mem=swap_total,
+      unallocated_swap_mem=swap_free,
+      allocated_swap_mem=swap_used,
+      utilization=cpu_util,
+  )
+
+
+def cpu_stats_str(stats: CpuStats | None = None) -> str:
+  """Returns a string representation of the CPU stats."""
+
+  if stats is None:
+    stats = cpu_stats()
+  total, occupied, unused = (
+      stats.total_virtual_mem,
+      stats.allocated_virtual_mem,
+      stats.unallocated_virtual_mem,
+  )
+  virtual_mem = (
+      f"CPU virtual memory: {total:.2f}({occupied=:.2f}, {unused=:.2f}) GB"
+  )
+  total, occupied, unused = (
+      stats.total_swap_mem,
+      stats.allocated_swap_mem,
+      stats.unallocated_swap_mem,
+  )
+  swap_mem = f"CPU swap memory: {total:.2f}({occupied=:.2f}, {unused=:.2f}) GB"
+  percent = stats.utilization
+  return f"{virtual_mem} {swap_mem} CPU Utilization: {percent:.2f}%"
 
 
 def init_partial_state(
@@ -722,7 +504,7 @@ def get_final_checkpoint_path(output_dir: str) -> str:
 
 def _maybe_get_modules_to_not_convert_by_model_id(
     pretrained_model_name_or_path: str,
-) -> Optional[Sequence[str]]:
+) -> Sequence[str] | None:
   """Returns the modules to not convert for the model."""
   if _LLAMA_3_1_405B_MODEL_ID in pretrained_model_name_or_path:
     return _get_llama_3_1_405b_modules_to_not_convert()

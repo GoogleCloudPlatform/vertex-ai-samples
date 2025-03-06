@@ -1,5 +1,7 @@
 """Different trainer callbacks for PEFT Trainer."""
 
+from collections.abc import MutableMapping
+import math
 import time
 
 from absl import logging
@@ -25,6 +27,30 @@ class TrainerStatsCallback(TrainerCallback):
     self._peak_mem = 0.0
     self._avg_throughput = 0.0
 
+  def on_log(
+      self,
+      args: TrainingArguments,
+      state: TrainerState,
+      control: TrainerControl,
+      logs: MutableMapping[str, float] | None = None,
+      **kwargs,
+  ) -> None:
+    """Calculates perplexity from train loss.
+
+    Args:
+      args: Arguments passed to the trainer.
+      state: State of the trainer.
+      control: Control of the trainer.
+      logs: A dict of logs from the training loop.
+      **kwargs: Additional keyword arguments, not used in this callback.
+    """
+    del kwargs  # Unused.
+    if self._partial_state.is_main_process:
+      train_loss = logs.get('loss') if logs is not None else None
+      if train_loss is not None:
+        perplexity = round(float(math.exp(train_loss)), 4)
+        logs['perplexity'] = perplexity
+
   def on_step_end(
       self,
       args: TrainingArguments,
@@ -35,21 +61,27 @@ class TrainerStatsCallback(TrainerCallback):
     if self._partial_state.is_main_process:
       if state.global_step == 1:
         self._prev_time = time.time()
-        delta_t = float('nan')
+        self._prev_num_token = state.num_input_tokens_seen
+        throughput = 0.0
       else:
         cur_time = time.time()
-        delta_t = cur_time - self._prev_time
+        cur_num_token = state.num_input_tokens_seen
+        throughput = (cur_num_token - self._prev_num_token) / (
+            cur_time - self._prev_time
+        )
         self._prev_time = cur_time
-        self._avg_throughput += (delta_t - self._avg_throughput) / (
+        self._prev_num_token = cur_num_token
+        self._avg_throughput += (throughput - self._avg_throughput) / (
             state.global_step - 1
         )
 
       gpu_stats = utils.gpu_stats()
       self._peak_mem = max(gpu_stats.total_mem, self._peak_mem)
       logging.info(
-          'on_step_end: %s, throughput: %.2f s/it',
+          'on_step_end: Throughput: %.2f token/s. %s, %s',
+          throughput,
           utils.gpu_stats_str(gpu_stats),
-          delta_t,
+          utils.cpu_stats_str(),
       )
 
   def on_train_begin(
@@ -61,7 +93,11 @@ class TrainerStatsCallback(TrainerCallback):
   ):
     if self._partial_state.is_main_process:
       self._start_time = time.time()
-      logging.info('on_train_begin: %s', utils.gpu_stats_str())
+      logging.info(
+          'on_train_begin: %s, %s',
+          utils.gpu_stats_str(),
+          utils.cpu_stats_str(),
+      )
 
   def on_train_end(
       self,
@@ -72,15 +108,17 @@ class TrainerStatsCallback(TrainerCallback):
   ):
     if self._partial_state.is_main_process:
       train_time = time.time() - self._start_time
+      throughput = state.num_input_tokens_seen / train_time
       logging.info(
-          'training time %.2f s, throughput: %.2f s/it, peak_mem: %.2f GB',
+          'training time %.2f s, throughput (including overhead, e.g., ckpt'
+          ' saving): %.2f token/s, peak_mem: %.2f GB',
           train_time,
-          self._avg_throughput,
+          throughput,
           self._peak_mem,
       )
       if self._filename:
         with open(self._filename, 'a') as out_f:
           out_f.write(
-              f'{self._max_seq_length/1024.0:.1f}k | {self._peak_mem:.2f} |'
+              f'{self._max_seq_length/1024.0:.1f} | {self._peak_mem:.2f} |'
               f' {self._avg_throughput:.2f}\n'
           )

@@ -10,8 +10,9 @@ class ValidateDatasetWithTemplateCommandBuilder:
     self._task = None
     self._template = None
     self._dataset_name = None
-    self._train_split_name = None
-    self._instruct_column_in_dataset = None
+    self._train_split = None
+    self._train_column = None
+    self._max_seq_length = None
     self._use_multiprocessing = None
     self._validate_k_rows_of_dataset = None
     self._validate_percentage_of_dataset = None
@@ -41,20 +42,28 @@ class ValidateDatasetWithTemplateCommandBuilder:
     self._dataset_name = val
 
   @property
-  def train_split_name(self):
-    return self._train_split_name
+  def train_split(self):
+    return self._train_split
 
-  @train_split_name.setter
-  def train_split_name(self, val: str):
-    self._train_split_name = val
+  @train_split.setter
+  def train_split(self, val: str):
+    self._train_split = val
 
   @property
-  def instruct_column_in_dataset(self):
-    return self._instruct_column_in_dataset
+  def train_column(self):
+    return self._train_column
 
-  @instruct_column_in_dataset.setter
-  def instruct_column_in_dataset(self, val: str):
-    self._instruct_column_in_dataset = val
+  @train_column.setter
+  def train_column(self, val: str):
+    self._train_column = val
+
+  @property
+  def max_seq_length(self):
+    return self._max_seq_length
+
+  @max_seq_length.setter
+  def max_seq_length(self, val: int):
+    self._max_seq_length = val
 
   @property
   def use_multiprocessing(self):
