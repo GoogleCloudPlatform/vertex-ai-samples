@@ -533,6 +533,7 @@ def get_resource_id(
       "NVIDIA_TESLA_A100": "nvidia_a100_gpus",
       "NVIDIA_A100_80GB": "nvidia_a100_80gb_gpus",
       "NVIDIA_H100_80GB": "nvidia_h100_gpus",
+      "NVIDIA_H100_MEGA_80GB": "nvidia_h100_mega_gpus",
       "NVIDIA_TESLA_T4": "nvidia_t4_gpus",
       "TPU_V5e": "tpu_v5e",
       "TPU_V3": "tpu_v3",
@@ -619,4 +620,17 @@ def check_quota(
         f"Quota not enough for {resource_id} in {region}: {quota} <"
         f" {accelerator_count}. {quota_request_instruction}"
     )
+
+
+def get_deploy_source() -> str:
+  """Gets deploy_source string based on running environment."""
+  vertex_product = os.environ.get("VERTEX_PRODUCT", "")
+  match vertex_product:
+    case "COLAB_ENTERPRISE":
+      return "notebook_colab_enterprise"
+    case "WORKBENCH_INSTANCE":
+      return "notebook_workbench"
+    case _:
+      # Legacy workbench, legacy colab, or other custom environments.
+      return "notebook_environment_unspecified"
 
