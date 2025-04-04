@@ -6,8 +6,10 @@ import io
 import json
 import os
 import subprocess
+import time
 from typing import Any, Dict, Sequence
 
+from google import auth
 from google.cloud import storage
 import matplotlib.pyplot as plt
 import numpy as np
@@ -633,4 +635,63 @@ def get_deploy_source() -> str:
     case _:
       # Legacy workbench, legacy colab, or other custom environments.
       return "notebook_environment_unspecified"
+
+
+def _is_operation_done(op_name: str, region: str) -> bool:
+  """Checks if the operation is done.
+
+  Args:
+    op_name: The name of the operation to poll.
+    region: The region of the operation.
+
+  Returns:
+    True if the operation is done, False otherwise.
+
+  Raises:
+    ValueError: If the operation failed.
+  """
+  creds, _ = auth.default()
+  auth_req = auth.transport.requests.Request()
+  creds.refresh(auth_req)
+  headers = {
+      "Authorization": f"Bearer {creds.token}",
+  }
+  url = f"https://{region}-aiplatform.googleapis.com/ui/{op_name}"
+  response = requests.get(url, headers=headers)
+  operation_data = response.json()
+  if "error" in operation_data:
+    raise ValueError(f"Operation failed: {operation_data['error']}")
+  return operation_data.get("done", False)
+
+
+def poll_and_wait(
+    op_name: str, region: str, total_wait: int, interval: int = 60
+) -> None:
+  """Polls the operation and waits for it to complete.
+
+  Args:
+    op_name: The name of the operation to poll.
+    region: The region of the operation.
+    total_wait: The total wait time in seconds.
+    interval: The interval between each poll in seconds.
+
+  Raises:
+    TimeoutError: If the operation times out.
+  """
+  start_time = time.time()
+  while True:
+    if _is_operation_done(op_name, region):
+      break
+    time_elapsed = time.time() - start_time
+    if time_elapsed > total_wait:
+      raise TimeoutError(
+          f"Operation timed out after {int(time_elapsed)} seconds."
+      )
+    print(
+        "\rStill waiting for operation... Elapsed time in seconds:"
+        f" {int(time_elapsed):<6}",
+        end="",
+        flush=True,
+    )
+    time.sleep(interval)
 
