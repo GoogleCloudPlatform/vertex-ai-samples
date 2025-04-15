@@ -32,6 +32,7 @@ class DockerCommandBuilder(CommandBuilder):
     super().__init__()
     self._docker_uri = [docker_uri]
     self.privilege_mode = []
+    self.entrypoint = []
 
     self._defaults = [
         'docker',
@@ -62,6 +63,9 @@ class DockerCommandBuilder(CommandBuilder):
   def add_privilege_mode(self):
     self.privilege_mode = ['--privileged']
 
+  def add_entrypoint(self, entrypoint: list[str]):
+    self.entrypoint = entrypoint
+
   def build_cmd(self) -> str:
     return (
         self._defaults
@@ -69,6 +73,7 @@ class DockerCommandBuilder(CommandBuilder):
         + self._mount_maps
         + self.privilege_mode
         + self._docker_uri
+        + self.entrypoint
     )
 
 
@@ -85,3 +90,6 @@ class PythonCommandBuilder(CommandBuilder):
   def build_cmd(self) -> str:
     os.environ.update(self._env_vars)
     return self._defaults
+
+  def add_entrypoint(self, entrypoint: list[str]):
+    self._defaults = entrypoint
