@@ -1,7 +1,6 @@
 """Instruct/Chat with LoRA models."""
 
 from collections.abc import Callable, Mapping, Sequence
-import dataclasses
 import datetime
 import json
 import os
@@ -23,6 +22,8 @@ import trl
 import wandb
 
 from util import dataset_validation_util
+from util import dataset_stats
+from util import device_stats
 from vertex_vision_model_garden_peft.train.vmg import callbacks
 from vertex_vision_model_garden_peft.train.vmg import eval_lib
 from vertex_vision_model_garden_peft.train.vmg import utils
@@ -231,11 +232,6 @@ _PER_DEVICE_EVAL_BATCH_SIZE = flags.DEFINE_integer(
     'The per device batch size for model evaluation.',
 )
 
-_EVAL_NUM_FEWSHOT = flags.DEFINE_integer(
-    'eval_num_fewshot',
-    None,
-    'Run N-shot language model evaluation. Not implemented in `builtin_eval`.',
-)
 
 _EVAL_LIMIT = flags.DEFINE_float(
     'eval_limit',
@@ -255,8 +251,7 @@ _EVAL_METRIC_NAME = flags.DEFINE_list(
 _EVAL_DATASET = flags.DEFINE_string(
     'eval_dataset',
     None,
-    'Overrides the default evaluation dataset path. In `builtin_eval` mode,'
-    ' this can be any Hugging Face dataset name or path.',
+    'The Hugging Face dataset name or path to use for evaluation.',
 )
 
 # We set the default eval split as `test`, based on observation from
@@ -264,13 +259,13 @@ _EVAL_DATASET = flags.DEFINE_string(
 _EVAL_SPLIT = flags.DEFINE_string(
     'eval_split',
     'test',
-    'Eval split name in the eval dataset for `builtin_eval`.',
+    'Eval split name in the eval dataset.',
 )
 
 _EVAL_TEMPLATE = flags.DEFINE_string(
     'eval_template',
     None,
-    'Template for formatting language model evaluation data for `builtin_eval`.'
+    'Template for formatting language model evaluation data.'
     ' Must be a filename under `templates` folder, without `.json` extension,'
     ' e.g. `alpaca`, or a Cloud Storage URI to a JSON file.',
 )
@@ -278,7 +273,7 @@ _EVAL_TEMPLATE = flags.DEFINE_string(
 _EVAL_COLUMN = flags.DEFINE_string(
     'eval_column',
     None,
-    'Eval column name in the eval dataset for `builtin_eval`.',
+    'Eval column name in the eval dataset.',
 )
 
 _METRIC_FOR_BEST_MODEL = flags.DEFINE_string(
@@ -576,8 +571,8 @@ def finetune_instruct(
   """Finetunes instruct."""
   logging.info(
       'on entering instruct_lora, %s,\n%s',
-      utils.gpu_stats_str(),
-      utils.cpu_stats_str(),
+      device_stats.gpu_stats_str(),
+      device_stats.cpu_stats_str(),
   )
   gradient_checkpointing_kwargs = {}
   # DDP provides limited support with the reentrant variant of gradient
@@ -594,7 +589,7 @@ def finetune_instruct(
       access_token=access_token,
   )
 
-  train_dataset_with_template = (
+  train_dataset, train_dataset_with_template = (
       dataset_validation_util.load_dataset_with_template(
           train_dataset,
           split=train_split,
@@ -621,18 +616,20 @@ def finetune_instruct(
           'getting tuning data stats with effective batch size %s',
           effective_batch_size,
       )
-      train_dataset_stats = utils.get_dataset_stats(
-          train_dataset_with_template,
-          tokenizer,
-          train_column,
-          effective_batch_size,
+      train_dataset_stats = dataset_stats.get_dataset_stats(
+          raw=train_dataset,
+          templated=train_dataset_with_template,
+          template=train_template,
+          tokenizer=tokenizer,
+          column=train_column,
+          effective_batch_size=effective_batch_size,
       )
       logging.info('stats: %s', train_dataset_stats)
       tuning_data_stats_file = dataset_validation_util.force_gcs_fuse_path(
           tuning_data_stats_file
       )
       with open(tuning_data_stats_file, 'w') as out_f:
-        json.dump(dataclasses.asdict(train_dataset_stats), out_f)
+        json.dump(train_dataset_stats, out_f)
 
   model = utils.load_model(
       pretrained_model_name_or_path=pretrained_model_name_or_path,
@@ -663,7 +660,9 @@ def finetune_instruct(
     # `get_peft_model`, which may revert other changes we did before. That's why
     # we are calling `get_peft_model` explicitly here.
     model = get_peft_model(model, peft_config)
-
+    adapter_for_eval_dir = os.path.join(output_dir, 'adapter_for_eval')
+    logging.info('saving adapter for evaluation to %s...', adapter_for_eval_dir)
+    peft_config.save_pretrained(adapter_for_eval_dir)
     # This is to work-around mix-precision training. This issue is not fixed as
     # of transformers==4.41.2.
     # See b/332760883#comment30 for more details.
@@ -840,7 +839,6 @@ def main(unused_argv: Sequence[str]) -> None:
   if _EVAL_DATASET.value:
     eval_config = eval_lib.EvalConfig(
         per_device_batch_size=_PER_DEVICE_EVAL_BATCH_SIZE.value,
-        num_fewshot=_EVAL_NUM_FEWSHOT.value,
         limit=_EVAL_LIMIT.value,
         metric_name=_EVAL_METRIC_NAME.value,
         steps=_EVAL_STEPS.value,

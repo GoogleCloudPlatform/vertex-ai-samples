@@ -3,6 +3,7 @@
 import copy
 import dataclasses
 import datetime
+import inspect
 import os
 import signal
 import subprocess
@@ -11,7 +12,7 @@ from absl import flags
 from absl import logging
 from absl.testing import parameterized
 import command_builder
-import frozendict
+import immutabledict
 import torch
 
 _DOCKER_URI = flags.DEFINE_string('docker_uri', None, 'docker image uri')
@@ -33,19 +34,19 @@ _LOCAL_OUTPUT_DIR = flags.DEFINE_string(
 
 _GCS_INPUT_DIR = flags.DEFINE_string(
     'gcs_input_dir',
-    'gs://peft-docker-test',
+    'gs://vmg-tuning-docker-test',
     'GCS directory that stores model checkpoint, dataset and etc.',
 )
 
 _GCS_OUTPUT_DIR = flags.DEFINE_string(
     'gcs_output_dir',
-    'gs://peft-docker-test/output',
+    'gs://vmg-tuning-docker-test/output',
     'GCS directory that stores test output.',
 )
 
 _GCS_TESTDATA_DIR = 'peft-train-image-test'
 
-_THROUGHPUT_TEST_EXCEPTIONS = frozendict.frozendict({
+_THROUGHPUT_TEST_EXCEPTIONS = immutabledict.immutabledict({
     ('bm_deepspeed_zero3_8gpu_gemma-2-9b-it_4bit.txt', '12.0'): float('inf'),
     ('bm_fsdp_8gpu_llama3.1-70b-hf_4bit.txt', '20.0'): float('inf'),
     ('bm_deepspeed_zero2_8gpu_gemma-2-2b-it_bfloat16.txt', '12.0'): 20.0,
@@ -101,26 +102,25 @@ class TestBase(parameterized.TestCase):
     return self.command_builder.build_cmd() + self.task_cmd_builder.build_cmd()
 
   def run_cmd(self) -> int:
-    logging.info('running command: \n%s', ' \\\n'.join(self.cmd()))
-    if _DRY_RUN.value:
-      return 0
-
-    p = subprocess.Popen(self.cmd(), stdout=sys.stdout, stderr=sys.stderr)
-    try:
-      unused_output, unused_error = p.communicate()
-      return p.returncode
-    except KeyboardInterrupt:
-      p.send_signal(signal.SIGINT)
-      return 0
+    return run_cmd(self.cmd(), output_file=None)
 
   def gcs_output_dir(self):
     return _GCS_OUTPUT_DIR.value
 
+  def local_input_dir(self):
+    """Returns local input dir in host/docker."""
+    return _LOCAL_INPUT_DIR.value
+
   def local_output_dir(self):
+    """Returns local output dir in host/docker."""
     return _LOCAL_OUTPUT_DIR.value
 
-  def local_input_dir(self):
-    return _LOCAL_INPUT_DIR.value
+  def get_testcase_name(self):
+    """Returns the function name at the calling site."""
+    # https://docs.python.org/3/library/inspect.html#inspect.FrameInfo
+    cur_frame = inspect.currentframe()
+    # https://stackoverflow.com/a/17366561
+    return cur_frame.f_back.f_code.co_name
 
 
 def get_timestamp():
@@ -157,11 +157,42 @@ def get_test_data_path(name: str, download: bool = True) -> str:
 
   local_data = os.path.join(_LOCAL_INPUT_DIR.value, name)
   if not os.path.exists(local_data):
-    download_from_gcs(
-        os.path.join(_GCS_INPUT_DIR.value, name), _LOCAL_INPUT_DIR.value
-    )
+    # If `name` is a file in sub-folders, then create the sub-folders under
+    # `_LOCAL_INPUT_DIR`.
+    local_data_dir = os.path.dirname(local_data)
+    if not os.path.exists(local_data_dir):
+      os.makedirs(local_data_dir)
+
+    download_from_gcs(os.path.join(_GCS_INPUT_DIR.value, name), local_data_dir)
 
   return local_data
+
+
+def run_cmd(cmd: list[str], output_file: str = None) -> int:
+  """Runs the command and returns the return code.
+
+  Args:
+    cmd: The command to run.
+    output_file: The file to write the output to.
+
+  Returns:
+    The return code of the command.
+  """
+  logging.info('running command: \n%s', ' \\\n'.join(cmd))
+  if _DRY_RUN.value:
+    return 0
+  stdout = sys.stdout if output_file is None else open(output_file, 'w')
+  p = subprocess.Popen(cmd, stdout=stdout, stderr=sys.stderr)
+  try:
+    unused_output, unused_error = p.communicate()
+    return_code = p.returncode
+  except KeyboardInterrupt:
+    p.send_signal(signal.SIGINT)
+    return_code = 0
+  finally:
+    if output_file is not None:
+      stdout.close()
+  return return_code
 
 
 def get_pretrained_model_name_or_path(model_id: str) -> str:

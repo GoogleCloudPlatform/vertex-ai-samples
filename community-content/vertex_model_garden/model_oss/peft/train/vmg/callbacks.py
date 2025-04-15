@@ -11,7 +11,7 @@ from transformers.trainer_callback import TrainerCallback
 from transformers.trainer_callback import TrainerControl
 from transformers.trainer_callback import TrainerState
 
-from vertex_vision_model_garden_peft.train.vmg import utils
+from util import device_stats
 
 
 class TrainerStatsCallback(TrainerCallback):
@@ -75,13 +75,15 @@ class TrainerStatsCallback(TrainerCallback):
             state.global_step - 1
         )
 
-      gpu_stats = utils.gpu_stats()
-      self._peak_mem = max(gpu_stats.total_mem, self._peak_mem)
+      gpu_stats = device_stats.gpu_stats()
+      self._peak_mem = max(
+          gpu_stats.reserved + gpu_stats.smi_diff, self._peak_mem
+      )
       logging.info(
           'on_step_end: Throughput: %.2f token/s. %s, %s',
           throughput,
-          utils.gpu_stats_str(gpu_stats),
-          utils.cpu_stats_str(),
+          device_stats.gpu_stats_str(gpu_stats),
+          device_stats.cpu_stats_str(),
       )
 
   def on_train_begin(
@@ -95,8 +97,8 @@ class TrainerStatsCallback(TrainerCallback):
       self._start_time = time.time()
       logging.info(
           'on_train_begin: %s, %s',
-          utils.gpu_stats_str(),
-          utils.cpu_stats_str(),
+          device_stats.gpu_stats_str(),
+          device_stats.cpu_stats_str(),
       )
 
   def on_train_end(

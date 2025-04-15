@@ -16,6 +16,7 @@ diffusers==0.25.1
 evaluate==0.4.3
 fsspec==2024.3.1
 gcsfs==2024.3.1
+immutabledict==4.2.1
 ninja==1.11.1 # Needed to avoid `ninja 1.11.1.1 is not supported on this platform` error
 nltk==3.9.1
 optimum==1.17.1

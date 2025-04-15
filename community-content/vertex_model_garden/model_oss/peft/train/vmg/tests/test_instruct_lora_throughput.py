@@ -64,6 +64,7 @@ class TrainerThroughputTest(test_util.TestBase):
           'Mistral-7B-v0.1',
           'Mixtral-8x7B-v0.1',
           'gemma-2-9b-it',
+          'Qwen2.5-32B-Instruct',
       ],
       precision=['4bit', '8bit', 'bfloat16'],
       max_seq_length=list(range(4 * 1024, 24 * 1024 + 1, 4 * 1024)),
@@ -89,6 +90,7 @@ class TrainerThroughputTest(test_util.TestBase):
           'Mistral-7B-v0.1',
           'Mixtral-8x7B-v0.1',
           'gemma-2-9b-it',
+          'Qwen2.5-32B-Instruct',
       ],
       precision=['4bit', '8bit', 'bfloat16'],
       max_seq_length=list(range(4 * 1024, 24 * 1024 + 1, 4 * 1024)),
@@ -119,7 +121,11 @@ class TrainerThroughputTest(test_util.TestBase):
     self.assertEqual(self.run_cmd_and_handle_failure(), 0)
 
   @parameterized.product(
-      model_name=['llama3.1-8b-hf', 'llama3.1-70b-hf'],
+      model_name=[
+          'llama3.1-8b-hf',
+          'llama3.1-70b-hf',
+          'Qwen2.5-32B-Instruct',
+      ],
       precision=['4bit', '8bit', 'bfloat16'],
       max_seq_length=list(range(4 * 1024, 24 * 1024 + 1, 4 * 1024)),
       num_gpus=[8],
@@ -136,9 +142,16 @@ class TrainerThroughputTest(test_util.TestBase):
         self.test_suite_output_dir,
         f'bm_fsdp_{num_gpus}gpu_{model_name}_{precision}.txt',
     )
-    self.task_cmd_builder.config_file = (
-        'vertex_vision_model_garden_peft/llama_fsdp_8gpu.yaml'
-    )
+    if 'llama' in model_name.lower():
+      self.task_cmd_builder.config_file = (
+          'vertex_vision_model_garden_peft/llama2_fsdp_8gpu.yaml'
+      )
+    elif 'qwen' in model_name.lower():
+      self.task_cmd_builder.config_file = (
+          'vertex_vision_model_garden_peft/qwen2_fsdp_8gpu.yaml'
+      )
+    else:
+      self.fail(f'Unsupported model: {model_name}')
 
     self.command_builder.add_env_var(
         'CUDA_VISIBLE_DEVICES', ','.join([str(x) for x in range(0, num_gpus)])
