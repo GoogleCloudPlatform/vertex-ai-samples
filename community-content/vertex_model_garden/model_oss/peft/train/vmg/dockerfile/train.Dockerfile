@@ -68,10 +68,12 @@ RUN mkdir -p ./vertex_vision_model_garden_peft/
 COPY model_oss/peft/train/vmg/configs/* ./vertex_vision_model_garden_peft/
 COPY model_oss/peft/train/vmg/*.py ./vertex_vision_model_garden_peft/train/vmg/
 COPY model_oss/peft/train/vmg/templates /diffusers/examples/util/templates
-COPY model_oss/util /diffusers/examples/util
+COPY model_oss/peft/train/util/*.py /diffusers/examples/util/
+COPY model_oss/util/* /diffusers/examples/util/
 COPY model_oss/notebook_util/dataset_validation_util.py /diffusers/examples/util
 COPY model_oss/peft/train/vmg/tests/*.py ./vertex_vision_model_garden_peft/tests/
 COPY model_oss/peft/train/test_utils/test_util.py ./vertex_vision_model_garden_peft/tests/
+COPY model_oss/peft/train/test_utils/command_builder.py ./vertex_vision_model_garden_peft/tests/
 
 RUN chmod a+rwX -R /diffusers/examples/
 ENV PYTHONPATH /diffusers/examples/

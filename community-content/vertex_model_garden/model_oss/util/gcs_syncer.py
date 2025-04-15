@@ -1,15 +1,105 @@
 """Sync local directory to GCS directory using rsync."""
 
-from collections.abc import Sequence
 import multiprocessing
 import os
 import subprocess
 import time
+from typing import Optional, Sequence, Tuple
 
 from absl import logging
 
+from util import constants
+from util import fileutils
+
 _GCS_COMMAND_RETRIES = 3
 _RSYNC_RETRY_INTERVAL_SECS = 30
+
+
+def is_gcs_or_gcsfuse_path(path: str) -> bool:
+  """Returns if the path is a GCS or gcsfuse path.
+
+  Args:
+    path: The path to check.
+
+  Returns:
+    True if the path is a GCS or gcsfuse path.
+  """
+  return path.startswith(
+      (constants.GCS_URI_PREFIX, constants.GCSFUSE_URI_PREFIX)
+  )
+
+
+def manage_sync_path(
+    path: str, node_rank: Optional[int] = None
+) -> Tuple[str, str]:
+  """Returns local dir and GCS location for the given path if the given path is a GCS or gcsfuse path.
+
+  It will also create a local directory if it does not exist. Otherwise, it
+  returns the same path.
+
+  Args:
+    path: The local or GCS path to manage.
+    node_rank: The node rank to be appended to the GCS path.
+
+  Returns:
+    The local and GCS paths.
+  """
+  local_dir = path
+  gcs_dir = path
+  if is_gcs_or_gcsfuse_path(path):
+    local_dir = os.path.join(
+        constants.LOCAL_OUTPUT_DIR,
+        fileutils.force_gcs_fuse_path(path)[1:],
+    )
+    gcs_dir = fileutils.force_gcs_path(path)
+  if not os.path.exists(local_dir):
+    os.makedirs(local_dir, exist_ok=True)
+
+  if node_rank is None:
+    return local_dir, gcs_dir
+  return local_dir, os.path.join(gcs_dir, f"node-{node_rank}")
+
+
+def setup_gcs_rsync(
+    dirs_to_sync: Sequence[Tuple[str, str]],
+    mp_queue: multiprocessing.Queue,
+    gcs_rsync_interval_secs: int,
+) -> multiprocessing.Process:
+  """Sets up the GCS rsync process.
+
+  Args:
+    dirs_to_sync: The absolute directory paths which will be synced to GCS.
+    mp_queue: The multiprocessing queue to check if the training is finished.
+    gcs_rsync_interval_secs: Integer, interval in seconds to run gcs rsync.
+
+  Returns:
+    The GCS rsync process.
+  """
+  rsync_process = multiprocessing.Process(
+      target=start_gcs_rsync,
+      args=(dirs_to_sync, mp_queue, gcs_rsync_interval_secs),
+  )
+  rsync_process.start()
+  return rsync_process
+
+
+def cleanup_gcs_rsync(
+    rsync_process: multiprocessing.Process, mp_queue: multiprocessing.Queue
+) -> None:
+  """Cleans up the GCS rsync process.
+
+  Args:
+    rsync_process: The GCS rsync process.
+    mp_queue: The multiprocessing queue.
+  """
+  mp_queue.put("finish rsync process")
+  rsync_process.join()
+  if rsync_process.exitcode == 0:
+    logging.info("Artifacts have been uploaded to GCS.")
+  else:
+    logging.error(
+        "GCS rsync process failed with exit code %d.", rsync_process.exitcode
+    )
 
 
 def _rsync_local_to_gcs(local_dir: str, gcs_dir: str) -> None:
@@ -57,7 +147,7 @@ def _rsync_local_to_gcs(local_dir: str, gcs_dir: str) -> None:
 
 
 def start_gcs_rsync(
-    dirs_to_sync: Sequence[tuple[str, str]],
+    dirs_to_sync: Sequence[Tuple[str, str]],
     mp_queue: multiprocessing.Queue,
     gcs_rsync_interval_secs: int,
 ) -> None:

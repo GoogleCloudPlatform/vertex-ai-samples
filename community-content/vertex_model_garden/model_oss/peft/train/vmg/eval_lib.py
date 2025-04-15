@@ -37,7 +37,6 @@ class EvalConfig:
     steps: The number of steps to run evaluation.
     tasks: The list of tasks to run evaluation on.
     per_device_batch_size: The per device batch size for evaluation.
-    num_fewshot: The number of few-shot examples to use for evaluation.
     limit: The maximum number of examples to evaluate.
     metric_name: The name of the metric to compute.
     tokenize_dataset: Whether to tokenize the dataset.
@@ -50,7 +49,6 @@ class EvalConfig:
 
   steps: int
   per_device_batch_size: int
-  num_fewshot: int | None
   limit: float | None
   metric_name: Sequence[str]
   tokenize_dataset: bool
@@ -99,7 +97,7 @@ def create_trainer(
   kwargs["tokenizer"] = tokenizer
 
   try:
-    eval_dataset = dataset_validation_util.load_dataset_with_template(
+    _, eval_dataset = dataset_validation_util.load_dataset_with_template(
         dataset_name=eval_config.dataset_path,
         split=eval_config.split,
         input_column=eval_config.column,

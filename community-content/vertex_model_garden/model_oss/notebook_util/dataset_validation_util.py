@@ -7,7 +7,7 @@ import json
 import multiprocessing
 import os
 import subprocess
-from typing import Any, Callable, Dict, Union
+from typing import Any, Callable, Dict, Tuple, Union
 from absl import logging
 import accelerate
 import datasets
@@ -70,7 +70,9 @@ def force_gcs_fuse_path(gcs_uri: str) -> str:
 
 
 def download_gcs_uri_to_local(
-    gcs_uri: str, destination_dir: str = LOCAL_BASE_MODEL_DIR
+    gcs_uri: str,
+    destination_dir: str = LOCAL_BASE_MODEL_DIR,
+    check_path_exists: bool = True,
 ) -> str:
   """Downloads GCS URI to local.
 
@@ -81,6 +83,7 @@ def download_gcs_uri_to_local(
   Args:
     gcs_uri: GCS URI to download.
     destination_dir: Local directory directory.
+    check_path_exists: Whether to check if the path exists.
 
   Returns:
     Local path to target folder/file.
@@ -89,7 +92,7 @@ def download_gcs_uri_to_local(
       destination_dir,
       os.path.basename(os.path.normpath(gcs_uri)),
   )
-  if os.path.exists(target):
+  if check_path_exists and os.path.exists(target):
     logging.info("File %s already exists.", target)
     return target
   if accelerate.PartialState().is_local_main_process:
@@ -415,13 +418,42 @@ def get_filtered_dataset(
   return filtered_dataset
 
 
+def format_dataset(
+    dataset: datasets.Dataset,
+    input_column: str,
+    template: str = None,
+    tokenizer: transformers.PreTrainedTokenizer | None = None,
+) -> datasets.Dataset:
+  """Takes a raw dataset and formats it using a template and tokenizer.
+
+  Args:
+    dataset: The raw (unprocessed) dataset to format.
+    input_column: The input column in the dataset to be used or updaded by the
+      template. If it does not exist, the template's `prompt_no_input` will be
+      used, and the input_column will be created.
+    template: Name of the JSON template file under `templates/` or GCS path to
+      the template file.
+    tokenizer: The tokenizer to use for chat_template templates.
+
+  Returns:
+    A dataset compatible with the template.
+  """
+  return dataset.map(
+      _format_template_fn(
+          template,
+          input_column=input_column,
+          tokenizer=tokenizer,
+      )
+  )
+
+
 def load_dataset_with_template(
     dataset_name: str,
     split: str,
     input_column: str,
     template: str = None,
     tokenizer: transformers.PreTrainedTokenizer | None = None,
-) -> Any:
+) -> Tuple[Any, Any]:
   """Loads dataset with templates.
 
   Args:
@@ -435,19 +467,15 @@ def load_dataset_with_template(
     tokenizer: The tokenizer to use for chat_template templates.
 
   Returns:
-    A dataset compatible with the template.
+    The raw dataset and the dataset compatible with the template.
   """
-  dataset = _get_dataset(dataset_name, split=split)
+  raw = _get_dataset(dataset_name, split=split)
   if template:
-    dataset = dataset.map(
-        _format_template_fn(
-            template,
-            input_column=input_column,
-            tokenizer=tokenizer,
-        )
-    )
+    templated = format_dataset(raw, input_column, template, tokenizer)
+  else:
+    templated = None
 
-  return dataset
+  return raw, templated
 
 
 def validate_dataset_with_template(
@@ -521,12 +549,11 @@ def validate_dataset_with_template(
         f" https://github.com/GoogleCloudPlatform/{_VERTEX_AI_SAMPLES_GITHUB_REPO_NAME}/tree/main/{_VERTEX_AI_SAMPLES_GITHUB_TEMPLATE_DIR}."
     )
 
-  dataset = _get_dataset(dataset_name, split, num_proc).map(
-      _format_template_fn(
-          template_path,
-          input_column=input_column,
-          tokenizer=tokenizer,
-      )
+  dataset = format_dataset(
+      _get_dataset(dataset_name, split, num_proc),
+      input_column,
+      template_path,
+      tokenizer,
   )
 
   if tokenizer is not None:
