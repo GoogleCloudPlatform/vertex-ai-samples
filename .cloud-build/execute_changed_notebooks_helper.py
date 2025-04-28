@@ -42,7 +42,7 @@ from utils import NotebookProcessors, util
 # A buffer so that workers finish before the orchestrating job
 WORKER_TIMEOUT_BUFFER_IN_SECONDS: int = 60 * 60
 
-PYTHON_VERSION = "3.9"  # Set default python version
+PYTHON_VERSION = "3.10"  # Set default python version
 
 # rolling time window for accumulating build results for selecting notebooks
 MAX_RESULTS_AGE_SECONDS: int = (60 * 60) * 24 * 60  # 60 days
