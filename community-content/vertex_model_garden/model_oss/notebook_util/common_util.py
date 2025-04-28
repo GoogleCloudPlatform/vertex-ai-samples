@@ -333,6 +333,7 @@ def vqa_predict(
     image: Any,
     language_code: str = "en",
     new_width: int = 1000,
+    use_dedicated_endpoint: bool = False,
 ) -> Sequence[str]:
   """Predicts the answer to a question about an image using an Endpoint."""
   # Resize and convert image to base64 string.
@@ -356,7 +357,9 @@ def vqa_predict(
         "image": resized_image_base64,
     })
 
-  response = endpoint.predict(instances=instances)
+  response = endpoint.predict(
+      instances=instances, use_dedicated_endpoint=use_dedicated_endpoint
+  )
   return [pred.get("response") for pred in response.predictions]
 
 
@@ -366,6 +369,7 @@ def caption_predict(
     image: Any,
     caption_prompt: bool = False,
     new_width: int = 1000,
+    use_dedicated_endpoint: bool = False,
 ) -> str:
   """Predicts a caption for a given image using an Endpoint."""
   # Resize and convert image to base64 string.
@@ -380,7 +384,9 @@ def caption_predict(
     instance["prompt"] = caption_prompt_format.format(language_code)
 
   instances = [instance]
-  response = endpoint.predict(instances=instances)
+  response = endpoint.predict(
+      instances=instances, use_dedicated_endpoint=use_dedicated_endpoint
+  )
   return response.predictions[0].get("response")
 
 
@@ -389,6 +395,7 @@ def ocr_predict(
     ocr_prompt: str,
     image: Any,
     new_width: int = 1000,
+    use_dedicated_endpoint: bool = False,
 ) -> str:
   """Extracts text from a given image using an Endpoint."""
   # Resize and convert image to base64 string.
@@ -400,7 +407,9 @@ def ocr_predict(
     instance["prompt"] = ocr_prompt
   instances = [instance]
 
-  response = endpoint.predict(instances=instances)
+  response = endpoint.predict(
+      instances=instances, use_dedicated_endpoint=use_dedicated_endpoint
+  )
   return response.predictions[0].get("response")
 
 
@@ -409,6 +418,7 @@ def detect_predict(
     detect_prompt: str,
     image: Any,
     new_width: int = 1000,
+    use_dedicated_endpoint: bool = False,
 ) -> str:
   """Predicts the answer to a question about an image using an Endpoint."""
   # Resize and convert image to base64 string.
@@ -420,7 +430,9 @@ def detect_predict(
     instance["prompt"] = detect_prompt
   instances = [instance]
 
-  response = endpoint.predict(instances=instances)
+  response = endpoint.predict(
+      instances=instances, use_dedicated_endpoint=use_dedicated_endpoint
+  )
   return response.predictions[0].get("response")
 
 
