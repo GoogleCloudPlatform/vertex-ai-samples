@@ -564,6 +564,7 @@ def get_resource_id(
       "NVIDIA_H100_MEGA_80GB": "nvidia_h100_mega_gpus",
       "NVIDIA_H200_141GB": "nvidia_h200_gpus",
       "NVIDIA_TESLA_T4": "nvidia_t4_gpus",
+      "TPU_V6e": "tpu_v6e",
       "TPU_V5e": "tpu_v5e",
       "TPU_V3": "tpu_v3",
   }
