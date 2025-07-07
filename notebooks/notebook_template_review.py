@@ -249,7 +249,7 @@ def parse_dir(directory: str) -> int:
             elif tag == 'pipelines':
                 tag = 'Vertex AI Pipelines'
             elif tag == 'prediction':
-                tag = 'Vertex AI Prediction'
+                tag = 'Vertex AI Inference'
             elif tag == 'pytorch':
                 tag = 'Vertex AI Training'
             elif tag == 'reduction_server':
@@ -1019,8 +1019,8 @@ class BrandingRule(TextRule):
         branding = {
                 'Vertex SDK': 'Vertex AI SDK',
                 'Vertex Training': 'Vertex AI Training',
-                'Vertex Prediction': 'Vertex AI Prediction',
-                'Vertex Batch Prediction': 'Vertex AI batch prediction',
+                'Vertex Prediction': 'Vertex AI Inference',
+                'Vertex Batch Prediction': 'Vertex AI batch inference',
                 'Vertex XAI': 'Vertex Explainable AI',
                 'Vertex Explainability': 'Vertex Explainable AI',
                 'Vertex AI Explainability': 'Vertex Explainable AI',
@@ -1270,8 +1270,8 @@ def replace_cl(text : str ) -> str:
         'Vertex AI Model Registry': '{{vertex_model_registry_name}}',
         'Vertex Training': '{{vertex_training_name}}',
         'Vertex AI Training': '{{vertex_training_name}}',
-        'Vertex Prediction': '{{vertex_prediction_name}}',
-        'Vertex AI Prediction': '{{vertex_prediction_name}}',
+        'Vertex Prediction': '{{vertex_inference_name}}',
+        'Vertex AI Prediction': '{{vertex_inference_name}}',
         'Vertex TensorBoard': '{{vertex_tensorboard_name}}',
         'Vertex AI TensorBoard': '{{vertex_tensorboard_name}}',
         'TensorBoard': '{{vertex_tensorboard_name}}',
@@ -1306,7 +1306,7 @@ def replace_cl(text : str ) -> str:
         #'Vertex SDK': '{{vertex_sdk_name}}',
         #'Vertex AI SDK': '{{vertex_sdk_name}}',
         'Vertex AI SDK for Python': '{{vertex_sdk_python}}',
-        'Vertex AI batch prediction': '{{vertex_ai_name}} {{batch_prediction_name}}',
+        'Vertex AI batch prediction': '{{vertex_ai_name}} batch inference',
         'Vertex AI': '{{vertex_ai_name}}',
         'Ray on Vertex AI': '{{ray_vertex_ai_name}}',
         'Google Cloud console': '{{console_name}}',
