@@ -1,0 +1,81 @@
+diff --git a/vllm/entrypoints/api_server.py b/vllm/entrypoints/api_server.py
+index 3d1e5dc14..70b0f5f4f 100644
+--- a/vllm/entrypoints/api_server.py
++++ b/vllm/entrypoints/api_server.py
+@@ -55,6 +55,8 @@ async def generate(request: Request) -> Response:
+ 
+ @with_cancellation
+ async def _generate(request_dict: dict, raw_request: Request) -> Response:
++    if "instances" in request_dict:
++        request_dict = request_dict["instances"][0]
+     prompt = request_dict.pop("prompt")
+     stream = request_dict.pop("stream", False)
+     sampling_params = SamplingParams(**request_dict)
+@@ -71,7 +73,7 @@ async def _generate(request_dict: dict, raw_request: Request) -> Response:
+             text_outputs = [
+                 prompt + output.text for output in request_output.outputs
+             ]
+-            ret = {"text": text_outputs}
++            ret = {"predictions": text_outputs}
+             yield (json.dumps(ret) + "\n").encode("utf-8")
+ 
+     if stream:
+@@ -89,7 +91,7 @@ async def _generate(request_dict: dict, raw_request: Request) -> Response:
+     prompt = final_output.prompt
+     assert prompt is not None
+     text_outputs = [prompt + output.text for output in final_output.outputs]
+-    ret = {"text": text_outputs}
++    ret = {"predictions": text_outputs}
+     return JSONResponse(ret)
+ 
+ 
+diff --git a/vllm/entrypoints/openai/api_server.py b/vllm/entrypoints/openai/api_server.py
+index 2f8b31c8a..6f4df7615 100644
+--- a/vllm/entrypoints/openai/api_server.py
++++ b/vllm/entrypoints/openai/api_server.py
+@@ -1384,7 +1384,44 @@ def build_app(args: Namespace) -> FastAPI:
+                             code=HTTPStatus.BAD_REQUEST)
+         return JSONResponse(err.model_dump(),
+                             status_code=HTTPStatus.BAD_REQUEST)
+-
++
++    # vertexai middleware
++    @app.middleware("http")
++    async def extract_from_vertexai_request(request: Request, call_next):
++        if request.method == "POST":
++            request_dict = await request.json()
++            if "instances" in request_dict:
++                request_dict = request_dict["instances"][0]
++                request._body = json.dumps(request_dict).encode()
++
++                response: StreamingResponse = await call_next(request)
++                response_body = [
++                            section async for section in response.body_iterator
++                        ]
++                json_body = json.loads(response_body[0])
++                logger.info("Model raw response is: %s", json_body)
++                vertex_output = {}
++                if json_body.get("choices"):
++                    vertex_output["predictions"] =  json_body["choices"]
++                    logger.info("Vertex AI response is: %s", vertex_output)
++                    content = json.dumps(vertex_output)
++                    content_bytes = content.encode()
++                    headers = dict(response.headers)
++                    headers['content-length'] = str(len(content))
++                    return Response(
++                        content=content_bytes,
++                        status_code=response.status_code,
++                        headers=headers,
++                        media_type=response.media_type,
++                        background=response.background
++                    )
++                else:
++                    return response
++            else:
++               return await call_next(request)
++        else:
++            return await call_next(request)
++
+     # Ensure --api-key option from CLI takes precedence over VLLM_API_KEY
+     if token := args.api_key or envs.VLLM_API_KEY:
+         app.add_middleware(AuthenticationMiddleware, api_token=token)
