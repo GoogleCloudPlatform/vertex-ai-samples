@@ -1389,7 +1389,7 @@ if args.web:
     print('        <tr>')
     print('            <th width="180px">Services</th>')
     print('            <th>Description</th>')
-    print('            <th width="180px">Open in</th>')
+    print('            <th style="width: 180px;">Open in</th>')
     print('        </tr>')
     print('    </thead>')
     print('    <tbody class="list">')
