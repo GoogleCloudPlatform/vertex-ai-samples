@@ -1203,9 +1203,7 @@ def add_index(path: str,
         print('        </td>')
         print('        <td>')
         if colab_link:
-            print(f'            <a href="{colab_link}" target="_blank" track-type="notebookTutorial" track-name="colabLink">')
-            print(f'              <img src="/vertex-ai/images/colab-logo-32px.png" alt="" width="24px" height="24px"')
-            print(f'              class="material-icons" style="margin-right: 5px; margin-bottom" />Colab</a><br/>\n')
+            print(f'            <a href="{colab_link}" target="_blank" track-type="notebookTutorial" track-name="colabLink"><img src="/vertex-ai/images/colab-logo-32px.png" alt="Colab logo" width="24" height="24" style="vertical-align: middle; margin-right: 5px;" /> Colab</a><br/>\n')
         if colab_enterprise_link:
             print(f'            <a href="{colab_enterprise_link}" target="_blank" track-type="notebookTutorial" track-name="colabEnterpriseLink"><img src="/vertex-ai/images/colab-enterprise-logo-32px.png" alt="Colab Enterprise logo" width="24" height="24" style="vertical-align: middle; margin-right: 5px;" /> Colab Enterprise</a><br/>\n')
         if git_link:
