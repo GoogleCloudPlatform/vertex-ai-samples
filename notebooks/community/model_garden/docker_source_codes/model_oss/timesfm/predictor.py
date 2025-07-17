@@ -9,9 +9,9 @@ https://www.huggingface.co/google/timesfm-1.0-200m
 
 from collections.abc import Sequence
 import datetime
+import json
 import os
 from typing import Any
-
 import fastapi
 from google.cloud.aiplatform.utils import prediction_utils
 from jax._src import config
@@ -64,11 +64,20 @@ _EXPECTED_FORMAT = """
 """
 
 
+class PredictionError(Exception):
+  """Custom exception for prediction errors."""
+
+  def __init__(self, message: str, status_code: int = _BAD_REQUEST_STATUS):
+    super().__init__(message)
+    self.status_code = status_code
+    self.message = message
+
+
 def _raise_bad_request(message: str):
   message = message + "\n" + _EXPECTED_FORMAT
-  raise HTTPException(
+  raise PredictionError(
+      message=message,
       status_code=_BAD_REQUEST_STATUS,
-      detail=message,
   )
 
 
@@ -476,5 +485,5 @@ class TimesFMPredictor:
         response["timestamp"] = response["timestamp"][: horizon_lens[i]]
 
       predictions.append(response)
-
+    print(f"quantile_forecasts: {json.dumps(quantile_forecasts, indent=2)}")
     return {"predictions": predictions}
