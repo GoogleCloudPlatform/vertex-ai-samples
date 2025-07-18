@@ -1,0 +1,18 @@
+# cuml-cu12==24.8.0 was installed in nemo:24.09
+# Removing cuml=24.4.0 to avoid conflicting packages.
+cudf==24.4.0
+cugraph==24.4.0
+cugraph-service-server==24.4.0
+cuml==24.4.0
+dask-cudf==24.4.0
+raft-dask==24.4.0
+cugraph-dgl==24.4.0
+cugraph-pyg==24.4.0
+# The following packages are removed temporarily to avoid conflicting packages
+# and can be brought back if needed.
+tensorrt-llm==0.12.0
+img2dataset==1.45.0
+Sphinx==8.1.3
+sphinxcontrib-bibtex==2.6.3
+torchx==0.7.0
+nemo-run
