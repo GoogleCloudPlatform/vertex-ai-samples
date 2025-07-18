@@ -34,7 +34,14 @@ def predict() -> flask.Response:
     body = flask.request.get_json(silent=True, force=True)
     preprocessed_inputs = predictor.preprocess(body)
     outputs = predictor.predict(preprocessed_inputs)
-    postprocessed_outputs = predictor.postprocess(outputs)
+    conf_level = preprocessed_inputs.get('conf_level')
+
+    if conf_level is not None:
+      postprocessed_outputs = predictor.postprocess_with_conf_level(
+          outputs, preprocessed_inputs['conf_level']
+      )
+    else:
+      postprocessed_outputs = predictor.postprocess(outputs)
     return flask.Response(
         json.dumps(postprocessed_outputs),
         status=_OK_STATUS,

@@ -9,13 +9,15 @@ https://www.huggingface.co/google/timesfm-1.0-200m
 
 from collections.abc import Sequence
 import datetime
-import json
 import os
 from typing import Any
 import fastapi
 from google.cloud.aiplatform.utils import prediction_utils
 from jax._src import config
+import numpy as np
+import scipy.stats as st
 import timesfm
+
 
 HTTPException = fastapi.HTTPException
 _BACKEND = os.getenv("TIMESFM_BACKEND", default="cpu")
@@ -242,6 +244,7 @@ class TimesFMPredictor:
 
     inputs, freqs, timestamps, timestamp_formats = [], [], [], []
     horizon_lens = []
+    conf_level = None
     static_numerical_covariates, static_categorical_covariates = {}, {}
     dynamic_numerical_covariates, dynamic_categorical_covariates = {}, {}
     xreg_kwargs = {}
@@ -332,6 +335,31 @@ class TimesFMPredictor:
       else:
         horizon_lens.append(self.MAX_HORIZON)
 
+      # 7. Process conf level.
+      all_conf_levels = [
+          each_input.get("conf_level", None) for each_input in input_instances
+      ]
+
+      defined_conf_levels = [cl for cl in all_conf_levels if cl is not None]
+      undefined_conf_levels = [cl for cl in all_conf_levels if cl is None]
+
+      if defined_conf_levels and undefined_conf_levels:
+        _raise_bad_request(
+            "Either all or none of the instances must define `conf_level`."
+        )
+
+      if defined_conf_levels:
+        unique_conf_levels = set(defined_conf_levels)
+        if len(unique_conf_levels) > 1:
+          _raise_bad_request("All instances must have the same `conf_level`.")
+        conf_level = unique_conf_levels.pop()
+        if not 0 <= conf_level <= 1:
+          _raise_bad_request(
+              f"`conf_level` must be between 0 and 1. Got {conf_level}."
+          )
+      else:
+        conf_level = None
+
     return {
         "inputs": inputs,
         "freqs": freqs,
@@ -344,6 +372,7 @@ class TimesFMPredictor:
         "dynamic_categorical_covariates": dynamic_categorical_covariates,
         "xreg_kwargs": xreg_kwargs,
         "horizon_lens": horizon_lens,
+        "conf_level": conf_level,
     }
 
   def predict(self, instances: dict[str, Any]) -> Any:
@@ -485,5 +514,96 @@ class TimesFMPredictor:
         response["timestamp"] = response["timestamp"][: horizon_lens[i]]
 
       predictions.append(response)
-    print(f"quantile_forecasts: {json.dumps(quantile_forecasts, indent=2)}")
     return {"predictions": predictions}
+
+  def postprocess_with_conf_level(
+      self,
+      forecasts: tuple[TsArray, TsArray, TsArray, TsArray, TsArray],
+      conf_level: float | None,
+  ) -> dict[str, list[dict[str, TsArray]]]:
+    """Translates the model output."""
+    lower_quantile = (1 - conf_level) / 2
+    higher_quantile = (1 + conf_level) / 2
+    _, quantile_forecast, _, _, horizon_lens = forecasts
+    response = self.postprocess(forecasts)
+
+    if quantile_forecast is None:
+      return response
+
+    # Note: The raw quantile forecast from TimesFM has the mean as the 0-th
+    # element. We strip it before passing to extend_quantiles.
+    quantile_forecast_np_array = np.array(quantile_forecast)
+    extended_forecasts = extend_quantiles(
+        quantile_forecast_np_array[..., 1:],
+        lower_quantile,
+        higher_quantile,
+        model_quantiles=self._model.model_p.quantiles,
+    )
+    lower_bounds = extended_forecasts["lower_bound"]
+    upper_bounds = extended_forecasts["upper_bound"]
+
+    for i, prediction in enumerate(response["predictions"]):
+      horizon = horizon_lens[i]
+      prediction["lower_bound"] = lower_bounds[i][:horizon].tolist()
+      prediction["upper_bound"] = upper_bounds[i][:horizon].tolist()
+
+    return response
+
+
+def extend_quantiles(
+    quantile_forecast: np.ndarray,
+    lower_quantile: float,
+    higher_quantile: float,
+    model_quantiles: list[float],
+) -> dict[str, np.ndarray]:
+  """Extends the quantile forecast to the lower and upper bounds.
+
+  Args:
+    quantile_forecast: The quantile forecast from TimesFM.
+    lower_quantile: The lower quantile to extend to.
+    higher_quantile: The higher quantile to extend to.
+    model_quantiles: The quantiles used by the model.
+
+  Returns:
+    A dictionary containing the lower and upper bounds.
+  """
+  if quantile_forecast.shape[2] != len(model_quantiles):
+    raise ValueError(
+        "Number of model quantiles should match the last dimension of the"
+        " quantile forecast. If you are using the raw TimesFM quantile forecast"
+        "output, you likely need to strip the 0-index which is the mean."
+    )
+
+  idx_median = model_quantiles.index(0.5)
+  idx_low_q = np.argmin(model_quantiles)
+  low_q = model_quantiles[idx_low_q]
+
+  if not (low_q < 0.5):
+    raise ValueError(
+        f"The lowest quantile {low_q=} provided in the forecast must be less"
+        " than 0.5."
+    )
+  idx_high_q = np.argmax(model_quantiles)
+  high_q = model_quantiles[idx_high_q]
+
+  if not (high_q > 0.5):
+    raise ValueError(
+        f"The highest quantile {high_q=} provided in the forecast must be"
+        " greater than 0.5."
+    )
+
+  positive_sigma = np.maximum(
+      0, quantile_forecast[..., idx_high_q] - quantile_forecast[..., idx_median]
+  ) / st.norm.ppf(high_q)
+  negative_sigma = np.minimum(
+      0, quantile_forecast[..., idx_low_q] - quantile_forecast[..., idx_median]
+  ) / st.norm.ppf(low_q)
+
+  lower_bound = quantile_forecast[
+      ..., idx_median
+  ] + negative_sigma * st.norm.ppf(lower_quantile)
+  upper_bound = quantile_forecast[
+      ..., idx_median
+  ] + positive_sigma * st.norm.ppf(higher_quantile)
+
+  return {"lower_bound": lower_bound, "upper_bound": upper_bound}
