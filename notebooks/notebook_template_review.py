@@ -1203,13 +1203,13 @@ def add_index(path: str,
         print('        </td>')
         print('        <td>')
         if colab_link:
-            print(f'            <a href="{colab_link}" target="_blank" track-type="notebookTutorial" track-name="colabLink">Colab</a><br/>\n')
+            print(f'            <a href="{colab_link}" target="_blank" track-type="notebookTutorial" track-name="colabLink"><img src="/vertex-ai/images/colab-logo-32px.png" alt="Colab logo" width="24" height="24" style="vertical-align: middle; margin-right: 5px;" /> Colab</a><br/>\n')
         if colab_enterprise_link:
-            print(f'            <a href="{colab_enterprise_link}" target="_blank" track-type="notebookTutorial" track-name="colabEnterpriseLink">Colab Enterprise</a><br/>\n')
+            print(f'            <a href="{colab_enterprise_link}" target="_blank" track-type="notebookTutorial" track-name="colabEnterpriseLink"><img src="/vertex-ai/images/colab-enterprise-logo-32px.png" alt="Colab Enterprise logo" width="24" height="24" style="vertical-align: middle; margin-right: 5px;" /> Colab Enterprise</a><br/>\n')
         if git_link:
-            print(f'            <a href="{git_link}" target="_blank" track-type="notebookTutorial" track-name="gitHubLink">GitHub</a><br/>\n')
+            print(f'            <a href="{git_link}" target="_blank" track-type="notebookTutorial" track-name="gitHubLink"><img src="/vertex-ai/images/github-logo-32px.png" alt="GitHub logo" width="24" height="24" style="vertical-align: middle; margin-right: 5px;" /> GitHub</a><br/>\n')
         if workbench_link:
-            print(f'            <a href="{workbench_link}" target="_blank" track-type="notebookTutorial" track-name="workbenchLink">Vertex AI Workbench</a><br/>\n')
+            print(f'            <a href="{workbench_link}" target="_blank" track-type="notebookTutorial" track-name="workbenchLink"><img src="/vertex-ai/images/vertex-ai-workbench-logo-32px.png" alt="Vertex AI Workbench logo" width="24" height="24" style="vertical-align: middle; margin-right: 5px;" /> Vertex AI Workbench</a><br/>\n')
         print('        </td>')
         print('    </tr>\n')
     elif args.repo:
@@ -1381,7 +1381,7 @@ if args.web:
     print('        <tr>')
     print('            <th width="180px">Services</th>')
     print('            <th>Description</th>')
-    print('            <th width="80px">Open in</th>')
+    print('            <th style="width: 180px;">Open in</th>')
     print('        </tr>')
     print('    </thead>')
     print('    <tbody class="list">')

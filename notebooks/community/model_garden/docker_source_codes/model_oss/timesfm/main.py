@@ -4,11 +4,13 @@ import json
 import os
 import flask
 import predictor
+from predictor import PredictionError
 
 # Create the flask app.
 app = flask.Flask(__name__)
 _OK_STATUS = 200
 _INTERNAL_ERROR_STATUS = 500
+_BAD_REQUEST_STATUS = 400
 _HOST = '0.0.0.0'
 
 # Define the predictor and load the checkpoints.
@@ -32,10 +34,29 @@ def predict() -> flask.Response:
     body = flask.request.get_json(silent=True, force=True)
     preprocessed_inputs = predictor.preprocess(body)
     outputs = predictor.predict(preprocessed_inputs)
-    postprocessed_outputs = predictor.postprocess(outputs)
+    conf_level = preprocessed_inputs.get('conf_level')
+
+    if conf_level is not None:
+      postprocessed_outputs = predictor.postprocess_with_conf_level(
+          outputs, preprocessed_inputs['conf_level']
+      )
+    else:
+      postprocessed_outputs = predictor.postprocess(outputs)
     return flask.Response(
         json.dumps(postprocessed_outputs),
         status=_OK_STATUS,
+        mimetype='application/json',
+    )
+  except PredictionError as e:
+    return flask.Response(
+        json.dumps({'error': str(e)}),
+        status=e.status_code,
+        mimetype='application/json',
+    )
+  except ValueError as e:
+    return flask.Response(
+        json.dumps({'error': str(e)}),
+        status=_BAD_REQUEST_STATUS,
         mimetype='application/json',
     )
   except Exception as e:  # pylint: disable=broad-exception-caught
