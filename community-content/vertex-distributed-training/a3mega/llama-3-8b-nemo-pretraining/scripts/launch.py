@@ -61,8 +61,8 @@ def launch_job(
         accelerator_type=gpu_type,
         accelerator_count=num_gpus_per_node,
         boot_disk_size_gb=1000,
-        # restart_job_on_worker_restart=True,
-        restart_job_on_worker_restart=False,
+        restart_job_on_worker_restart=True,
+        #restart_job_on_worker_restart=False,
     )
 
     if strategy == "spot":
@@ -132,7 +132,7 @@ def main(argv: Sequence[str]) -> None:
     # Training command and args
     entrypoint_cmd = ["python3", "vdt/run.py"]
 
-    dataset_bucket = f"gs://{config["dataset_bucket"]}"
+    dataset_bucket = f"gs://{config['dataset_bucket']}"
 
     trainer_args = [
         f"--train_data_gcs={dataset_bucket}",
