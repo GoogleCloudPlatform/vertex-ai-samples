@@ -105,7 +105,7 @@ def main(argv: Sequence[str]) -> None:
     machine_type = config["machine_type"]
     num_gpus_per_node = int(config["gpus_per_node"])
     gpu_type = config["gpu_type"]
-    reservation_name = config["reservation_name"]
+    reservation_name = config.get("reservation_name")
     reservation_full_name = (
         f"projects/{project_id}/zones/{zone}/reservations/{reservation_name}"
         if "reservation_name" in config

@@ -89,7 +89,7 @@ model:
   ffn_hidden_size: 14336  # 8b: 14336 | 70b: 28672 | 405b: 53248
   num_attention_heads: 32  # 8b: 32 | 70b: 64 | 405b: 128
   num_query_groups: 8  # Number of query groups for group query attention. If None, normal attention is used. 8b: 8 | 70b: 8 | 405b: 16
-  init_method_std: 0.01  # Standard deviation of the zero mean normal distribution used for weight initialization.')  8b: 0.01 | 70b: 0.008944 | 405b: 0.02
+  init_method_std: 0.01  # Standard deviation of the zero mean normal distribution used for weight initialization.  8b: 0.01 | 70b: 0.008944 | 405b: 0.02
   use_scaled_init_method: true  # use scaled residuals initialization
   hidden_dropout: 0.0  # Dropout probability for hidden state transformer.
   attention_dropout: 0.0  # Dropout probability for attention
