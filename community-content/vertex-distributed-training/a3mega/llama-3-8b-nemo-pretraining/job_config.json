@@ -1,0 +1,16 @@
+{
+  "project_id": "<your_project_id>",
+  "region": "us-central1",
+  "zone": "us-central1-c",
+  "bucket": "<your_bucket",
+  "dataset_bucket": "github-repo/data/third-party/enwiki-latest-pages-articles",
+  "image_uri": "<your_image_uri>",
+  "strategy": "spot",
+  "nodes": "2",
+  "machine_type": "a3-megagpu-8g",
+  "gpu_type": "NVIDIA_H100_MEGA_80GB",
+  "gpus_per_node": "8",
+  "recipe_name": "llama3_1_8b_pretrain_a3mega",
+  "job_prefix": "vertex-ai",
+  "reservation_name": ""
+}

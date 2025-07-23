@@ -1,0 +1,24 @@
+diff --git a/examples/nlp/language_modeling/tuning/megatron_gpt_finetuning.py b/examples/nlp/language_modeling/tuning/megatron_gpt_finetuning.py
+index bfe8ea359..dfeaf93b5 100644
+--- a/examples/nlp/language_modeling/tuning/megatron_gpt_finetuning.py
++++ b/examples/nlp/language_modeling/tuning/megatron_gpt_finetuning.py
+@@ -13,6 +13,8 @@
+ # limitations under the License.
+
+ import torch.multiprocessing as mp
++import torch.distributed as dist
++
+ from omegaconf.omegaconf import OmegaConf
+
+ from nemo.collections.nlp.models.language_modeling.megatron_gpt_sft_model import MegatronGPTSFTModel
+@@ -76,6 +78,10 @@ def main(cfg) -> None:
+
+     trainer.fit(model)
+
++    if dist.is_available() and dist.is_initialized():
++        dist.barrier()
++        dist.destroy_process_group()
++
+
+ if __name__ == '__main__':
+     main()
