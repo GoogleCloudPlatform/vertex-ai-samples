@@ -330,7 +330,13 @@ def should_add_pad_token(model_id: str) -> bool:
   Returns:
     True if the model requires adding a special pad token, False otherwise.
   """
-  return any(s.lower() in model_id.lower() for s in _MODELS_REQUIRING_PAD_TOKEN)
+  model_config = transformers.AutoConfig.from_pretrained(model_id)
+  if model_config.model_type is None:
+    return False
+  return any(
+      s.lower() in model_config.model_type.lower()
+      for s in _MODELS_REQUIRING_PAD_TOKEN
+  )
 
 
 def should_add_eos_token(model_id: str) -> bool:
