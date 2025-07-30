@@ -24,19 +24,19 @@ git clone https://github.com/GoogleCloudPlatform/vertex-ai-samples.git
 Run the following command to build vLLM container image TPU. Replace `vertexai-vllm-tpu` with actual image tag, which could be something like `us-central1-docker.pkg.dev/my-gcp-project/my-docker-repo/vllm-gcp-tpu`.
 
 ```
-cd vertex-ai-samples/notebooks/official/model_serving/docker && docker build . --file Dockerfile.tpu --tag vertexai-vllm-tpu
+cd vertex-ai-samples/notebooks/official/prediction/vertexai_serving_vllm/docker && docker build . --file Dockerfile.tpu --tag vertexai-vllm-tpu
 ```
 
 ## GPU
 Run the following command to build vLLM container image for GPU. Replace `vertexai-vllm-gpu` with actual image tag, which could be something like `us-central1-docker.pkg.dev/my-gcp-project/my-docker-repo/vllm-gcp-gpu`.
 
 ```
-cd vertex-ai-samples/notebooks/official/model_serving/docker && docker build . --file Dockerfile.gpu --tag vertexai-vllm-gpu
+cd vertex-ai-samples/notebooks/official/prediction/vertexai_serving_vllm/docker && docker build . --file Dockerfile.gpu --tag vertexai-vllm-gpu
 ```
 
 ## CPU
 Run the following command to build vLLM container image for CPU. Replace `vertexai-vllm-cpu` with actual image tag, which could be something like `us-central1-docker.pkg.dev/my-gcp-project/my-docker-repo/vllm-gcp-cpu`.
 
 ```
-cd vertex-ai-samples/notebooks/official/model_serving/docker && docker build . --file Dockerfile.cpu --tag vertexai-vllm-cpu
+cd vertex-ai-samples/notebooks/official/prediction/vertexai_serving_vllm/docker && docker build . --file Dockerfile.cpu --tag vertexai-vllm-cpu
 ```

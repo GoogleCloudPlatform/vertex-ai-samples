@@ -65,8 +65,8 @@
 /generative_ai/nvidia_nim_vertexai.ipynb @sujituk
 /generative_ai/cambai_intro.ipynb @arnavmehta7
 /generative_ai/qodo_intro.ipynb @talshef
-/model_serving/vertexai_serving_vllm_cpu_llama3_2_3B.ipynb @ravi-dalal
-/model_serving/vertexai_serving_vllm_gpu_llama3_2_3B.ipynb @ravi-dalal
-/model_serving/vertexai_serving_vllm_tpu_llama3_2_3B.ipynb @ravi-dalal
-/model_serving/vertexai_serving_vllm_tpu_gcs_llama3_2_3B.ipynb @ravi-dalal
+/prediction/vertexai_serving_vllm/vertexai_serving_vllm_cpu_llama3_2_3B.ipynb @ravi-dalal
+/prediction/vertexai_serving_vllm/vertexai_serving_vllm_gpu_llama3_2_3B.ipynb @ravi-dalal
+/prediction/vertexai_serving_vllm/vertexai_serving_vllm_tpu_llama3_2_3B.ipynb @ravi-dalal
+/prediction/vertexai_serving_vllm/vertexai_serving_vllm_tpu_gcs_llama3_2_3B.ipynb @ravi-dalal
 /generative_ai/csm_intro.ipynb @elaidlaw
