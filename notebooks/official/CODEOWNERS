@@ -69,3 +69,4 @@
 /model_serving/vertexai_serving_vllm_gpu_llama3_2_3B.ipynb @ravi-dalal
 /model_serving/vertexai_serving_vllm_tpu_llama3_2_3B.ipynb @ravi-dalal
 /model_serving/vertexai_serving_vllm_tpu_gcs_llama3_2_3B.ipynb @ravi-dalal
+/generative_ai/csm_intro.ipynb @elaidlaw
