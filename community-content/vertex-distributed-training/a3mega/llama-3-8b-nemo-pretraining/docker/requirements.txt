@@ -2,7 +2,7 @@ dllogger@git+https://github.com/NVIDIA/dllogger@v1.0.0
 
 # Fixing these libraries versions to avoid conflicting or broken packages.
 immutabledict==4.2.1
-protobuf==3.20.3
+protobuf==4.25.8
 opencv-python-headless==4.11.0.86
 docutils==0.16
 urllib3==2.0.7
