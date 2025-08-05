@@ -1,26 +1,14 @@
-FROM nvcr.io/nvidia/pytorch:25.02-py3
-
-# Install minimal dependencies and uv
-RUN apt-get update && apt-get -y upgrade \
-    && apt-get install -y --no-install-recommends apt-utils git \
-    && apt-get autoremove -y
+FROM vllm/vllm-openai
 
 # Install gcloud SDK
+RUN apt-get update
 RUN apt-get install apt-transport-https ca-certificates gnupg curl -y
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg && apt-get update -y && apt-get install google-cloud-cli -y
 
 WORKDIR /workspace
 
-# Download vLLM source code and apply Vertex AI Patch
-RUN git clone https://github.com/vllm-project/vllm.git
+# Copy entrypoint.sh to container
 COPY ./entrypoint.sh /workspace/vllm/vertexai/entrypoint.sh
-COPY ./vertexai.patch /workspace/vllm/vertexai/vertexai.patch
 RUN chmod +x /workspace/vllm/vertexai/entrypoint.sh
-
-WORKDIR /workspace/vllm
-RUN git apply /workspace/vllm/vertexai/vertexai.patch
-
-# Build from source
-RUN VLLM_USE_PRECOMPILED=1 python3 -m pip install --editable .
 
 ENTRYPOINT ["/workspace/vllm/vertexai/entrypoint.sh"]

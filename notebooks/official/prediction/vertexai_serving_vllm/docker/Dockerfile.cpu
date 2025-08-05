@@ -1,46 +1,15 @@
-FROM ubuntu:22.04
+FROM vllm_cpu_base
 
 ENV DEBIAN_FRONTEND=noninteractive
-ARG PYTHON_VERSION=3.12
-
-# Install minimal dependencies and uv
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates ccache curl git \
-        gcc-12 g++-12 libtcmalloc-minimal4 libnuma-dev ffmpeg libsm6 libxext6 libgl1 \
-    && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 10 --slave /usr/bin/g++ g++ /usr/bin/g++-12 \
-    && curl -LsSf https://astral.sh/uv/install.sh | sh
-
-ENV CCACHE_DIR=/root/.cache/ccache
-ENV CMAKE_CXX_COMPILER_LAUNCHER=ccache
-
-ENV PATH="/root/.local/bin:$PATH"
-ENV VIRTUAL_ENV="/opt/venv"
-ENV UV_PYTHON_INSTALL_DIR=/opt/uv/python
-RUN uv venv --python ${PYTHON_VERSION} --seed ${VIRTUAL_ENV}
-ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-ENV UV_HTTP_TIMEOUT=500
 
 # Install gcloud SDK
+RUN apt-get update
 RUN apt-get install apt-transport-https gnupg -y
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg && apt-get update -y && apt-get install google-cloud-cli -y
 
 WORKDIR /workspace
 
-# Download vLLM source code and apply Vertex AI Patch
-RUN git clone https://github.com/vllm-project/vllm.git
 COPY ./entrypoint.sh /workspace/vllm/vertexai/entrypoint.sh
-COPY ./vertexai.patch /workspace/vllm/vertexai/vertexai.patch
 RUN chmod +x /workspace/vllm/vertexai/entrypoint.sh
-
-WORKDIR /workspace/vllm
-RUN git apply /workspace/vllm/vertexai/vertexai.patch
-RUN pip install --upgrade pip \
-    && pip install "cmake>=3.26.1" wheel packaging ninja "setuptools-scm>=8" numpy \
-    && pip install -v -r requirements/cpu.txt --extra-index-url https://download.pytorch.org/whl/cpu
-
-# Install vLLM
-RUN VLLM_TARGET_DEVICE="cpu" python setup.py install
-
-WORKDIR /workspace
 
 ENTRYPOINT ["/workspace/vllm/vertexai/entrypoint.sh"]

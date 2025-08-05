@@ -1,35 +1,14 @@
-ARG NIGHTLY_DATE="20250124"
-ARG BASE_IMAGE="us-central1-docker.pkg.dev/tpu-pytorch-releases/docker/xla:nightly_3.10_tpuvm_$NIGHTLY_DATE"
-
-FROM $BASE_IMAGE
-WORKDIR /workspace/vllm
-
-# Install some basic utilities
-RUN apt-get update && apt-get install -y \
-    git apt-transport-https gnupg ca-certificates curl\
-    ffmpeg libsm6 libxext6 libgl1
+FROM vllm/vllm-tpu:nightly
 
 # Install gcloud SDK
+RUN apt-get update
+RUN apt-get install -y git apt-transport-https gnupg ca-certificates curl
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg && apt-get update -y && apt-get install google-cloud-cli -y
 
 WORKDIR /workspace
 
-# Download vLLM source code and apply Vertex AI Patch
-RUN git clone https://github.com/vllm-project/vllm.git
+# Copy entrypoint.sh to the container
 COPY ./entrypoint.sh /workspace/vllm/vertexai/entrypoint.sh
-COPY ./vertexai.patch /workspace/vllm/vertexai/vertexai.patch
 RUN chmod +x /workspace/vllm/vertexai/entrypoint.sh
-
-WORKDIR /workspace/vllm
-RUN git apply /workspace/vllm/vertexai/vertexai.patch
-
-# Remove existing versions of dependencies
-RUN pip uninstall -y torch torch_xla torchvision
-
-# Build vLLM from source
-ENV VLLM_TARGET_DEVICE="tpu"
-RUN python3 -m pip install \
-        -r requirements/tpu.txt
-RUN python3 -m pip install -e .
 
 ENTRYPOINT ["/workspace/vllm/vertexai/entrypoint.sh"]
