@@ -38,7 +38,7 @@ pydantic==2.11.4
 pydantic_core==2.33.2
 python-dateutil==2.9.0.post0
 pytz==2025.2
-requests==2.32.3
+requests==2.32.4
 rsa==4.9.1
 shapely==2.1.0
 six==1.17.0
