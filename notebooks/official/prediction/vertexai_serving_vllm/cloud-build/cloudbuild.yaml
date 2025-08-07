@@ -8,7 +8,7 @@ steps:
       device_type_param=${_DEVICE_TYPE}
       device_type=${device_type_param,,}
       if [[ $device_type == "cpu" ]]; then
-          echo "Quietly building open source vLLM CPU container image..."
+        echo "Quietly building open source vLLM CPU container image"
         git clone https://github.com/vllm-project/vllm.git
         cd vllm && DOCKER_BUILDKIT=1 docker build -t vllm-cpu-base -f docker/Dockerfile.cpu . -q
         cd ..
@@ -21,7 +21,7 @@ steps:
         base_image='vllm/vllm-tpu:nightly'
         image_name='vllm-tpu'
       fi
-      echo "Quietly building container image for: $device_type..."
+      echo "Quietly building container image for: $device_type"
       docker build -t $LOCATION-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/$image_name --build-arg BASE_IMAGE=$base_image . -q
       docker push $LOCATION-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/$image_name
 substitutions:
