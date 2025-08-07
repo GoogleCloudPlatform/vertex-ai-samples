@@ -472,13 +472,13 @@ def copy_model_artifacts(
   ])
 
 
-def get_quota(project_id: str, region: str, resource_id: str) -> int:
+def get_quota(project_id: str, region: str, quota_id: str) -> int:
   """Returns the quota for a resource in a region.
 
   Args:
     project_id: The project id.
     region: The region.
-    resource_id: The resource id.
+    quota_id: The quota id.
 
   Returns:
     The quota for the resource in the region. Returns -1 if can not figure out
@@ -490,57 +490,44 @@ def get_quota(project_id: str, region: str, resource_id: str) -> int:
   service_endpoint = "aiplatform.googleapis.com"
 
   command = (
-      "gcloud alpha services quota list"
-      f" --service={service_endpoint} --consumer=projects/{project_id}"
-      f" --filter='{service_endpoint}/{resource_id}' --format=json"
+      "gcloud beta quotas info describe"
+      f" {quota_id} --service={service_endpoint} --project={project_id} --format=json"
   )
-  process = subprocess.run(
-      command, shell=True, capture_output=True, text=True, check=True
-  )
-  if process.returncode == 0:
-    quota_data = json.loads(process.stdout)
-  else:
-    raise RuntimeError(f"Error fetching quota data: {process.stderr}")
+  try:
+    process = subprocess.run(
+        command, shell=True, capture_output=True, text=True, check=True
+    )
+  except subprocess.CalledProcessError as e:
+    raise RuntimeError(f"Error fetching quota data: {e.stderr}") from e
 
-  if not quota_data or "consumerQuotaLimits" not in quota_data[0]:
-    return -1
-  if (
-      not quota_data[0]["consumerQuotaLimits"]
-      or "quotaBuckets" not in quota_data[0]["consumerQuotaLimits"][0]
-  ):
-    return -1
-  all_regions_data = quota_data[0]["consumerQuotaLimits"][0]["quotaBuckets"]
+  quota_data = json.loads(process.stdout)
 
-  # If the quota data does not have dimensions, it is global quota. However,
-  # global quota may be overridden by regional quota. So we need to check the
-  # global quota first.
-  global_quota = -1
-  if (
-      all_regions_data
-      and "dimensions" not in all_regions_data[0]
-      and "effectiveLimit" in all_regions_data[0]
-  ):
-    global_quota = int(all_regions_data[0]["effectiveLimit"])
+  if not quota_data or "dimensionsInfos" not in quota_data:
+    return -1
+
+  all_regions_data = quota_data["dimensionsInfos"]
   for region_data in all_regions_data:
-    if (
-        region_data.get("dimensions")
-        and region_data["dimensions"]["region"] == region
-    ):
-      if "effectiveLimit" in region_data:
-        return int(region_data["effectiveLimit"])
-      else:
-        return 0
-  return global_quota
+    applicable_locations = region_data.get("applicableLocations")
+    if not applicable_locations or region not in applicable_locations:
+      continue
+
+    details = region_data.get("details")
+    if not details or "value" not in details:
+      continue
+
+    return int(details["value"])
+
+  return 0
 
 
-def get_resource_id(
+def get_quota_id(
     accelerator_type: str,
     is_for_training: bool,
     is_spot: bool = False,
     is_restricted_image: bool = False,
     is_dynamic_workload_scheduler: bool = False,
 ) -> str:
-  """Returns the resource id for a given accelerator type and the use case.
+  """Returns the quota id for a given accelerator type and the use case.
 
   Args:
     accelerator_type: The accelerator type.
@@ -552,40 +539,47 @@ def get_resource_id(
       Workload Scheduler.
 
   Returns:
-    The resource id.
+    The quota id.
   """
-  accelerator_suffix_map = {
-      "NVIDIA_TESLA_V100": "nvidia_v100_gpus",
-      "NVIDIA_TESLA_P100": "nvidia_p100_gpus",
-      "NVIDIA_L4": "nvidia_l4_gpus",
-      "NVIDIA_TESLA_A100": "nvidia_a100_gpus",
-      "NVIDIA_A100_80GB": "nvidia_a100_80gb_gpus",
-      "NVIDIA_H100_80GB": "nvidia_h100_gpus",
-      "NVIDIA_H100_MEGA_80GB": "nvidia_h100_mega_gpus",
-      "NVIDIA_H200_141GB": "nvidia_h200_gpus",
-      "NVIDIA_TESLA_T4": "nvidia_t4_gpus",
-      "TPU_V6e": "tpu_v6e",
-      "TPU_V5e": "tpu_v5e",
-      "TPU_V3": "tpu_v3",
+  accelerator_map = {
+      "NVIDIA_TESLA_V100": "V100GPUs",
+      "NVIDIA_TESLA_P100": "P100GPUs",
+      "NVIDIA_L4": "L4GPUs",
+      "NVIDIA_TESLA_A100": "A100GPUs",
+      "NVIDIA_A100_80GB": "A10080GBGPUs",
+      "NVIDIA_H100_80GB": "H100GPUs",
+      "NVIDIA_H100_MEGA_80GB": "H100MEGAGPUs",
+      "NVIDIA_H200_141GB": "H200GPUs",
+      "NVIDIA_GB200": "B200GPUs",
+      "NVIDIA_TESLA_T4": "T4GPUs",
+      "TPU_V6e": "V6ETPU",
+      "TPU_V5e": "V5ETPU",
+      "TPU_V3": "V3TPUs",
   }
   default_training_accelerator_map = {
-      key: f"custom_model_training_{accelerator_suffix_map[key]}"
-      for key in accelerator_suffix_map
+      key: f"CustomModelTraining{accelerator_map[key]}PerProjectPerRegion"
+      for key in accelerator_map
   }
   dws_training_accelerator_map = {
-      key: f"custom_model_training_preemptible_{accelerator_suffix_map[key]}"
-      for key in accelerator_suffix_map
+      key: (
+          f"CustomModelTrainingPreemptible{accelerator_map[key]}PerProjectPerRegion"
+      )
+      for key in accelerator_map
   }
   restricted_image_training_accelerator_map = {
-      "NVIDIA_A100_80GB": "restricted_image_training_nvidia_a100_80gb_gpus",
+      "NVIDIA_A100_80GB": (
+          "RestrictedImageTrainingA10080GBGPUsPerProjectPerRegion"
+      ),
   }
   spot_serving_accelerator_map = {
-      key: f"custom_model_serving_preemptible_{accelerator_suffix_map[key]}"
-      for key in accelerator_suffix_map
+      key: (
+          f"CustomModelServingPreemptible{accelerator_map[key]}PerProjectPerRegion"
+      )
+      for key in accelerator_map
   }
   serving_accelerator_map = {
-      key: f"custom_model_serving_{accelerator_suffix_map[key]}"
-      for key in accelerator_suffix_map
+      key: f"CustomModelServing{accelerator_map[key]}PerProjectPerRegion"
+      for key in accelerator_map
   }
 
   if is_for_training:
@@ -646,14 +640,14 @@ def check_quota(
     is_dynamic_workload_scheduler: Whether the resource is used with Dynamic
       Workload Scheduler.
   """
-  resource_id = get_resource_id(
+  quota_id = get_quota_id(
       accelerator_type,
       is_for_training=is_for_training,
       is_spot=is_spot,
       is_restricted_image=is_restricted_image,
       is_dynamic_workload_scheduler=is_dynamic_workload_scheduler,
   )
-  quota = get_quota(project_id, region, resource_id)
+  quota = get_quota(project_id, region, quota_id)
   quota_request_instruction = (
       "Either use "
       "a different region or request additional quota. Follow "
@@ -664,12 +658,12 @@ def check_quota(
   )
   if quota == -1:
     raise ValueError(
-        f"Quota not found for: {resource_id} in {region}."
+        f"Quota not found for: {quota_id} in {region}."
         f" {quota_request_instruction}"
     )
   if quota < accelerator_count:
     raise ValueError(
-        f"Quota not enough for {resource_id} in {region}: {quota} <"
+        f"Quota not enough for {quota_id} in {region}: {quota} <"
         f" {accelerator_count}. {quota_request_instruction}"
     )
 
