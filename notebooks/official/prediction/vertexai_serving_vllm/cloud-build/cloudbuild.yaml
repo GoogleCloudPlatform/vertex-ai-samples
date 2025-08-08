@@ -18,35 +18,20 @@ steps:
   script: |
       #!/usr/bin/env bash
       set -euo pipefail
-      base_image=''
-      image_name=''
       device_type_param=${_DEVICE_TYPE}
       device_type=${device_type_param,,}
-      case $device_type in
-        "cpu")
-            echo "Quietly building open source vLLM CPU container image"
-            git clone https://github.com/vllm-project/vllm.git
-            cd vllm && DOCKER_BUILDKIT=1 docker build -t vllm-cpu-base -f docker/Dockerfile.cpu . -q
-            cd ..
-            base_image='vllm-cpu-base'
-            image_name='vllm-cpu'
-            ;;
-        "gpu")
-            base_image='vllm/vllm-openai'
-            image_name='vllm-gpu'
-            ;;
-        "tpu")
-            base_image='vllm/vllm-tpu:nightly'
-            image_name='vllm-tpu'
-            ;;
-        *)
-            echo "Error: Not a valid device type." >&2
-            exit 1
-            ;;
-      esac
+      base_image=${_BASE_IMAGE}
+      image_name='vllm-${_DEVICE_TYPE}'
+      if [[ $device_type == "cpu" ]]; then
+        echo "Quietly building open source vLLM CPU container image"
+        git clone https://github.com/vllm-project/vllm.git
+        cd vllm && DOCKER_BUILDKIT=1 docker build -t $base_image -f docker/Dockerfile.cpu . -q
+        cd ..
+      fi
       echo "Quietly building container image for: $device_type"
       docker build -t $LOCATION-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/$image_name --build-arg BASE_IMAGE=$base_image . -q
       docker push $LOCATION-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/$image_name
 substitutions:
-    _DEVICE_TYPE: cpu
+    _DEVICE_TYPE: gpu
+    _BASE_IMAGE: vllm/vllm-openai
     _REPOSITORY: my-docker-repo
