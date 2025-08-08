@@ -3,24 +3,32 @@ steps:
   automapSubstitutions: true
   script: |
       #!/usr/bin/env bash
+      set -euo pipefail
       base_image=''
       image_name=''
       device_type_param=${_DEVICE_TYPE}
       device_type=${device_type_param,,}
-      if [[ $device_type == "cpu" ]]; then
-        echo "Quietly building open source vLLM CPU container image"
-        git clone https://github.com/vllm-project/vllm.git
-        cd vllm && DOCKER_BUILDKIT=1 docker build -t vllm-cpu-base -f docker/Dockerfile.cpu . -q
-        cd ..
-        base_image='vllm-cpu-base'
-        image_name='vllm-cpu'
-      elif [[ $device_type == "gpu" ]]; then
-        base_image='vllm/vllm-openai'
-        image_name='vllm-gpu'
-      elif [[ $device_type == "tpu" ]]; then
-        base_image='vllm/vllm-tpu:nightly'
-        image_name='vllm-tpu'
-      fi
+      case $device_type in
+        "cpu")
+            echo "Quietly building open source vLLM CPU container image"
+            git clone https://github.com/vllm-project/vllm.git
+            cd vllm && DOCKER_BUILDKIT=1 docker build -t vllm-cpu-base -f docker/Dockerfile.cpu . -q
+            cd ..
+            base_image='vllm-cpu-base'
+            image_name='vllm-cpu'
+            ;;
+        "gpu")
+            base_image='vllm/vllm-openai'
+            image_name='vllm-gpu'
+            ;;
+        "tpu")
+            base_image='vllm/vllm-tpu:nightly'
+            image_name='vllm-tpu'
+            ;;
+        *)
+            exit 0
+            ;;
+      esac
       echo "Quietly building container image for: $device_type"
       docker build -t $LOCATION-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/$image_name --build-arg BASE_IMAGE=$base_image . -q
       docker push $LOCATION-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/$image_name

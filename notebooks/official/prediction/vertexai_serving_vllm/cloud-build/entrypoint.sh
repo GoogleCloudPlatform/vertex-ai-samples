@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -e
+set -euo pipefail
 
 readonly LOCAL_MODEL_DIR=${LOCAL_MODEL_DIR:-"/tmp/model_dir"}
 
@@ -25,7 +25,7 @@ download_model_from_gcs() {
     if gcloud storage cp -r "$gcs_uri/*" "$LOCAL_MODEL_DIR"; then
       echo "Model downloaded successfully to ${LOCAL_MODEL_DIR}."
     else
-      echo "Failed to download model from Cloud Storage: $gcs_uri."
+      echo "Failed to download model from Cloud Storage: $gcs_uri." >&2
       exit 1
     fi
 }
@@ -36,7 +36,8 @@ model_arg="--model="
 gcs_protocol="gs://"
 for a in "$@"; do
     if [[ $a == $model_arg* ]]; then
-        model_path=$(cut -d'=' -f2 <<<"$a")
+        model_path=${a#*=}
+        echo $model_path
         if [[ $model_path == $gcs_protocol* ]]; then
             download_model_from_gcs $model_path
             updated_args+=("--model=${LOCAL_MODEL_DIR}")
