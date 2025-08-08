@@ -21,7 +21,7 @@ steps:
       device_type_param=${_DEVICE_TYPE}
       device_type=${device_type_param,,}
       base_image=${_BASE_IMAGE}
-      image_name='vllm-${_DEVICE_TYPE}'
+      image_name="vllm-${_DEVICE_TYPE}"
       if [[ $device_type == "cpu" ]]; then
         echo "Quietly building open source vLLM CPU container image"
         git clone https://github.com/vllm-project/vllm.git
