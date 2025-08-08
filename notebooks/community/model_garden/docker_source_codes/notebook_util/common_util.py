@@ -494,9 +494,12 @@ def get_quota(project_id: str, region: str, resource_id: str) -> int:
       f" --service={service_endpoint} --consumer=projects/{project_id}"
       f" --filter='{service_endpoint}/{resource_id}' --format=json"
   )
-  process = subprocess.run(
-      command, shell=True, capture_output=True, text=True, check=True
-  )
+  try:
+    process = subprocess.run(
+        command, shell=True, capture_output=True, text=True, check=True
+    )
+  except subprocess.CalledProcessError:
+    return -2
   if process.returncode == 0:
     quota_data = json.loads(process.stdout)
   else:
@@ -662,6 +665,12 @@ def check_quota(
       " to check quota in a region or request additional quota for "
       "your project."
   )
+  if quota == -2:
+    print(
+        "This is a no-op for now. Please check the quota manually to verify if"
+        " you have enough quota for your use case."
+    )
+    return
   if quota == -1:
     raise ValueError(
         f"Quota not found for: {resource_id} in {region}."
