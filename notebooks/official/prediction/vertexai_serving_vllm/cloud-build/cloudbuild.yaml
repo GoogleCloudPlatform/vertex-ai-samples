@@ -26,7 +26,8 @@ steps:
             image_name='vllm-tpu'
             ;;
         *)
-            exit 0
+            echo "Error: Not a valid device type." >&2
+            exit 1
             ;;
       esac
       echo "Quietly building container image for: $device_type"
