@@ -108,7 +108,7 @@ class VertexAIInstallProprocessor(Preprocessor):
         if "google-cloud-aiplatform" not in content:
             return content
         return (
-            f"gsutil cp {self.vertex_ai_wheel} google-cloud-aiplatform.whl\n" + 
+            f"gcloud storage cp {self.vertex_ai_wheel} google-cloud-aiplatform.whl\n" + 
             content.replace("google-cloud-aiplatform\n", "google-cloud-aiplatform.whl\n")
             .replace("google-cloud-aiplatform ", "google-cloud-aiplatform.whl ")
         )
