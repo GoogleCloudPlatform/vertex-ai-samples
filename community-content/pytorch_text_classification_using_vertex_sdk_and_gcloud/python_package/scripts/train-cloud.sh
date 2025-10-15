@@ -67,4 +67,4 @@ echo "After the job is completed successfully, model files will be saved at $JOB
 
 # # Verify the model was exported
 # echo "Verify the model was exported:"
-# gsutil ls ${JOB_DIR}/
+# gcloud storage ls ${JOB_DIR}/

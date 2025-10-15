@@ -57,7 +57,7 @@ def execute_notebook(
     print(f"Please debug the executed notebook by downloading the executed notebook:")
 
     print("Option 1. Using gsutil. Run the following command in your terminal.")
-    print(f'\tgsutil cp "{output_file_or_uri}" .')
+    print(f'\tgcloud storage cp "{output_file_or_uri}" .')
 
     print("Option 2. Using this link.")
     print(f"\thttps://storage.googleapis.com/{output_file_or_uri[5:]}")
