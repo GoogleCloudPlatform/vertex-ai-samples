@@ -56,7 +56,7 @@ def execute_notebook(
     print("\n=== DOWNLOAD EXECUTED NOTEBOOK ===\n")
     print(f"Please debug the executed notebook by downloading the executed notebook:")
 
-    print("Option 1. Using gsutil. Run the following command in your terminal.")
+    print("Option 1. Using gcloud storage. Run the following command in your terminal.")
     print(f'\tgcloud storage cp "{output_file_or_uri}" .')
 
     print("Option 2. Using this link.")
