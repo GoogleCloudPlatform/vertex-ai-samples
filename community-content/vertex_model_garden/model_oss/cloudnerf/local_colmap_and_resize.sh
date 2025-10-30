@@ -66,7 +66,7 @@ mkdir -p "$local_folder"
 mkdir -p "$output_folder"
 
 # Download the content from the GCS URI
-gsutil -m cp -r "$gcs_dataset_path"/* "$local_folder/"
+gcloud storage cp --recursive "$gcs_dataset_path"/* "$local_folder/"
 
 # Process files in the local folder
 for file in "$local_folder"/*; do
@@ -122,23 +122,23 @@ cp -r "$output_folder" "$images_folder"/images_2
 pushd "$images_folder"/images_2
 ls | xargs -P 8 -I {} mogrify -resize 50% {}
 popd
-gsutil -m cp -r "$images_folder"/images_2/*  "$gcs_experiment_path"/data/images_2
+gcloud storage cp --recursive "$images_folder"/images_2/*  "$gcs_experiment_path"/data/images_2
 
 cp -r "$output_folder" "$images_folder"/images_4
 pushd "$images_folder"/images_4
 ls | xargs -P 8 -I {} mogrify -resize 25% {}
 popd
-gsutil -m cp -r "$images_folder"/images_4/*  "$gcs_experiment_path"/data/images_4
+gcloud storage cp --recursive "$images_folder"/images_4/*  "$gcs_experiment_path"/data/images_4
 
 cp -r "$output_folder" "$images_folder"/images_8
 pushd "$images_folder"/images_8
 ls | xargs -P 8 -I {} mogrify -resize 12.5% {}
 popd
-gsutil -m cp "$images_folder"/images_8/*  "$gcs_experiment_path"/data/images_8
+gcloud storage cp "$images_folder"/images_8/*  "$gcs_experiment_path"/data/images_8
 
 # Copy images and sparse reconstruction files to gcs experiment folder.
-gsutil -m cp "$images_folder"/images/*  "$gcs_experiment_path"/data/images
-gsutil -m cp -r "$local_folder"/sparse  "$gcs_experiment_path"/data
-gsutil -m cp "$local_folder"/database.db  "$gcs_experiment_path"/data
+gcloud storage cp "$images_folder"/images/*  "$gcs_experiment_path"/data/images
+gcloud storage cp --recursive "$local_folder"/sparse  "$gcs_experiment_path"/data
+gcloud storage cp "$local_folder"/database.db  "$gcs_experiment_path"/data
 
 echo "Processing complete."
