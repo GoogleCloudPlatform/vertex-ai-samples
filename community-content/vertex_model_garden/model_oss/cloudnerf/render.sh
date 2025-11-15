@@ -99,14 +99,14 @@ create_dir_if_not_exists "$CHECKPOINTS_PATH"
 touch "$local_experiment_path/$exp_folder_name/log_render.txt"
 
 # Copy experiment from GCS bucket to local
-gsutil -m cp -r "${args[-gcs_experiment_path]}/data" "$local_experiment_path/$exp_folder_name" || exit 1
-gsutil -m cp -r "${args[-gcs_experiment_path]}/checkpoints/${training_job_name}/*" "$CHECKPOINTS_PATH" || exit 1
+gcloud storage cp --recursive "${args[-gcs_experiment_path]}/data" "$local_experiment_path/$exp_folder_name" || exit 1
+gcloud storage cp --recursive "${args[-gcs_experiment_path]}/checkpoints/${training_job_name}/*" "$CHECKPOINTS_PATH" || exit 1
 
 # Check and copy keyframes file.
 if [[ -n ${args[-gcs_keyframes_file]} ]]; then
   keyframes_file_basename=$(basename "${args[-gcs_keyframes_file]}")
   local_keyframes_file="$local_dataset_path/$keyframes_file_basename"
-  gsutil cp "${args[-gcs_keyframes_file]}" "$local_keyframes_file" || exit 1
+  gcloud storage cp "${args[-gcs_keyframes_file]}" "$local_keyframes_file" || exit 1
   echo "Local keyframe file: $local_keyframes_file"
   launch_rendering "$local_keyframes_file"
 else
@@ -114,4 +114,4 @@ else
 fi
 
 # Copy rendered data back to GCS.
-gsutil -m cp -r "$OUTPUT_RENDER_PATH" "${args[-gcs_experiment_path]}/render/${rendering_job_name}"
+gcloud storage cp --recursive "$OUTPUT_RENDER_PATH" "${args[-gcs_experiment_path]}/render/${rendering_job_name}"
