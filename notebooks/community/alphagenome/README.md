@@ -101,7 +101,7 @@ To utilize these models via this service:
 *   You must **Request Access** using your Google contact.
 *   Your application will be reviewed, and if approved, you will be **added to
     an allowlist**.
-*   Only allow listed users can access the API
+*   Only allowlisted users can access the API
 *   **Pricing information** will be shared directly with users upon approval
     and placement on the allowlist.
 
