@@ -1,11 +1,7 @@
 ![AlphaGenome header image](https://raw.githubusercontent.com/google-deepmind/alphagenome/refs/heads/main/docs/source/_static/header.png)
 
 # AlphaGenome
-[**Overview**](#overview) | 
-[**Use Cases**](#use-cases) |
-[**Documentation**](#documentation) |
-[**Pricing**](#pricing) |
-[**Quick start**](#quick-start)
+[**Overview**](#overview) | [**Use Cases**](#use-cases) | [**Documentation**](#documentation) | [**Pricing**](#pricing) | [**Quick start**](#quick-start)
 
 ## Overview
 **Disclaimer:** *Experimental*.
