@@ -110,5 +110,4 @@ To utilize these models via this service:
     and placement on the allowlist.
 
 ## Quick start
-The quickest way to get started with the AlphaGenome in Google Cloud Platform is to run [our example notebook](cloudai_alphagenome_vai_quickstart.ipynb) in
-[Google Colab](https://colab.research.google.com/). 
+The quickest way to get started with the AlphaGenome in Google Cloud Platform is to run [our example notebook](cloudai_alphagenome_vai_quickstart.ipynb) in [Google Colab](https://colab.research.google.com/).
