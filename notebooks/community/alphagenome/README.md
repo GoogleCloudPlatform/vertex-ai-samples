@@ -81,7 +81,7 @@ prediction benchmarks, including diverse variant effect prediction tasks.
 The Google Cloud API for AlphaGenome provides a way for Google Cloud customers
 to explore the AlphaGenome API for commercial use cases. This API is in private
 preview (Request Access above). Once allowlisted, customers can access the API
-directly or use the colab (link here).
+directly or use the [colab](cloudai_alphagenome_vai_quickstart.ipynb).
 
 ### Acknowledgements
 
