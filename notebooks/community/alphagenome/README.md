@@ -85,7 +85,7 @@ directly or use the [colab](cloudai_alphagenome_vai_quickstart.ipynb).
 
 ### Contact
 If you have any questions on using these models on Google Cloud please contact:
-[alphagenome-cloud-external@google.com](alphagenome-cloud-external@google.com) or join the community [Discourse](https://www.alphagenomecommunity.com/) for more generic questions on AlphaGenome.
+[alphagenome-cloud-external@google.com](mailto:alphagenome-cloud-external@google.com) or join the community [Discourse](https://www.alphagenomecommunity.com/) for more generic questions on AlphaGenome.
 
 ### Links
 
