@@ -92,7 +92,7 @@ If you have any questions on using these models on Google Cloud please contact:
 *   Read our [paper](https://doi.org/10.1101/2025.06.25.661532)
 *   Read our [blog post](https://deepmind.google/discover/blog/alphagenome-ai-for-better-understanding-the-genome)
 *   Join the [community](https://www.alphagenomecommunity.com/)
-*   Checkout the [AlphaGenome 101 Video](https://youtu.be/Xbvloe13nak)
+*   Check out the [AlphaGenome 101 Video](https://youtu.be/Xbvloe13nak)
 
 ## Pricing
 Access to AlphaGenome on Vertex AI is currently restricted.
