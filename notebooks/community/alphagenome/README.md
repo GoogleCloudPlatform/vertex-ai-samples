@@ -40,29 +40,13 @@ human and mouse cell types and tissues.
 ![Diagram showing an overview of the AlphaGenome model architecture and its inputs/outputs](https://www.alphagenomedocs.com/_images/model_overview.png)
 
 ## Use Cases
-*   **Predict outputs for a DNA sequence:** AlphaGenome is a model that makes
-    predictions from DNA sequences. AlphaGenome predicts multiple 'tracks' per
-    output type, covering a wide variety of tissues and cell-types.
+*   **Sequence-to-function predictions:** Predict multiple functional tracks (such as gene expression, splicing) from DNA sequences across a wide variety of tissues and cell types.
 
-*   **Open-vocabulary object retrieval:** AlphaGenome can make predictions for
-    a human reference genome sequence specified by a genomic interval.
-    For example, let's predict RNA-seq for tissue 'Right liver lobe' in a 1MB
-    region of Chromosome 19 around the gene CYP2B6, which encodes an enzyme
-    involved in drug metabolism, and is primarily expressed in the liver.
+*   **Variant effect scoring:** Assess the impact of genetic variants by comparing predictions for the reference and alternative alleles and summarising the differences between them.
 
-*   **Predict variant effects:** AlphaGenome can predict the effect of a
-    variant on a specific output type and tissue by making predictions for the
-    reference (REF) and alternative (ALT) allele sequences.
+*   **Identify functional regions:** Use in silico mutagenesis (ISM) to identify functionally important regions in the DNA sequence.
 
-*   **Scoring the effect of a genetic variant:** AlphaGenome can score the
-    effect of a genetic variant by making predictions for the REF and ALT
-    sequences and aggregating the track signal. To highlight which regions in a
-    DNA sequence are functionally important for a final variant prediction,
-    AlphaGenome can help you to perform an in silico mutagenesis (ISM) analysis
-    by scoring all possible single nucleotide variants in a specific interval.
-
-*   **Human and mouse predictions:** AlphaGenome can generate predictions for
-    both humans and mouse.
+*   **Human and mouse capability:** Generate predictions for both human and mouse genomes.
 
 ## Documentation
 This API provides access to AlphaGenome, Google DeepMind's unifying model for
