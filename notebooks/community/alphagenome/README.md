@@ -42,7 +42,7 @@ human and mouse cell types and tissues.
 ## Use Cases
 *   **Sequence-to-function predictions:** Predict multiple functional tracks (such as gene expression, splicing) from DNA sequences across a wide variety of tissues and cell types.
 
-*   **Variant effect scoring:** AAssess the impact of genetic variants by comparing predictions for the reference and alternative alleles and summarising the differences between them.
+*   **Variant effect scoring:** Assess the impact of genetic variants by comparing predictions for the reference and alternative alleles and summarising the differences between them.
 
 *   **Identify functional regions:** Use in silico mutagenesis (ISM) to identify functionally important regions in the DNA sequence.
 
