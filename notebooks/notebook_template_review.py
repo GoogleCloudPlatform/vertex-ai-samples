@@ -227,7 +227,7 @@ def parse_dir(directory: str) -> int:
             elif tag == 'bigquery_ml':
                 tag = 'BigQuery ML'
             elif tag == 'custom':
-                tag = 'Vertex AI Training'
+                tag = 'Vertex AI serverless training'
             elif tag == 'experiments':
                 tag = 'Vertex AI Experiments'
             elif tag == 'explainable_ai':
