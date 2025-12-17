@@ -29,7 +29,6 @@ implementation:
                 gcloud storage cp --recursive "$uri" "$output_path"
             else
                 mkdir -p "$output_path" # When source path is a directory, gsutil requires the destination to also be a directory
-                # Note: By default, gsutil rsync compares modification times and sizes to detect changes. It only uses checksums if modification times are unavailable or if the -c flag is specified. gcloud storage rsync also uses modification times and sizes, but will fall back to checksums if the sizes match but modification times are unavailable or differ.
                 gcloud storage rsync --recursive "$uri" "$output_path" # gsutil cp has different path handling than Linux cp. It always puts the source directory (name) inside the destination directory. gsutil rsync does not have that problem.
             fi
         - inputValue: GCS path
