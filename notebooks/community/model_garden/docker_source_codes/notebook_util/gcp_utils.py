@@ -117,24 +117,24 @@ def setup_buckets(bucket_uri: str, model_bucket_name: str) -> tuple[str, str]:
 
   # Check if bucket exists
   try:
-    run_command(["gcloud", "storage", "ls", "--buckets", bucket_uri])
+    run_command(["gsutil", "ls", "-b", bucket_uri])
     logger.info("Bucket %s already exists.", bucket_uri)
   except subprocess.CalledProcessError:
     logger.info("Creating bucket %s.", bucket_uri)
     # Create the bucket in the same region as the project
-    run_command(["gcloud", "storage", "buckets", "create", "--location", REGION, bucket_uri])
+    run_command(["gsutil", "mb", "-l", REGION, bucket_uri])
 
   # Construct the model bucket path
   model_bucket = os.path.join(bucket_uri, model_bucket_name)
 
   # Check if the model bucket exists (as a folder within the main bucket)
   try:
-    run_command(["gcloud", "storage", "ls", model_bucket])
+    run_command(["gsutil", "ls", model_bucket])
     logger.info("Model bucket %s already exists.", model_bucket)
   except subprocess.CalledProcessError:
     logger.info("Creating model bucket %s.", model_bucket)
     # Create the model bucket folder
-    run_command(["gcloud", "storage", "cp", "/dev/null", model_bucket + "/"])
+    run_command(["gsutil", "cp", "/dev/null", model_bucket + "/"])
 
   return bucket_name, model_bucket
 
@@ -174,13 +174,11 @@ def provision_permissions(service_account: str, bucket_name: str) -> None:
   """Provision permissions to the service account with the GCS bucket."""
   if bucket_name:
     run_command([
-        "gcloud",
-        "storage",
-        "buckets",
-        "add-iam-policy-binding",
+        "gsutil",
+        "iam",
+        "ch",
+        f"serviceAccount:{service_account}:roles/storage.admin",
         bucket_name,
-        f"--member=serviceAccount:{service_account}",
-        "--role=roles/storage.admin",
     ])
 
 
@@ -265,13 +263,13 @@ def delete_endpoint_and_model(
 
 
 def delete_gcs_bucket(bucket_name: str) -> str:
-  """Deletes a GCS bucket using gcloud storage."""
+  """Deletes a GCS bucket using gsutil."""
   try:
-    run_command(["gcloud", "storage", "rm", "--recursive", bucket_name])
-    logger.info("Bucket %s deleted using gcloud storage.", bucket_name)
+    run_command(["gsutil", "-m", "rm", "-r", bucket_name])
+    logger.info("Bucket %s deleted using gsutil.", bucket_name)
     return f"Bucket {bucket_name} deleted successfully!"
   except subprocess.CalledProcessError as e:
     logger.error(
-        "Error deleting bucket %s using gcloud storage: %s", bucket_name, str(e)
+        "Error deleting bucket %s using gsutil: %s", bucket_name, str(e)
     )
     return f"Bucket {bucket_name} could not be found or deleted. "
