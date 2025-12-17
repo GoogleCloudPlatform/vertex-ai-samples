@@ -546,6 +546,7 @@ def get_quota_id(
       "NVIDIA_GB200": "B200GPUs",
       "NVIDIA_TESLA_T4": "T4GPUs",
       "NVIDIA_RTX_PRO_6000": "RTXPRO6000GPUs",
+      "TPU_7x": "7XTPU",
       "TPU_V6e": "V6ETPU",
       "TPU_V5e": "V5ETPU",
       "TPU_V3": "V3TPUs",
