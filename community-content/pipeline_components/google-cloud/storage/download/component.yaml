@@ -24,12 +24,12 @@ implementation:
 
             # Checking whether the URI points to a single blob, a directory or a URI pattern
             # URI points to a blob when that URI does not end with slash and listing that URI only yields the same URI
-            if [[ "$uri" != */ ]] && (gsutil ls "$uri" | grep --fixed-strings --line-regexp "$uri"); then
+            if [[ "$uri" != */ ]] && (gcloud storage ls "$uri" | grep --fixed-strings --line-regexp "$uri"); then
                 mkdir -p "$(dirname "$output_path")"
-                gsutil -m cp -r "$uri" "$output_path"
+                gcloud storage cp --recursive "$uri" "$output_path"
             else
                 mkdir -p "$output_path" # When source path is a directory, gsutil requires the destination to also be a directory
-                gsutil -m rsync -r "$uri" "$output_path" # gsutil cp has different path handling than Linux cp. It always puts the source directory (name) inside the destination directory. gsutil rsync does not have that problem.
+                gcloud storage rsync --recursive "$uri" "$output_path" # gsutil cp has different path handling than Linux cp. It always puts the source directory (name) inside the destination directory. gsutil rsync does not have that problem.
             fi
         - inputValue: GCS path
         - outputPath: Data
