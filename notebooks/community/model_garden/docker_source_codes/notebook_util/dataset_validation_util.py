@@ -103,10 +103,10 @@ def download_gcs_uri_to_local(
     if not os.path.exists(destination_dir):
       os.mkdir(destination_dir)
     subprocess.check_output([
-        "gcloud",
-        "storage",
+        "gsutil",
+        "-m",
         "cp",
-        "--recursive",
+        "-r",
         gcs_uri,
         destination_dir,
     ])
