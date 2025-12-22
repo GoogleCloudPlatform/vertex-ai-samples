@@ -39,7 +39,6 @@ import argparse
 import json
 import os
 import sys
-import urllib.request
 import csv
 from enum import Enum
 from abc import ABC, abstractmethod
