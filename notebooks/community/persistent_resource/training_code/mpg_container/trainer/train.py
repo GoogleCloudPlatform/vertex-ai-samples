@@ -14,10 +14,7 @@
 
 import argparse
 import logging
-import os
-import numpy as np
 import pandas as pd
-import pathlib
 import tensorflow as tf
 
 from tensorflow import keras
