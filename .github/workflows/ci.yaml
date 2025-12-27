@@ -11,7 +11,7 @@ jobs:
       with:
         python-version: '3.13'      
     - name: Fetch pull request branch
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         fetch-depth: 0      
     - name: Fetch base main branch
