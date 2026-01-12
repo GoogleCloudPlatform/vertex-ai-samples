@@ -5,6 +5,6 @@ immutabledict==4.2.1
 protobuf==4.25.8
 opencv-python-headless==4.11.0.86
 docutils==0.16
-urllib3==2.6.0
+urllib3==2.6.3
 google-cloud-storage==3.0.0
 retrying
