@@ -99,7 +99,7 @@ if [[ $device_type == "cpu" ]]; then
     echo "Building open source vLLM CPU container image..."
     if [[ ! -d "vllm" ]]; then
         echo "Cloning vLLM repository..."
-        git clone https://github.com/vllm-project/vllm.git
+        git clone --branch v0.5.1 https://github.com/vllm-project/vllm.git --depth 1
     else
         echo "vLLM directory already exists, using existing clone"
     fi
