@@ -24,7 +24,7 @@ steps:
       image_name="vllm-${_DEVICE_TYPE}"
       if [[ $device_type == "cpu" ]]; then
         echo "Quietly building open source vLLM CPU container image"
-        git clone https://github.com/vllm-project/vllm.git
+        git clone -b v0.15.0 https://github.com/vllm-project/vllm.git
         cd vllm && DOCKER_BUILDKIT=1 docker build -t $base_image -f docker/Dockerfile.cpu . -q
         cd ..
       fi

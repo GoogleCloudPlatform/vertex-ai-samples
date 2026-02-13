@@ -20,7 +20,7 @@ readonly LOCAL_MODEL_DIR=${LOCAL_MODEL_DIR:-"/tmp/model_dir"}
 readonly LOCAL_LORA_DIR=${LOCAL_LORA_DIR:-"/tmp/lora_adapters"}
 
 download_model_from_gcs() {
-    gcs_uri=$1
+    local gcs_uri="$1"
     mkdir -p $LOCAL_MODEL_DIR
     echo "Downloading model from $gcs_uri to local directory..."
     if gcloud storage cp -r "$gcs_uri/*" "$LOCAL_MODEL_DIR"; then
@@ -33,8 +33,8 @@ download_model_from_gcs() {
 
 
 download_lora_adapters_from_gcs() {
-    gcs_uri=$1
-    local_dir=$2
+    local gcs_uri="$1"
+    local local_dir="$2"
     mkdir -p "$local_dir"
     echo "Downloading LoRA adapters from $gcs_uri to $local_dir..."
     if gcloud storage cp -r "$gcs_uri/*" "$local_dir"; then
