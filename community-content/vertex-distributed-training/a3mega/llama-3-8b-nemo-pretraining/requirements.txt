@@ -31,7 +31,7 @@ packaging==25.0
 pathspec==0.12.1
 platformdirs==4.3.8
 proto-plus==1.26.1
-protobuf==5.29.4
+protobuf==5.29.6
 pyasn1==0.6.2
 pyasn1_modules==0.4.2
 pydantic==2.11.4
