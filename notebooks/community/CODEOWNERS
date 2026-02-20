@@ -27,7 +27,7 @@
 /vertex_endpoints/nvidia-triton/nvidia-triton-custom-container-prediction.ipynb @RajeshThallam
 /vertex_endpoints/optimized_tensorflow_runtime @vlasenkoalexey
 /notebooks/community/alphagenome/cloudai_alphagenome_vai_quickstart.ipynb @dpanigra
-/notebooks/community/alphagenome/cloudai_alphagenome_finetune.ipynb @dpanigra
+/notebooks/community/alphagenome/cloudai_alphagenome_finetune.ipynb  @dpanigra
 /notebooks/community/weathernext/weathernext_2_early_access_program.ipynb @dpanigra
 /notebooks/community/ml_ops/stage2/get_started_with_visionapi_and_automl.ipynb @mansari
 /notebooks/community/neo4j/graph_paysim.ipynb @benofben @laeg
