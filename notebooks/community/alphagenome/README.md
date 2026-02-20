@@ -94,4 +94,4 @@ To utilize these models via this service:
 The quickest way to get started with the AlphaGenome in Google Cloud Platform is to run [our example notebook](cloudai_alphagenome_vai_quickstart.ipynb) in [Google Colab](https://colab.research.google.com/).
 
 ## Quick start finetune
-The quickest way to get started with the AlphaGenome fineutning in Google Cloud Platform is to run [our finetuning notebook](cloudai_alphagenome_finetune.ipynb) in [Google Cloud Platform Enteprise Colab](https://docs.cloud.google.com/colab/docs/introduction).
+The quickest way to get started with the AlphaGenome fineutning in Google Cloud Platform is to run [our finetuning notebook](cloudai_alphagenome_finetune.ipynb) in [Google Cloud Platform Enterprise Colab](https://docs.cloud.google.com/colab/docs/introduction).
