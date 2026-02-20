@@ -1,7 +1,8 @@
 ![AlphaGenome header image](https://raw.githubusercontent.com/google-deepmind/alphagenome/refs/heads/main/docs/source/_static/header.png)
 
 # AlphaGenome
-[**Overview**](#overview) | [**Use Cases**](#use-cases) | [**Documentation**](#documentation) | [**Pricing**](#pricing) | [**Quick start**](#quick-start)
+[**Overview**](#overview) | [**Use Cases**](#use-cases) | [**Documentation**](#documentation) | [**Pricing**](#pricing) | [**Quick start inference**](#quick-start-inference) | 
+[**Quick start finetune**](#quick-start-finetune)
 
 ## Overview
 **Disclaimer:** *Experimental*.
@@ -89,5 +90,8 @@ To utilize these models via this service:
 *   **Pricing information** will be shared directly with users upon approval
     and placement on the allowlist.
 
-## Quick start
+## Quick start inference
 The quickest way to get started with the AlphaGenome in Google Cloud Platform is to run [our example notebook](cloudai_alphagenome_vai_quickstart.ipynb) in [Google Colab](https://colab.research.google.com/).
+
+## Quick start finetune
+The quickest way to get started with the AlphaGenome fineutning in Google Cloud Platform is to run [our finetuning notebook](cloudai_alphagenome_finetune.ipynb) in [Google Cloud Enteprise Colab](https://docs.cloud.google.com/colab/docs/introduction).
