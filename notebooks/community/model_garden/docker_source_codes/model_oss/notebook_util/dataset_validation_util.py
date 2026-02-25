@@ -555,7 +555,7 @@ def drop_long_sequences(
     dataset_dropped_threshold: float,
     is_train: bool,
 ) -> tuple[Any, Any, int]:
-  """Returns the dataset by removing examples that are longer than max_seq_length.
+  """Drops examples longer than max_seq_length from the dataset.
 
   Args:
     dataset: The dataset to filter.
@@ -571,6 +571,7 @@ def drop_long_sequences(
     A tuple of (filtered_dataset, filtered_dataset_with_template,
     dropped_samples).
   """
+
   context_name = f"the {'train' if is_train else 'eval'} dataset"
   indices_to_keep, original_length, dropped_samples = (
       _get_indices_for_valid_length(
@@ -582,16 +583,20 @@ def drop_long_sequences(
       )
   )
 
+  samples_removed_percent = (
+      (dropped_samples / original_length) * 100 if original_length > 0 else 0.0
+  )
   if (
       original_length > 0
-      and dropped_samples / original_length * 100 > dataset_dropped_threshold
+      and samples_removed_percent > dataset_dropped_threshold
   ):
     logging.error(
-        "More than %f%% of the samples were dropped from {%s} after"
-        " filtering for max_sequence_length=%d. Please check your dataset.",
-        dataset_dropped_threshold,
+        "%.2f%% of the samples were dropped from %s after filtering for"
+        " max_sequence_length=%d. The threshold is %.2f%%.",
+        samples_removed_percent,
         context_name,
         max_sequence_length,
+        dataset_dropped_threshold,
     )
     
     # handling library when available.
