@@ -8,6 +8,7 @@ import json
 import multiprocessing
 import os
 import subprocess
+import sys
 from typing import Any, Union
 from absl import logging
 import accelerate
@@ -387,6 +388,57 @@ def load_tokenizer(
   return tokenizer
 
 
+def _get_indices_for_valid_length(
+    dataset: Any,
+    input_column: str,
+    max_sequence_length: int,
+    tokenizer: transformers.PreTrainedTokenizer,
+    context_name: str = "the dataset",
+) -> tuple[list[int], int, int]:
+  """Gets indices of examples shorter than or equal to max_seq_length.
+
+  Args:
+    dataset: The dataset to check.
+    input_column: The input column in the dataset.
+    max_sequence_length: The maximum sequence length.
+    tokenizer: The tokenizer.
+    context_name: A name for the dataset used in log messages.
+
+  Returns:
+    A tuple of (indices_to_keep, original_length, dropped_samples).
+  """
+  if not dataset:
+    return [], 0, 0
+
+  original_length = len(dataset)
+  indices_to_keep = [
+      i
+      for i, entry in enumerate(dataset)
+      if len(tokenizer(entry[input_column])["input_ids"]) <= max_sequence_length
+  ]
+  dropped_samples = original_length - len(indices_to_keep)
+
+  if dropped_samples > 0:
+    examples_removed_percent = (dropped_samples * 100) / original_length
+    logging.info(
+        "(%.2f%%) of examples token length is <= max-seq-length(%d); (%.2f%%) >"
+        " max-seq-length in %s. %d example(s) were longer than max-seq-length.",
+        100 - examples_removed_percent,
+        max_sequence_length,
+        examples_removed_percent,
+        context_name,
+        dropped_samples,
+    )
+  else:
+    logging.info(
+        "No samples were dropped from %s because all samples are"
+        " shorter than max_sequence_length=%d.",
+        context_name,
+        max_sequence_length,
+    )
+  return indices_to_keep, original_length, dropped_samples
+
+
 def get_filtered_dataset(
     dataset: Any,
     input_column: str,
@@ -411,33 +463,25 @@ def get_filtered_dataset(
     ValueError: If more than `example_removed_threshold` of the dataset is
       filtered out.
   """
-  actual_dataset_length = len(dataset)
-  filtered_dataset = dataset.filter(
-      lambda x: len(tokenizer(x[input_column])["input_ids"]) <= max_seq_length
-  )
-  filtered_dataset_length = len(filtered_dataset)
-  if actual_dataset_length != filtered_dataset_length:
-    examples_removed_percent = (
-        (actual_dataset_length - filtered_dataset_length)
-        * 100
-        / actual_dataset_length
-    )
-    logging.info(
-        "(%.2f%%) of examples token length is <= max-seq-length(%d); (%.2f%%) >"
-        " max-seq-length. Filtering out %d example(s) which are longer than"
-        " max-seq-length.",
-        100 - examples_removed_percent,
-        max_seq_length,
-        examples_removed_percent,
-        actual_dataset_length - filtered_dataset_length,
-    )
-    if examples_removed_percent > example_removed_threshold:
-      raise ValueError(
-          "More than %.2f%% of the dataset is filtered out. This may be due to"
-          " small value of max-seq-length(%d) or incorrect template. Please"
-          " increase the max-seq-length or check the template."
-          % (examples_removed_percent, max_seq_length)
+  indices_to_keep, original_length, dropped_samples = (
+      _get_indices_for_valid_length(
+          dataset, input_column, max_seq_length, tokenizer, "the dataset"
       )
+  )
+
+  if (
+      original_length > 0
+      and dropped_samples / original_length * 100 > example_removed_threshold
+  ):
+    examples_removed_percent = (dropped_samples * 100) / original_length
+    raise ValueError(
+        f"More than {examples_removed_percent:.2f}% of the dataset is filtered"
+        " out. This may be due to small value of"
+        f" max-seq-length({max_seq_length}) or incorrect template. Please"
+        " increase the max-seq-length or check the template."
+    )
+
+  filtered_dataset = dataset.select(indices_to_keep)
   print(f"Some formatted examples from the dataset are: {filtered_dataset[:5]}")
   return filtered_dataset
 
@@ -500,6 +544,62 @@ def load_dataset_with_template(
     templated = None
 
   return raw, templated
+
+
+def drop_long_sequences(
+    dataset: Any,
+    dataset_with_template: Any,
+    input_column: str,
+    max_sequence_length: int,
+    tokenizer: transformers.PreTrainedTokenizer,
+    dataset_dropped_threshold: float,
+    is_train: bool,
+) -> tuple[Any, Any, int]:
+  """Returns the dataset by removing examples that are longer than max_seq_length.
+
+  Args:
+    dataset: The dataset to filter.
+    dataset_with_template: The dataset with template to filter.
+    input_column: The input column in the dataset to be used.
+    max_sequence_length: The maximum sequence length.
+    tokenizer: The tokenizer.
+    dataset_dropped_threshold: The threshold for the number of samples dropped
+      from the dataset.
+    is_train: Whether the dataset is for training.
+
+  Returns:
+    A tuple of (filtered_dataset, filtered_dataset_with_template,
+    dropped_samples).
+  """
+  context_name = f"the {'train' if is_train else 'eval'} dataset"
+  indices_to_keep, original_length, dropped_samples = (
+      _get_indices_for_valid_length(
+          dataset_with_template,
+          input_column,
+          max_sequence_length,
+          tokenizer,
+          context_name,
+      )
+  )
+
+  if (
+      original_length > 0
+      and dropped_samples / original_length * 100 > dataset_dropped_threshold
+  ):
+    logging.error(
+        "More than %f%% of the samples were dropped from {%s} after"
+        " filtering for max_sequence_length=%d. Please check your dataset.",
+        dataset_dropped_threshold,
+        context_name,
+        max_sequence_length,
+    )
+    
+    # handling library when available.
+    sys.exit(1)
+
+  filtered_dataset = dataset.select(indices_to_keep)
+  filtered_dataset_with_template = dataset_with_template.select(indices_to_keep)
+  return filtered_dataset, filtered_dataset_with_template, dropped_samples
 
 
 def validate_dataset_with_template(
