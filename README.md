@@ -45,7 +45,7 @@ To get started using Vertex AI, you must have a Google Cloud project.
 │   │   ├── model_garden
 │   │   ├── ...
 ├── community-content - Sample code and tutorials contributed by the community
-
+├─- skills - Skills related to Vertex AI interaction
 ```
 ## Examples
 
