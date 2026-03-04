@@ -8,7 +8,6 @@ import json
 import multiprocessing
 import os
 import subprocess
-import sys
 from typing import Any, Union
 from absl import logging
 import accelerate
@@ -552,10 +551,9 @@ def drop_long_sequences(
     input_column: str,
     max_sequence_length: int,
     tokenizer: transformers.PreTrainedTokenizer,
-    dataset_dropped_threshold: float,
     is_train: bool,
 ) -> tuple[Any, Any, int]:
-  """Returns the dataset by removing examples that are longer than max_seq_length.
+  """Drops examples longer than max_seq_length from the dataset.
 
   Args:
     dataset: The dataset to filter.
@@ -563,39 +561,21 @@ def drop_long_sequences(
     input_column: The input column in the dataset to be used.
     max_sequence_length: The maximum sequence length.
     tokenizer: The tokenizer.
-    dataset_dropped_threshold: The threshold for the number of samples dropped
-      from the dataset.
     is_train: Whether the dataset is for training.
 
   Returns:
     A tuple of (filtered_dataset, filtered_dataset_with_template,
     dropped_samples).
   """
-  context_name = f"the {'train' if is_train else 'eval'} dataset"
-  indices_to_keep, original_length, dropped_samples = (
-      _get_indices_for_valid_length(
-          dataset_with_template,
-          input_column,
-          max_sequence_length,
-          tokenizer,
-          context_name,
-      )
-  )
 
-  if (
-      original_length > 0
-      and dropped_samples / original_length * 100 > dataset_dropped_threshold
-  ):
-    logging.error(
-        "More than %f%% of the samples were dropped from {%s} after"
-        " filtering for max_sequence_length=%d. Please check your dataset.",
-        dataset_dropped_threshold,
-        context_name,
-        max_sequence_length,
-    )
-    
-    # handling library when available.
-    sys.exit(1)
+  context_name = f"the {'train' if is_train else 'eval'} dataset"
+  indices_to_keep, _, dropped_samples = _get_indices_for_valid_length(
+      dataset_with_template,
+      input_column,
+      max_sequence_length,
+      tokenizer,
+      context_name,
+  )
 
   filtered_dataset = dataset.select(indices_to_keep)
   filtered_dataset_with_template = dataset_with_template.select(indices_to_keep)
