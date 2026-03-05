@@ -13,10 +13,12 @@ Each model has some [limitations](https://docs.cloud.google.com/vertex-ai/genera
 
 ## Model Selection Guidelines
 
+**Identify Task**: Check a few samples from the dataset to identify the task.
+
 Choose a model family based on your task type:
 
 - **Qwen**: Best for code generation or complex math-based tasks.
-- **Gemma**: Optimized for chat-based interactions and creative writing.
+- **Gemma**: Optimized for chat-based interactions, creative writing and multilingual tasks.
 - **Llama (Instruct)**: Strong general-purpose chat/instruction models.
 - **Llama (Base/Scout)**: Best for continuation tasks or building custom instruction-tuned models.
 

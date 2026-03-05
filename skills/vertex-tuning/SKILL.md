@@ -88,7 +88,8 @@ Verify the following identities have the required roles.
 Create and use a virtual environment named `tuning_agent_venv` in the home
 directory. Install dependencies from `references/requirements.txt`. `bash
 python3 -m venv ~/tuning_agent_venv source ~/tuning_agent_venv/bin/activate pip
-install -r references/requirements.txt`
+install -r
+cloud/ai/platform/modelgarden/agent_skills/vertex-tuning/references/requirements.txt`
 
 --------------------------------------------------------------------------------
 
@@ -109,7 +110,7 @@ Vertex AI requires valid JSONL format in GCS.
 
 ### 1.1 Formatting & Validation
 
--   **Conversion**: If data is in CSV or JSON, use `vertex-tuning/scripts/prepare_dataset.py`
+-   **Conversion**: If data is in CSV or JSON, use `scripts/prepare_dataset.py`
     to convert.
 -   **Validation Split Confirmation**: If the user only provides a training
     dataset, **you must prompt the user** to seek permission to split the
@@ -117,7 +118,8 @@ Vertex AI requires valid JSONL format in GCS.
     `--validation_split 0.2`). If they agree, proceed with the split. If they
     decline, just use the training dataset without a validation dataset.
 -   **Validation**: If data is already in JSONL, validate it before uploading:
-    `bash python3 vertex-tuning/scripts/prepare_dataset.py
+    `bash python3
+    cloud/ai/platform/modelgarden/agent_skills/vertex-tuning/scripts/prepare_dataset.py
     \ --input my_data.jsonl \ --format messages \ --validate_only`
 -   Refer to [Data Preparation Guide](references/data_prep.md) for required
     schemas.
@@ -161,9 +163,11 @@ confirmation before submitting the job.**
 ## Phase 3: Tuning Job Execution
 
 Submit the job using `scripts/tune_model.py`.
+Identify the model id using available models documentation at
+[documentation](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/models/open-model-tuning#supported-models).
 
 ```bash
-python3 scripts/tune_model.py \
+python3 cloud/ai/platform/modelgarden/agent_skills/vertex-tuning/scripts/tune_model.py \
     --project YOUR_PROJECT \
     --location YOUR_LOCATION \
     --bucket YOUR_STAGING_BUCKET \
@@ -189,7 +193,7 @@ polling the job status.
 Once the job is `SUCCEEDED`, deploy the model using `scripts/deploy_model.py`.
 
 ```bash
-python3 vertex_tuning/scripts/deploy_model.py \
+python3 cloud/ai/platform/modelgarden/agent_skills/vertex-tuning/scripts/deploy_model.py \
     --project YOUR_PROJECT \
     --location YOUR_LOCATION \
     --artifacts_uri gs://YOUR_BUCKET/tuning_agent_job_<datetime>/output/postprocess/node-0/checkpoints/final \
