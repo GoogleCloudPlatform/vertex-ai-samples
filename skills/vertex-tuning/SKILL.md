@@ -167,7 +167,7 @@ Identify the model id using available models documentation at
 [documentation](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/models/open-model-tuning#supported-models).
 
 ```bash
-python3 cloud/ai/platform/modelgarden/agent_skills/vertex-tuning/scripts/tune_model.py \
+python3 skills/vertex-tuning/scripts/tune_model.py \
     --project YOUR_PROJECT \
     --location YOUR_LOCATION \
     --bucket YOUR_STAGING_BUCKET \
