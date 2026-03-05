@@ -193,7 +193,7 @@ polling the job status.
 Once the job is `SUCCEEDED`, deploy the model using `scripts/deploy_model.py`.
 
 ```bash
-python3 cloud/ai/platform/modelgarden/agent_skills/vertex-tuning/scripts/deploy_model.py \
+python3 skills/vertex-tuning/scripts/deploy_model.py \
     --project YOUR_PROJECT \
     --location YOUR_LOCATION \
     --artifacts_uri gs://YOUR_BUCKET/tuning_agent_job_<datetime>/output/postprocess/node-0/checkpoints/final \
