@@ -1,4 +1,4 @@
-Collection of Vertex AI Skills for Agents. 
+Collection of Vertex AI Skills for Agents.
 
 This supports the following workflows:
 
