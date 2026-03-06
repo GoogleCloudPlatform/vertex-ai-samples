@@ -47,4 +47,4 @@ gcloud storage buckets create gs://YOUR_BUCKET_NAME --location=YOUR_LOCATION
 
 1. **Quality over Quantity**: 100 high-quality examples often outperform 1,000 noisy ones.
 2. **Consistency**: Use consistent formatting for system prompts and instruction styles.
-3. **No Empty Values**: Ensure every example has a valid prompt/user message and completion/assistant response. Use the [preparation script](/cloud/ai/platform/modelgarden/agent_skills/vertex-tuning/scripts/prepare_dataset.py) to validate this.
+3. **No Empty Values**: Ensure every example has a valid prompt/user message and completion/assistant response. Use the [preparation script](../scripts/prepare_dataset.py) to validate this.
