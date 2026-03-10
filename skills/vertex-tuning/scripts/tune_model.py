@@ -29,7 +29,7 @@ def tune_model(
   tuning_job = sft.train(
       source_model=source_model,
       train_dataset=train_dataset,
-      validation_dataset=validation_dataset if validation_dataset else None,
+      validation_dataset=validation_dataset,
       epochs=epochs,
       learning_rate=learning_rate,
       tuning_mode=tuning_mode,
