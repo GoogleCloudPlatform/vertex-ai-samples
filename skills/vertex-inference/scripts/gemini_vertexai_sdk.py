@@ -21,6 +21,6 @@ _, project_id = google.auth.default()
 
 vertexai.init(project=project_id, location="us-central1")
 
-model = GenerativeModel("gemini-3-pro")
+model = GenerativeModel("gemini-1.5-pro")
 response = model.generate_content("Why is the sky blue?")
 print(response.text)

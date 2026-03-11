@@ -23,6 +23,6 @@ _, project_id = google.auth.default()
 client = genai.Client(vertexai=True, project=project_id, location="us-central1")
 
 response = client.models.generate_content(
-    model="gemini-3-pro", contents="Why is the sky blue?"
+    model="gemini-1.5-pro", contents="Why is the sky blue?"
 )
 print(response.text)
