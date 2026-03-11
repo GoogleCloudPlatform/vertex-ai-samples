@@ -27,7 +27,7 @@ description: >
 
 This skill provides procedural knowledge for fine-tuning Gemini Large Language
 Models using Vertex AI's tuning service. It covers the entire lifecycle from
-environment setup and data preparation to job confifguration, monitoring, and
+environment setup and data preparation to job configuration, monitoring, and
 deployment.
 
 ## Workflow Decision Tree

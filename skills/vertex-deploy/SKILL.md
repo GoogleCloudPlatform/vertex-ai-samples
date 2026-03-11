@@ -29,8 +29,13 @@ Garden to endpoints, and subsequently undeploying them to clean up resources.
 Before deploying, ensure you have the correct project and region set. The
 commands below use placeholder variables `PROJECT_ID` and `LOCATION_ID`.
 
-Ensure you are authenticated: `bash gcloud auth login gcloud auth
-application-default login gcloud config set project $PROJECT_ID`
+Ensure you are authenticated:
+
+```bash
+gcloud auth login
+gcloud auth application-default login
+gcloud config set project $PROJECT_ID`
+```
 
 ## 2. Discovering Deployable Models
 

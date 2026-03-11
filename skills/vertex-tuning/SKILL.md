@@ -35,6 +35,7 @@ corresponding sub-skill.
 
 1.  **Model Category**: Has the user explicitly stated whether they want to tune
     an **Open Model** or a **Gemini Model**?
+
     -   **No** → **STOP**. Ask the user if they want to tune an Open Model or a
         Gemini Model. Do not proceed or recommend any specific models until this
         is confirmed.

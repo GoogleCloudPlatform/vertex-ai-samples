@@ -187,14 +187,14 @@ Help the user choose the best open model and parameters.
 ### 2.2 Calculating Cost
 
 -   We can calculate a rough estimate of cost of tuning based on the dataset and
-    the selected model in the [Models Catalog](references/model.md):
+    the selected model in the [Models Catalog](references/models.md):
     ```bash
     python3 \
-        ./vertex-tuning/open-model/scripts/calculate_cost.py \
+        open-model/scripts/calculate_cost.py \
         --input my_data.jsonl \
         --model MODEL_NAME \
         --tuning_mode TUNING_MODE \
-        --epochs epochs
+        --epochs EPOCHS
     ```
 -   **Prompt for Confirmation:** Present the recommended hyperparameter
     configuration and estimated cost to the user and ask for their approval

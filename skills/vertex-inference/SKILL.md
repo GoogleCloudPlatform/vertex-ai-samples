@@ -137,7 +137,7 @@ See [`scripts/openmaas_openai_sdk.py`](scripts/openmaas_openai_sdk.py) for the c
 
 > [!TIP]
 > **Alternative: Environment Variables**
-> You can set environment variables in your shell instead of updated the code.
+> You can set environment variables in your shell instead of updating the code.
 > ```bash
 > export OPENAI_BASE_URL="https://aiplatform.googleapis.com/v1/projects/YOUR_PROJECT_ID/locations/global/endpoints/openapi"
 > export OPENAI_API_KEY="$(gcloud auth print-access-token)"

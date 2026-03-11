@@ -89,16 +89,4 @@ if __name__ == "__main__":
   )
 
   args = parser.parse_args()
-  tune_open_model(
-      project=args.project,
-      location=args.location,
-      bucket=args.bucket,
-      base_model=args.base_model,
-      train_dataset=args.train_dataset,
-      validation_dataset=args.validation_dataset,
-      output_uri=args.output_uri,
-      epochs=args.epochs,
-      learning_rate=args.learning_rate,
-      tuning_mode=args.tuning_mode,
-      adapter_size=args.adapter_size,
-  )
+  tune_open_model(**vars(args))
