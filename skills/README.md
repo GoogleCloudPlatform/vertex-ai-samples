@@ -6,6 +6,25 @@ This directory contains a suite of AI Agent "Skills" configured to help agents u
 
 These skills are designed hierarchically to guide the LLM agent from a broad user intent down to the specific technical implementation steps.
 
+```text
+skills/                     # Suite of AI Agent "Skills" for Vertex AI
+├── README.md               # This developer guide
+├── vertex-ai/              # Primary router for Vertex AI tasks
+│   └── SKILL.md            # Entry point that routes across capabilities
+├── genai-sdk/              # Gemini API usage with Gen AI SDK
+│   └── SKILL.md            # Guides for Python, JS/TS, Go, Java, C#
+├── vertex-deploy/          # Deploying models to Endpoints
+│   └── SKILL.md            # Commands for open models & custom weights
+├── vertex-inference/       # Inferencing with GenAI models
+│   └── SKILL.md            # Code samples for Gemini and OpenMaaS
+└── vertex-tuning/          # Secondary router for model fine-tuning
+    ├── SKILL.md            # Router for tuning tasks
+    ├── gemini/             # Fine-tuning first-party Gemini models
+    │   └── SKILL.md
+    └── open-model/         # Fine-tuning third-party open models
+        └── SKILL.md
+```
+
 ### Primary Router: `vertex-ai`
 The entry point for any general Vertex AI task. The `vertex-ai/SKILL.md` file acts as a traffic controller. When an agent receives a generic request (e.g., "I want to use Vertex AI"), it reads this file to determine the next step based on a Decision Tree:
 - **Deploying a model** → Routes to `vertex-deploy`
