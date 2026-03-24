@@ -16,11 +16,11 @@ You can explore, learn, and contribute to this repository to unleash the full po
 
 Explore this repository, follow the links in the header section of each of the notebooks to -
 
-![Colab](https://www.gstatic.com/pantheon/images/bigquery/welcome_page/colab-logo.svg)  Open and run the notebook in [Colab](https://colab.google/)\
-![Colab Enterprise](https://lh3.googleusercontent.com/JmcxdQi-qOpctIvWKgPtrzZdJJK-J3sWE1RsfjZNwshCFgE_9fULcNpuXYTilIR2hjwN)  Open and run the notebook in [Colab Enterprise](https://cloud.google.com/colab/docs/introduction)\
-![Workbench](https://www.gstatic.com/images/branding/gcpiconscolors/vertexai/v1/32px.svg)  Open and run the notebook in [Vertex AI Workbench](https://cloud.google.com/vertex-ai/docs/workbench/introduction)\
-![Github](https://raw.githubusercontent.com/primer/octicons/refs/heads/main/icons/mark-github-24.svg)  View the notebook on Github
-
+- Open and run the notebook in [Colab](https://colab.google/)
+- Open and run the notebook in [Colab Enterprise](https://cloud.google.com/colab/docs/introduction)
+- Open and run the notebook in [Vertex AI Workbench](https://cloud.google.com/vertex-ai/docs/workbench/introduction)
+- View the notebook on Github
+  
 ### Contribute
 
 See the [Contributing Guide](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/master/CONTRIBUTING.md).
