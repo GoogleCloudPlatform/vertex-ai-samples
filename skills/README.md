@@ -9,11 +9,16 @@ These skills are designed hierarchically to guide the LLM agent from a broad use
 ### Primary Router: `vertex-ai`
 The entry point for any general Vertex AI task. The `vertex-ai/SKILL.md` file acts as a traffic controller. When an agent receives a generic request (e.g., "I want to use Vertex AI"), it reads this file to determine the next step based on a Decision Tree:
 - **Deploying a model** → Routes to `vertex-deploy`
+- **Using Gemini API & Gen AI SDK** → Routes to `genai-sdk`
 - **Generating text, chat, or embeddings** → Routes to `vertex-inference`
 - **Fine-tuning a model** → Routes to `vertex-tuning`
 
 ### Sub-Skills
-1. **`vertex-deploy`**
+1. **`genai-sdk`**
+   - **Purpose:** Guides the usage of Gemini API on Google Cloud Vertex AI with the Gen AI SDK across multiple languages (Python, JS/TS, Go, Java, C#).
+   - **Capabilities:** Core inference, Live API, function calling, structured output, caching, and batch prediction.
+
+2. **`vertex-deploy`**
    - **Purpose:** Instructions and bash scripts for deploying Open Models from Model Garden or custom weights to a dedicated Vertex AI Endpoint.
    - **Capabilities:** Handling `gcloud ai model-garden models deploy`, checking operation status, calculating quota/cost estimates, and undeploying models to save costs.
 
