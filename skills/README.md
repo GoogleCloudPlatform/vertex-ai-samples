@@ -6,25 +6,6 @@ This directory contains a suite of AI Agent "Skills" configured to help agents u
 
 These skills are designed hierarchically to guide the LLM agent from a broad user intent down to the specific technical implementation steps.
 
-```text
-skills/                     # Suite of AI Agent "Skills" for Vertex AI
-├── README.md               # This developer guide
-├── vertex-ai/              # Primary router for Vertex AI tasks
-│   └── SKILL.md            # Entry point that routes across capabilities
-├── genai-sdk/              # Gemini API usage with Gen AI SDK
-│   └── SKILL.md            # Guides for Python, JS/TS, Go, Java, C#
-├── vertex-deploy/          # Deploying models to Endpoints
-│   └── SKILL.md            # Commands for open models & custom weights
-├── vertex-inference/       # Inferencing with GenAI models
-│   └── SKILL.md            # Code samples for Gemini and OpenMaaS
-└── vertex-tuning/          # Secondary router for model fine-tuning
-    ├── SKILL.md            # Router for tuning tasks
-    ├── gemini/             # Fine-tuning first-party Gemini models
-    │   └── SKILL.md
-    └── open-model/         # Fine-tuning third-party open models
-        └── SKILL.md
-```
-
 ### Primary Router: `vertex-ai`
 The entry point for any general Vertex AI task. The `vertex-ai/SKILL.md` file acts as a traffic controller. When an agent receives a generic request (e.g., "I want to use Vertex AI"), it reads this file to determine the next step based on a Decision Tree:
 - **Deploying a model** → Routes to `vertex-deploy`
@@ -57,6 +38,27 @@ Agent skills are essentially specialized prompt contexts. When building agents (
 2. **Determine Intent:** The LLM processes the user prompt against the conditions in the Router's Decision Tree.
 3. **Navigate:** The LLM actively uses file-reading tools to navigate to the correct underlying `SKILL.md` (e.g., `skills/vertex-inference/SKILL.md`).
 4. **Execute:** The agent reads the highly-detailed instructions, caveats, and code snippets in the sub-skill to fulfill the user's request.
+
+## Installation & Usage
+
+To use these skills with your AI agent:
+
+1. **Clone the Repository**: Clone this repository to your local development environment or production workspace.
+2. **Expose to Agent**: Ensure the `skills/` directory is accessible to your AI assistant. This typically involves mounting or copying the folder into your agent's workspace (e.g., `.agents/skills/` or equivalent custom routing directory).
+3. **Trigger the Skills**: Prompt your agent with a Vertex AI related task. The agent should automatically scan for skills, find the primary `vertex-ai/SKILL.md` router, and follow the documented workflow.
+
+### Example Prompts
+
+Here are some example prompts you can use to trigger the routing logic and test the skills:
+
+**Testing Deployment:**
+> "I want to deploy a Llama 3.3 model from Model Garden to a Vertex AI endpoint. Can you help me write the script?"
+
+**Testing Inference (Gen AI SDK):**
+> "Can you show me how to connect to Vertex AI and get text embeddings using the new Gemini SDK?"
+
+**Testing Tuning:**
+> "I need to fine-tune a Gemini 1.5 Pro model using Vertex AI. Where should I start?"
 
 ## How to Add a New Skill
 
