@@ -8,6 +8,7 @@ This directory contains a suite of AI Agent **Skills** configured to help agents
 ## Table of Contents
 
 - [Top Starter Skills](#top-starter-skills)
+- [Tool Configuration](#tool-configuration)
 - [Architecture & Routing](#architecture--routing)
   - [Primary Router: `vertex-ai`](#primary-router-vertex-ai)
   - [Sub-Skills](#sub-skills)
@@ -23,6 +24,17 @@ This directory contains a suite of AI Agent **Skills** configured to help agents
 - 🛠️ `@genai-sdk` for learning how to use the latest Google Gen AI SDK.
 - 🎯 `@vertex-tuning` for fine-tuning models with your own data.
 - ⚡ `@vertex-inference` for executing Generative AI inference.
+
+## ⚙️ Tool Configuration
+
+These skills follow the universal **SKILL.md** format and work with any AI coding assistant that supports agentic skills.
+
+| Tool                  | Type | Invocation Example                  | Path                                                                      |
+| :-------------------- | :--- | :---------------------------------- | :------------------------------------------------------------------------ |
+| **Gemini CLI**  | CLI  | `(User Prompt) Use skill-name...` | `.gemini/skills/`                                                       |
+| **Antigravity** | IDE  | `(Agent Mode) Use skill...`       | Global:`~/.gemini/antigravity/skills/` · Workspace: `.agent/skills/` |
+| **Claude Code** | CLI  | `>> /skill-name help me...`       | `.claude/skills/`                                                       |
+| **Cursor**      | IDE  | `@skill-name (in Chat)`           | `.cursor/skills/`                                                       |
 
 
 ## Architecture & Routing
