@@ -1,6 +1,6 @@
-# Vertex AI Skills Developer Guide
+# Agentic Skills for Google Cloud Vertex AI
 
-This directory contains a suite of AI Agent "Skills" configured to help agents understand, navigate, and execute tasks on Google Cloud Vertex AI.
+This directory contains a suite of AI Agent **Skills** configured to help agents understand, navigate, and execute tasks on Google Cloud Vertex AI.
 
 ## Architecture & Routing
 
