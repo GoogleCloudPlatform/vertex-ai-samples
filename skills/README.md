@@ -101,7 +101,7 @@ Here are some example prompts you can use to trigger the routing logic and test 
 > "Can you show me how to connect to Vertex AI and get text embeddings using the new Gen AI SDK?"
 
 **Testing Tuning:**
-> "I need to fine-tune a Gemini 1.5 Pro model using Vertex AI. Where should I start?"
+> "I need to fine-tune a Gemini 2.5 Pro model using Vertex AI. Where should I start?"
 
 ## How to Add a New Skill
 
