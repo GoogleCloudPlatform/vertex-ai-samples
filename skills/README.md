@@ -70,9 +70,25 @@ Agent skills are essentially specialized prompt contexts. When building agents (
 
 To use these skills with your AI agent:
 
-1. **Clone the Repository**: Clone this repository to your local development environment or production workspace.
-2. **Expose to Agent**: Ensure the `skills/` directory is accessible to your AI assistant. This typically involves mounting or copying the folder into your agent's workspace (e.g., `.agents/skills/` or equivalent custom routing directory).
-3. **Trigger the Skills**: Prompt your agent with a Vertex AI related task. The agent should automatically scan for skills, find the primary `vertex-ai/SKILL.md` router, and follow the documented workflow.
+1. **Clone the repository** (without checking out files yet):
+   ```bash
+   git clone --no-checkout https://github.com/GoogleCloudPlatform/vertex-ai-samples.git
+   ```
+2. **Enable sparse checkout in cone mode**:
+   ```bash
+   cd vertex-ai-samples
+   git sparse-checkout init --cone
+   ```
+3. **Specify the skills folder**:
+   ```bash
+   git sparse-checkout set skills
+   ```
+4. **Check out the branch**:
+   ```bash
+   git checkout main
+   ```
+5. **Expose to Agent**: Ensure the `skills/` directory is accessible to your AI assistant. This typically involves mounting or copying the folder into your agent's specific custom routing directory. See the [Tool Configuration](#tool-configuration) section above for the correct path for your tool.
+6. **Trigger the Skills**: Prompt your agent with a Vertex AI related task. The agent should automatically scan for skills, find the primary `vertex-ai/SKILL.md` router, and follow the documented workflow.
 
 ### Example Prompts
 
