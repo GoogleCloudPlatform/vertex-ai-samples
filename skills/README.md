@@ -1,6 +1,29 @@
-# Agentic Skills for Google Cloud Vertex AI
+# 🤖 Agentic Skills for Google Cloud Vertex AI
 
 This directory contains a suite of AI Agent **Skills** configured to help agents understand, navigate, and execute tasks on Google Cloud Vertex AI.
+
+> [!NOTE]
+> These skills act as specialized prompt contexts, enabling your LLM agents to perform complex Cloud AI workflows autonomously.
+
+## Table of Contents
+
+- [Top Starter Skills](#top-starter-skills)
+- [Architecture & Routing](#architecture--routing)
+  - [Primary Router: `vertex-ai`](#primary-router-vertex-ai)
+  - [Sub-Skills](#sub-skills)
+- [How It Works Under The Hood](#how-it-works-under-the-hood)
+- [Installation & Usage](#installation--usage)
+  - [Example Prompts](#example-prompts)
+- [How to Add a New Skill](#how-to-add-a-new-skill)
+- [Best Practices for Authoring Skills](#best-practices-for-authoring-skills)
+
+## 🌟 Top Starter Skills
+
+- 🚀 `@vertex-deploy` for deploying Open Models from Model Garden directly to endpoints.
+- 🛠️ `@genai-sdk` for learning how to use the latest Google Gen AI SDK.
+- 🎯 `@vertex-tuning` for fine-tuning models with your own data.
+- ⚡ `@vertex-inference` for executing Generative AI inference.
+
 
 ## Architecture & Routing
 
@@ -13,22 +36,14 @@ The entry point for any general Vertex AI task. The `vertex-ai/SKILL.md` file ac
 - **Generating text, chat, or embeddings** → Routes to `vertex-inference`
 - **Fine-tuning a model** → Routes to `vertex-tuning`
 
-### Sub-Skills
-1. **`genai-sdk`**
-   - **Purpose:** Guides the usage of Gemini API on Google Cloud Vertex AI with the Gen AI SDK across multiple languages (Python, JS/TS, Go, Java, C#).
-   - **Capabilities:** Core inference, Live API, function calling, structured output, caching, and batch prediction.
+### 🧰 Sub-Skills Directory
 
-2. **`vertex-deploy`**
-   - **Purpose:** Instructions and bash scripts for deploying Open Models from Model Garden or custom weights to a dedicated Vertex AI Endpoint.
-   - **Capabilities:** Handling `gcloud ai model-garden models deploy`, checking operation status, calculating quota/cost estimates, and undeploying models to save costs.
-
-2. **`vertex-inference`**
-   - **Purpose:** Code samples and instructions for authenticating and executing Generative AI inference.
-   - **Capabilities:** Supports both First-Party (Gemini) using the `google-genai` SDK and Third-Party OpenMaaS (Llama, DeepSeek, Qwen) using the standard OpenAI SDK configured with a Vertex AI endpoint.
-
-3. **`vertex-tuning`**
-   - **Purpose:** A secondary router specifically for model fine-tuning.
-   - **Capabilities:** Directs the agent to specific tuning procedures depending on whether the user wants to tune an Open Model (e.g., Llama) or a First-Party Gemini model.
+| Category / Skill | Purpose | Capabilities |
+| :--- | :--- | :--- |
+| **`genai-sdk`** | Guides the usage of Gemini API with the Gen AI SDK across multiple languages. | Core inference, Live API, function calling, structured output, caching, and batch prediction. |
+| **`vertex-deploy`** | Instructions and bash scripts for deploying Open Models or custom weights to a dedicated Endpoint. | `gcloud ai model-garden models deploy`, checking status, cost estimates, undeploying. |
+| **`vertex-inference`** | Code samples and instructions for authenticating and executing Generative AI inference. | First-Party (Gemini) via `google-genai` and Third-Party OpenMaaS via OpenAI SDK. |
+| **`vertex-tuning`** | A secondary router specifically for model fine-tuning. | Directs the agent to specific tuning procedures for Open Models or First-Party Gemini models. |
 
 ## How It Works Under The Hood
 
