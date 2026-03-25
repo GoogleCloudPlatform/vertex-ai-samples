@@ -1,9 +1,9 @@
-# 🤖 Agentic Skills for Google Cloud Vertex AI
+# 🤖 Agent Skills for Google Cloud Vertex AI
 
-This directory contains a suite of AI Agent **Skills** configured to help agents understand, navigate, and execute tasks on Google Cloud Vertex AI.
+This directory contains a suite of AI agent **skills** configured to help agents understand, navigate, and execute tasks on Google Cloud Vertex AI.
 
 > [!NOTE]
-> These skills act as specialized prompt contexts, enabling your LLM agents to perform complex Cloud AI workflows autonomously.
+> These skills act as specialized prompt contexts, enabling your AI agents to perform complex workflows autonomously.
 
 ## Table of Contents
 
@@ -20,8 +20,8 @@ This directory contains a suite of AI Agent **Skills** configured to help agents
 
 ## 🌟 Top Starter Skills
 
-- 🚀 `@vertex-deploy` for deploying Open Models from Model Garden directly to endpoints.
 - 🛠️ `@genai-sdk` for learning how to use the latest Google Gen AI SDK.
+- 🚀 `@vertex-deploy` for deploying Open Models from Model Garden directly to endpoints.
 - 🎯 `@vertex-tuning` for fine-tuning models with your own data.
 - ⚡ `@vertex-inference` for executing Generative AI inference.
 
@@ -32,7 +32,7 @@ These skills follow the universal **SKILL.md** format and work with any AI codin
 | Tool                  | Type | Invocation Example                  | Path                                                                      |
 | :-------------------- | :--- | :---------------------------------- | :------------------------------------------------------------------------ |
 | **Gemini CLI**  | CLI  | `(User Prompt) Use skill-name...` | `.gemini/skills/`                                                       |
-| **Antigravity** | IDE  | `(Agent Mode) Use skill...`       | Global:`~/.gemini/antigravity/skills/` · Workspace: `.agent/skills/` |
+| **Antigravity** | IDE  | `(Agent Mode) Use skill...`       |  - Global:`~/.gemini/antigravity/skills/`  - Workspace: `.agent/skills/` |
 | **Claude Code** | CLI  | `>> /skill-name help me...`       | `.claude/skills/`                                                       |
 | **Cursor**      | IDE  | `@skill-name (in Chat)`           | `.cursor/skills/`                                                       |
 
@@ -88,7 +88,7 @@ To use these skills with your AI agent:
    git checkout main
    ```
 5. **Expose to Agent**: Ensure the `skills/` directory is accessible to your AI assistant. This typically involves mounting or copying the folder into your agent's specific custom routing directory. See the [Tool Configuration](#tool-configuration) section above for the correct path for your tool.
-6. **Trigger the Skills**: Prompt your agent with a Vertex AI related task. The agent should automatically scan for skills, find the primary `vertex-ai/SKILL.md` router, and follow the documented workflow.
+7. **Trigger the Skills**: Prompt your agent with a Vertex AI related task. The agent should automatically scan for skills, find the primary `vertex-ai/SKILL.md` router, and follow the documented workflow.
 
 ### Example Prompts
 
@@ -98,7 +98,7 @@ Here are some example prompts you can use to trigger the routing logic and test 
 > "I want to deploy a Llama 3.3 model from Model Garden to a Vertex AI endpoint. Can you help me write the script?"
 
 **Testing Inference (Gen AI SDK):**
-> "Can you show me how to connect to Vertex AI and get text embeddings using the new Gemini SDK?"
+> "Can you show me how to connect to Vertex AI and get text embeddings using the new Gen AI SDK?"
 
 **Testing Tuning:**
 > "I need to fine-tune a Gemini 1.5 Pro model using Vertex AI. Where should I start?"
