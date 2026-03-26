@@ -57,10 +57,10 @@ Before running any code, ensure you are authenticated with Application Default C
 
 ## 2. Gemini Models
 
-For Gemini models (e.g., `gemini-1.5-pro`, `gemini-2.0-flash`), the **GenAI SDK** (`google-genai`) is the **PREFERRED** method. The legacy `vertexai` SDK is still supported but GenAI SDK is recommended for new projects.
+For Gemini models (e.g., `gemini-2.5-pro`, `gemini-3-flash-preview`), the **GenAI SDK** (`google-genai`) is the **PREFERRED** method. The legacy `vertexai` SDK is still supported but GenAI SDK is recommended for new projects.
 
 > [!IMPORTANT]
-> **Preview Models (including Gemini 2.0)** are often **ONLY** available in the `global` region. Stable models are available in `us-central1` and other regions.
+> **Preview Models (including Gemini 3.1)** are often **ONLY** available in the `global` region. Stable models are available in `us-central1` and other regions.
 
 ### Choosing the Right SDK
 
@@ -240,7 +240,7 @@ See [`scripts/openmaas_vertexai_sdk.py`](scripts/openmaas_vertexai_sdk.py) for t
         *   **OpenMaaS**: Verify the model is available in your region. See [Model Availability by Location](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/learn/locations#genai-open-models).
         *   **Gemini**:
             *   **Source of Truth**: Always check [Gemini Model Locations](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations#google-models) for the authoritative list.
-            *   **Preview Models**: All Preview models (e.g., Gemini 2.0, experimental versions) are often **ONLY** available in the `us-central1` or `global` regions.
-            *   **Stable Models**: (e.g., Gemini 1.5 Pro) Available in `us-central1`, `europe-west4`, and many other regions.
+            *   **Preview Models**: All Preview models (e.g., Gemini 3.1, experimental versions) are often **ONLY** available in the `us-central1` or `global` regions.
+            *   **Stable Models**: (e.g., Gemini 2.5 Pro) Available in `us-central1`, `europe-west4`, and many other regions.
             *   **Important**: If you get a 404/400 error, try switching your client location to `us-central1` or `global`.
     2.  **Enable Llama Models**: For **Llama 3.3** and **Llama 4**, you **MUST** enable the model in Model Garden before use. Go to the [Model Garden](https://console.cloud.google.com/vertex-ai/model-garden), search for the model card (e.g., "Llama 3.3 API Service"), and click **Enable**. Only then can you make inference requests.
