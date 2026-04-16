@@ -68,7 +68,7 @@ Our primary requirements for a target dataset to run experiments to validate thi
 3. It should be able to train the model to perform better than the counterpart generalist model
 
 A good heuristic to determine where the data lies with respect to the model distribution is by calculating perplexity on samples from the dataset. Assuming
-- <span>$$X={x_1, x_2, …, x_N}$$</span> is a dataset sample represented as sequence of tokens
+- <span>$$X={x_1, x_2, \dots, x_N}$$</span> is a dataset sample represented as sequence of tokens
 - <span>$$P(x_i \mid x_{<i})$$</span> is the model likelihood of the i-th token given the sample till that token
 
 Then the perplexity for this sample can be calculated as follows:
@@ -78,7 +78,7 @@ $$\begin{align*}
 & = \exp \left( -\frac{1}{N} \log (\prod_{i=1}^{N} P(x_i \mid x_{<i})) \right)
 \end{align*}  $$
 
-The product form of the equation shows that this is a direct measure of the joint probability of this sequence of tokens according to the model. Since this computation has a balancing negative sign to account for the negative log value a lower joining probability results in a higher perplexity value and vice versa. We evaluated the following datasets as out-of-distribution candidates:
+The product form of the equation shows that this is a direct measure of the joint probability of this sequence of tokens according to the model. Since this computation has a balancing negative sign to account for the negative log value a lower joint probability results in a higher perplexity value and vice versa. We evaluated the following datasets as out-of-distribution candidates:
 
 - [MedMCQA](https://huggingface.co/datasets/syz-ml2025/medmcqa) : Multiple Choice Questions (MCQ) dataset focusing on the medical domain
 - [BirdSQL](https://huggingface.co/datasets/birdsql/bird23-train-filtered) : Text to SQL generation dataset
@@ -143,7 +143,7 @@ We tested the impact of how forgetting responds to mixing the base dataset in di
 
 We run 2 baseline experiments for each model size: using only the base dataset and only the target dataset. The mixing experiments are the base dataset being mixed in ratios of 0.9:0.1, 0.75:0.25 and 0.5:0.5. (0.9:0.1 means 90% of samples are from the base in-distribution dataset, while 10% are from the target out-of-distribution dataset.)
 
-The base dataset is randomly subsampled for each of these experiments. For simpler reference and analysis let’s define a mixing ratio <span>$$0 <= \alpha < 1$$</span>, such that the final dataset mixture includes <span>$$ N^{'}_{B} = \frac{\alpha}{1 - \alpha} N_T$$</span> samples from the base dataset where <span>$$N_T$$</span>is the number of samples in the target dataset. In each of these mixtures the complete target dataset is used, contributing <span>$$N_T$$</span> samples for a total training dataset size of <span>$$\frac{N_T}{1 - \alpha}$$</span>.
+The base dataset is randomly subsampled for each of these experiments. For simpler reference and analysis let’s define a mixing ratio <span>$$0 \le \alpha < 1$$</span>, such that the final dataset mixture includes <span>$$ N'_{B} = \frac{\alpha}{1 - \alpha} N_T$$</span> samples from the base dataset where <span>$$N_T$$</span> is the number of samples in the target dataset. In each of these mixtures the complete target dataset is used, contributing <span>$$N_T$$</span> samples for a total training dataset size of <span>$$\frac{N_T}{1 - \alpha}$$</span>.
 
 Since, our target dataset has 182,712 samples, this means that:
 
@@ -308,9 +308,9 @@ All models in this experiment are trained starting from the Qwen3 base checkpoin
 
 [Figure 3](#fig3_data_mixing) shows that for all non-target metrics other than Science using just the target dataset shows significant forgetting. Math and ARC-AGI are almost completely forgotten for all model sizes up to 8B parameters. The mixed dataset recovers the performance to similar levels as the base dataset. The base dataset delivers performance comparable to the public model in all domains and significantly better on ARC-AGI.
 
-The Science domain evaluations do not suffer severe forgetting likely because MedMCQA is very close to this domain. In fact, for the 8B and 14B sizes due to these transfer learning dynamics the <span>$$\alpha = 0.9$$</span> model outperforms both the public ITed and the base dataset (<span>$$\alpha = 1$$</span>) models.
+The Science domain evaluations do not suffer severe forgetting likely because MedMCQA is very close to this domain. In fact, for the 8B and 14B sizes due to these transfer learning dynamics the <span>$$\alpha = 0.9$$</span> model outperforms both the public instruction-tuned and the base dataset (<span>$$\alpha = 1$$</span>) models.
 
-Performance on the target metric of MedMCQA follows expected behavior with best results achieved by the model when trained only with the target dataset. It is important to note that the <span>$$\alpha = 0.9$$</span> model for all sizes is still significantly better than the public ITed and base dataset (<span>$$\alpha = 1$$</span>) model and for all sizes other than the 0.6B mostly maintains the performance gains of the target dataset (<span>$$\alpha = 0$$</span>) model.
+Performance on the target metric of MedMCQA follows expected behavior with best results achieved by the model when trained only with the target dataset. It is important to note that the <span>$$\alpha = 0.9$$</span> model for all sizes is still significantly better than the public instruction-tuned and base dataset (<span>$$\alpha = 1$$</span>) model and for all sizes other than the 0.6B mostly maintains the performance gains of the target dataset (<span>$$\alpha = 0$$</span>) model.
 
 #### Key Observations
 
@@ -379,7 +379,7 @@ The mixing ratio comparison shows us that:
 
 ### Different Starting Models
 
-We have trained all our models starting from Qwen3 base checkpoints. A natural question here might be: What happens if we train starting from the instruction tuned public Qwen3 checkpoints for our target task? In this section we examine this question and compare the ITed model tuned with the target dataset and an <span>$$\alpha = 0.9$$</span> mix to the ITed model itself and the base model tuned with an <span>$$\alpha = 0.9$$</span> mix.
+We have trained all our models starting from Qwen3 base checkpoints. A natural question here might be: What happens if we train starting from the instruction tuned public Qwen3 checkpoints for our target task? In this section we examine this question and compare the instruction-tuned model tuned with the target dataset and an <span>$$\alpha = 0.9$$</span> mix to the instruction-tuned model itself and the base model tuned with an <span>$$\alpha = 0.9$$</span> mix.
 
 <figure align="center" id="fig5_starting_models">
 
@@ -416,12 +416,12 @@ We have trained all our models starting from Qwen3 base checkpoints. A natural q
   </tr>
 </table>
 <figcaption align="left">
-<sub><b>Figure 5: Performance across Starting Models.</b> <i>A comparison across (a) Math, (b) Science, (c) Coding, (d) IFEval, (e) ARC-AGI and (f) MedMCQA benchmarks showing how different starting models impact forgetting and performance on the target metric. Qwen 3 Public is the public instruction tuned Qwen3 model, &alpha;=0 (IT) and &alpha;=0.9 (IT) are the public ITed Qwen3 model trained only with the target dataset and the &alpha;=0.9 mixed dataset. &alpha;=0.9 (Base) is the base Qwen3 model trained on a 90% VTC dataset and 10% target dataset mix.</i></sub>
+<sub><b>Figure 5: Performance across Starting Models.</b> <i>A comparison across (a) Math, (b) Science, (c) Coding, (d) IFEval, (e) ARC-AGI and (f) MedMCQA benchmarks showing how different starting models impact forgetting and performance on the target metric. Qwen 3 Public is the public instruction tuned Qwen3 model, &alpha;=0 (IT) and &alpha;=0.9 (IT) are the public instruction-tuned Qwen3 model trained only with the target dataset and the &alpha;=0.9 mixed dataset. &alpha;=0.9 (Base) is the base Qwen3 model trained on a 90% VTC dataset and 10% target dataset mix.</i></sub>
 </figcaption>
 
 </figure>
 
-In [Figure 5](#fig5_starting_models), among the non-target metrics other than science we see a common trend that starting with the IT model and using only the target dataset (<span>$$\alpha = 0$$</span>) shows severe forgetting. The base model and the ITed model trained using the <span>$$\alpha = 0.9$$</span> mix match or surpass the performance of the public model. This shows that starting with an ITed model while better than starting with the base model is still not a solution to forgetting. This also shows the high quality of our dataset that it can provide further gains on the public ITed model.
+In [Figure 5](#fig5_starting_models), among the non-target metrics other than science we see a common trend that starting with the IT model and using only the target dataset (<span>$$\alpha = 0$$</span>) shows severe forgetting. The base model and the instruction-tuned model trained using the <span>$$\alpha = 0.9$$</span> mix match or surpass the performance of the public model. This shows that starting with an instruction-tuned model while better than starting with the base model is still not a solution to forgetting. This also shows the high quality of our dataset that it can provide further gains on the public instruction-tuned model.
 
 Science domain metrics show different trends based on the model size. The advantage of data mixing is much more apparent in 0.6B and 1.7B models. Overall though there are no disadvantages to mixing across all model sizes. The IT model demonstrating significant forgetting is a clear indication that cross domain characteristics of our target dataset are not enough to mitigate forgetting on its own.
 
@@ -431,9 +431,9 @@ The performance of the target metric, MedMCQA, shows no additional gain when we 
 
 The comparison of different starting models shows us:
 
-- Using the ITed model as the starting model is better than the Base model.
+- Using the instruction-tuned model as the starting model is better than the Base model.
 - The IT model also shows catastrophic forgetting and loses performance on non target metrics.
-- The <span>$$\alpha = 0.9$$</span> mix avoids forgetting even with the ITed starting model showing its robustness.
+- The <span>$$\alpha = 0.9$$</span> mix avoids forgetting even with the instruction-tuned starting model showing its robustness.
 
 ## Acknowledgements
 
