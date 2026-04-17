@@ -1302,8 +1302,6 @@ def replace_cl(text : str ) -> str:
         'NAS': '{{vertex_nas_name_short}}',
         'Vertex AI Neural Architectural Search': '{{vertex_nas_name}}',
         'Neural Architectural Search': '{{vertex_nas_name_short}}',
-        '{{vertex_nas_name}}',
-        'Neural Architectural Search': '{{vertex_nas_name_short}}',
         'Vertex Workbench': '{{vertex_workbench_name}}',
         'Vertex AI Workbench': '{{vertex_workbench_name}}',
         #'Vertex SDK': '{{vertex_sdk_name}}',
@@ -1345,7 +1343,25 @@ def replace_backtick(text: str) -> str:
     return updated_text
 
 
-
+class StorageMigrationRule(NotebookRule):
+    def validate(self, notebook: Notebook) -> bool:
+        """
+        Check for deprecated gsutil commands and migrate to gcloud storage.
+        """
+        ret = True
+        for cell in notebook._cells:
+            if cell['cell_type'] == 'code':
+                for i, line in enumerate(cell['source']):
+                    if 'gsutil' in line:
+                        # 1. التبليغ عن الخطأ باستخدام الكود (103)
+                        notebook.report_error(ErrorCode.ERROR_GSUTIL_DEPRECATED, f"Deprecated gsutil usage: {line.strip()}")
+                        
+                        # 2. الإصلاح التلقائي في محتوى الخلية
+                        if args.fix:
+                            if notebook.report_fix(FixCode.FIX_GSUTIL_TO_GCLOUD, "Migrating gsutil to gcloud storage"):
+                                cell['source'][i] = line.replace('gsutil', 'gcloud storage')
+                                ret = False
+        return ret
 # Instantiate the rules
 copyright = CopyrightRule()
 notices = NoticesRule()
@@ -1367,11 +1383,11 @@ beforebegin = BeforeBeginRule()
 enableapis = EnableAPIsRule()
 setupproject = SetupProjectRule()
 
- # Cell Validation
+# Cell Validation
 rules = [ copyright, notices, title, links, testenv, table, overview, objective,
           recommendations, dataset, costs, setuplocal, helpers,
           installation, restart, versions, beforebegin, enableapis,
-          setupproject
+          setupproject, storage_migration # <--- السطر ده هو اللي هيفعل القاعدة الجديدة
 ]
 
 if args.web:
