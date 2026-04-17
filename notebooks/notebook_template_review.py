@@ -101,6 +101,8 @@ class ErrorCode(Enum):
     #   H1 heading required
     #   git, colab and workbench link required
     #   links must be valid links
+    # Storage migration rules
+    ERROR_GSUTIL_DEPRECATED = 103,  # Warning for deprecated gsutil usage
     ERROR_TITLE_HEADING = 1,
     ERROR_HEADING_CASE = 2,
     ERROR_HEADING_CAP = 3,
@@ -1300,6 +1302,8 @@ def replace_cl(text : str ) -> str:
         'NAS': '{{vertex_nas_name_short}}',
         'Vertex AI Neural Architectural Search': '{{vertex_nas_name}}',
         'Neural Architectural Search': '{{vertex_nas_name_short}}',
+        '{{vertex_nas_name}}',
+        'Neural Architectural Search': '{{vertex_nas_name_short}}',
         'Vertex Workbench': '{{vertex_workbench_name}}',
         'Vertex AI Workbench': '{{vertex_workbench_name}}',
         #'Vertex SDK': '{{vertex_sdk_name}}',
@@ -1309,12 +1313,14 @@ def replace_cl(text : str ) -> str:
         'Vertex AI': '{{vertex_ai_name}}',
         'Ray on Vertex AI': '{{ray_vertex_ai_name}}',
         'Google Cloud console': '{{console_name}}',
-        
         'Cloud Storage': '{{storage_name}}',
         'GCS': '{{storage_name}}',
         'GCP': '{{gcp_name}}',
         'TensorFlow Enterprise': '{{tf4gcp_name}}',
         'TensorFlow': '{{tensorflow_name}}',
+        'gsutil ': 'gcloud storage ',
+        '!gsutil ': '!gcloud storage ',
+        '! gsutil ': '! gcloud storage ',
     }
     
     for key, value in substitutions.items():
