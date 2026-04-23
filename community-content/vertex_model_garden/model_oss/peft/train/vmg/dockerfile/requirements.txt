@@ -18,7 +18,7 @@ fsspec==2024.3.1
 gcsfs==2024.3.1
 immutabledict==4.2.1
 ninja==1.11.1 # Needed to avoid `ninja 1.11.1.1 is not supported on this platform` error
-nltk==3.9.1
+nltk==3.9.4
 optimum==1.17.1
 peft==0.12.0
 pynvml==11.5.3
