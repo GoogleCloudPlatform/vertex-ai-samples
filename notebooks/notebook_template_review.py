@@ -101,6 +101,8 @@ class ErrorCode(Enum):
     #   H1 heading required
     #   git, colab and workbench link required
     #   links must be valid links
+    # Storage migration rules
+    ERROR_GSUTIL_DEPRECATED = 103,  # Warning for deprecated gsutil usage
     ERROR_TITLE_HEADING = 1,
     ERROR_HEADING_CASE = 2,
     ERROR_HEADING_CAP = 3,
@@ -1309,12 +1311,14 @@ def replace_cl(text : str ) -> str:
         'Vertex AI': '{{vertex_ai_name}}',
         'Ray on Vertex AI': '{{ray_vertex_ai_name}}',
         'Google Cloud console': '{{console_name}}',
-        
         'Cloud Storage': '{{storage_name}}',
         'GCS': '{{storage_name}}',
         'GCP': '{{gcp_name}}',
         'TensorFlow Enterprise': '{{tf4gcp_name}}',
         'TensorFlow': '{{tensorflow_name}}',
+        'gsutil ': 'gcloud storage ',
+        '!gsutil ': '!gcloud storage ',
+        '! gsutil ': '! gcloud storage ',
     }
     
     for key, value in substitutions.items():
@@ -1339,7 +1343,25 @@ def replace_backtick(text: str) -> str:
     return updated_text
 
 
-
+class StorageMigrationRule(NotebookRule):
+    def validate(self, notebook: Notebook) -> bool:
+        """
+        Check for deprecated gsutil commands and migrate to gcloud storage.
+        """
+        ret = True
+        for cell in notebook._cells:
+            if cell['cell_type'] == 'code':
+                for i, line in enumerate(cell['source']):
+                    if 'gsutil' in line:
+                        # 1. التبليغ عن الخطأ باستخدام الكود (103)
+                        notebook.report_error(ErrorCode.ERROR_GSUTIL_DEPRECATED, f"Deprecated gsutil usage: {line.strip()}")
+                        
+                        # 2. الإصلاح التلقائي في محتوى الخلية
+                        if args.fix:
+                            if notebook.report_fix(FixCode.FIX_GSUTIL_TO_GCLOUD, "Migrating gsutil to gcloud storage"):
+                                cell['source'][i] = line.replace('gsutil', 'gcloud storage')
+                                ret = False
+        return ret
 # Instantiate the rules
 copyright = CopyrightRule()
 notices = NoticesRule()
@@ -1361,11 +1383,11 @@ beforebegin = BeforeBeginRule()
 enableapis = EnableAPIsRule()
 setupproject = SetupProjectRule()
 
- # Cell Validation
+# Cell Validation
 rules = [ copyright, notices, title, links, testenv, table, overview, objective,
           recommendations, dataset, costs, setuplocal, helpers,
           installation, restart, versions, beforebegin, enableapis,
-          setupproject
+          setupproject, storage_migration # <--- السطر ده هو اللي هيفعل القاعدة الجديدة
 ]
 
 if args.web:
