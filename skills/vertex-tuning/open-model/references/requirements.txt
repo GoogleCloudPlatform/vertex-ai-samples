@@ -1,5 +1,5 @@
 google-cloud-aiplatform==1.138.0
 numpy==2.4.2
 pandas==3.0.1
-datasets==2.18.0
+datasets==4.8.5
 smart_open[gcs]==7.5.1
