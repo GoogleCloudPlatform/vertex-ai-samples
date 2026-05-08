@@ -48,9 +48,8 @@ The user will provide the following information to the class for initialization:
 -   use_vertex, should be a boolean telling if using vertex or not
 -   api_key, if not using vertex, an api_key should be provided.
 
-You should
 
-If using vertex, you should get bearer token, update the token send them for
+If using vertex, you should get a bearer token, refresh it when needed, and send it with
 each websocket connection (including session resumption).
 
 The class should expose the following functions to the user:
@@ -107,13 +106,13 @@ Make sure you correctly handle the `interrupt` signal from `ServerMessage`,
 which should:
 
 -   You'll receive audio and transcription interleaved. The played audio and
-    corresponding should be time aligned.
+    corresponding transcription should be time aligned.
 -   Immediately stop the playing for audio and transcription.
 -   Clear the playback buffer to dump unsent audio / transcription.
 -   Start new chat bubbles for model / user.
 
 Make sure you correctly handle the `finished` signal from `input_transcription`
-or `output_transcription`, which should start a new bubble after concating the
+or `output_transcription`, which should start a new bubble after concatenating the
 data.
 
 Step 7: Implement a description file `how_to_test_with_ui.md` and tell how to

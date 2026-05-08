@@ -19,7 +19,7 @@ This skill guides the implementation of a `SessionManager` class for the Gemini 
 
 ## Protocol Details
 
--   **Proto File**: `google3/google/ai/generativelanguage/v1main/generative_service.proto`
+-   **Proto File**: `client_server_messages.proto`
 -   **Server Message**: `BidiGenerateContentServerMessage`
 -   **Client Message**: `BidiGenerateContentClientMessage`
 
@@ -29,7 +29,7 @@ To support transparent session resumption, the manager must implement the follow
 
 ### 1. Enable Transparent Session Resumption
 Modify the `session_resumption` field in the `setup` message (type `BidiGenerateContentSetup`) of the initial `BidiGenerateContentClientMessage`. Always set the `transparent` field to `true` in the `SessionResumptionConfig`. This enables the model to return `last_consumed_client_message_index` in `SessionResumptionUpdate` messages, indicating when to update the buffer.
--   **Proto Reference**: `google3/google/ai/generativelanguage/v1main/generative_service.proto`
+-   **Proto Reference**: `client_server_messages.proto`
     -   `BidiGenerateContentSetup.session_resumption` (type `SessionResumptionConfig`)
     -   `SessionResumptionConfig.transparent` (bool)
 
