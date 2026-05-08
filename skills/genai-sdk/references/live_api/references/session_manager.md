@@ -49,13 +49,13 @@ Maintain a buffer of sent messages to replay if a disconnection occurs.
 Catch disconnections and initiate resumption:
 -   **Proactive Reconnection**: If the server sends a `go_away` signal, proactively reconnect using the latest handle.
 -   **Error Handling**: Catch WebSocket errors (specifically error codes **1000** or **1006**) in both sending and receiving loops. Trigger the reconnection process on these errors.
--   **Unexpected Errors**: For other unexpected errors, the session manager should be stopped and raise that error immediately. All following user send / receive function call should raise Exceptions with stop reasons.
+-   **Unexpected Errors**: For other unexpected errors, the session manager should be stopped and raise that error immediately. Subsequent user send/receive function calls should raise exceptions with stop reasons.
 -   **Reconnection Errors**: Exceptions can also occur during the reconnection process itself. These must be handled correctly, for example, by implementing retries with exponential backoff or failing gracefully if the connection cannot be re-established.
 
 ### 5. Reconnection with Message Replay
 When a disconnection occurs:
-1.  Establish a new websocket connection and passing the stored session handle.
-2.  Resend all messages remaining in the buffer BEFORE sending / receiving any other messages. [Do not modify the buffer until receiving the resumption handle update. Since there could be connection failure during this time and a new retry will be needed.]
+1.  Establish a new websocket connection and pass the stored session handle.
+2.  Resend all messages remaining in the buffer BEFORE sending / receiving any other messages. Do not modify the buffer until receiving the resumption handle update, since there could be connection failure during this time and a new retry will be needed.
 3.  The first message sent from the buffer on the new connection MUST be marked with index **1**. THIS IS VERY IMPORTANT.
 
 ## Gotchas

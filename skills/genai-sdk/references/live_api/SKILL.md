@@ -20,7 +20,7 @@ Copy existing reference files to user provided destination folder
 
 Step 2:
 
-Exam the public documents mentioned in `client_server_messages.md`. Checking if
+Examine the public documents mentioned in `client_server_messages.md`. Checking if
 there are any discrepancies between the public documents and the created
 markdown / proto as `client_server_messages`. If yes, update these file in the
 destination folder
@@ -29,7 +29,7 @@ Step 3:
 
 Implement a class in the user wanted coding language that work as a LiveAPI
 service, it should import the existing proto file, build the connection to the
-LiveAPI endpoint, expose functions to user and let use able to send and receive
+LiveAPI endpoint, expose functions to user and let user able to send and receive
 data to / from the model.
 
 If a language need a specific environment, such as python, you should create the

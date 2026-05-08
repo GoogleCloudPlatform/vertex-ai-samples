@@ -555,7 +555,7 @@ Reconnect with:
 
 ---
 
-## 13b. Full input examples — audio, video, text
+## 14. Full input examples — audio, video, text
 
 There are **two distinct ways** to send user input. Pick one based on intent:
 
@@ -940,7 +940,7 @@ Text + image + audio in a single user turn:
 
 ---
 
-## 14. Vertex vs Google AI differences
+## 15. Vertex vs Google AI differences
 
 | Area | Vertex AI | Google AI |
 | --- | --- | --- |
@@ -960,7 +960,7 @@ Text + image + audio in a single user turn:
 
 ---
 
-## 15. Common pitfalls
+## 16. Common pitfalls
 
 - **Sending data before `setupComplete`** — server will close the connection.
 - **Mixing `clientContent` and `realtimeInput`** for the same logical turn —
