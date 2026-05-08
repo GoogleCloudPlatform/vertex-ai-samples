@@ -219,7 +219,7 @@ Depending on the specific user request, refer to the following reference files f
 - **Structured Output & Tools**: JSON generation, Function Calling, Search Grounding, and Code Execution. See [references/structured_and_tools.md](references/structured_and_tools.md)
 - **Media Generation**: Image generation, Image editing, and Video generation. See [references/media_generation.md](references/media_generation.md)
 - **Bounding Box Detection**: Object detection and localization within images and video. See [references/bounding_box.md](references/bounding_box.md)
-- **Live API**: Real-time bidirectional streaming for voice, vision, and text. See [references/live_api.md](references/live_api.md)
+- **Live API**: Real-time bidirectional streaming for voice, vision, and text. See [references/live_api/SKILL.md](references/live_api/SKILL.md)
 - **Advanced Features**: Content Caching, Batch Prediction, and Thinking/Reasoning. See [references/advanced_features.md](references/advanced_features.md)
 - **Safety**: Adjusting Responsible AI filters and thresholds. See [references/safety.md](references/safety.md)
 - **Model Tuning**: Supervised Fine-Tuning and Preference Tuning. See [references/model_tuning.md](references/model_tuning.md)
