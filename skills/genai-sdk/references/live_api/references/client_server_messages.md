@@ -5,13 +5,12 @@ API as exposed by two public endpoints:
 
 | Backend | Docs |
 | --- | --- |
-| **Vertex AI** (`BidiGenerateContent*`) | https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/multimodal-live |
+| **Gemini Enterprise Agent Platform** (`BidiGenerateContent*`) | https://docs.cloud.google.com/gemini-enterprise-agent-platform/reference/models/multimodal-live |
 | **Google AI / Gemini Developer API** (`LiveClient*` / `LiveServer*`) | https://ai.google.dev/api/live |
 
 The two services share the same underlying RPC (`BidiGenerateContent`) and the
 same JSON/proto shapes, but differ in endpoint URL, auth, model name format,
-and a handful of fields. Differences are called out inline and summarized in
-[§ Vertex vs Google AI differences](#vertex-vs-google-ai-differences).
+and a handful of fields. Search corresponding websites for more information.
 
 ---
 
@@ -21,14 +20,14 @@ and a handful of fields. Differences are called out inline and summarized in
 
 | Backend | WebSocket URI |
 | --- | --- |
-| Vertex AI | `wss://{LOCATION}-aiplatform.googleapis.com/ws/google.cloud.aiplatform.v1beta1.LlmBidiService/BidiGenerateContent` |
-| Vertex AI (global) | `wss://aiplatform.googleapis.com/ws/google.cloud.aiplatform.v1beta1.LlmBidiService/BidiGenerateContent` |
+| Gemini Enterprise Agent Platform | `wss://{LOCATION}-aiplatform.googleapis.com/ws/google.cloud.aiplatform.v1beta1.LlmBidiService/BidiGenerateContent` |
+| Gemini Enterprise Agent Platform (global) | `wss://aiplatform.googleapis.com/ws/google.cloud.aiplatform.v1beta1.LlmBidiService/BidiGenerateContent` |
 | Google AI | `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent` |
 | Google AI (ephemeral token) | `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained` |
 
 ### Auth
 
-- **Vertex AI** — `Authorization: Bearer <ADC token>` (or API key in Express
+- **Gemini Enterprise Agent Platform** — `Authorization: Bearer <ADC token>` (or API key in Express
   mode).
 - **Google AI** — `?key=<API_KEY>` query parameter, **or**
   `Authorization: Token <ephemeral_token>` against the `Constrained` method.
@@ -119,14 +118,14 @@ Initial-and-only-once configuration for the session.
 
 | Field | Type | Notes |
 | --- | --- | --- |
-| `model` | `string` (required) | Vertex: `projects/{p}/locations/{l}/publishers/google/models/{m}`. Google AI: `models/{m}`. |
+| `model` | `string` (required) | Gemini Enterprise: `projects/{p}/locations/{l}/publishers/google/models/{m}`. Google AI: `models/{m}`. |
 | `generationConfig` | `GenerationConfig` | Unsupported sub-fields here: `responseLogprobs`, `responseMimeType`, `logprobs`, `responseSchema`, `stopSequence`, `routingConfig`, `audioTimestamp`. |
 | `systemInstruction` | `Content` | Text-only parts. |
 | `tools[]` | repeated `Tool` | Function declarations and built-ins (Search, code execution). |
 | `sessionResumption` | `SessionResumptionConfig` | `{ handle?: string, transparent?: bool }`. Provide `handle` to resume; omit to start a new resumable session. |
 | `contextWindowCompression` | `ContextWindowCompressionConfig` | `{ triggerTokens?: int64, slidingWindow?: { targetTokens?: int64 } }`. |
 | `realtimeInputConfig` | `RealtimeInputConfig` | See below. |
-| `inputAudioTranscription` | `AudioTranscriptionConfig` | Vertex: empty type. Google AI: `{ languageCodes?: string[] }`. |
+| `inputAudioTranscription` | `AudioTranscriptionConfig` | Gemini Enterprise: empty type. Google AI: `{ languageCodes?: string[] }`. |
 | `outputAudioTranscription` | `AudioTranscriptionConfig` | Same. |
 | `proactivity` | `ProactivityConfig` | **Google AI only.** `{ proactiveAudio?: bool }`. |
 
@@ -136,7 +135,7 @@ Initial-and-only-once configuration for the session.
 | --- | --- | --- |
 | `automaticActivityDetection` | `AutomaticActivityDetection` | Unset → server-side VAD enabled by default. |
 | `activityHandling` | enum | `START_OF_ACTIVITY_INTERRUPTS` (default) \| `NO_INTERRUPTION`. |
-| `turnCoverage` | enum | Vertex default `TURN_INCLUDES_ALL_INPUT`; Google AI default `TURN_INCLUDES_ONLY_ACTIVITY`. Also `TURN_INCLUDES_AUDIO_ACTIVITY_AND_ALL_VIDEO`. |
+| `turnCoverage` | enum | Gemini Enterprise default `TURN_INCLUDES_ALL_INPUT`; Google AI default `TURN_INCLUDES_ONLY_ACTIVITY`. Also `TURN_INCLUDES_AUDIO_ACTIVITY_AND_ALL_VIDEO`. |
 
 ### `AutomaticActivityDetection`
 
@@ -215,7 +214,6 @@ The Live API supports **30 prebuilt voices**. Names are case-sensitive.
 
 **References (authoritative voice list):**
 
-- Vertex AI: <https://cloud.google.com/vertex-ai/generative-ai/docs/live-api/configure-language-voice#voices_supported>
 - Gemini Enterprise Agent Platform: <https://cloud.google.com/gemini-enterprise-agent-platform/models/live-api/configure-language-voice#voices-supported>
 - Google AI (Gemini Developer API) — Speech generation voices: <https://ai.google.dev/gemini-api/docs/speech-generation#voices>
 
@@ -232,7 +230,7 @@ The Live API supports **24 BCP-47 languages** for `speechConfig.languageCode`:
 `pl-PL`, `pt-BR`, `ro-RO`, `ru-RU`, `ta-IN`, `te-IN`, `th-TH`, `tr-TR`,
 `uk-UA`, `vi-VN`.
 
-Reference: <https://cloud.google.com/vertex-ai/generative-ai/docs/live-api/configure-language-voice#languages_supported>
+Reference: <https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/live-api/configure-language-voice#languages-supported>
 
 > Native-audio models (e.g. `gemini-live-2.5-flash-native-audio`) can switch
 > languages mid-conversation; for those, `languageCode` is optional and the
@@ -311,7 +309,7 @@ derived from VAD (or activity events).
 
 | Field | Type | Notes |
 | --- | --- | --- |
-| `mediaChunks[]` | repeated `Blob` | Combined audio/video chunks. Primary field on Vertex AI raw WebSocket. |
+| `mediaChunks[]` | repeated `Blob` | Combined audio/video chunks. Primary field on Gemini Enterprise raw WebSocket. |
 | `audio` | `Blob` | Typed realtime audio. PCM 16-bit, 16 kHz mono input. (Google AI raw WebSocket; SDKs on both backends accept this.) |
 | `video` | `Blob` | Typed realtime video frame (`image/jpeg`/`png`/`webp`). (Google AI raw WebSocket; SDKs on both backends accept this.) |
 | `text` | `string` | Realtime text input. **Google AI only.** |
@@ -330,7 +328,7 @@ derived from VAD (or activity events).
 
 | Field | Type | Notes |
 | --- | --- | --- |
-| `functionResponses[]` | repeated `FunctionResponse` | Match `FunctionCall.id` from the server. **Google AI requires `id`**; Vertex does not. |
+| `functionResponses[]` | repeated `FunctionResponse` | Match `FunctionCall.id` from the server. **Google AI requires `id`**; Gemini Enterprise does not. |
 
 ---
 
@@ -398,7 +396,7 @@ with mimeType `audio/pcm;rate=24000`. Concatenate as they stream. On
 
 ### `UsageMetadata`
 
-**Vertex AI (cached-content style):**
+**Gemini Enterprise (cached-content style):**
 
 | Field | Type |
 | --- | --- |
@@ -428,7 +426,7 @@ with mimeType `audio/pcm;rate=24000`. Concatenate as they stream. On
 
 ## 13. End-to-end JSON examples
 
-### Setup (Vertex)
+### Setup (Gemini Enterprise)
 
 ```json
 {
@@ -483,7 +481,7 @@ with mimeType `audio/pcm;rate=24000`. Concatenate as they stream. On
 }
 ```
 
-(Vertex equivalent uses `mediaChunks: [...]` instead of `audio:`.)
+(Gemini Enterprise equivalent uses `mediaChunks: [...]` instead of `audio:`.)
 
 ### Typed user message (turn-based)
 
@@ -566,7 +564,7 @@ There are **two distinct ways** to send user input. Pick one based on intent:
 | **Added to history?** | **No** (transient signals) | **Yes** (persistent conversation) |
 | **Turn boundary** | VAD (auto), or explicit `activityStart`/`End` | Explicit `turnComplete: true` |
 | **Effect on model** | Streamed; auto-triggers a turn when VAD fires | Setting `turnComplete` triggers generation; **interrupts** any ongoing model output |
-| **Field carriers** | `audio` / `video` / `text` (Google AI) or `mediaChunks[]` (Vertex) | `turns[].parts[].text` / `inlineData` / `fileData` |
+| **Field carriers** | `audio` / `video` / `text` (Google AI) or `mediaChunks[]` (Gemini Enterprise) | `turns[].parts[].text` / `inlineData` / `fileData` |
 | **Typical use** | Live voice + screen sharing, push-to-talk | Typed chat, uploading an image/clip, replaying history on resume |
 
 > You may use both in the same session — e.g. send a `clientContent` system
@@ -574,7 +572,7 @@ There are **two distinct ways** to send user input. Pick one based on intent:
 > logical user turn, pick one.
 
 The two parts below give every supported variant for **audio**, **video**,
-and **text** in each mode, for both Vertex AI and Google AI.
+and **text** in each mode, for both Gemini Enterprise and Google AI.
 
 ---
 
@@ -609,9 +607,9 @@ When the mic turns off (and server-side VAD is enabled), commit end-of-stream:
 { "realtimeInput": { "audioStreamEnd": true } }
 ```
 
-### 1.A.2 Continuous mic — Vertex AI
+### 1.A.2 Continuous mic — Gemini Enterprise
 
-Vertex uses the combined `mediaChunks[]` field:
+Gemini Enterprise uses the combined `mediaChunks[]` field:
 
 ```json
 {
@@ -665,7 +663,7 @@ client-side and send each as an inline image.
 }
 ```
 
-### 1.B.2 Continuous camera — Vertex AI
+### 1.B.2 Continuous camera — Gemini Enterprise
 
 ```json
 {
@@ -685,9 +683,9 @@ client-side and send each as an inline image.
 { "realtimeInput": { "text": "Switch to a calmer tone." } }
 ```
 
-### 1.C.2 — Vertex AI
+### 1.C.2 — Gemini Enterprise
 
-`realtimeInput.text` is **not supported** on Vertex. To inject ad-hoc text
+`realtimeInput.text` is **not supported** on Gemini Enterprise. To inject ad-hoc text
 during a live session, fall back to **Part 2** (`clientContent`) — note that
 sending `clientContent` will interrupt any ongoing model generation.
 
@@ -707,7 +705,7 @@ Typical "talk-to-the-screen" flow.
 { "realtimeInput": { "audioStreamEnd": true } }
 ```
 
-### 1.D.2 — Vertex AI
+### 1.D.2 — Gemini Enterprise
 
 Audio + video can be combined in a single frame via `mediaChunks[]`:
 
@@ -732,7 +730,7 @@ Audio + video can be combined in a single frame via `mediaChunks[]`:
 
 ## 1.E Realtime quick reference
 
-| Modality | Google AI | Vertex AI |
+| Modality | Google AI | Gemini Enterprise |
 | --- | --- | --- |
 | Audio chunk | `realtimeInput.audio` | `realtimeInput.mediaChunks[]` (`audio/pcm;rate=16000`) |
 | Video frame | `realtimeInput.video` | `realtimeInput.mediaChunks[]` (`image/jpeg`/`png`/`webp`) |
@@ -866,7 +864,7 @@ A pre-recorded clip delivered as a discrete history-bearing turn.
 }
 ```
 
-### 2.C.3 Image by URI (`fileData`) — Vertex AI
+### 2.C.3 Image by URI (`fileData`) — Gemini Enterprise
 
 ```json
 {
@@ -934,15 +932,15 @@ Text + image + audio in a single user turn:
 | Text | `turns[].parts[].text` | One or more `text` parts per turn. |
 | Inline audio | `turns[].parts[].inlineData` (`audio/pcm;rate=16000`) | Full clip, base64. |
 | Inline image / video frame | `turns[].parts[].inlineData` (`image/jpeg`/`png`/`webp`) | Multiple parts allowed for sampled clips. |
-| Remote file | `turns[].parts[].fileData` (`fileUri`) | Vertex: GCS URI. Google AI: Files-API URI. |
+| Remote file | `turns[].parts[].fileData` (`fileUri`) | Gemini Enterprise: GCS URI. Google AI: Files-API URI. |
 | Trigger generation | `turnComplete: true` | Omit to keep streaming more parts. |
 | History order | `turns[]` ordered oldest → newest | `role` is `"user"` or `"model"`. |
 
 ---
 
-## 15. Vertex vs Google AI differences
+## 15. Gemini Enterprise vs Google AI differences
 
-| Area | Vertex AI | Google AI |
+| Area | Gemini Enterprise | Google AI |
 | --- | --- | --- |
 | Type prefix | `BidiGenerateContent*` | `LiveClient*` / `LiveServer*` (wire types still `BidiGenerateContent*`) |
 | Endpoint host | `{location}-aiplatform.googleapis.com` (or global) | `generativelanguage.googleapis.com` |
@@ -972,5 +970,5 @@ Text + image + audio in a single user turn:
 - **Wrong audio format** — input must be 16 kHz PCM, output is 24 kHz PCM.
 - **No reconnect handling** — sessions have a max duration; always honor
   `goAway` and persist the latest `SessionResumptionUpdate.newHandle`.
-- **Wrong model-name format** between Vertex (`projects/.../models/...`) and
+- **Wrong model-name format** between Gemini Enterprise (`projects/.../models/...`) and
   Google AI (`models/...`).

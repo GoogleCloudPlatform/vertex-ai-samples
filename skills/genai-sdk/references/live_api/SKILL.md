@@ -1,6 +1,6 @@
 ---
 name: liveapi-service
-description: Generates a LiveAPI client service class in the user's chosen programming language. Use when the user wants to build, scaffold, or integrate a client that connects to the Gemini LiveAPI websocket endpoint (Vertex or non-Vertex), handles session setup/resumption, bearer token refresh, and sending/receiving `ClientMessage`/`ServerMessage` protos.
+description: Generates a LiveAPI client service class in the user's chosen programming language. Use when the user wants to build, scaffold, or integrate a client that connects to the Gemini LiveAPI websocket endpoint (Gemini Enterprise or non-Gemini Enterprise), handles session setup/resumption, bearer token refresh, and sending/receiving `ClientMessage`/`ServerMessage` protos.
 ---
 
 # LiveAPI Service Skill
@@ -45,11 +45,11 @@ The user will provide the following information to the class for initialization:
 -   location
 -   model_id
 -   config, should be a `ClientMessage` with `setup` field.
--   use_vertex, should be a boolean telling if using vertex or not
--   api_key, if not using vertex, an api_key should be provided.
+-   use_gemini_enterprise, should be a boolean telling if using Gemini Enterprise or not
+-   api_key, if not using Gemini Enterprise, an api_key should be provided.
 
 
-If using vertex, you should get a bearer token, refresh it when needed, and send it with
+If using Gemini Enterprise, you should get a bearer token, refresh it when needed, and send it with
 each websocket connection (including session resumption).
 
 The class should expose the following functions to the user:
@@ -100,7 +100,7 @@ proto for sending and receiving messages.
 
 While implementing the audio / transcription playback logic, please follow the
 instruction in
-https://docs.cloud.google.com/vertex-ai/generative-ai/docs/live-api/best-practices.
+https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/live-api/best-practices.
 
 Make sure you correctly handle the `interrupt` signal from `ServerMessage`,
 which should:

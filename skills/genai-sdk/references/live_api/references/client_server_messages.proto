@@ -5,7 +5,7 @@
 // client) are oneof envelopes; each WebSocket frame sets exactly one of the
 // listed fields.
 //
-// Covers both Vertex AI (`BidiGenerateContent*`) and Google AI / Gemini
+// Covers both Gemini Enterprise (`BidiGenerateContent*`) and Google AI / Gemini
 // Developer API (`LiveClient*` / `LiveServer*`) shapes; backend-specific
 // fields are noted inline.
 
@@ -85,7 +85,7 @@ message FileData {
 // A function call requested by the model.
 message FunctionCall {
   // Opaque ID matching the eventual `FunctionResponse.id`.
-  // Required on Google AI; optional on Vertex.
+  // Required on Google AI; optional on Gemini Enterprise.
   string id = 1;
   string name = 2;
   google.protobuf.Struct args = 3;
@@ -131,7 +131,7 @@ message Tool {
 
 message BidiGenerateContentSetup {
   // Required.
-  // Vertex: "projects/{p}/locations/{l}/publishers/google/models/{m}"
+  // Gemini Enterprise: "projects/{p}/locations/{l}/publishers/google/models/{m}"
   // Google AI: "models/{m}"
   string model = 1;
 
@@ -264,7 +264,7 @@ message AutomaticActivityDetection {
 }
 
 message AudioTranscriptionConfig {
-  // Google AI only; empty on Vertex.
+  // Google AI only; empty on Gemini Enterprise.
   repeated string language_codes = 1;
 }
 
@@ -288,7 +288,7 @@ message BidiGenerateContentRealtimeInput {
   message ActivityStart {}
   message ActivityEnd {}
 
-  // Combined audio/video chunks. Primary field on Vertex AI raw WebSocket.
+  // Combined audio/video chunks. Primary field on Gemini Enterprise raw WebSocket.
   repeated Blob media_chunks = 1;
 
   // Typed realtime audio (PCM 16-bit, 16 kHz mono). Google AI raw WebSocket.
@@ -310,7 +310,7 @@ message BidiGenerateContentRealtimeInput {
 
 message BidiGenerateContentToolResponse {
   // Match `FunctionCall.id` from the server.
-  // Google AI requires `id`; Vertex does not.
+  // Google AI requires `id`; Gemini Enterprise does not.
   repeated FunctionResponse function_responses = 1;
 }
 
@@ -388,7 +388,7 @@ message ModalityTokenCount {
   int32 token_count = 2;
 }
 
-// Token / duration accounting. Carries both Vertex- and Google-AI-shaped
+// Token / duration accounting. Carries both Gemini Enterprise- and Google-AI-shaped
 // fields; only one shape is populated depending on the backend.
 message UsageMetadata {
   enum TrafficType {
@@ -400,7 +400,7 @@ message UsageMetadata {
   // ---- Common ----
   int32 total_token_count = 1;
 
-  // ---- Vertex AI (cached-content style) ----
+  // ---- Gemini Enterprise (cached-content style) ----
   int32 text_count = 2;
   int32 image_count = 3;
   int32 video_duration_seconds = 4;
