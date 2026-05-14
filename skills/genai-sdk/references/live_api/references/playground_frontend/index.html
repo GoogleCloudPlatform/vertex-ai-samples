@@ -1,0 +1,732 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Live API Playground</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <!-- ============================== Header ============================ -->
+      <header class="app-header">
+        <div class="brand">
+          <div class="brand-mark"></div>
+          <div class="brand-text">Live API Playground</div>
+        </div>
+        <div class="status-indicator" id="status-indicator">
+          <span class="status-dot status-idle"></span>
+          <span class="status-label">Idle</span>
+        </div>
+        <div class="header-actions">
+          <button id="open-settings" type="button" class="btn btn-ghost">
+            Settings
+          </button>
+          <button id="session-button" type="button" class="btn btn-primary">
+            Start session
+          </button>
+        </div>
+      </header>
+
+      <!-- ============================== Main ============================== -->
+      <main class="app-main">
+        <!-- Conversation -->
+        <section class="panel conversation-panel">
+          <div class="panel-header">
+            <div class="panel-title">Conversation</div>
+            <button id="clear-chat" type="button" class="link-button">
+              Clear
+            </button>
+          </div>
+          <div class="conversation" id="conversation">
+            <div class="empty-state" id="empty-state">
+              <div class="empty-icon">💬</div>
+              <div class="empty-title">No messages yet</div>
+              <div class="empty-hint">
+                Start a session and begin speaking, or send a text message
+                below.
+              </div>
+            </div>
+          </div>
+          <div class="composer">
+            <textarea
+              id="chat-input"
+              class="composer-input"
+              placeholder="Type a message and press Enter…"
+              rows="1"
+            ></textarea>
+            <button id="send-button" type="button" class="btn btn-primary">
+              Send
+            </button>
+          </div>
+        </section>
+
+        <!-- Right rail -->
+        <aside class="panel side-panel">
+          <!-- Live config summary -->
+          <div class="side-section">
+            <div class="side-section-title">Configuration</div>
+            <dl class="kv-list" id="kv-list">
+              <dt>Environment</dt>
+              <dd id="kv-environment">—</dd>
+              <dt>Location</dt>
+              <dd id="kv-location">—</dd>
+              <dt>Endpoint</dt>
+              <dd id="kv-endpoint" class="mono ellipsis">—</dd>
+              <dt>Model</dt>
+              <dd id="kv-model" class="mono ellipsis">—</dd>
+              <dt>Voice</dt>
+              <dd id="kv-voice">—</dd>
+              <dt>Language</dt>
+              <dd id="kv-language">—</dd>
+            </dl>
+          </div>
+
+          <!-- Sources -->
+          <div class="side-section">
+            <div class="side-section-title">Sources</div>
+            <div class="source-row">
+              <label for="audio-source" class="source-label">Microphone</label>
+              <select id="audio-source" class="select">
+                <option value="none">None</option>
+              </select>
+            </div>
+            <div class="source-row">
+              <label for="video-source" class="source-label">Video</label>
+              <select id="video-source" class="select">
+                <option value="none">None</option>
+                <option value="screen">Screen sharing</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Video preview -->
+          <div class="side-section">
+            <div class="side-section-title">Preview</div>
+            <div class="video-preview" id="video-preview">
+              <video
+                class="video-display"
+                id="video-display"
+                autoplay
+                muted
+                playsinline
+              ></video>
+              <div class="video-empty" id="video-empty">No video</div>
+            </div>
+          </div>
+
+          <!-- Status messages -->
+          <div class="side-section">
+            <div class="status-message" id="status-message"></div>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <!-- ============================== Settings modal ====================== -->
+    <div
+      id="settings-modal"
+      class="modal-root"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="settings-title"
+      hidden
+    >
+      <div class="modal-backdrop" data-close-modal></div>
+      <div class="modal-card">
+        <header class="modal-card-header">
+          <div>
+            <h2 id="settings-title">Session settings</h2>
+            <p class="modal-card-subtitle">
+              Customize the WebSocket session setup.
+            </p>
+          </div>
+          <button
+            type="button"
+            class="icon-button"
+            aria-label="Close"
+            data-close-modal
+          >
+            <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true">
+              <path
+                d="M5 5l10 10M15 5L5 15"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
+        </header>
+
+        <div class="modal-card-body">
+          <!-- Environment -->
+          <div class="settings-block">
+            <label class="settings-label">Environment</label>
+            <div class="segmented" id="env-segmented">
+              <button
+                type="button"
+                class="segmented-option"
+                data-value="autopush"
+              >
+                Autopush
+              </button>
+              <button
+                type="button"
+                class="segmented-option"
+                data-value="staging"
+              >
+                Staging
+              </button>
+              <button
+                type="button"
+                class="segmented-option"
+                data-value="prod"
+              >
+                Prod
+              </button>
+            </div>
+          </div>
+
+          <!-- Location -->
+          <div class="settings-block">
+            <label class="settings-label" for="location">Location</label>
+            <select id="location" class="input">
+              <option value="global">global</option>
+              <option value="us-central1" selected>us-central1</option>
+              <option value="us-east4">us-east4</option>
+              <option value="us-east5">us-east5</option>
+              <option value="us-west1">us-west1</option>
+              <option value="us-west4">us-west4</option>
+              <option value="europe-west1">europe-west1</option>
+              <option value="europe-west2">europe-west2</option>
+              <option value="europe-west3">europe-west3</option>
+              <option value="europe-west4">europe-west4</option>
+              <option value="europe-southwest1">europe-southwest1</option>
+              <option value="asia-east1">asia-east1</option>
+              <option value="asia-northeast1">asia-northeast1</option>
+              <option value="asia-southeast1">asia-southeast1</option>
+            </select>
+          </div>
+
+          <!-- Computed Endpoint URL (read-only) -->
+          <div class="settings-block">
+            <label class="settings-label">
+              Endpoint URL
+              <span class="settings-hint-inline">
+                computed from Environment + Location
+              </span>
+            </label>
+            <div id="endpoint-display" class="computed-display mono"></div>
+          </div>
+
+          <!-- Model -->
+          <div class="settings-block">
+            <label class="settings-label" for="model-id">
+              Model ID
+              <span class="settings-hint-inline">short name only</span>
+            </label>
+            <input id="model-id" class="input mono" type="text" />
+          </div>
+
+          <!-- Speech (key, kept visible) -->
+          <div class="settings-block split">
+            <div>
+              <label class="settings-label" for="voice-name">Voice</label>
+              <input
+                id="voice-name"
+                class="input"
+                type="text"
+                value="Puck"
+              />
+            </div>
+            <div>
+              <label class="settings-label" for="language-code">
+                Language
+              </label>
+              <input
+                id="language-code"
+                class="input"
+                type="text"
+                value="en-US"
+              />
+            </div>
+          </div>
+
+          <!-- System instruction (always visible) -->
+          <div class="settings-block">
+            <label class="settings-label" for="system-instruction">
+              System instruction
+            </label>
+            <textarea
+              id="system-instruction"
+              class="input textarea"
+              rows="4"
+            >
+You are a helpful assistant.</textarea>
+          </div>
+
+          <!-- Advanced sections (collapsed by default) -->
+          <details class="advanced">
+            <summary>
+              <span>Generation parameters</span>
+              <svg
+                class="chev"
+                viewBox="0 0 20 20"
+                width="14"
+                height="14"
+                aria-hidden="true"
+              >
+                <path
+                  d="M6 8l4 4 4-4"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  fill="none"
+                />
+              </svg>
+            </summary>
+            <div class="advanced-body">
+              <div class="settings-block">
+                <label class="settings-label">Response modalities</label>
+                <div class="checkbox-row">
+                  <label class="checkbox">
+                    <input type="checkbox" id="modality-audio" checked />
+                    <span>AUDIO</span>
+                  </label>
+                  <label class="checkbox">
+                    <input type="checkbox" id="modality-text" />
+                    <span>TEXT</span>
+                  </label>
+                </div>
+              </div>
+              <div class="settings-grid">
+                <div>
+                  <label class="settings-label" for="gen-temperature">
+                    Temperature
+                  </label>
+                  <input
+                    id="gen-temperature"
+                    class="input"
+                    type="number"
+                    step="0.05"
+                    min="0"
+                    max="2"
+                    placeholder="default"
+                  />
+                </div>
+                <div>
+                  <label class="settings-label" for="gen-top-p">Top P</label>
+                  <input
+                    id="gen-top-p"
+                    class="input"
+                    type="number"
+                    step="0.05"
+                    min="0"
+                    max="1"
+                    placeholder="default"
+                  />
+                </div>
+                <div>
+                  <label class="settings-label" for="gen-top-k">Top K</label>
+                  <input
+                    id="gen-top-k"
+                    class="input"
+                    type="number"
+                    min="0"
+                    placeholder="default"
+                  />
+                </div>
+                <div>
+                  <label class="settings-label" for="gen-max-tokens">
+                    Max output tokens
+                  </label>
+                  <input
+                    id="gen-max-tokens"
+                    class="input"
+                    type="number"
+                    min="0"
+                    placeholder="default"
+                  />
+                </div>
+              </div>
+              <div class="settings-grid">
+                <div>
+                  <label class="settings-label" for="gen-thinking-budget">
+                    Thinking budget
+                  </label>
+                  <input
+                    id="gen-thinking-budget"
+                    class="input"
+                    type="number"
+                    min="0"
+                    placeholder="default (0 = disabled)"
+                  />
+                </div>
+                <div>
+                  <label class="settings-label" for="gen-media-resolution">
+                    Media resolution
+                  </label>
+                  <select id="gen-media-resolution" class="input">
+                    <option value="">Default</option>
+                    <option value="MEDIA_RESOLUTION_LOW">LOW</option>
+                    <option value="MEDIA_RESOLUTION_MEDIUM">MEDIUM</option>
+                    <option value="MEDIA_RESOLUTION_HIGH">HIGH</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <details class="advanced">
+            <summary>
+              <span>Transcription</span>
+              <svg
+                class="chev"
+                viewBox="0 0 20 20"
+                width="14"
+                height="14"
+                aria-hidden="true"
+              >
+                <path
+                  d="M6 8l4 4 4-4"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  fill="none"
+                />
+              </svg>
+            </summary>
+            <div class="advanced-body">
+              <label class="checkbox">
+                <input id="input-transcription" type="checkbox" checked />
+                <span>Input audio transcription</span>
+              </label>
+              <label class="checkbox">
+                <input id="output-transcription" type="checkbox" checked />
+                <span>Output audio transcription</span>
+              </label>
+            </div>
+          </details>
+
+          <details class="advanced">
+            <summary>
+              <span>Realtime input</span>
+              <svg
+                class="chev"
+                viewBox="0 0 20 20"
+                width="14"
+                height="14"
+                aria-hidden="true"
+              >
+                <path
+                  d="M6 8l4 4 4-4"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  fill="none"
+                />
+              </svg>
+            </summary>
+            <div class="advanced-body">
+              <div class="settings-block">
+                <label class="settings-label" for="activity-handling">
+                  Activity handling
+                </label>
+                <select id="activity-handling" class="input">
+                  <option value="">Default (interrupts on activity)</option>
+                  <option value="START_OF_ACTIVITY_INTERRUPTS">
+                    START_OF_ACTIVITY_INTERRUPTS
+                  </option>
+                  <option value="NO_INTERRUPTION">NO_INTERRUPTION</option>
+                </select>
+              </div>
+              <div class="settings-block">
+                <label class="settings-label" for="turn-coverage">
+                  Turn coverage
+                </label>
+                <select id="turn-coverage" class="input">
+                  <option value="">Default</option>
+                  <option value="TURN_INCLUDES_ALL_INPUT">
+                    TURN_INCLUDES_ALL_INPUT
+                  </option>
+                  <option value="TURN_INCLUDES_ONLY_ACTIVITY">
+                    TURN_INCLUDES_ONLY_ACTIVITY
+                  </option>
+                  <option value="TURN_INCLUDES_AUDIO_ACTIVITY_AND_ALL_VIDEO">
+                    TURN_INCLUDES_AUDIO_ACTIVITY_AND_ALL_VIDEO
+                  </option>
+                </select>
+              </div>
+              <label class="checkbox">
+                <input
+                  id="disable-automatic-activity-detection"
+                  type="checkbox"
+                />
+                <span>Disable automatic activity detection</span>
+              </label>
+              <div class="settings-grid">
+                <div>
+                  <label class="settings-label" for="aad-start-sensitivity">
+                    Start-of-speech sensitivity
+                  </label>
+                  <select id="aad-start-sensitivity" class="input">
+                    <option value="">Default</option>
+                    <option value="START_SENSITIVITY_HIGH">HIGH</option>
+                    <option value="START_SENSITIVITY_LOW">LOW</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="settings-label" for="aad-end-sensitivity">
+                    End-of-speech sensitivity
+                  </label>
+                  <select id="aad-end-sensitivity" class="input">
+                    <option value="">Default</option>
+                    <option value="END_SENSITIVITY_HIGH">HIGH</option>
+                    <option value="END_SENSITIVITY_LOW">LOW</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="settings-label" for="aad-prefix-padding">
+                    Prefix padding (ms)
+                  </label>
+                  <input
+                    id="aad-prefix-padding"
+                    class="input"
+                    type="number"
+                    min="0"
+                    placeholder="default"
+                  />
+                </div>
+                <div>
+                  <label class="settings-label" for="aad-silence-duration">
+                    Silence duration (ms)
+                  </label>
+                  <input
+                    id="aad-silence-duration"
+                    class="input"
+                    type="number"
+                    min="0"
+                    placeholder="default"
+                  />
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <details class="advanced">
+            <summary>
+              <span>Context window compression</span>
+              <svg
+                class="chev"
+                viewBox="0 0 20 20"
+                width="14"
+                height="14"
+                aria-hidden="true"
+              >
+                <path
+                  d="M6 8l4 4 4-4"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  fill="none"
+                />
+              </svg>
+            </summary>
+            <div class="advanced-body">
+              <label class="checkbox">
+                <input id="ctx-compression" type="checkbox" checked />
+                <span>Enable sliding window compression</span>
+              </label>
+              <div class="settings-grid">
+                <div>
+                  <label class="settings-label" for="ctx-trigger-tokens">
+                    Trigger tokens
+                  </label>
+                  <input
+                    id="ctx-trigger-tokens"
+                    class="input"
+                    type="number"
+                    value="100000"
+                  />
+                </div>
+                <div>
+                  <label class="settings-label" for="ctx-target-tokens">
+                    Target tokens
+                  </label>
+                  <input
+                    id="ctx-target-tokens"
+                    class="input"
+                    type="number"
+                    value="4000"
+                  />
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <details class="advanced">
+            <summary>
+              <span>Proactivity</span>
+              <svg
+                class="chev"
+                viewBox="0 0 20 20"
+                width="14"
+                height="14"
+                aria-hidden="true"
+              >
+                <path
+                  d="M6 8l4 4 4-4"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  fill="none"
+                />
+              </svg>
+            </summary>
+            <div class="advanced-body">
+              <label class="checkbox">
+                <input id="proactive-audio" type="checkbox" />
+                <span>Proactive audio</span>
+              </label>
+            </div>
+          </details>
+
+          <details class="advanced">
+            <summary>
+              <span>Setup JSON override</span>
+              <svg
+                class="chev"
+                viewBox="0 0 20 20"
+                width="14"
+                height="14"
+                aria-hidden="true"
+              >
+                <path
+                  d="M6 8l4 4 4-4"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  fill="none"
+                />
+              </svg>
+            </summary>
+            <div class="advanced-body">
+              <p class="settings-help">
+                When non-empty, this JSON is parsed as a
+                <code>BidiGenerateContentSetup</code> proto and used verbatim
+                (the structured fields above are ignored).
+              </p>
+              <textarea
+                id="setup-json-override"
+                class="input textarea mono"
+                rows="8"
+                placeholder='{"model": "...", "generationConfig": {...}}'
+              ></textarea>
+            </div>
+          </details>
+        </div>
+
+        <footer class="modal-card-footer">
+          <button type="button" class="btn btn-ghost" data-close-modal>
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary" id="settings-done">
+            Done
+          </button>
+        </footer>
+      </div>
+    </div>
+
+    <!-- ============================== Save recording modal ============== -->
+    <div
+      id="save-recording-modal"
+      class="modal-root"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="save-recording-title"
+      hidden
+    >
+      <div class="modal-backdrop" data-close-save-modal></div>
+      <div class="modal-card modal-card-narrow">
+        <header class="modal-card-header">
+          <div>
+            <h2 id="save-recording-title">Save session recording?</h2>
+            <p class="modal-card-subtitle">
+              The session ended. A .pb log (length-prefixed protobuf) of every message exchanged is
+              available on the server. Choose a filename and download it, or
+              discard it.
+            </p>
+          </div>
+          <button
+            type="button"
+            class="icon-button"
+            aria-label="Close"
+            data-close-save-modal
+          >
+            <svg
+              viewBox="0 0 20 20"
+              width="18"
+              height="18"
+              aria-hidden="true"
+            >
+              <path
+                d="M5 5l10 10M15 5L5 15"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
+        </header>
+
+        <div class="modal-card-body">
+          <div class="settings-block">
+            <label class="settings-label" for="recording-filename">
+              File name
+            </label>
+            <input
+              id="recording-filename"
+              class="input mono"
+              type="text"
+              spellcheck="false"
+              autocomplete="off"
+            />
+          </div>
+          <p class="settings-help" id="save-recording-help">
+            On supported browsers (Chromium-based), you'll be prompted with a
+            native dialog to pick the destination folder. Otherwise the file
+            is downloaded to your default downloads folder.
+          </p>
+        </div>
+
+        <footer class="modal-card-footer">
+          <button
+            type="button"
+            class="btn btn-ghost btn-danger-text"
+            id="recording-discard"
+          >
+            Discard
+          </button>
+          <button
+            type="button"
+            class="btn btn-ghost"
+            data-close-save-modal
+          >
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary" id="recording-save">
+            Save…
+          </button>
+        </footer>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

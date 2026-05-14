@@ -57,28 +57,37 @@ Each persisted entry should be a self-describing record containing at minimum:
 | `timestamp`     | A monotonic or wall-clock timestamp (e.g. nanoseconds) marking when the frame was observed. Used for replay timing and latency analysis. |
 | `agent_name`    | (Optional but recommended) An identifier of the participant — useful when multiple sessions or multiple roles share a log. |
 
-Implementations are free to choose the wire format. The choice should:
+### Wire format — REQUIRED
 
-- Be **append-only** and **streamable** (so a crash mid-write loses at most
-  the last partial record).
-- Preserve **insertion order**.
-- Be re-readable by a separate replay/inspection tool.
-- Be **portable across languages** — avoid formats that only have a single
-  language's tooling.
+All recorders **MUST** persist records as a **length-prefixed serialized
+protobuf** stream written to a file with the `.pb` extension. No other
+container format is permitted.
 
-### Recommended formats
+Concretely, every record on disk is:
 
-| Format | Notes |
-| --- | --- |
-| **Length-prefixed serialized protobuf** (varint or fixed32 length + bytes) | Recommended default. Trivial to read/write in any language with a protobuf library. Compact and fast. |
-| **JSON Lines (`.jsonl`)** | One JSON object per line. Human-readable, easy to debug, ubiquitous tooling. Larger on disk and lossier for binary fields (must base64-encode audio/image bytes). |
-| **TFRecord** | Open-source readers available via TensorFlow; reasonable if your downstream tooling already speaks it. |
+```
+[varint length][serialized protobuf bytes]
+[varint length][serialized protobuf bytes]
+...
+```
 
-### Formats to avoid
+This format is:
 
+- **Append-only** and **streamable** — a crash mid-write loses at most
+  the last partial record.
+- **Order-preserving** — records are read back in the order they were
+  written.
+- **Portable across languages** — any language with a protobuf library
+  can read/write it.
+- **Compact and fast** — no base64 expansion of binary audio/image data.
+
+### Formats that MUST NOT be used
+
+- **JSON / JSON Lines (`.jsonl`)** — human-readable but inflates audio
+  payloads ~33% via base64 and loses fidelity on binary fields.
+- **TFRecord** — extra TensorFlow-specific framing; not used here.
 - **`recordio`** — Google-internal format with no widely-available
-  cross-language readers/writers. Do not use it if portability beyond a
-  single ecosystem matters.
+  cross-language readers/writers.
 - Anything that requires the entire log to be parsed as a single root
   message (see size-limit warning below).
 
@@ -100,8 +109,7 @@ proto and serialize the wrapper as one record, you risk:
   losing one frame.
 
 Always serialize and write **one record = one message**. The on-disk
-container (length-prefixed stream, JSONL, etc.) is what concatenates
-records, not protobuf itself.
+length-prefixed stream is what concatenates records, not protobuf itself.
 
 The recorder treats the record as opaque: callers populate the
 direction-specific arm of `payload`, the `timestamp`, and the `agent_name`.
@@ -257,6 +265,7 @@ Note that neither `alice` nor `bob` calls `recorder.start()` or
   frames into a single wrapper proto before serializing. Protobuf has a
   2 GB hard size limit per message (and a much lower default parse limit);
   a long audio session will blow past it. One record = one message.
-- **Choosing a non-portable container format** — `recordio` and similar
-  Google-internal formats have no cross-language tooling. Prefer
-  length-prefixed protobuf or JSONL.
+- **Choosing any format other than length-prefixed `.pb`** — JSONL,
+  TFRecord, `recordio`, and similar formats are not permitted. The
+  recorder MUST always write a length-prefixed serialized protobuf
+  stream to a `.pb` file.

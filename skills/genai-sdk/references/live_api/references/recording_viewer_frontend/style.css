@@ -1,0 +1,621 @@
+/* ===========================================================================
+ * Tokens — shared with playground_frontend for visual consistency.
+ * ========================================================================= */
+:root {
+  --bg: #fafaf9;
+  --surface: #ffffff;
+  --surface-muted: #f4f4f5;
+  --border: #e7e5e4;
+  --border-strong: #d6d3d1;
+
+  --text: #18181b;
+  --text-muted: #6b7280;
+  --text-subtle: #a1a1aa;
+
+  --accent: #4338ca;
+  --accent-hover: #3730a3;
+  --accent-soft: #eef2ff;
+
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-lg: 12px;
+
+  --shadow-sm: 0 1px 2px rgba(24, 24, 27, 0.04);
+  --shadow: 0 1px 3px rgba(24, 24, 27, 0.06),
+    0 1px 2px rgba(24, 24, 27, 0.04);
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Menlo", "Consolas", monospace;
+
+  /* ---- Recording-viewer-specific message colors ---- */
+  --msg-client-audio: #4338ca;
+  --msg-server-audio: #f59e0b;
+  --msg-text: #10b981;
+  --msg-image: #ec4899;
+  --msg-video: #14b8a6;
+  --msg-tool: #a78bfa;
+  --msg-setup: #94a3b8;
+  --msg-interrupt: #ef4444;
+  --msg-control: #64748b;
+}
+
+/* ===========================================================================
+ * Reset
+ * ========================================================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+  background-color: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+button,
+select,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+button {
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+[hidden] {
+  display: none !important;
+}
+.mono {
+  font-family: var(--font-mono);
+}
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ===========================================================================
+ * App shell — mirrors playground_frontend patterns
+ * ========================================================================= */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ----- Header ----- */
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.brand-mark {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, var(--warning), #f97316);
+  box-shadow: 0 1px 2px rgba(245, 158, 11, 0.3);
+}
+.brand-text {
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
+}
+.path {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  max-width: 280px;
+}
+.header-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.toolbar-input {
+  padding: 7px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background-color: var(--surface);
+  font-size: 0.82rem;
+  min-width: 340px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.toolbar-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.upload-label {
+  display: inline-block;
+}
+.status-badge {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  padding: 4px 8px;
+}
+.status-badge.error {
+  color: var(--danger);
+}
+.status-badge.ok {
+  color: var(--success);
+}
+
+/* ===========================================================================
+ * Buttons — same as playground_frontend
+ * ========================================================================= */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  transition: background-color 0.12s, border-color 0.12s, color 0.12s;
+  white-space: nowrap;
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.btn-primary {
+  background-color: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--accent-hover);
+}
+.btn-ghost {
+  background-color: transparent;
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+.btn-ghost:hover:not(:disabled) {
+  background-color: var(--surface-muted);
+}
+.btn-sm {
+  padding: 4px 10px;
+  font-size: 0.8rem;
+}
+
+/* ===========================================================================
+ * Segmented control (shared pattern with playground_frontend)
+ * ========================================================================= */
+.segmented {
+  display: inline-flex;
+  background-color: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 3px;
+  gap: 2px;
+}
+.segmented-option {
+  padding: 6px 14px;
+  border-radius: 5px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: background-color 0.12s, color 0.12s, box-shadow 0.12s;
+}
+.segmented-option:hover:not(.is-active) {
+  color: var(--text);
+}
+.segmented-option.is-active {
+  background-color: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+.segmented-sm .segmented-option {
+  padding: 4px 10px;
+  font-size: 0.78rem;
+}
+
+/* ===========================================================================
+ * Main content area
+ * ========================================================================= */
+.app-main-viewer {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+.empty-state {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 64px 32px;
+}
+.empty-icon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+  opacity: 0.6;
+}
+.empty-title {
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+  font-size: 1.1rem;
+}
+.empty-hint {
+  font-size: 0.88rem;
+}
+
+/* ===========================================================================
+ * Agent block — a card per agent containing header + legend + timeline
+ * ========================================================================= */
+.agent {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.agent-header {
+  padding: 12px 16px;
+  background: var(--surface-muted);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.agent-header h2 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.agent-header .total {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+.player {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+.player audio {
+  height: 30px;
+}
+.zoom-ctrl {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.zoom-ctrl button {
+  background: var(--surface-muted);
+  color: var(--text);
+  border: 0;
+  padding: 2px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 600;
+  min-width: 24px;
+}
+.zoom-ctrl button:hover {
+  background: var(--border);
+}
+.zoom-ctrl .zoom-level {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  min-width: 42px;
+  text-align: center;
+}
+
+/* ===========================================================================
+ * Legend
+ * ========================================================================= */
+.legend {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 8px 16px;
+  background: var(--surface);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+.legend .swatch {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+/* ===========================================================================
+ * Timeline
+ * ========================================================================= */
+.timeline-wrap {
+  padding: 22px 16px;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+.timeline {
+  position: relative;
+  min-width: 100%;
+  border-top: 1px solid var(--border);
+}
+.ruler {
+  position: relative;
+  height: 22px;
+  color: var(--text-muted);
+  font-size: 10px;
+  border-bottom: 1px solid var(--border);
+  padding-left: 90px;
+  box-sizing: border-box;
+}
+.tick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid var(--border);
+  padding-left: 3px;
+}
+.row {
+  position: relative;
+  height: 48px;
+  border-bottom: 1px dashed var(--border);
+}
+.row-label {
+  position: sticky;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  width: 90px;
+  height: 100%;
+  padding: 0 8px;
+  box-sizing: border-box;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  z-index: 3;
+}
+.row-track {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 90px;
+  right: 0;
+}
+.cursor-line {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 1px;
+  background: rgba(24, 24, 27, 0.25);
+  pointer-events: none;
+  display: none;
+  z-index: 11;
+}
+.row-track.zoom .msg {
+  transition: none;
+}
+.row-track.zoom .msg.audio {
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+}
+
+/* ===========================================================================
+ * Message bars
+ * ========================================================================= */
+.msg {
+  position: absolute;
+  top: 6px;
+  height: 36px;
+  min-width: 3px;
+  min-height: 4px;
+  border-radius: 3px;
+  cursor: pointer;
+  box-sizing: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 10px;
+  padding: 0 3px;
+  line-height: 36px;
+  color: white;
+  font-weight: 600;
+}
+.msg.instant {
+  width: 2px !important;
+  min-width: 2px;
+  top: -2px;
+  height: 52px;
+  min-height: 4px;
+  padding: 0;
+  border: 0;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), 0 0 4px 1px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  border-radius: 0;
+}
+.msg.text {
+  background: var(--msg-text);
+}
+.msg.audio {
+  background: var(--msg-client-audio);
+}
+.msg.audio.server {
+  background: var(--msg-server-audio);
+  color: rgba(0, 0, 0, 0.75);
+}
+.msg.image {
+  background: var(--msg-image);
+}
+.msg.video {
+  background: var(--msg-video);
+}
+.msg.tool {
+  background: var(--msg-tool);
+}
+.msg.setup {
+  background: var(--msg-setup);
+}
+.msg.control {
+  background: var(--msg-control);
+}
+.msg.turn_complete,
+.msg.generation_complete {
+  background: #94a3b8;
+}
+.msg.interrupt {
+  background: var(--msg-interrupt);
+}
+.msg.dropped {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--border-strong),
+    var(--border-strong) 4px,
+    var(--border) 4px,
+    var(--border) 8px
+  );
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+.msg.tiny {
+  padding: 0;
+}
+
+/* ===========================================================================
+ * Tooltip
+ * ========================================================================= */
+#tooltip {
+  position: fixed;
+  pointer-events: none;
+  max-width: 480px;
+  max-height: 60vh;
+  overflow: auto;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  box-shadow: 0 8px 28px rgba(24, 24, 27, 0.15);
+  z-index: 1000;
+  display: none;
+}
+#tooltip.pinned {
+  pointer-events: auto;
+  border-color: var(--accent);
+  box-shadow: 0 8px 28px rgba(24, 24, 27, 0.18),
+    0 0 0 1px var(--accent);
+}
+#tt-pin-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+#tt-pin-bar .hint {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+#tt-pin-bar button {
+  margin-left: auto;
+  background: transparent;
+  border: 0;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 4px;
+}
+#tt-pin-bar button:hover {
+  color: var(--text);
+}
+#tooltip .play-action {
+  background: var(--accent);
+  color: white;
+  border: 0;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+#tooltip .play-action:hover {
+  background: var(--accent-hover);
+}
+#tooltip .hint {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+#tooltip pre {
+  margin: 6px 0 0 0;
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 280px;
+  overflow: auto;
+  background: var(--surface-muted);
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+#tooltip .kv {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 2px 8px;
+}
+#tooltip .kv b {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+#tooltip h3 {
+  margin: 0 0 6px 0;
+  font-size: 0.85rem;
+}
+.badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  background: var(--surface-muted);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-right: 4px;
+}

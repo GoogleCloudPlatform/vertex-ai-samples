@@ -431,7 +431,7 @@ with mimeType `audio/pcm;rate=24000`. Concatenate as they stream. On
 ```json
 {
   "setup": {
-    "model": "projects/my-proj/locations/us-central1/publishers/google/models/gemini-2.0-flash-live-preview-04-09",
+    "model": "projects/my-proj/locations/us-central1/publishers/google/models/gemini-live-2.5-flash-native-audio",
     "generationConfig": {
       "responseModalities": ["AUDIO"],
       "speechConfig": {

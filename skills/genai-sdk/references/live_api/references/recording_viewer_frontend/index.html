@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LiveAPI Recording Viewer</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <!-- ============================== Header ============================ -->
+      <header class="app-header">
+        <div class="brand">
+          <div class="brand-mark"></div>
+          <div class="brand-text">Recording Viewer</div>
+        </div>
+        <div class="segmented segmented-sm" id="global-mode-toggle">
+          <button type="button" class="segmented-option is-active"
+                  data-value="playback">Playback</button>
+          <button type="button" class="segmented-option"
+                  data-value="message">Message</button>
+        </div>
+        <span class="path mono ellipsis" id="input-path"></span>
+        <div class="header-actions">
+          <input
+            type="text"
+            id="path-input"
+            class="toolbar-input mono"
+            placeholder="/path/to/file.pb"
+          />
+          <button id="load-btn" type="button" class="btn btn-primary">
+            Load path
+          </button>
+          <label class="upload-label">
+            <input
+              type="file"
+              id="upload-input"
+              accept=".pb,application/octet-stream"
+              hidden
+            />
+            <button id="upload-btn" type="button" class="btn btn-ghost">
+              Upload file…
+            </button>
+          </label>
+          <span class="status-badge" id="status"></span>
+        </div>
+      </header>
+
+      <!-- ============================== Main ============================== -->
+      <main id="root" class="app-main-viewer">
+        <div class="empty-state">
+          <div class="empty-icon">📼</div>
+          <div class="empty-title">No recording loaded</div>
+          <div class="empty-hint">
+            Enter a .pb path or upload a file to visualize a session.
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- ============================== Tooltip ============================ -->
+    <div id="tooltip"></div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
