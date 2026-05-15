@@ -77,7 +77,7 @@ startup argument and build the full model name before forwarding the
 setup to the upstream Live API:
 
 ```
-model = f"projects/{project_id}/locations/{location}/publishers/{setup.model}"
+model = f"projects/{project_id}/locations/{location}/publishers/google/models/{setup.model}"
 ```
 
 - `project_id` — a startup argument to the backend service (NOT a
