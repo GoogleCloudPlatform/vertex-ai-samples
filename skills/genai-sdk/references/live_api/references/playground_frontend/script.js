@@ -62,6 +62,44 @@ function computeEndpointUrl(env, location) {
   return `wss://${host}${WS_PATH}`;
 }
 
+// ============================================================================
+// Visible error banner (FAIL-LOUD POLICY).
+//
+// The reference deliberately avoids broad try/catch around the WebSocket
+// `onmessage` handler. When a single thrown exception slips by, three
+// separate bugs (e.g. a missing proto accessor, an audio-decode shape
+// mismatch, and a transcription field rename) commonly cascade into the
+// same silent "page does nothing" symptom. Instead we:
+//
+//   1. Scope try/catch per concern (one for tool calls, one for audio,
+//      one for transcription).
+//   2. On the first error in any concern, render a persistent red banner
+//      at the top of the page so the user sees the failure even without
+//      opening dev-tools.
+//   3. Keep the rest of the handler running -- a broken audio decoder
+//      should not also disable tool-call rendering.
+//
+// Implementations adapting this script for other proto stacks MUST
+// preserve this fail-loud structure.
+// ============================================================================
+function showLoadError(message) {
+  let banner = document.getElementById('liveapi-error-banner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'liveapi-error-banner';
+    banner.style.cssText = [
+      'position:fixed', 'top:0', 'left:0', 'right:0', 'z-index:99999',
+      'padding:10px 16px', 'background:#fef2f2', 'color:#991b1b',
+      'border-bottom:2px solid #dc2626',
+      'font:13px/1.4 system-ui,sans-serif',
+    ].join(';');
+    document.body.insertBefore(banner, document.body.firstChild);
+  }
+  banner.innerHTML +=
+      '<div><strong>Chat UI error:</strong> ' + String(message) +
+      ' <small>(see browser dev-tools console for details)</small></div>';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // ===========================================================================
   // DOM lookup
@@ -612,8 +650,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function playAudioChunk(audioData) {
     if (!playbackAudioContext) return;
-    // Adapt this line to your proto library's API for getting raw bytes.
-    const pcmData = new Int16Array(audioData.buffer);
+    // Accept every shape callers might supply, so a future proto-library
+    // change doesn't silently break audio playback:
+    //   - Uint8Array (most common; what protobufjs's bytes-field
+    //     accessor returns for a `Blob.data` field),
+    //   - ArrayBuffer,
+    //   - any TypedArray view (`audioData.buffer` is the underlying
+    //     ArrayBuffer; honor `byteOffset` so we slice the correct
+    //     window),
+    //   - any object with a `.buffer` ArrayBuffer (the legacy
+    //     google-protobuf JS API shape).
+    // If `audioData` is none of the above, log + bail with a banner
+    // instead of throwing -- a single bad chunk should not stop
+    // subsequent playback.
+    let arrayBuffer;
+    if (audioData instanceof ArrayBuffer) {
+      arrayBuffer = audioData;
+    } else if (ArrayBuffer.isView(audioData)) {
+      arrayBuffer = audioData.buffer.slice(
+          audioData.byteOffset,
+          audioData.byteOffset + audioData.byteLength);
+    } else if (audioData && audioData.buffer instanceof ArrayBuffer) {
+      arrayBuffer = audioData.buffer;
+    } else {
+      console.warn('playAudioChunk: unsupported audioData shape', audioData);
+      if (typeof showLoadError === 'function') {
+        showLoadError(
+            'audio chunk had unsupported shape; check that your proto ' +
+            'binding returns raw bytes from Blob.data (Uint8Array).');
+      }
+      return;
+    }
+    const pcmData = new Int16Array(arrayBuffer);
     const floatData = pcm16ToFloat32(pcmData);
     const audioBuffer = playbackAudioContext.createBuffer(
         1, floatData.length, AUDIO_OUTPUT_SAMPLE_RATE);
@@ -693,13 +761,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return;
       }
+      // Step 1: decode the frame. A failure here is fatal for this
+      // message (no concern can run) but must NOT silently break
+      // subsequent messages: log + banner, then return.
+      let message;
       try {
         // Deserialize the binary protobuf ServerMessage.
         // Adapt this to your proto library (e.g. ServerMessage.decode(),
         // ServerMessage.deserializeBinary(), etc.)
-        const message = ServerMessage.deserializeBinary(event.data);
+        message = ServerMessage.deserializeBinary(event.data);
+      } catch (e) {
+        console.error('ServerMessage decode failed:', e);
+        showLoadError('failed to decode ServerMessage: ' + (e && e.message || e));
+        return;
+      }
 
-        // Tool calls
+      // Step 2: dispatch each concern independently. A throw in one
+      // concern must not stop the others -- that was the original
+      // silent-cascade bug pattern (a single broken accessor disabling
+      // audio + transcription + tool calls all at once).
+      try {
         if (message.hasToolCall()) {
           const fcs = message.getToolCall().getFunctionCallsList();
           fcs.forEach((fc) => {
@@ -715,49 +796,70 @@ document.addEventListener('DOMContentLoaded', () => {
           const ids = message.getToolCallCancellation().getIdsList();
           enqueue({type: 'toolCallCancellation', ids});
         }
+      } catch (e) {
+        console.error('tool-call dispatch failed:', e);
+        showLoadError('tool-call dispatch error: ' + (e && e.message || e));
+      }
 
-        if (!message.hasServerContent()) return;
-        const sc = message.getServerContent();
+      if (!message.hasServerContent()) return;
+      const sc = message.getServerContent();
 
-        // Model audio
+      // Concern A: model audio + text from modelTurn.parts[].
+      try {
         if (sc.hasModelTurn()) {
           sc.getModelTurn().getPartsList().forEach((part) => {
+            const partText = part.getText && part.getText();
+            if (partText) {
+              enqueue({type: 'transcription', role: 'model', text: partText});
+            }
             if (part.hasInlineData() &&
                 part.getInlineData().getMimeType().startsWith('audio/')) {
-              enqueue({type: 'audio', data: part.getInlineData()});
+              // Pass the raw audio bytes (Uint8Array). Wrapping libraries
+              // typically expose this via `.getData()`; if your binding's
+              // accessor returns a wrapper object instead of a typed
+              // array, unwrap here.
+              enqueue({type: 'audio', data: part.getInlineData().getData()});
             }
           });
         }
-        // Transcriptions
+      } catch (e) {
+        console.error('modelTurn dispatch failed:', e);
+        showLoadError('modelTurn dispatch error: ' + (e && e.message || e));
+      }
+
+      // Concern B: input/output transcription. Transcription has only
+      // `text` (see client_server_messages.proto); no `finished` field.
+      // Bubble closure is driven by `turn_complete` below.
+      try {
         if (sc.hasInputTranscription()) {
-          const t = sc.getInputTranscription();
           enqueue({
             type: 'transcription',
             role: 'user',
-            text: t.getText(),
-            finished: t.getFinished(),
+            text: sc.getInputTranscription().getText(),
           });
         }
         if (sc.hasOutputTranscription()) {
-          const t = sc.getOutputTranscription();
           enqueue({
             type: 'transcription',
             role: 'model',
-            text: t.getText(),
-            finished: t.getFinished(),
+            text: sc.getOutputTranscription().getText(),
           });
         }
-        // Interrupt: flush the playback queue
-        if (sc.getInterrupted()) {
-          clearQueue();
-        }
-        // Turn complete: close current bubbles for next turn
+      } catch (e) {
+        console.error('transcription dispatch failed:', e);
+        showLoadError('transcription dispatch error: ' + (e && e.message || e));
+      }
+
+      // Concern C: turn lifecycle (interrupt + turn_complete).
+      try {
+        if (sc.getInterrupted()) clearQueue();
         if (sc.getTurnComplete()) {
           enqueue({type: 'newTranscriptionSignal', role: 'model'});
           enqueue({type: 'newTranscriptionSignal', role: 'user'});
         }
       } catch (e) {
-        console.error('Failed to decode incoming message:', e);
+        console.error('turn-lifecycle dispatch failed:', e);
+        showLoadError('turn-lifecycle dispatch error: ' + (e && e.message || e));
       }
     };
 

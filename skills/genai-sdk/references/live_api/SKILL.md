@@ -14,13 +14,28 @@ Files in `references/`:
 -   `session_manager.md` — Session handling spec (setup, resumption,
     bearer token refresh).
 -   `interactive_ui.md` — Spec + reference frontend for the test UI
-    (Step 7).
+    (Step 7). Includes the **REQUIRED browser↔backend wire-shape
+    contract** for `/start` / `/ws` / `/recording/finalize` and the
+    worked example for model-name reconstruction.
 -   `requirements.md` — **Cross-cutting requirements that apply at
-    every step.** Re-read before declaring any step complete.
+    every step.** Re-read before declaring any step complete. The
+    **"Silent failures to defend against"** appendix lists the seven
+    failure patterns that have repeatedly broken previous adaptations
+    of this skill — re-read it before declaring Step 4 (service),
+    Step 6 (backend), or Step 7 (frontend) complete.
 -   `message_recorder.md` — **Optional.** Spec for the async,
     non-blocking recorder of bidirectional Live API traffic.
 -   `recording_viewer.md` — **Optional.** Spec for the single-page web
     viewer of recordings produced by the recorder.
+-   `proto-shim.md` + `proto-shim/proto-shim.js` +
+    `proto-shim/proto-shim.test.js` — **Only when the generated
+    frontend is JS.** Contract and tested reference implementation
+    for the browser-side shim that exposes the Closure-style
+    `getX/setX/hasX/serializeBinary` API the reference scripts assume
+    on top of the reflective `protobufjs` runtime. Run
+    `node references/proto-shim/proto-shim.test.js` as part of
+    Step-8 verification — a failure indicates the shim will produce
+    empty wire frames.
 
 
 ## Class contract
@@ -222,12 +237,32 @@ modal with the server-assigned filename and an "Open Recording
 viewer" action; the viewer's side panel lists recordings from
 `/api/recordings`, supports per-row download, refresh, and upload;
 the "Open Recording viewer" action lands the user on the viewer
-surface with the just-saved recording already loaded.
+surface with the just-saved recording already loaded. **Additionally**
+(see `references/requirements.md` § "Silent failures to defend
+against" → "Verification"):
+
+-   The chat surface preserves the **fail-loud** structure from
+    `playground_frontend/script.js` — per-concern `try/catch` blocks
+    plus the visible red error banner. A thrown exception in one
+    concern MUST NOT silently disable any other concern.
+-   If the generated frontend uses the JS proto shim, the
+    `references/proto-shim/proto-shim.test.js` conformance test
+    passes (run via `node`). A failure here means the shim will
+    produce empty `ClientMessage{}` frames on the wire — ship is
+    blocked until it passes.
+-   All runtime dependencies the chat surface needs (e.g.
+    `protobuf.min.js`, the well-known protos under
+    `google/protobuf/`) are vendored under the static-asset tree.
+    The chat UI MUST load fully with no CDN fetches.
 
 ### Step 8 — Verify
 
 Run the verification protocol in `references/requirements.md` (smoke
-checks + end-to-end interactions for every produced service).
+checks + end-to-end interactions for every produced service). The
+**"Silent failures to defend against" → "Verification"** subsection
+of `requirements.md` lists five must-pass checks that catch the
+historical silent-failure modes; treat each one as a gating
+acceptance criterion, not a suggestion.
 
 **Definition of done:** every applicable verification passed; failures
 have been fixed and re-verified, not merely reported.

@@ -114,6 +114,41 @@ model = f"projects/{project_id}/locations/{location}/publishers/google/models/{s
 This keeps the project ID out of the browser and avoids exposing it in
 the UI.
 
+### Worked example
+
+Given the inputs:
+
+| Source | Value |
+| --- | --- |
+| Backend startup flag | `--project_id=foo-corp` |
+| Frontend `/start` body `endpoint_url` | `wss://us-central1-aiplatform.googleapis.com/ws/google.cloud.aiplatform.v1beta1.LlmBidiService/BidiGenerateContent` |
+| Frontend `/start` body `setup.model` | `gemini-2.0-flash-live-preview-04-09` |
+
+The backend MUST:
+
+1. **Parse location from the endpoint host.** Match longest known
+   host-suffix first (`staging-aiplatform.sandbox.googleapis.com` is a
+   substring of the prod suffix's tail, so a naïve match returns the
+   wrong fleet). The location is the part of the host before the matched
+   suffix, separated by `-`; if the host equals the suffix exactly the
+   location is `global`.
+   Result: `location = "us-central1"`.
+2. **Rewrite `setup.model`** to the fully-qualified resource name:
+   `projects/foo-corp/locations/us-central1/publishers/google/models/gemini-2.0-flash-live-preview-04-09`.
+3. **Forward the rewritten setup** as the first `ClientMessage` on the
+   upstream Vertex AI WebSocket.
+
+Edge cases the backend MUST handle:
+
+- `endpoint_url` host is `aiplatform.googleapis.com` (no location prefix)
+  → `location = "global"`.
+- `endpoint_url` host is `europe-west4-staging-aiplatform.sandbox.googleapis.com`
+  → `location = "europe-west4"`, environment = `staging`.
+- `setup.model` already looks fully qualified (`projects/.../models/...`)
+  → pass through unchanged; do NOT re-wrap.
+- `setup.model` is empty → reject `/start` with HTTP 400 (a Live API
+  session is unusable without a model).
+
 ---
 
 ## What to adapt
@@ -146,6 +181,47 @@ When integrating the reference into a new project, the agent should adjust:
    | `WS` | `/ws?session_id=<UUID>` | Bidirectional bridge. Browser sends serialized `ClientMessage`s; server forwards to upstream. Server forwards `ServerMessage`s as binary frames. |
    | `POST` | `/recording/finalize` | Multipart `session_id=...`. Called by the chat UI when the websocket has closed. The backend **automatically persists** the session's recording into the recordings directory under a server-chosen filename (e.g. `liveapi_session_<timestamp>.pb`) and returns `{"name": "<basename>"}`. If the session produced no recording (recorder disabled, zero frames, etc.) the response is `{"name": ""}`. |
    | `POST` | `/recording/discard` | Multipart `session_id=...`. Deletes the server-side temp recording file. Used when the user explicitly declines to save. |
+
+   ### Wire shapes (REQUIRED contract)
+
+   Each of these legs is a different wire format. Implementations MUST
+   match exactly — a mismatch is the single most common source of
+   "messages flow but the recorder shows empty `{}`" bugs.
+
+   | Hop | Direction | Frame type | Payload |
+   | --- | --- | --- | --- |
+   | A. Browser → backend `/start` | HTTP | JSON | `{"session_id": string, "endpoint_url": string, "setup": <bare BidiGenerateContentSetup, NOT a ClientMessage envelope>}`. The `setup` value is the inner message (`{model, generationConfig, ...}`), proto3-JSON encoded (camelCase). Do **not** wrap it as `{"setup": {...}}`. |
+   | B. Browser → backend `/ws` | WebSocket BINARY | `ClientMessage.serializeBinary()` (standard protobuf wire format). |
+   | C. Backend → browser `/ws` | WebSocket BINARY | `ServerMessage.serializeBinary()` (standard protobuf wire format). |
+   | D. Backend → Vertex upstream | WebSocket TEXT | **Proto-JSON** encoded `ClientMessage` / `ServerMessage`. Vertex's bridge rejects raw binary protobuf with `"Invalid JSON payload received"` even though the proto wire spec allows it; treat TEXT proto-JSON as the upstream contract. |
+
+   **Strict-parse rule for `/start` (hop A).** The backend MUST verify
+   that the parsed setup contains a populated
+   `BidiGenerateContentSetup` (at minimum: `setup.model` is non-empty
+   after model-name reconstruction). Permissive parsing (e.g.
+   `discard_unknown=true`, `proto.Marshal(...).Unmarshal(...)` with
+   unknown-field tolerance) is allowed for forward-compatibility BUT
+   the resulting message MUST then be validated. **Returning HTTP 200
+   on an empty `setup` is a silent-failure bug**: the LiveAPI session
+   manager will accept it, dial upstream, and the WebSocket will close
+   immediately with a cryptic policy violation. Reject with HTTP 400
+   and a human-readable error before opening the upstream connection.
+
+   **Strict-decode rule for `/ws` (hop B).** The backend MUST treat
+   binary frames whose `ClientMessage.proto_decode(bytes)` returns an
+   *empty* proto (no oneof arm populated) as malformed: log a
+   warning identifying the session ID and drop the frame. Empty
+   `ClientMessage{}` frames most often indicate a frontend serialization
+   bug (see [`proto-shim.md`](proto-shim.md) for the standard
+   protobufjs setter pitfalls) and silently forwarding them to the
+   upstream API just produces equally cryptic upstream errors.
+
+   **Important:** the only difference between the four legs that
+   actually matters is the *encoding* (JSON-vs-proto-binary-vs-
+   proto-JSON). The *wire-level messages* on every leg are
+   `ClientMessage` / `ServerMessage` / `BidiGenerateContentSetup` from
+   the canonical `client_server_messages.proto`. Never invent parallel
+   ad-hoc structs for any of these.
 
    The chat UI **does NOT** provide a download endpoint or a download
    button. Downloads are owned exclusively by the Recording viewer (see

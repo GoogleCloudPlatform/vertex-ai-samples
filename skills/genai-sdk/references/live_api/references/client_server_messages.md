@@ -356,6 +356,13 @@ Primary streaming-output channel.
 | `inputTranscription` | `Transcription` | `{ text?: string }` — transcription of the user's spoken input. Requires `inputAudioTranscription` set in `setup`. |
 | `outputTranscription` | `Transcription` | `{ text?: string }` — transcription of the model's spoken output. Requires `outputAudioTranscription` set in `setup`. |
 
+> **`Transcription` has no `finished` field.** Some legacy snippets call
+> `transcription.finished` / `getFinished()`; the current public wire
+> protocol does not include it. End-of-transcription is signaled by
+> `serverContent.turn_complete` (or `serverContent.generation_complete`).
+> Frontends MUST drive bubble closure off those signals — not off a
+> per-frame `finished` flag.
+
 **Playback note:** audio chunks arrive inside `modelTurn.parts[].inlineData`
 with mimeType `audio/pcm;rate=24000`. Concatenate as they stream. On
 `interrupted: true`, **flush** the playback queue.

@@ -202,3 +202,154 @@ class smoke check from Step 5 applies.)
 
 Report any failures and fix them before declaring the implementation
 complete.
+
+## Silent failures to defend against
+
+These are the failure modes that have repeatedly bitten previous
+implementations of this skill in new languages or new proto stacks.
+Each one shares the same shape: a layer assumes an environment the
+next layer doesn't provide, and the result is a *successful-looking*
+empty payload rather than a loud error. Re-read this list before
+declaring **any** of Steps 4 – 8 complete.
+
+### 1. Permissive proto-JSON parsing of an outer envelope
+
+**Trigger.** A backend uses `discard_unknown=true` (or any
+unknown-tolerant decoder) on the `/start` body's `setup` field and
+treats the result as a `ClientMessage`. The browser POSTs a *bare*
+`BidiGenerateContentSetup` (per `interactive_ui.md` § "Wire shapes"),
+which has no field that matches any `ClientMessage` arm; the decoder
+quietly produces an empty `ClientMessage{}` and the backend opens an
+upstream session with no setup, which Vertex AI then closes with a
+cryptic policy violation.
+
+**Defense.** Always validate the parsed message *after* the
+permissive parse: assert that the expected oneof arm (`setup`) is
+populated and that `setup.model` is non-empty after model-name
+reconstruction. Reject with HTTP 400 + a human-readable message
+before opening the upstream WebSocket. (See `interactive_ui.md` §
+"Strict-parse rule for `/start`".)
+
+### 2. Lazy proto-type resolution in reflective JS bindings
+
+**Trigger.** A frontend uses `protobufjs` (or any other reflective
+runtime) to build proxy classes whose setters branch on
+`field.resolvedType` (`isMessage`-style checks). Protobufjs resolves
+message-typed references **lazily**, so iterating `Type.fields`
+immediately after `protobuf.load()` returns fields whose
+`resolvedType` is still `null`. Every message-typed setter then falls
+through to the primitive branch, storing the wrapper *itself* on the
+parent and producing zero-byte payloads on the wire.
+
+**Defense.** Call `root.resolveAll()` (or the equivalent in your
+runtime) *before* iterating fields to build accessors. Add a JS
+round-trip test that serializes a populated `ClientMessage` through
+the shim and asserts the encoded byte length is greater than the
+single-arm-tag-plus-zero-length stub (~2–3 bytes); a passing test
+proves at least one message-typed field was actually written. (See
+`proto-shim.md`.)
+
+### 3. Wire-format ambiguity between binary and proto-JSON
+
+**Trigger.** The Live API's WebSocket bridge silently rejects raw
+binary `ClientMessage` frames (close code 1007 with text "Invalid
+JSON payload received…"), but only when the JSON-encoded form
+*happens* to start with bytes that look like JSON. Implementations
+that send `proto.Marshal(...)` straight onto the wire see the
+session close right after `setup` with a misleading error pointing at
+the model resource name.
+
+**Defense.** Send WebSocket TEXT frames containing proto-JSON
+(`protojson.Marshal` / `protobuf.util.toJSON` / equivalents) for
+every frame sent to Vertex. Accept TEXT proto-JSON for receive (with
+a binary-protobuf fallback for forward compat). Document the
+encoding choice in the session manager's comments so a future change
+isn't accidental.
+
+### 4. Coarse `try/catch` around event handlers
+
+**Trigger.** Reference frontends commonly wrap the entire
+`ws.onmessage` body in one `try { ... } catch (e) { console.error(...) }`.
+A single bug in any concern (e.g. a missing `Transcription.finished`
+accessor) throws on the first frame and silences every subsequent
+concern — transcription, audio playback, *and* tool calls all stop
+rendering together. The user sees a UI that does nothing while frames
+flow normally on the wire.
+
+**Defense.** Scope each `try/catch` to one concern (tool calls,
+audio, transcription, turn lifecycle). On the first error in any
+concern, render a **visible** banner at the top of the page so the
+failure is obvious without opening dev-tools. Let unaffected
+concerns keep running. The reference `playground_frontend/script.js`
+implements this pattern; adaptations MUST preserve it.
+
+### 5. Accessor-return-type drift between proto runtimes
+
+**Trigger.** The reference script expects `Blob.getData()` to return
+an object with a `.buffer` ArrayBuffer (legacy google-protobuf JS
+API). A different runtime (e.g. protobufjs) returns a `Uint8Array`
+directly. The audio code path computes `new Int16Array(audioData.buffer)`
+on what's actually `Uint8Array.buffer` — which happens to work in some
+shapes and silently produces nothing in others, depending on
+`byteOffset` alignment.
+
+**Defense.** Wrap the audio decoder in a shape adapter that handles
+`Uint8Array`, `ArrayBuffer`, generic `ArrayBuffer.isView` results,
+and the legacy `{buffer: ArrayBuffer}` shape. Bail with a visible
+banner on unknown shapes rather than computing on garbage. The
+reference `playAudioChunk` in `playground_frontend/script.js` is the
+template.
+
+### 6. CDN dependencies in the browser
+
+**Trigger.** Frontend pulls protobufjs (or any other runtime) from a
+public CDN. The CDN is blocked by a corporate proxy or just slow,
+`window.protoReady` never resolves, and the page presents as a blank
+spinner with no error message.
+
+**Defense.** Vendor every runtime dependency under the static-asset
+tree (`web/proto/protobuf.min.js`, etc.). Add a visible banner on
+any `await window.protoReady` rejection so the failure surfaces in
+the UI even if dev-tools are closed. Never depend on
+`https://cdn.example.com/...` at runtime for the chat UI to load.
+
+### 7. Server-message oneof violations
+
+**Trigger.** The Live API public docs describe `ServerMessage` as a
+strict oneof, but Vertex AI in practice bundles multiple top-level
+fields into a single end-of-turn frame (typically `serverContent` +
+`usageMetadata`). A strict-oneof decoder rejects these frames with
+"oneof is already set"; a strict-arm `switch` on `msg.MessageType`
+silently ignores the second arm.
+
+**Defense.** Model server-side top-level fields as independently
+optional in your generated bindings. Process each populated field
+with `if msg.GetServerContent() != nil { ... }` style checks rather
+than a `switch` over a oneof tag. Mirror the same shape in your
+generated proto. (See `client_server_messages.md` § 2 and the
+`ServerMessage` definition in `client_server_messages.proto`.)
+
+### Verification: must-pass before declaring Step 8 complete
+
+A frontend implementation MUST satisfy all of the following or it is
+not done:
+
+1. Loading the chat UI with the browser console closed produces
+   either a working UI or a visible red banner. There is no third
+   state.
+2. Killing the network mid-load (or pointing the CDN URL at an
+   unreachable host) reproduces the banner, not a blank page.
+3. Sending a text message via the composer produces a populated
+   `clientContent` record in `/api/recordings` (NOT
+   `clientContent {}`). The record's `text_preview` contains the
+   typed text.
+4. Receiving a model response renders a model bubble in the
+   conversation panel (TEXT modality) or plays audible audio (AUDIO
+   modality) — never both blank.
+5. Triggering an error in one concern (e.g. by sending malformed
+   bytes through the WS) does not stop subsequent frames from
+   rendering through the other concerns.
+
+Failures of any of (1)–(5) almost always trace back to one of the
+seven patterns above; consult the matching subsection before
+attempting a fix.
