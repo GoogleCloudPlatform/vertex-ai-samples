@@ -37,6 +37,26 @@ A complete reference frontend is provided in `recording_viewer_frontend/`:
 rewrite them to fit the target project.** Do not generate the frontend
 from scratch — adapt the reference.
 
+## Shared shell with the chat UI
+
+When this skill produces the recording viewer, the viewer is **not**
+served as a standalone page. It is rendered as one of two surfaces
+inside a shared application shell (the other being the testing chat
+UI described in `interactive_ui.md`). The shell renders a persistent
+**left sidebar** with at least two entries — "Chat UI" and "Recording
+viewer" — and selecting an entry swaps the main content area to that
+surface without a full page reload.
+
+Both surfaces are served by the **same backend process and same
+port**. The viewer's HTTP endpoints listed below (`/api/agents`,
+`/api/audio/<idx>.wav`, `/api/load`, `/api/upload`) live on the same
+origin as the chat UI's `/start` / `/ws` endpoints. Sub-routing the
+static assets (e.g. `/viewer/*`) is encouraged.
+
+The chat UI's save-recording dialog calls the viewer's `/api/load`
+endpoint and switches the sidebar to the viewer entry to implement the
+"Open in viewer" hand-off — no new tab, no second backend.
+
 ---
 
 ## Architecture

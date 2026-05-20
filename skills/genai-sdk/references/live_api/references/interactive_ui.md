@@ -23,6 +23,27 @@ A complete reference frontend is provided in `playground_frontend/` alongside th
 them to fit the target project's build system, module format, and proto
 library.** Do not generate the UI from scratch — adapt the reference.
 
+## Shared shell with the recording viewer
+
+When this skill produces the testing chat UI, it always also produces
+the recording viewer (see `recording_viewer.md`) and serves both from
+the **same backend process and same port**. The chat UI described here
+is therefore not a standalone page — it is one of two surfaces hosted
+inside a shared application shell that renders a persistent **left
+sidebar** with at least two entries: "Chat UI" and "Recording viewer".
+Selecting a sidebar entry swaps the main content area to the
+corresponding surface without a full page reload.
+
+The shell, the sidebar, and the routing between the two surfaces are
+the agent's responsibility. The reference frontend files here
+(`playground_frontend/`) only cover the chat surface itself; they
+must be embedded into the shared shell when adapted.
+
+When the session ends, the chat UI's save-recording dialog MUST expose
+an **"Open in viewer"** action that switches the sidebar to the viewer
+entry and loads the just-saved recording into it (no new tab, no
+second backend).
+
 ---
 
 ## Computed endpoint URL (Environment + Location)
@@ -120,15 +141,28 @@ When integrating the reference into a new project, the agent should adjust:
    | --- | --- | --- |
    | `POST` | `/start` | Body: `{session_id, endpoint_url, setup}`. The `endpoint_url` is the computed WebSocket endpoint. `setup.model` is the **short** model ID; the backend reconstructs the fully-qualified name using its `--project_id` argument. Returns `{"status": "started"}`. |
    | `WS` | `/ws?session_id=<UUID>` | Bidirectional bridge. Browser sends serialized `ClientMessage`s; server forwards to upstream. Server forwards `ServerMessage`s as binary frames. |
-   | `GET` | `/recording/download?session_id=...` | Streams the session recording (optional). |
-   | `POST` | `/recording/discard` | Deletes the server-side temp recording file (optional). |
+   | `GET` | `/recording/download?session_id=...` | Streams the session recording. |
+   | `POST` | `/recording/discard` | Deletes the server-side temp recording file. |
+
+   The **same** backend process MUST also expose the recording-viewer
+   endpoints documented in `recording_viewer.md`
+   (`GET /api/agents`, `GET /api/audio/<idx>.wav`, `POST /api/load`,
+   `POST /api/upload`) so the sidebar can swap between the chat and
+   viewer surfaces without leaving the origin or hitting a second
+   process. Sub-routing the static assets (e.g. `/chat/*` vs
+   `/viewer/*`) is encouraged to keep the two surfaces' files
+   organized.
 
 5. **Proto serialization** — The reference calls
    `ServerMessage.deserializeBinary()` and `msg.serializeBinary()`. Adapt
    to whatever proto library the project uses.
 
-6. **Save-recording modal** — Remove if the project does not include the
-   recorder feature.
+6. **Save-recording modal** — Always present when this skill produces
+   the chat UI (because the recorder is bundled with the chat UI in
+   that case). The modal MUST include an **"Open in viewer"** action
+   that switches the sidebar to the viewer entry and loads the
+   just-saved recording into it via the shared backend's viewer
+   endpoints.
 
 ---
 

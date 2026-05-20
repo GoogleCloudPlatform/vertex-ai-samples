@@ -62,15 +62,20 @@ Collect upfront, do not assume:
 
 -   Destination folder for the generated project.
 -   Target programming language.
--   Whether to enable the **recorder** (optional).
--   Whether to enable the **viewer** (optional). If yes but recorder is
-    no, warn that the viewer will have nothing to load.
+-   Whether to enable the **testing chat UI** (optional). When the user
+    says **yes**, the **recorder** and the **recording viewer** are
+    enabled automatically as part of the same deliverable — they are
+    not separately optional in this mode. Confirm this bundling with
+    the user so they know what they are getting. When the user says
+    **no**, skip the chat UI, the recorder, and the viewer entirely.
 -   Whether the deployment will use **Gemini Enterprise** (affects
     auth + endpoint).
 -   Whether the user can provide an project_id for testing purpose.
 
 **Definition of done:** every choice above is captured in the agent's
-plan; no implicit defaults remain.
+plan; no implicit defaults remain. If the chat UI was selected, the
+plan explicitly records that the recorder and viewer will be built
+alongside it.
 
 ### Step 2 — Copy references
 
@@ -123,21 +128,51 @@ endpoint, prints `PASS`, and exits 0.
 
 ### Step 6 — Backend service
 
-Build an HTTP + WebSocket bridge that exposes the service class to a
-browser frontend, following the endpoint contract in
-`interactive_ui.md`.
+Build a **single** HTTP + WebSocket backend that exposes both the
+testing chat UI and the recording viewer from the **same process and
+same port**. The backend MUST serve:
 
-If the viewer was selected, deploy the viewer service alongside the
-test backend (separate port or sub-route is fine).
+-   The chat UI endpoints from `interactive_ui.md` (`POST /start`,
+    `WS /ws`, plus the optional recording download / discard
+    endpoints).
+-   The recording viewer endpoints from `recording_viewer.md`
+    (`GET /api/agents`, `GET /api/audio/<idx>.wav`, `POST /api/load`,
+    `POST /api/upload`).
+-   The static assets for both frontends.
+-   Reuse the service implemented as user required.
 
-**Definition of done:** backend starts on the configured port, the
-WebSocket endpoint accepts a connection, and (if the viewer was
-selected) the viewer service also starts on its port / route.
+Use sub-routes to disambiguate the two surfaces (e.g.
+`/chat/*` for the chat UI assets and `/viewer/*` for the viewer
+assets, with a shared `/` shell that renders the sidebar described in
+Step 7). Do **not** spin up a second process or a second port for the
+viewer.
+
+**Definition of done:** a single backend process starts on the
+configured port; the chat WebSocket endpoint accepts a connection;
+the viewer JSON / WAV / load / upload endpoints all respond; both
+frontends are reachable from the same origin.
 
 ### Step 7 — Frontend UI
 
-Adapt `interactive_ui.md`'s reference frontend (do not generate from
-scratch). The UI MUST allow the user to:
+Adapt `interactive_ui.md`'s reference frontend for the chat surface
+and `recording_viewer.md`'s reference frontend for the viewer
+surface (do not generate either from scratch). Both surfaces are
+served by the single backend from Step 6 and share a common shell.
+
+**Sidebar navigation (REQUIRED).** The shared shell MUST render a
+persistent left sidebar with at least two entries:
+
+-   **Chat UI** — routes to the chat playground.
+-   **Recording viewer** — routes to the viewer.
+
+Selecting a sidebar entry swaps the main content area to the
+corresponding surface without a full page reload (client-side route
+or equivalent). The currently active entry MUST be visually marked.
+The sidebar is always visible and follows the responsive layout rules
+in `references/requirements.md` (no page-level scrolling at
+≥ 1366×768; sidebar + content split the viewport).
+
+The **Chat UI** surface MUST allow the user to:
 
 -   Start a new connection / close the current connection.
 -   Select the model.
@@ -147,14 +182,18 @@ scratch). The UI MUST allow the user to:
 -   Hear model audio and see model + user transcription / conversation
     history.
 
-If the recorder feature was selected, show a save-recording dialog
-when the session ends. If the viewer is also enabled, the dialog must
-expose an **"Open in viewer"** action that loads the just-saved
-recording in a new browser tab.
+Because the chat UI is only generated when the user also opted in to
+the recorder and viewer (per Step 1's bundling rule), the chat UI
+MUST show a save-recording dialog when the session ends, and that
+dialog MUST expose an **"Open in viewer"** action that navigates to
+the viewer sidebar entry with the just-saved recording loaded.
 
-**Definition of done:** the page renders all required controls;
-clicking through the UI exercises every required interaction listed
-above.
+**Definition of done:** the page renders the sidebar plus both
+surfaces; switching sidebar entries swaps the content area; clicking
+through the chat UI exercises every required chat interaction; the
+viewer entry loads recordings via the shared backend; the
+"Open in viewer" action from the save-recording dialog lands the user
+on the viewer surface with the recording already loaded.
 
 ### Step 8 — Verify
 
@@ -172,13 +211,13 @@ Produce in the destination folder:
     check from Step 5, programmatic usage of the service class with
     full examples of building a `ClientMessage` for each modality and
     consuming `ServerMessage`s.
--   `how_to_test_with_ui.md` — how to start the test UI service, the
-    URL to open, and how to interact with the model through it.
--   `how_to_use_viewer.md` — only if the viewer was enabled. Covers
-    launching the viewer, loading a recording (path or upload),
-    switching between Playback / Message modes (global + per-agent),
-    and inspecting / playing back individual messages. Defer to
-    `recording_viewer.md` for what each mode shows.
+-   `how_to_test_with_ui.md` — only if the chat UI was enabled. Covers
+    starting the unified backend, the URL to open, sidebar
+    navigation between the chat surface and the viewer surface, how
+    to interact with the model through the chat UI, and how to open
+    a just-recorded session in the viewer via the save-recording
+    dialog. Defer to `recording_viewer.md` for what the viewer modes
+    show.
 
 **Definition of done:** all expected docs exist, the commands they
 print actually run, and the URLs they cite resolve.

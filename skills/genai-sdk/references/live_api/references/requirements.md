@@ -21,11 +21,43 @@ no hand-rolled JSON shapes for messages already defined in the proto.
 
 ## Optional features integration
 
+### Feature bundling
+
+The testing chat UI, the recorder, and the recording viewer are a
+**single bundled option**, not three independent toggles. The Step 1
+interview asks one question: "do you want the testing chat UI?".
+
+-   **User answers yes:** the agent MUST produce the chat UI, the
+    recorder, and the viewer together. The viewer is served from the
+    same backend process and same port as the chat UI, behind a shared
+    sidebar (see "Unified backend & sidebar" below).
+-   **User answers no:** the agent MUST NOT produce any of the three.
+    The deliverable is just the service class plus the smoke check.
+
+There is no supported configuration where the chat UI exists without
+the recorder, or the viewer exists without the recorder, or the
+recorder/viewer exist without the chat UI.
+
+### Unified backend & sidebar (when the chat UI is enabled)
+
+-   A **single** backend process serves both the chat UI and the
+    viewer on the same port. Do not spin up a second process or a
+    second port for the viewer.
+-   The frontend is a shared shell with a persistent left sidebar
+    containing at least two entries — "Chat UI" and "Recording
+    viewer" — that swap the main content area without a full page
+    reload. The active entry is visually marked.
+-   The chat UI's save-recording dialog MUST expose an
+    **"Open in viewer"** action that switches the sidebar to the
+    viewer entry and loads the just-saved recording via the shared
+    backend's viewer endpoints (no new tab, no second backend).
+
 ### Recorder (per `message_recorder.md`)
 
 -   The service class accepts the recorder as an **optional**
     constructor argument. When omitted, recording is disabled with zero
-    runtime overhead.
+    runtime overhead. (Per the bundling rule above, the recorder is
+    omitted exactly when the chat UI is not requested.)
 -   The class owns building each record before calling
     `recorder.record(...)`: set the appropriate `payload` oneof arm
     (client or server message), the `timestamp`, and the `agent_name`.
@@ -40,9 +72,10 @@ no hand-rolled JSON shapes for messages already defined in the proto.
 
 ### Viewer (per `recording_viewer.md`)
 
--   Only useful when the recorder is also enabled.
--   If the user picks the viewer without the recorder, warn them they
-    will have nothing to load.
+-   Always produced together with the chat UI per the bundling rule
+    above; never produced standalone.
+-   Served from the same backend process and same port as the chat UI,
+    reachable via the shared sidebar.
 
 ## Audio / transcription playback
 
@@ -77,8 +110,10 @@ stacking them into a tall page.
 
 ## Verification (run during Step 8)
 
-For every web service produced, the agent MUST start it, open it in a
-(headless) browser, and verify all of the following:
+For the unified backend produced when the chat UI is enabled, the
+agent MUST start it, open it in a (headless) browser, and verify all
+of the following. (When the chat UI is not enabled, only the service
+class smoke check from Step 5 applies.)
 
 ### Smoke checks (every service)
 
@@ -86,6 +121,10 @@ For every web service produced, the agent MUST start it, open it in a
 2.  Page loads (HTTP 200) and primary content renders.
 3.  Core controls are visible without page-level scrolling at
     1366×768.
+4.  The shared sidebar renders with at least the "Chat UI" and
+    "Recording viewer" entries; clicking each entry swaps the main
+    content area to the corresponding surface without a full page
+    reload, and the active entry is visually marked.
 
 ### End-to-end interactions
 
@@ -121,11 +160,14 @@ For every web service produced, the agent MUST start it, open it in a
         reconstruction pipeline, not the frontend. See
         `recording_viewer.md` § Diagnostics for the five known
         failure modes.
--   **Recorder + Viewer end-to-end** (if both enabled): record a live
-    session in the test UI → use the save dialog to open it in the
-    viewer → server audio bars appear in playback mode as **wide
-    duration bars** (not instant markers); the same bars in message
-    mode collapse to the 4 px fixed-width form.
+-   **Recorder + Viewer end-to-end** (when the chat UI is enabled):
+    record a live session in the chat UI → click "Open in viewer" in
+    the save-recording dialog → the sidebar switches to the viewer
+    entry **in the same tab and same backend** and the just-saved
+    recording is already loaded → server audio bars appear in
+    playback mode as **wide duration bars** (not instant markers);
+    the same bars in message mode collapse to the 4 px fixed-width
+    form.
 
 Report any failures and fix them before declaring the implementation
 complete.
