@@ -47,10 +47,32 @@ recorder/viewer exist without the chat UI.
     containing at least two entries — "Chat UI" and "Recording
     viewer" — that swap the main content area without a full page
     reload. The active entry is visually marked.
--   The chat UI's save-recording dialog MUST expose an
-    **"Open in viewer"** action that switches the sidebar to the
-    viewer entry and loads the just-saved recording via the shared
-    backend's viewer endpoints (no new tab, no second backend).
+-   When the chat session ends, the chat UI shows an
+    **informational session-ended modal** (no filename input, no
+    save action, no download action) that includes an
+    **"Open Recording viewer"** button. That button switches the
+    sidebar to the viewer entry and auto-loads the recording the
+    backend just saved (via `#/viewer?recording=<name>`).
+
+### Recordings directory alignment
+
+-   The backend takes a single `--recordings_dir` startup argument.
+-   On websocket close the chat UI calls
+    `POST /recording/finalize`; the backend auto-saves the session's
+    recording into `--recordings_dir` under a server-chosen filename
+    and returns the resulting `name`. The chat UI does not expose a
+    user-chosen filename, a save button, or a download action.
+-   The viewer's `GET /api/recordings`,
+    `GET /api/recordings/download`, and `POST /api/load` all read
+    from the same directory. **Downloads are exposed only through
+    the viewer.**
+-   The viewer frontend MUST present a left **side panel** populated
+    from `GET /api/recordings`, with each row supporting load +
+    download, plus a refresh button and an upload action. It MUST
+    NOT expose a free-form filesystem path input.
+-   `POST /api/load`, `GET /api/recordings/download`, and
+    `POST /recording/finalize` MUST reject any name containing path
+    separators or `..` to prevent directory traversal.
 
 ### Recorder (per `message_recorder.md`)
 
@@ -125,6 +147,9 @@ class smoke check from Step 5 applies.)
     "Recording viewer" entries; clicking each entry swaps the main
     content area to the corresponding surface without a full page
     reload, and the active entry is visually marked.
+5.  On the Recording viewer surface, the left side panel of
+    recordings, the refresh button, and the upload action are all
+    visible without page-level scrolling at 1366×768.
 
 ### End-to-end interactions
 
@@ -135,9 +160,12 @@ class smoke check from Step 5 applies.)
     recorder → the resulting file is non-empty and parseable as the
     chosen on-disk format.
 -   **Viewer** (if enabled):
-    1.  Load the shipped fixture
-        `references/sample_recording.jsonl` by path, then load it
-        again by upload.
+    1.  Drop the shipped fixture `references/sample_recording.pb`
+        into the backend's `--recordings_dir`; verify it appears as
+        a row in the left side panel (sourced from
+        `GET /api/recordings`), that clicking the row loads it, and
+        that clicking the row's Download button streams the same
+        bytes back. Then load it again via Upload.
     2.  Switch the global toggle and at least one per-agent toggle
         between Playback and Message modes.
     3.  Click a server audio bar and pin its tooltip; confirm the
@@ -161,13 +189,16 @@ class smoke check from Step 5 applies.)
         `recording_viewer.md` § Diagnostics for the five known
         failure modes.
 -   **Recorder + Viewer end-to-end** (when the chat UI is enabled):
-    record a live session in the chat UI → click "Open in viewer" in
-    the save-recording dialog → the sidebar switches to the viewer
-    entry **in the same tab and same backend** and the just-saved
-    recording is already loaded → server audio bars appear in
-    playback mode as **wide duration bars** (not instant markers);
-    the same bars in message mode collapse to the 4 px fixed-width
-    form.
+    record a live session in the chat UI → end the session and
+    confirm the informational session-ended modal appears with the
+    server-assigned filename and **no** download or save controls →
+    click "Open Recording viewer" → the sidebar switches to the
+    viewer entry **in the same tab and same backend**, the
+    just-saved recording is the active row in the left side panel,
+    and it is auto-loaded → the row's Download button streams the
+    `.pb` back to the user → server audio bars appear in playback
+    mode as **wide duration bars** (not instant markers); the same
+    bars in message mode collapse to the 4 px fixed-width form.
 
 Report any failures and fix them before declaring the implementation
 complete.

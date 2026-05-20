@@ -133,11 +133,11 @@ testing chat UI and the recording viewer from the **same process and
 same port**. The backend MUST serve:
 
 -   The chat UI endpoints from `interactive_ui.md` (`POST /start`,
-    `WS /ws`, plus the optional recording download / discard
-    endpoints).
+    `WS /ws`, `POST /recording/finalize`, `POST /recording/discard`).
 -   The recording viewer endpoints from `recording_viewer.md`
-    (`GET /api/agents`, `GET /api/audio/<idx>.wav`, `POST /api/load`,
-    `POST /api/upload`).
+    (`GET /api/agents`, `GET /api/audio/<idx>.wav`,
+    `GET /api/recordings`, `GET /api/recordings/download`,
+    `POST /api/load`, `POST /api/upload`).
 -   The static assets for both frontends.
 -   Reuse the service implemented as user required.
 
@@ -147,10 +147,21 @@ assets, with a shared `/` shell that renders the sidebar described in
 Step 7). Do **not** spin up a second process or a second port for the
 viewer.
 
+The backend takes a `--recordings_dir` startup argument naming a
+single on-disk directory. On websocket close the chat UI's
+`POST /recording/finalize` auto-saves the session's recording into
+this directory under a server-chosen filename; the viewer's
+`GET /api/recordings`, `GET /api/recordings/download`, and
+`POST /api/load` endpoints all read from the same directory. The
+user therefore never types a filesystem path in the viewer, and
+downloads are exposed **only** through the viewer.
+
 **Definition of done:** a single backend process starts on the
 configured port; the chat WebSocket endpoint accepts a connection;
-the viewer JSON / WAV / load / upload endpoints all respond; both
-frontends are reachable from the same origin.
+the viewer JSON / WAV / recordings-list / recordings-download / load
+/ upload endpoints all respond; both frontends are reachable from the
+same origin; a session finalized via `POST /recording/finalize`
+appears in the very next `GET /api/recordings` response.
 
 ### Step 7 — Frontend UI
 
@@ -184,16 +195,34 @@ The **Chat UI** surface MUST allow the user to:
 
 Because the chat UI is only generated when the user also opted in to
 the recorder and viewer (per Step 1's bundling rule), the chat UI
-MUST show a save-recording dialog when the session ends, and that
-dialog MUST expose an **"Open in viewer"** action that navigates to
-the viewer sidebar entry with the just-saved recording loaded.
+MUST show a **session-ended notice modal** when the session ends.
+The modal is informational only: it has no filename input, no save
+button, and no download button. Its purpose is to tell the user the
+recording has already been auto-saved to the backend's recordings
+directory and to direct them to the **Recording viewer** (sidebar)
+for review and download. It MUST include an **"Open Recording
+viewer"** action that navigates to the viewer sidebar entry with the
+just-saved recording auto-loaded (e.g. via
+`#/viewer?recording=<name>`).
+
+The **Recording viewer** surface MUST render a persistent **left
+side panel** listing recordings returned by `GET /api/recordings`.
+Each row shows the recording name + metadata, loads the recording
+when clicked, and exposes a per-row **Download** button pointing at
+`GET /api/recordings/download?name=<name>`. The panel header
+includes a **Refresh** button that re-fetches `/api/recordings`. An
+**Upload** action allows reviewing a hand-imported `.pb` file. The
+user never types a filesystem path.
 
 **Definition of done:** the page renders the sidebar plus both
 surfaces; switching sidebar entries swaps the content area; clicking
-through the chat UI exercises every required chat interaction; the
-viewer entry loads recordings via the shared backend; the
-"Open in viewer" action from the save-recording dialog lands the user
-on the viewer surface with the recording already loaded.
+through the chat UI exercises every required chat interaction; on
+session close the chat UI shows the informational session-ended
+modal with the server-assigned filename and an "Open Recording
+viewer" action; the viewer's side panel lists recordings from
+`/api/recordings`, supports per-row download, refresh, and upload;
+the "Open Recording viewer" action lands the user on the viewer
+surface with the just-saved recording already loaded.
 
 ### Step 8 — Verify
 
@@ -212,12 +241,14 @@ Produce in the destination folder:
     full examples of building a `ClientMessage` for each modality and
     consuming `ServerMessage`s.
 -   `how_to_test_with_ui.md` — only if the chat UI was enabled. Covers
-    starting the unified backend, the URL to open, sidebar
-    navigation between the chat surface and the viewer surface, how
-    to interact with the model through the chat UI, and how to open
-    a just-recorded session in the viewer via the save-recording
-    dialog. Defer to `recording_viewer.md` for what the viewer modes
-    show.
+    starting the unified backend (including the
+    `--recordings_dir` flag), the URL to open, sidebar navigation
+    between the chat surface and the viewer surface, how to interact
+    with the model through the chat UI, the informational
+    session-ended notice that points the user at the viewer, and how
+    to use the viewer's left side panel to load / refresh / upload /
+    download recordings. Defer to `recording_viewer.md` for what the
+    viewer modes show.
 
 **Definition of done:** all expected docs exist, the commands they
 print actually run, and the URLs they cite resolve.

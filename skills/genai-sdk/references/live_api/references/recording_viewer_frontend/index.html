@@ -22,40 +22,66 @@
         </div>
         <span class="path mono ellipsis" id="input-path"></span>
         <div class="header-actions">
-          <input
-            type="text"
-            id="path-input"
-            class="toolbar-input mono"
-            placeholder="/path/to/file.pb"
-          />
-          <button id="load-btn" type="button" class="btn btn-primary">
-            Load path
-          </button>
-          <label class="upload-label">
+          <span class="status-badge" id="status"></span>
+        </div>
+      </header>
+
+      <!-- ============================== Body (panel + main) =============== -->
+      <div class="app-body-viewer">
+        <!-- ====================== Left side panel ======================== -->
+        <aside class="recordings-panel" aria-label="Recordings panel">
+          <div class="recordings-panel-header">
+            <div class="recordings-panel-title">Recordings</div>
+            <button
+              id="refresh-btn"
+              type="button"
+              class="btn btn-ghost btn-sm"
+              title="Refresh recordings list"
+              aria-label="Refresh recordings list"
+            >
+              ⟳
+            </button>
+          </div>
+
+          <!--
+            Upload action lives at the top of the panel so a hand-imported
+            .pb file (e.g. one received from a teammate) can be reviewed
+            without being persisted into the backend's recordings dir.
+          -->
+          <label class="upload-label recordings-upload">
             <input
               type="file"
               id="upload-input"
               accept=".pb,application/octet-stream"
               hidden
             />
-            <button id="upload-btn" type="button" class="btn btn-ghost">
+            <button id="upload-btn" type="button" class="btn btn-ghost btn-sm">
               Upload file…
             </button>
           </label>
-          <span class="status-badge" id="status"></span>
-        </div>
-      </header>
 
-      <!-- ============================== Main ============================== -->
-      <main id="root" class="app-main-viewer">
-        <div class="empty-state">
-          <div class="empty-icon">📼</div>
-          <div class="empty-title">No recording loaded</div>
-          <div class="empty-hint">
-            Enter a .pb path or upload a file to visualize a session.
+          <!--
+            The list is populated from GET /api/recordings. Each row has
+            a clickable label (load) and a per-row download button. The
+            currently loaded recording is visually marked.
+          -->
+          <ul id="recordings-list" class="recordings-list" role="listbox">
+            <li class="recordings-empty">Loading…</li>
+          </ul>
+        </aside>
+
+        <!-- ============================== Main ============================ -->
+        <main id="root" class="app-main-viewer">
+          <div class="empty-state">
+            <div class="empty-icon">📼</div>
+            <div class="empty-title">No recording loaded</div>
+            <div class="empty-hint">
+              Pick a saved recording from the left panel, or upload a
+              .pb file to visualize a session.
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
 
     <!-- ============================== Tooltip ============================ -->

@@ -49,13 +49,18 @@ surface without a full page reload.
 
 Both surfaces are served by the **same backend process and same
 port**. The viewer's HTTP endpoints listed below (`/api/agents`,
-`/api/audio/<idx>.wav`, `/api/load`, `/api/upload`) live on the same
-origin as the chat UI's `/start` / `/ws` endpoints. Sub-routing the
-static assets (e.g. `/viewer/*`) is encouraged.
+`/api/audio/<idx>.wav`, `/api/recordings`,
+`/api/recordings/download`, `/api/load`, `/api/upload`) live on the
+same origin as the chat UI's `/start` / `/ws` endpoints. Sub-routing
+the static assets (e.g. `/viewer/*`) is encouraged.
 
-The chat UI's save-recording dialog calls the viewer's `/api/load`
-endpoint and switches the sidebar to the viewer entry to implement the
-"Open in viewer" hand-off — no new tab, no second backend.
+When a chat session ends, the chat UI's session-ended notice modal
+navigates to `#/viewer?recording=<name>`; the viewer reads that
+query on load and calls its own `/api/load` to render the
+just-saved recording. The chat UI does not download or stream the
+recording itself — downloads are exposed only by the viewer's
+`GET /api/recordings/download` endpoint and the per-row Download
+button in the side panel.
 
 ---
 
@@ -78,8 +83,10 @@ endpoint and switches the sidebar to the viewer entry to implement the
                                      └──────────────────────────────┘
 ```
 
-The server starts with **no recording loaded**. The user picks a file
-path or uploads a file from the page.
+The server starts with **no recording loaded**. The user picks a
+recording from the server-populated dropdown (sourced from the
+recordings directory the chat UI writes to) or uploads a file from
+the page. The user does **not** type a filesystem path.
 
 ---
 
@@ -87,20 +94,74 @@ path or uploads a file from the page.
 
 ### HTTP endpoints
 
-| Method & Path              | Purpose |
-| -------------------------- | --- |
-| `GET /`                    | Serves the SPA (static assets). |
-| `GET /api/agents`          | JSON payload with per-agent timelines (see schema below). |
-| `GET /api/audio/<idx>.wav` | 24 kHz stereo WAV for agent `<idx>`. Left = client audio, right = server audio. Silence gaps preserved. Interrupted audio excluded. |
-| `POST /api/load`           | Body `{"path": "..."}`. Loads a new recording. Returns the `/api/agents` payload. |
-| `POST /api/upload`         | Multipart `file=...`. Uploads + loads a recording. Returns the `/api/agents` payload. |
+| Method & Path                          | Purpose |
+| -------------------------------------- | --- |
+| `GET /`                                | Serves the SPA (static assets). |
+| `GET /api/agents`                      | JSON payload with per-agent timelines (see schema below). |
+| `GET /api/audio/<idx>.wav`             | 24 kHz stereo WAV for agent `<idx>`. Left = client audio, right = server audio. Silence gaps preserved. Interrupted audio excluded. |
+| `GET /api/recordings`                  | JSON `{recordings: [{name, size_bytes?, saved_at?}, ...]}` listing recordings saved in the backend's **recordings directory** (the same directory the chat UI's `/recording/finalize` writes to). The viewer reads only from this directory; the user never types a filesystem path. |
+| `GET /api/recordings/download?name=...` | Streams the named `.pb` file from the recordings directory back to the user as a download. The backend MUST set `Content-Disposition: attachment; filename="<name>"` and reject any `name` that escapes the recordings directory. **This is the only download endpoint exposed by the unified backend** — the chat UI does not duplicate it. |
+| `POST /api/load`                       | Body `{"name": "..."}` naming an entry returned by `/api/recordings`. Loads that recording. Returns the `/api/agents` payload (which SHOULD include the loaded `recording_name` so the side panel can mark the active row). The backend MUST reject any `name` that escapes the recordings directory (e.g. contains `..` or path separators). |
+| `POST /api/upload`                     | Multipart `file=...`. Uploads + loads a recording from the user's local disk (useful for reviewing a recording received from someone else). Returns the `/api/agents` payload. Uploaded recordings are not required to be persisted into the recordings directory. |
 
 The recording on disk is always a length-prefixed serialized protobuf
 stream in a `.pb` file (see `message_recorder.md`). No other format is
 supported.
 
-Both load endpoints replace the in-memory recording atomically under a
-lock. Offload parsing + WAV mixing to a worker thread.
+`POST /api/load` and `POST /api/upload` replace the in-memory
+recording atomically under a lock. Offload parsing + WAV mixing to a
+worker thread.
+
+### Recordings directory alignment
+
+When the unified backend (per `interactive_ui.md`) serves both the
+chat UI and the viewer, the chat UI's `POST /recording/finalize`
+action MUST write the auto-saved `.pb` file into the **same
+directory** that `GET /api/recordings` lists from,
+`GET /api/recordings/download` streams from, and `POST /api/load`
+reads from. This is what makes "session ends in chat UI →
+immediately available in viewer" work without the user ever typing
+a path or downloading anything in between.
+
+Recommended layout:
+
+-   The backend takes a `--recordings_dir` startup flag (default:
+    a writable path inside the destination project, e.g.
+    `./recordings`).
+-   `POST /recording/finalize` writes
+    `<recordings_dir>/liveapi_session_<timestamp>.pb` using a
+    server-chosen filename.
+-   `GET /api/recordings` enumerates `*.pb` files in
+    `<recordings_dir>`, returning each as `{name: <basename>, ...}`.
+-   `GET /api/recordings/download` resolves `<recordings_dir>/<name>`,
+    rejects anything resolving outside, and streams the file with
+    a download `Content-Disposition` header.
+-   `POST /api/load` resolves `<recordings_dir>/<name>` and refuses
+    anything that resolves outside the directory.
+
+The viewer frontend never sees absolute paths — only the basenames
+returned in `/api/recordings`.
+
+### Side panel (frontend)
+
+The viewer's main page MUST render a persistent **left side panel**
+that lists the entries returned by `GET /api/recordings`. Each row
+contains:
+
+-   The recording's `name` (and optional `size_bytes` / `saved_at`
+    metadata).
+-   A clickable label that loads the recording via `POST /api/load`.
+-   A per-row **Download** button (anchor) pointing at
+    `GET /api/recordings/download?name=<name>` with the `download`
+    attribute set so the browser saves it as a file.
+
+The currently loaded recording is visually marked as active. The
+panel header includes a **refresh** button that re-fetches
+`GET /api/recordings`. An **Upload file…** action at the top of the
+panel forwards to `POST /api/upload` for hand-imported recordings.
+
+The user never types a filesystem path; the dropdown previously used
+in earlier revisions is removed.
 
 ### Reconstruction pipeline
 
@@ -265,6 +326,10 @@ For one agent, build a 24 kHz stereo WAV:
 ```jsonc
 {
   "input_path": "/path/to/recording  OR  <uploaded: name>",
+  // For recordings loaded from --recordings_dir, this is the basename
+  // (matches the `name` in /api/recordings entries) so the side panel
+  // can mark the active row. Omitted/empty for uploaded recordings.
+  "recording_name": "liveapi_session_20240101_120000.pb",
   "agents": [
     {
       "index": 0,

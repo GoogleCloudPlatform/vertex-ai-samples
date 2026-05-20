@@ -12,7 +12,8 @@ A complete reference frontend is provided in `playground_frontend/` alongside th
 
 - **`playground_frontend/index.html`** — Page structure: header with status indicator,
   conversation panel with chat bubbles, side rail with config summary /
-  media sources / video preview, settings modal, save-recording modal.
+  media sources / video preview, settings modal, and an informational
+  session-ended notice modal.
 - **`playground_frontend/script.js`** — Session lifecycle, WebSocket messaging,
   audio/video capture pipelines, PCM playback with interrupt handling,
   conversation rendering (transcription + tool-call bubbles).
@@ -39,10 +40,12 @@ the agent's responsibility. The reference frontend files here
 (`playground_frontend/`) only cover the chat surface itself; they
 must be embedded into the shared shell when adapted.
 
-When the session ends, the chat UI's save-recording dialog MUST expose
-an **"Open in viewer"** action that switches the sidebar to the viewer
-entry and loads the just-saved recording into it (no new tab, no
-second backend).
+When the session ends, the chat UI shows an **informational
+session-ended modal** (no save controls, no download button) that
+includes an **"Open Recording viewer"** action. That action switches
+the sidebar to the viewer entry and auto-loads the recording the
+backend just persisted (no new tab, no second backend). Downloads
+are exposed only inside the viewer's side panel.
 
 ---
 
@@ -141,28 +144,59 @@ When integrating the reference into a new project, the agent should adjust:
    | --- | --- | --- |
    | `POST` | `/start` | Body: `{session_id, endpoint_url, setup}`. The `endpoint_url` is the computed WebSocket endpoint. `setup.model` is the **short** model ID; the backend reconstructs the fully-qualified name using its `--project_id` argument. Returns `{"status": "started"}`. |
    | `WS` | `/ws?session_id=<UUID>` | Bidirectional bridge. Browser sends serialized `ClientMessage`s; server forwards to upstream. Server forwards `ServerMessage`s as binary frames. |
-   | `GET` | `/recording/download?session_id=...` | Streams the session recording. |
-   | `POST` | `/recording/discard` | Deletes the server-side temp recording file. |
+   | `POST` | `/recording/finalize` | Multipart `session_id=...`. Called by the chat UI when the websocket has closed. The backend **automatically persists** the session's recording into the recordings directory under a server-chosen filename (e.g. `liveapi_session_<timestamp>.pb`) and returns `{"name": "<basename>"}`. If the session produced no recording (recorder disabled, zero frames, etc.) the response is `{"name": ""}`. |
+   | `POST` | `/recording/discard` | Multipart `session_id=...`. Deletes the server-side temp recording file. Used when the user explicitly declines to save. |
+
+   The chat UI **does NOT** provide a download endpoint or a download
+   button. Downloads are owned exclusively by the Recording viewer (see
+   `recording_viewer.md`'s `GET /api/recordings/download`).
 
    The **same** backend process MUST also expose the recording-viewer
    endpoints documented in `recording_viewer.md`
-   (`GET /api/agents`, `GET /api/audio/<idx>.wav`, `POST /api/load`,
-   `POST /api/upload`) so the sidebar can swap between the chat and
-   viewer surfaces without leaving the origin or hitting a second
-   process. Sub-routing the static assets (e.g. `/chat/*` vs
-   `/viewer/*`) is encouraged to keep the two surfaces' files
-   organized.
+   (`GET /api/agents`, `GET /api/audio/<idx>.wav`,
+   `GET /api/recordings`, `GET /api/recordings/download`,
+   `POST /api/load`, `POST /api/upload`) so the sidebar can swap
+   between the chat and viewer surfaces without leaving the origin or
+   hitting a second process. Sub-routing the static assets (e.g.
+   `/chat/*` vs `/viewer/*`) is encouraged to keep the two surfaces'
+   files organized.
+
+   **Recordings directory alignment (REQUIRED).** The directory
+   `POST /recording/finalize` writes to MUST be the same directory
+   `GET /api/recordings` lists from and `POST /api/load` reads from.
+   The user therefore never types a filesystem path in the viewer —
+   the chat UI's auto-save and the viewer's recording picker share
+   the same on-disk location. The backend takes the directory as a
+   startup argument (e.g. `--recordings_dir`).
 
 5. **Proto serialization** — The reference calls
    `ServerMessage.deserializeBinary()` and `msg.serializeBinary()`. Adapt
    to whatever proto library the project uses.
 
-6. **Save-recording modal** — Always present when this skill produces
-   the chat UI (because the recorder is bundled with the chat UI in
-   that case). The modal MUST include an **"Open in viewer"** action
-   that switches the sidebar to the viewer entry and loads the
-   just-saved recording into it via the shared backend's viewer
-   endpoints.
+6. **Session-ended notice modal** — Always present when this skill
+   produces the chat UI (because the recorder is bundled with the
+   chat UI in that case). The modal is **purely informational** — it
+   has no filename input, no "save" action, and no "download" action.
+
+   On websocket close, the chat UI:
+
+   1.  Calls `POST /recording/finalize`; the backend auto-saves the
+       recording into the recordings directory under a server-chosen
+       filename and returns the resulting `name`.
+   2.  Opens a modal that says the session ended, displays the
+       server-assigned filename, and tells the user to use the
+       **Recording viewer** (sidebar) to review the conversation and
+       to download the raw `.pb` if needed.
+
+   The modal MUST include a primary **"Open Recording viewer"**
+   button that switches the sidebar to the viewer entry with the
+   just-saved recording preselected (navigate to
+   `#/viewer?recording=<name>`; the viewer's initial load honors that
+   query and auto-loads the named recording). A secondary
+   **"Stay here"** button just closes the modal.
+
+   Downloads are not exposed on the chat surface — they live in the
+   viewer (see `recording_viewer.md`).
 
 ---
 

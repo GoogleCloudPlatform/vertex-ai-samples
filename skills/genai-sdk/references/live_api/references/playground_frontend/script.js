@@ -259,112 +259,56 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ===========================================================================
-  // Save-recording modal (shown when the websocket closes after a session)
+  // Session-ended notice modal
+  // ---------------------------------------------------------------------------
+  // When the websocket closes, the chat UI no longer prompts the user for a
+  // filename or a download. The backend has already auto-saved the recording
+  // into its recordings directory under a server-chosen filename; this modal
+  // is purely informational and points the user at the Recording viewer
+  // (sidebar) for review and download.
   // ===========================================================================
-  const saveModal = $('save-recording-modal');
-  const recordingFilenameInput = $('recording-filename');
-  const recordingSaveButton = $('recording-save');
-  const recordingDiscardButton = $('recording-discard');
-  let pendingRecordingSessionId = '';
+  const sessionEndedModal = $('session-ended-modal');
+  const sessionEndedFilename = $('session-ended-filename');
+  const openRecordingViewerBtn = $('open-recording-viewer');
+  let lastSavedRecordingName = '';
 
-  function defaultRecordingFilename() {
-    const d = new Date();
-    const pad = (n) => String(n).padStart(2, '0');
-    const stamp =
-        `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}` +
-        `_${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
-    return `liveapi_session_${stamp}.pb`;
+  function openSessionEndedModal(savedName) {
+    lastSavedRecordingName = savedName || '';
+    if (sessionEndedFilename) {
+      sessionEndedFilename.textContent =
+          savedName || '(no recording was produced)';
+    }
+    sessionEndedModal.hidden = false;
   }
-
-  function openSaveRecordingModal(sid) {
-    pendingRecordingSessionId = sid;
-    recordingFilenameInput.value = defaultRecordingFilename();
-    saveModal.hidden = false;
-    setTimeout(() => recordingFilenameInput.focus(), 0);
+  function closeSessionEndedModal() {
+    sessionEndedModal.hidden = true;
   }
-  function closeSaveModal() {
-    saveModal.hidden = true;
-    pendingRecordingSessionId = '';
-  }
-  saveModal.querySelectorAll('[data-close-save-modal]').forEach((el) => {
-    el.addEventListener('click', closeSaveModal);
-  });
+  sessionEndedModal
+      .querySelectorAll('[data-close-session-ended-modal]')
+      .forEach((el) => {
+        el.addEventListener('click', closeSessionEndedModal);
+      });
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && !saveModal.hidden) closeSaveModal();
-  });
-
-  async function discardRecording(sid) {
-    if (!sid) return;
-    try {
-      const fd = new FormData();
-      fd.append('session_id', sid);
-      await fetch('/recording/discard', {method: 'POST', body: fd});
-    } catch (e) {
-      console.warn('Failed to discard recording on server:', e);
+    if (event.key === 'Escape' && !sessionEndedModal.hidden) {
+      closeSessionEndedModal();
     }
-  }
-
-  async function saveRecording() {
-    const sid = pendingRecordingSessionId;
-    if (!sid) return;
-    const filename =
-        recordingFilenameInput.value.trim() || defaultRecordingFilename();
-
-    recordingSaveButton.disabled = true;
-    recordingDiscardButton.disabled = true;
-
-    try {
-      if (typeof window.showSaveFilePicker === 'function') {
-        let fileHandle;
-        try {
-          fileHandle = await window.showSaveFilePicker({
-            suggestedName: filename,
-            types: [{
-              description: 'Protobuf recording (.pb)',
-              accept: {'application/octet-stream': ['.pb']},
-            }],
-          });
-        } catch (err) {
-          if (err && err.name === 'AbortError') return;
-          throw err;
-        }
-        const url = `/recording/download?session_id=${encodeURIComponent(sid)}`;
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${await response.text()}`);
-        }
-        const writable = await fileHandle.createWritable();
-        await response.body.pipeTo(writable);
+  });
+  if (openRecordingViewerBtn) {
+    openRecordingViewerBtn.addEventListener('click', () => {
+      closeSessionEndedModal();
+      const name = lastSavedRecordingName;
+      const target = name
+          ? '#/viewer?recording=' + encodeURIComponent(name)
+          : '#/viewer';
+      if (window.location.hash !== target) {
+        window.location.hash = target;
       } else {
-        const url =
-            `/recording/download?session_id=${encodeURIComponent(sid)}` +
-            `&filename=${encodeURIComponent(filename)}`;
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
+        // Force a hashchange so the shell re-routes even when the
+        // user re-opens the viewer with the same recording.
+        window.dispatchEvent(new HashChangeEvent('hashchange'));
       }
-      await discardRecording(sid);
-      showStatus('Recording saved.', false);
-      closeSaveModal();
-    } catch (e) {
-      console.error('Failed to save recording:', e);
-      showStatus(`Failed to save recording: ${e.message}`, true);
-    } finally {
-      recordingSaveButton.disabled = false;
-      recordingDiscardButton.disabled = false;
-    }
+    });
   }
-
-  recordingSaveButton.addEventListener('click', saveRecording);
-  recordingDiscardButton.addEventListener('click', async () => {
-    const sid = pendingRecordingSessionId;
-    closeSaveModal();
-    await discardRecording(sid);
-    showStatus('Recording discarded.', false);
-  });
 
   // ===========================================================================
   // Sidebar config summary
@@ -836,7 +780,28 @@ document.addEventListener('DOMContentLoaded', () => {
       stopAudioStreaming();
       stopMediaStreams();
       if (hadActiveSession) {
-        setTimeout(() => openSaveRecordingModal(sessionId), 800);
+        // Ask the backend which (if any) recording file was produced
+        // for this session, then show the informational session-ended
+        // modal pointing the user at the Recording viewer.
+        const sidForFinalize = sessionId;
+        setTimeout(async () => {
+          let savedName = '';
+          try {
+            const fd = new FormData();
+            fd.append('session_id', sidForFinalize);
+            const resp = await fetch('/recording/finalize', {
+              method: 'POST',
+              body: fd,
+            });
+            if (resp.ok) {
+              const data = await resp.json().catch(() => ({}));
+              savedName = data.name || '';
+            }
+          } catch (e) {
+            console.warn('Failed to finalize recording:', e);
+          }
+          openSessionEndedModal(savedName);
+        }, 800);
       }
     };
   }

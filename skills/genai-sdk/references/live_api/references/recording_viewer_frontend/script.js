@@ -9,10 +9,22 @@
  *   - Per-agent zoom controls (independent horizontal scale).
  *
  * The companion server must expose:
- *   GET  /api/agents              — JSON with per-agent message summaries.
- *   GET  /api/audio/<idx>.wav     — 24 kHz stereo WAV per agent.
- *   POST /api/load                — Body: {"path": "..."}; returns agents JSON.
- *   POST /api/upload              — Multipart file upload; returns agents JSON.
+ *   GET  /api/agents                       — JSON with per-agent message
+ *                                            summaries.
+ *   GET  /api/audio/<idx>.wav              — 24 kHz stereo WAV per agent.
+ *   GET  /api/recordings                   — JSON list of recordings the
+ *                                            backend has saved to its
+ *                                            recordings directory. The viewer
+ *                                            reads only from this directory;
+ *                                            the user never types a path.
+ *   GET  /api/recordings/download?name=... — Streams the named .pb recording
+ *                                            for the user to download.
+ *   POST /api/load                         — Body: {"name": "..."} naming an
+ *                                            entry returned by
+ *                                            /api/recordings. Returns
+ *                                            agents JSON.
+ *   POST /api/upload                       — Multipart file upload; returns
+ *                                            agents JSON.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -22,14 +34,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const $ = (id) => document.getElementById(id);
 
   const inputPathLabel = $('input-path');
-  const pathInput = $('path-input');
-  const loadBtn = $('load-btn');
+  const recordingsList = $('recordings-list');
+  const refreshBtn = $('refresh-btn');
   const uploadBtn = $('upload-btn');
   const uploadInput = $('upload-input');
   const statusEl = $('status');
   const globalModeToggle = $('global-mode-toggle');
   const root = $('root');
   const tooltip = $('tooltip');
+
+  // Tracks which recording (if any) is currently rendered in the main
+  // pane. Used to mark the active row in the side panel.
+  let currentRecordingName = '';
+  // Cache of the most recent /api/recordings response so we can re-render
+  // the side panel (e.g. when the active row changes) without re-fetching.
+  let recordingsCache = [];
 
   // ===========================================================================
   // Constants
@@ -1038,10 +1057,14 @@ document.addEventListener('DOMContentLoaded', () => {
   function render(data) {
     _lastAgentsData = data;
     inputPathLabel.textContent = data.input_path || '';
-    pathInput.value =
-        (data.input_path && data.input_path.startsWith('<'))
-            ? ''
-            : (data.input_path || '');
+    // Update the side-panel active-row highlight. Uploaded recordings
+    // (input_path starts with '<') have no matching row.
+    if (data.input_path && !data.input_path.startsWith('<')) {
+      currentRecordingName = data.recording_name || data.input_path;
+    } else {
+      currentRecordingName = '';
+    }
+    renderRecordingsPanel();
     agentZoom.clear();
     agentModeOverride.clear();
     _decodedBuffers.clear();
@@ -1053,7 +1076,8 @@ document.addEventListener('DOMContentLoaded', () => {
           '<div class="empty-icon">📼</div>' +
           '<div class="empty-title">No recording loaded</div>' +
           '<div class="empty-hint">' +
-          'Enter a .pb path or upload a file to visualize a session.' +
+          'Pick a saved recording from the left panel, or upload a' +
+          ' .pb file to visualize a session.' +
           '</div></div>';
       return;
     }
@@ -1071,7 +1095,103 @@ document.addEventListener('DOMContentLoaded', () => {
     return data;
   }
 
+  /**
+   * Builds one row of the recordings side panel.
+   *
+   * Each row has:
+   *   - A clickable label (recording name + size + saved-at) that
+   *     loads the recording into the main pane.
+   *   - A "Download" button that streams the raw .pb to the user via
+   *     GET /api/recordings/download?name=...
+   *
+   * The row corresponding to the currently loaded recording is
+   * marked with the `.is-active` class.
+   */
+  function buildRecordingRow(rec) {
+    const li = document.createElement('li');
+    li.className = 'recording-row';
+    if (rec.name === currentRecordingName) li.classList.add('is-active');
+    li.dataset.name = rec.name;
+    li.setAttribute('role', 'option');
+
+    const loadBtn = document.createElement('button');
+    loadBtn.type = 'button';
+    loadBtn.className = 'recording-load';
+    loadBtn.title = 'Load ' + rec.name;
+    const nameEl = document.createElement('div');
+    nameEl.className = 'recording-name mono';
+    nameEl.textContent = rec.name;
+    const metaEl = document.createElement('div');
+    metaEl.className = 'recording-meta';
+    const metaParts = [];
+    if (rec.size_bytes) metaParts.push(fmtBytes(rec.size_bytes));
+    if (rec.saved_at) metaParts.push(rec.saved_at);
+    metaEl.textContent = metaParts.join(' · ');
+    loadBtn.appendChild(nameEl);
+    if (metaParts.length) loadBtn.appendChild(metaEl);
+    loadBtn.addEventListener('click', () => loadByName(rec.name));
+
+    const dlBtn = document.createElement('a');
+    dlBtn.className = 'btn btn-ghost btn-sm recording-download';
+    dlBtn.href =
+        '/api/recordings/download?name=' + encodeURIComponent(rec.name);
+    dlBtn.setAttribute('download', rec.name);
+    dlBtn.title = 'Download ' + rec.name;
+    dlBtn.textContent = '↓';
+    // Stop the row's load-on-click from firing when the user clicks
+    // the download button.
+    dlBtn.addEventListener('click', (e) => e.stopPropagation());
+
+    li.appendChild(loadBtn);
+    li.appendChild(dlBtn);
+    return li;
+  }
+
+  /** Re-renders the side panel from the cached /api/recordings response. */
+  function renderRecordingsPanel() {
+    if (!recordingsList) return;
+    recordingsList.innerHTML = '';
+    if (!recordingsCache.length) {
+      const empty = document.createElement('li');
+      empty.className = 'recordings-empty';
+      empty.textContent = '(no recordings saved yet)';
+      recordingsList.appendChild(empty);
+      return;
+    }
+    for (const r of recordingsCache) {
+      recordingsList.appendChild(buildRecordingRow(r));
+    }
+  }
+
+  /**
+   * Fetches /api/recordings, updates the cache + side panel. The
+   * backend serves only recordings from its own recordings directory;
+   * the user never types or sees a filesystem path.
+   */
+  async function loadRecordingsList() {
+    if (!recordingsList) return;
+    try {
+      const data = await fetchJsonOrThrow(
+          await fetch('/api/recordings'));
+      recordingsCache = data.recordings || [];
+      renderRecordingsPanel();
+    } catch (e) {
+      recordingsCache = [];
+      renderRecordingsPanel();
+      setStatus(
+          'Failed to list recordings: ' + e.message, 'error');
+      console.error(e);
+    }
+  }
+
   async function loadInitial() {
+    const requested = getRequestedRecordingFromHash();
+    await loadRecordingsList();
+    if (requested
+        && recordingsCache.some((r) => r.name === requested)) {
+      await loadByName(requested);
+      return;
+    }
     try {
       const data = await fetchJsonOrThrow(await fetch('/api/agents'));
       render(data);
@@ -1081,30 +1201,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  async function loadPath() {
-    const path = pathInput.value.trim();
-    if (!path) {
-      setStatus('Enter a path first.', 'error');
+  /**
+   * Loads the named recording from the backend's recordings directory
+   * into the main pane.
+   */
+  async function loadByName(name) {
+    if (!name) {
+      setStatus('Pick a recording first.', 'error');
       return;
     }
-    loadBtn.disabled = true;
-    setStatus('Loading ' + path + ' …');
+    setStatus('Loading ' + name + ' …');
     try {
       const resp = await fetch('/api/load', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({path}),
+        body: JSON.stringify({name}),
       });
       const data = await fetchJsonOrThrow(resp);
+      // Ensure the active-row highlight tracks the just-loaded file
+      // even if the server's response omitted `recording_name`.
+      if (!data.recording_name) data.recording_name = name;
       render(data);
       setStatus(
           'Loaded ' + (data.agents?.length || 0) + ' agent(s).', 'ok');
     } catch (e) {
       setStatus('Load failed: ' + e.message, 'error');
       console.error(e);
-    } finally {
-      loadBtn.disabled = false;
     }
+  }
+
+  /**
+   * If the shell handed us a `recording=<name>` query in the URL
+   * hash (e.g. `#/viewer?recording=session_20240101.pb` produced by
+   * the chat UI's "Open Recording viewer" action), preselect and
+   * load that recording on initial render.
+   */
+  function getRequestedRecordingFromHash() {
+    const hash = window.location.hash || '';
+    const qIdx = hash.indexOf('?');
+    if (qIdx === -1) return '';
+    const params = new URLSearchParams(hash.slice(qIdx + 1));
+    return params.get('recording') || '';
   }
 
   async function uploadFile(file) {
@@ -1152,18 +1289,30 @@ document.addEventListener('DOMContentLoaded', () => {
   // ===========================================================================
   // Event wiring
   // ===========================================================================
-  loadBtn.addEventListener('click', loadPath);
-  pathInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') loadPath();
-  });
-  uploadBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    uploadInput.click();
-  });
-  uploadInput.addEventListener('change', (e) => {
-    const f = e.target.files && e.target.files[0];
-    if (f) uploadFile(f);
-    e.target.value = '';
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', () => loadRecordingsList());
+  }
+  if (uploadBtn) {
+    uploadBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      uploadInput.click();
+    });
+  }
+  if (uploadInput) {
+    uploadInput.addEventListener('change', (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (f) uploadFile(f);
+      e.target.value = '';
+    });
+  }
+
+  // When the parent shell re-routes to `#/viewer?recording=<name>`,
+  // honor the new query and auto-load it.
+  window.addEventListener('hashchange', () => {
+    const requested = getRequestedRecordingFromHash();
+    if (requested && requested !== currentRecordingName) {
+      loadByName(requested);
+    }
   });
 
   loadInitial();

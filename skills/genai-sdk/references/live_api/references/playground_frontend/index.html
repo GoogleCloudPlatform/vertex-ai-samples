@@ -643,31 +643,33 @@ You are a helpful assistant.</textarea>
       </div>
     </div>
 
-    <!-- ============================== Save recording modal ============== -->
+    <!-- ============================== Session-ended notice modal ======== -->
     <div
-      id="save-recording-modal"
+      id="session-ended-modal"
       class="modal-root"
       role="dialog"
       aria-modal="true"
-      aria-labelledby="save-recording-title"
+      aria-labelledby="session-ended-title"
       hidden
     >
-      <div class="modal-backdrop" data-close-save-modal></div>
+      <div class="modal-backdrop" data-close-session-ended-modal></div>
       <div class="modal-card modal-card-narrow">
         <header class="modal-card-header">
           <div>
-            <h2 id="save-recording-title">Save session recording?</h2>
+            <h2 id="session-ended-title">Session ended</h2>
             <p class="modal-card-subtitle">
-              The session ended. A .pb log (length-prefixed protobuf) of every message exchanged is
-              available on the server. Choose a filename and download it, or
-              discard it.
+              The recording of this session has been saved to the
+              backend's recordings directory. To review the
+              conversation, listen back to the audio, or download the
+              raw <code>.pb</code> file, open the
+              <strong>Recording viewer</strong> from the sidebar.
             </p>
           </div>
           <button
             type="button"
             class="icon-button"
             aria-label="Close"
-            data-close-save-modal
+            data-close-session-ended-modal
           >
             <svg
               viewBox="0 0 20 20"
@@ -686,42 +688,25 @@ You are a helpful assistant.</textarea>
         </header>
 
         <div class="modal-card-body">
-          <div class="settings-block">
-            <label class="settings-label" for="recording-filename">
-              File name
-            </label>
-            <input
-              id="recording-filename"
-              class="input mono"
-              type="text"
-              spellcheck="false"
-              autocomplete="off"
-            />
-          </div>
-          <p class="settings-help" id="save-recording-help">
-            On supported browsers (Chromium-based), you'll be prompted with a
-            native dialog to pick the destination folder. Otherwise the file
-            is downloaded to your default downloads folder.
+          <p class="settings-help" id="session-ended-help">
+            Saved as: <span id="session-ended-filename" class="mono"></span>
           </p>
         </div>
 
         <footer class="modal-card-footer">
           <button
             type="button"
-            class="btn btn-ghost btn-danger-text"
-            id="recording-discard"
+            class="btn btn-ghost"
+            data-close-session-ended-modal
           >
-            Discard
+            Stay here
           </button>
           <button
             type="button"
-            class="btn btn-ghost"
-            data-close-save-modal
+            class="btn btn-primary"
+            id="open-recording-viewer"
           >
-            Cancel
-          </button>
-          <button type="button" class="btn btn-primary" id="recording-save">
-            Save…
+            Open Recording viewer
           </button>
         </footer>
       </div>

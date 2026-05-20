@@ -242,6 +242,97 @@ button {
 }
 
 /* ===========================================================================
+ * Body layout: left side panel + main content
+ * ========================================================================= */
+.app-body-viewer {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.recordings-panel {
+  flex: 0 0 260px;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--surface);
+  border-right: 1px solid var(--border);
+  overflow: hidden;
+}
+.recordings-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.recordings-panel-title {
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--text);
+}
+.recordings-upload {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.recordings-list {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+.recordings-empty {
+  padding: 16px 12px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
+.recording-row {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.recording-row.is-active {
+  background-color: var(--accent-soft, rgba(0, 0, 0, 0.04));
+}
+.recording-load {
+  flex: 1 1 auto;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 6px 4px;
+  cursor: pointer;
+  color: var(--text);
+  overflow: hidden;
+}
+.recording-load:hover {
+  background-color: var(--surface-hover, rgba(0, 0, 0, 0.04));
+}
+.recording-name {
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.recording-meta {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.recording-download {
+  align-self: center;
+  text-decoration: none;
+  padding: 4px 8px;
+}
+
+/* ===========================================================================
  * Main content area
  * ========================================================================= */
 .app-main-viewer {
