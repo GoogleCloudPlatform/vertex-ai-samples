@@ -1,0 +1,94 @@
+suite_name: quality_flywheel
+timeout_seconds: 300
+max_tool_calls: 30
+
+cases:
+  - name: cold_start_dataset_creation
+    prompt: >
+      I'm building a RAG agent that answers questions about internal
+      docs but I have no evaluation data yet. Help me get started
+      with evaluations.
+    skills: [quality-flywheel]
+    difficulty: medium
+    outcome_assertions:
+      - "The agent identifies this as a cold-start scenario and recommends synthetic data generation"
+      - "The agent explains the evaluation dataset format (EvalCase, EvaluationDataset)"
+      - "The agent suggests relevant metrics for RAG evaluation (hallucination, grounding, or general quality)"
+      - "The agent asks for or attempts to discover the GCP Project ID and Location"
+    expect_keywords_any:
+      - "synthetic"
+      - "generate"
+      - "dataset"
+      - "EvalCase"
+
+  - name: metric_selection_for_tool_agent
+    prompt: >
+      My agent uses 5 different tools (search, calculator, calendar,
+      email, file manager). It's working okay but I need to set up
+      evals to measure quality. What metrics should I track?
+    skills: [quality-flywheel]
+    difficulty: easy
+    outcome_assertions:
+      - "The agent recommends tool-call-specific metrics like tool_use_quality or tool_call_valid"
+      - "The agent recommends task completion metrics like multi_turn_task_success"
+      - "The agent explains how to assess correct tool selection vs wrong tool usage"
+      - "The agent does not recommend only generic text quality metrics"
+    expect_keywords_any:
+      - "tool_use"
+      - "tool_call"
+      - "task_success"
+      - "trajectory"
+
+  - name: trace_ingestion_adk
+    prompt: >
+      I have ADK session logs from my local development in the default
+      ADK format. How do I turn these into an evaluation dataset I can
+      run through Vertex Eval?
+    skills: [quality-flywheel]
+    difficulty: medium
+    outcome_assertions:
+      - "The agent describes how to convert traces into AgentData format"
+      - "The agent references the canonical types: AgentData, ConversationTurn, AgentEvent"
+      - "The agent provides concrete code or a step-by-step conversion plan"
+    expect_keywords_any:
+      - "AgentData"
+      - "ConversationTurn"
+      - "AgentEvent"
+      - "EvalCase"
+
+  - name: analyze_poor_results
+    prompt: >
+      I ran evals on my RAG agent and got 0.45 on the hallucination
+      metric and 0.62 on grounding. The agent seems to make up answers
+      instead of using the retrieved context. What should I fix?
+    skills: [quality-flywheel]
+    difficulty: easy
+    outcome_assertions:
+      - "The agent identifies low hallucination score as a critical problem"
+      - "The agent connects the symptom (making up answers) to a grounding/prompting root cause"
+      - "The agent suggests specific prompt or system instruction changes to improve grounding"
+      - "The agent recommends re-running evals after applying the fix"
+    expect_keywords_any:
+      - "grounding"
+      - "prompt"
+      - "hallucin"
+      - "context"
+
+  - name: custom_llm_metric_creation
+    prompt: >
+      I need to evaluate whether my customer support agent is always
+      polite and empathetic, even when delivering bad news. The
+      predefined metrics don't cover this. Can you help me create a
+      custom metric for this?
+    skills: [quality-flywheel]
+    difficulty: medium
+    outcome_assertions:
+      - "The agent creates a custom LLMMetric with a prompt_template for politeness/empathy"
+      - "The metric template evaluates tone specifically, not just general quality"
+      - "The agent provides runnable Python code for the custom metric"
+      - "The agent explains how to integrate it with client.evals.evaluate()"
+    expect_keywords_any:
+      - "LLMMetric"
+      - "prompt_template"
+      - "polite"
+      - "empathy"
