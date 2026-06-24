@@ -70,3 +70,5 @@
 /prediction/vertexai_serving_vllm/vertexai_serving_vllm_tpu_llama3_2_3B.ipynb @ravi-dalal
 /prediction/vertexai_serving_vllm/vertexai_serving_vllm_tpu_gcs_llama3_2_3B.ipynb @ravi-dalal
 /generative_ai/csm_intro.ipynb @elaidlaw
+/prediction/vertexai_serving_vllm/vertexai_serving_vllm_mistral_7b_with_lora_adopters_custom_container.ipynb @shamikaa
+/prediction/vertexai_serving_vllm/vertexai_serving_vllm_mistral_7b_with_lora_adopters_prebuilt_container.ipynb @shamikaa
