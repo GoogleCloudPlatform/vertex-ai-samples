@@ -1,4 +1,4 @@
 google-cloud-aiplatform==1.138.0
 numpy==2.4.4
-pandas==3.0.1
+pandas==3.0.3
 datasets==2.18.0
