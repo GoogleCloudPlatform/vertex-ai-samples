@@ -349,6 +349,15 @@ message BidiGenerateContentServerContent {
   Transcription output_transcription = 7;
 }
 
+// Streamed transcription chunk delivered inside `server_content`.
+//
+// IMPORTANT: this message intentionally has NO `finished` / `is_final`
+// field. Some older internal versions of the Live API exposed one, but
+// the current public wire protocol does not. End-of-transcription is
+// signaled by `BidiGenerateContentServerContent.turn_complete` (or
+// `generation_complete`), not by a per-frame flag. Frontends and
+// adapters MUST close transcription bubbles on those signals, not on a
+// nonexistent `Transcription.finished`.
 message Transcription {
   string text = 1;
 }

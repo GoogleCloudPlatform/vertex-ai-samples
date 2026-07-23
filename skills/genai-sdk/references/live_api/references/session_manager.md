@@ -16,6 +16,18 @@ This skill guides the implementation of a `SessionManager` class for the Gemini 
 1.  **Connection Management**: Maintain a continuous WebSocket connection to the specified endpoint until explicitly stopped.
 2.  **Bidirectional Communication**: Handle sending and receiving messages concurrently (use separate coroutines or threads).
 3.  **Session Resumption**: Automatically reconnect and restore state when disconnections occur.
+4.  **Optional Message Recording**: Accept an *optional* `MessageRecorder` (see
+    `message_recorder.md`) at construction time. When supplied, the session
+    manager MUST forward every successfully sent client message and every
+    received server message to `recorder.record(...)` so the full bidirectional
+    transcript can be persisted. When the recorder is omitted (`None` / not
+    provided), recording is disabled with zero runtime overhead and no
+    behavioral change. Recorder errors are best-effort and must never
+    interrupt the session. The session manager MUST NOT call `recorder.start()`
+    or `recorder.close()` — the recorder's lifecycle is owned by the caller,
+    so a single recorder instance can be shared across multiple session
+    managers (e.g. multiple agents writing to one transcript, disambiguated
+    by `agent_name`).
 
 ## Protocol Details
 
