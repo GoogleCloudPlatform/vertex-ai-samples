@@ -1,0 +1,4 @@
+google-genai
+google-cloud-aiplatform
+openai
+google-auth

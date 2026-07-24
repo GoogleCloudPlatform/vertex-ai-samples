@@ -1,12 +1,12 @@
 # ![Google Cloud](https://avatars.githubusercontent.com/u/2810941?s=60&v=4) Google Cloud Vertex AI Samples
 
-This repository contains notebooks, code samples, sample apps, and other resources that demonstrate how to use, develop and manage machine learning and generative AI workflows using Google Cloud Vertex AI.
+This repository contains notebooks, code samples, sample apps, skills, and other resources that demonstrate how to use, develop and manage machine learning and generative AI workflows using Google Cloud Vertex AI.
 
 ## Overview
 
 [Vertex AI](https://cloud.google.com/vertex-ai) is a fully-managed, unified AI development platform for building and using generative AI. This repository is designed to help you get started with Vertex AI. Whether you're new to Vertex AI or an experienced ML practitioner, you'll find valuable resources here.
 
-For more Vertex AI Generative AI notebook samples, please visit the Vertex AI [Generative AI](https://github.com/GoogleCloudPlatform/generative-ai) GitHub repository.
+⚠️ For more Vertex AI Generative AI notebook samples, please visit the Vertex AI [Generative AI](https://github.com/GoogleCloudPlatform/generative-ai) GitHub repository.
 
 ## Explore, learn and contribute
 
@@ -16,11 +16,11 @@ You can explore, learn, and contribute to this repository to unleash the full po
 
 Explore this repository, follow the links in the header section of each of the notebooks to -
 
-![Colab](https://cloud.google.com/ml-engine/images/colab-logo-32px.png)  Open and run the notebook in [Colab](https://colab.google/)\
-![Colab Enterprise](https://cloud.google.com/ml-engine/images/colab-enterprise-logo-32px.png)  Open and run the notebook in [Colab Enterprise](https://cloud.google.com/colab/docs/introduction)\
-![Workbench](https://lh3.googleusercontent.com/UiNooY4LUgW_oTvpsNhPpQzsstV5W8F7rYgxgGBD85cWJoLmrOzhVs_ksK_vgx40SHs7jCqkTkCk=e14-rj-sc0xffffff-h130-w32)  Open and run the notebook in [Vertex AI Workbench](https://cloud.google.com/vertex-ai/docs/workbench/introduction)\
-![Github](https://cloud.google.com/ml-engine/images/github-logo-32px.png)  View the notebook on Github
-
+- Open and run the notebook in [Colab](https://colab.google/)
+- Open and run the notebook in [Colab Enterprise](https://cloud.google.com/colab/docs/introduction)
+- Open and run the notebook in [Vertex AI Workbench](https://cloud.google.com/vertex-ai/docs/workbench/introduction)
+- View the notebook on Github
+  
 ### Contribute
 
 See the [Contributing Guide](https://github.com/GoogleCloudPlatform/vertex-ai-samples/blob/master/CONTRIBUTING.md).
@@ -35,7 +35,7 @@ To get started using Vertex AI, you must have a Google Cloud project.
 
 ## Repository structure
 
-```bash
+```text
 ├── notebooks
 │   ├── official - Notebooks demonstrating use of each Vertex AI service
 │   │   ├── automl
@@ -45,7 +45,23 @@ To get started using Vertex AI, you must have a Google Cloud project.
 │   │   ├── model_garden
 │   │   ├── ...
 ├── community-content - Sample code and tutorials contributed by the community
-
+├── docs - Deep-dive documentation and advanced setup guides
+└── skills - Suite of AI Agent "Skills" for Vertex AI
+    ├── README.md               # Developer guide for Vertex AI skills
+    ├── vertex-ai/              # Primary router for Vertex AI tasks
+    │   └── SKILL.md            # Entry point that routes across capabilities
+    ├── genai-sdk/              # Gemini API usage with Gen AI SDK
+    │   └── SKILL.md            # Guides for Python, JS/TS, Go, Java, C#
+    ├── vertex-deploy/          # Deploying models to Endpoints
+    │   └── SKILL.md            # Commands for open models & custom weights
+    ├── vertex-inference/       # Inferencing with GenAI models
+    │   └── SKILL.md            # Code samples for Gemini and OpenMaaS
+    └── vertex-tuning/          # Secondary router for model fine-tuning
+        ├── SKILL.md            # Router for tuning tasks
+        ├── gemini/             # Fine-tuning first-party Gemini models
+        │   └── SKILL.md
+        └── open-model/         # Fine-tuning third-party open models
+            └── SKILL.md
 ```
 ## Examples
 
