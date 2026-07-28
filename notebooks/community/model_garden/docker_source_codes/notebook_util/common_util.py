@@ -233,7 +233,7 @@ def download_image(url: str) -> str:
     base64 encoded image.
   """
   response = requests.get(url)
-  return Image.open(io.BytesIO(response.content))  # pytype: disable=bad-return-type  # pillow-102-upgrade
+  return Image.open(io.BytesIO(response.content))
 
 
 def resize_image(image: Any, new_width: int = 1000) -> Any:
