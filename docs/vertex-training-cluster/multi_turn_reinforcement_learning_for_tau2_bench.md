@@ -1,8 +1,3 @@
-<script type="text/javascript" async
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
-</script><br><br>
-
-
 # Multi-Turn Reinforcement Learning for &tau;<sup>2</sup>-bench
 
 **Authors:** [Fei Xia](mailto:feixia@google.com), [Genquan Duan](mailto:genquan@google.com), [Youbao Tang](mailto:tangyoubao@google.com), [Jingya Liu](mailto:leyajiu@google.com), [Jiuqiang Tang](mailto:jqtang@google.com), [Xuehan Xiong](mailto:xxman@google.com)
@@ -14,7 +9,7 @@
 * [Background](#background)
     * [Multi-Turn Tool-Calling Agents](#multi-turn-tool-calling-agents)
     * [GRPO](#grpo)
-    * [&tau;<sup>2</sup>-bench](#2-bench)
+    * [&tau;<sup>2</sup>-bench](#tau2-bench)
 * [Training Pipeline](#training-pipeline)
     * [Training Framework](#training-framework)
     * [User Simulator](#user-simulator)
