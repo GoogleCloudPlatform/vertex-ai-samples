@@ -39,7 +39,7 @@ To support our MTC community in accelerating their own development, we release o
 
 ### Multi-Turn Tool-Calling Agents
 
-Multi-Turn Tool-Calling Agents are autonomous architectures that interact with external functions or APIs over extended, iterative dialogues to solve complex, multi-step tasks. Instead of generating a final answer in a single pass, these agents alternate between reasoning, executing a tool, processing the tool's output, and planning their next move over several sequential rounds. At each turn $t$, the agent maintains an internal state consisting of the initial user query $q$, the hidden text history $h_t$, and a list of all prior tool executions and results $z_0, \dots, z_{t-1}$:
+Multi-Turn Tool-Calling Agents are autonomous architectures that interact with external functions or APIs over extended, iterative dialogues to solve complex, multi-step tasks. Instead of generating a final answer in a single pass, these agents alternate between reasoning, executing a tool, processing the tool's output, and planning their next move over several sequential rounds. At each turn <span>$$t$$</span>, the agent maintains an internal state consisting of the initial user query <span>$$q$$</span>, the hidden text history <span>$$h_t$$</span>, and a list of all prior tool executions and results <span>$$z_0, \dots, z_{t-1}$$</span>:
 
 $$s_t = (q, h_t, z_0, \dots, z_{t-1})$$
 
@@ -51,17 +51,17 @@ Using this state, the agent's policy executes a classic Observation &rarr; Plann
 
 ### GRPO
 
-Group Relative Policy Optimization (GRPO) normalizes rewards within groups of $G$ rollouts per prompt. The Group Relative Advantage is calculated as $A_i = \frac{R_i - \bar{R}}{\sigma_R}$, where:
-* $A_i$: The relative advantage of the $i$-th output in the group.
-* $R_i$: The absolute reward score given to the $i$-th output.
-* $\bar{R}$: The mean reward across all outputs in the sampled group ($G$): $\bar{R} = \frac{1}{G} \sum_{j=1}^G R_j$
-* $\sigma_R$: The standard deviation of the rewards within the group: $\sigma_R = \sqrt{\frac{1}{G} \sum_{j=1}^G (R_j - \bar{R})^2}$
+Group Relative Policy Optimization (GRPO) normalizes rewards within groups of <span>$$G$$</span> rollouts per prompt. The Group Relative Advantage is calculated as <span>$$A_i = \frac{R_i - \bar{R}}{\sigma_R}$$</span>, where:
+* <span>$$A_i$$</span>: The relative advantage of the <span>$$i$$</span>-th output in the group.
+* <span>$$R_i$$</span>: The absolute reward score given to the <span>$$i$$</span>-th output.
+* <span>$$\bar{R}$$</span>: The mean reward across all outputs in the sampled group (<span>$$G$$</span>): <span>$$\bar{R} = \frac{1}{G} \sum_{j=1}^G R_j$$</span>
+* <span>$$\sigma_R$$</span>: The standard deviation of the rewards within the group: <span>$$\sigma_R = \sqrt{\frac{1}{G} \sum_{j=1}^G (R_j - \bar{R})^2}$$</span>
 
 We apply the [decoupled clipped objective](https://arxiv.org/pdf/2110.00641):
 
 $$L^{\text{CLIP}}_{\text{decoupled}}(\theta) := \hat{\mathbb{E}}_t \left[ \frac{\pi_{\theta_{\text{prox}}}(a_t \mid s_t)}{\pi_{\theta_{\text{behav}}}(a_t \mid s_t)} \min \left( r_t(\theta)\hat{A}_t, \text{clip}\left(r_t(\theta), 1-\epsilon, 1+\epsilon\right)\hat{A}_t \right) \right]$$
 
-where $\hat{A}_t$ is an estimator of the advantage at timestep $t$, $\hat{\mathbb{E}}_t[\dots]$ indicates the empirical average over a finite batch of timesteps $t$, and the probability ratio $r_t(\theta)$ is defined as $r_t(\theta) := \frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\text{prox}}}(a_t \mid s_t)}$.
+where <span>$$\hat{A}_t$$</span> is an estimator of the advantage at timestep <span>$$t$$</span>, <span>$$\hat{\mathbb{E}}_t[\dots]$$</span> indicates the empirical average over a finite batch of timesteps <span>$$t$$</span>, and the probability ratio <span>$$r_t(\theta)$$</span> is defined as <span>$$r_t(\theta) := \frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\text{prox}}}(a_t \mid s_t)}$$</span>.
 
 ### &tau;<sup>2</sup>-bench
 
@@ -69,11 +69,11 @@ where $\hat{A}_t$ is an estimator of the advantage at timestep $t$, $\hat{\mathb
 
 #### Reward
 
-For any given task scenario, the overall reward for a completed interaction sequence is binary, $R_{\text{episode}} \in \{0, 1\}$. To achieve a perfect reward of 1, the agent must simultaneously clear two distinct evaluation layers: State-Based Verification and Action-Based Verification:
+For any given task scenario, the overall reward for a completed interaction sequence is binary, <span>$$R_{\text{episode}} \in \{0, 1\}$$</span>. To achieve a perfect reward of 1, the agent must simultaneously clear two distinct evaluation layers: State-Based Verification and Action-Based Verification:
 
 $$R_{\text{episode}}=\mathbf{1}(\text{State Verified}) \times \mathbf{1}(\text{Actions Verified})$$
 
-**State-Based Verification:** The state of the environment is represented as a database state, $S_{\text{db}}$. At the beginning of a task, the database is initialized to a specific state, $S_{\text{db}}^{\text{init}}$. The user simulator interacts with the agent to achieve an underlying goal state. At the end of the conversation, the evaluation engine extracts the final database state, $S_{\text{db}}^{\text{final}}$, and compares it against the pre-annotated ground-truth expected state, $S_{\text{db}}^{\text{target}}$.
+**State-Based Verification:** The state of the environment is represented as a database state, <span>$$S_{\text{db}}$$</span>. At the beginning of a task, the database is initialized to a specific state, <span>$$S_{\text{db}}^{\text{init}}$$</span>. The user simulator interacts with the agent to achieve an underlying goal state. At the end of the conversation, the evaluation engine extracts the final database state, <span>$$S_{\text{db}}^{\text{final}}$$</span>, and compares it against the pre-annotated ground-truth expected state, <span>$$S_{\text{db}}^{\text{target}}$$</span>.
 
 $$\mathbf{1}(\text{State Verified}) = \begin{cases} 1 & \text{if } S_{\text{db}}^{\text{final}} = S_{\text{db}}^{\text{target}} \\ 0 & \text{otherwise} \end{cases}$$
 
@@ -85,11 +85,11 @@ This ensures that regardless of the exact phrasing or natural language drift dur
 
 $$\mathbf{1}(\text{Actions Verified}) = \begin{cases} 1 & \text{if } \forall a_t \in \tau, \mathcal{C}_{\text{policy}}(a_t) = \text{True} \\ 0 & \text{otherwise} \end{cases}$$
 
-Where $\tau$ is the trajectory history and $\mathcal{C}_{\text{policy}}$ maps an action to its validity given the policy document.
+Where <span>$$\tau$$</span> is the trajectory history and <span>$$\mathcal{C}_{\text{policy}}$$</span> maps an action to its validity given the policy document.
 
 #### Metric
 
-Because LLM-based agents are inherently stochastic, evaluating a task a single time can lead to misleading variance in performance numbers. The fundamental metric reported on the benchmark leaderboards is Pass<sup>1</sup>. It represents the expected success rate across the evaluation dataset when running exactly one trial per task scenario. Given a dataset of $N$ unique task descriptions, Pass<sup>1</sup> is computed as:
+Because LLM-based agents are inherently stochastic, evaluating a task a single time can lead to misleading variance in performance numbers. The fundamental metric reported on the benchmark leaderboards is Pass<sup>1</sup>. It represents the expected success rate across the evaluation dataset when running exactly one trial per task scenario. Given a dataset of <span>$$N$$</span> unique task descriptions, Pass<sup>1</sup> is computed as:
 
 $$\text{Pass}^1 = \frac{1}{N} \sum_{i=1}^{N} R_{\text{episode}}^{(i)}$$
 
@@ -160,7 +160,7 @@ The pipeline ([Figure 2](#fig-pipeline)) comprises the following stages:
 * **Task Refinement:**
     * *Rollout Refinement (Crash Fixing):* Every task runs once in a live simulator. Tasks that crash are captured, and their stack tracebacks are sent back to the LLM for automated repair up to 3 rounds.
     * *Ground-Truth (GT) Refinement (Solvability):* A specialized "Golden Agent" with perfect knowledge of the correct resolution path attempts each task. If this expert agent cannot achieve a perfect reward (reward=1.0), the task's database state or evaluation criteria are fundamentally misaligned and are sent back to the LLM to be repaired. If the expert fails to solve the task after 2 rounds, then the task is marked as failed to check ground truth.
-* **Task Verification:** The pipeline verifies each task across 16 independent, stochastic rollouts with standard agents. This stage calculates a statistical Pass Rate for each task to evaluate solvability: $\text{Pass Rate} = \frac{\text{num pass}}{\text{num trials}}$. If a task is unsolvable by standard agents and has a 0% pass rate, then the task is marked as failed to check ground truth.
+* **Task Verification:** The pipeline verifies each task across 16 independent, stochastic rollouts with standard agents. This stage calculates a statistical Pass Rate for each task to evaluate solvability: <span>$$\text{Pass Rate} = \frac{\text{num pass}}{\text{num trials}}$$</span>. If a task is unsolvable by standard agents and has a 0% pass rate, then the task is marked as failed to check ground truth.
 
 * **Failure Refinement and Re-verify:** Rather than discarding failed tasks entirely, the pipeline takes a "fix the test, not the code" approach. The LLM reviews the best recorded trajectory and only modifies evaluation criteria to make them solvable but still meaningful. Refined tasks are verified again and merged with previously verified results.
 * **Task Export:** Generated tasks are categorized into difficulty buckets based on their statistical pass rates: easy (9&ndash;12 correct rollouts), medium (5&ndash;8 correct rollouts), and hard (1&ndash;4 correct rollouts). Tasks with 13&ndash;16 correct rollouts are excluded because they are already well-solved and provide limited training signal.
