@@ -1,3 +1,7 @@
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script><br><br>
+
 # Multi-Turn Reinforcement Learning for &tau;<sup>2</sup>-bench
 
 **Authors:** [Fei Xia](mailto:feixia@google.com), [Genquan Duan](mailto:genquan@google.com), [Youbao Tang](mailto:tangyoubao@google.com), [Jingya Liu](mailto:leyajiu@google.com), [Jiuqiang Tang](mailto:jqtang@google.com), [Xuehan Xiong](mailto:xxman@google.com)
@@ -156,7 +160,7 @@ The pipeline ([Figure 2](#fig-pipeline)) comprises the following stages:
 * **Task Refinement:**
     * *Rollout Refinement (Crash Fixing):* Every task runs once in a live simulator. Tasks that crash are captured, and their stack tracebacks are sent back to the LLM for automated repair up to 3 rounds.
     * *Ground-Truth (GT) Refinement (Solvability):* A specialized "Golden Agent" with perfect knowledge of the correct resolution path attempts each task. If this expert agent cannot achieve a perfect reward (reward=1.0), the task's database state or evaluation criteria are fundamentally misaligned and are sent back to the LLM to be repaired. If the expert fails to solve the task after 2 rounds, then the task is marked as failed to check ground truth.
-* **Task Verification:** The pipeline verifies each task across 16 independent, stochastic rollouts with standard agents. This stage calculates a statistical Pass Rate for each task to evaluate solvability: $\text{Pass Rate} = \frac{\text{num\_pass}}{\text{num\_trials}}$. If a task is unsolvable by standard agents and has a 0% pass rate, then the task is marked as failed to check ground truth.
+* **Task Verification:** The pipeline verifies each task across 16 independent, stochastic rollouts with standard agents. This stage calculates a statistical Pass Rate for each task to evaluate solvability: $\text{Pass Rate} = \frac{\text{num pass}}{\text{num trials}}$. If a task is unsolvable by standard agents and has a 0% pass rate, then the task is marked as failed to check ground truth.
 
 * **Failure Refinement and Re-verify:** Rather than discarding failed tasks entirely, the pipeline takes a "fix the test, not the code" approach. The LLM reviews the best recorded trajectory and only modifies evaluation criteria to make them solvable but still meaningful. Refined tasks are verified again and merged with previously verified results.
 * **Task Export:** Generated tasks are categorized into difficulty buckets based on their statistical pass rates: easy (9&ndash;12 correct rollouts), medium (5&ndash;8 correct rollouts), and hard (1&ndash;4 correct rollouts). Tasks with 13&ndash;16 correct rollouts are excluded because they are already well-solved and provide limited training signal.
