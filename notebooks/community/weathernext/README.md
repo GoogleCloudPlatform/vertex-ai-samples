@@ -4,10 +4,9 @@
 ## Overview
 **Disclaimer:**
 
-*Experimental*\
-This product is subject to the "Pre-GA Offerings Terms" in the General Service Terms section of the [Service Specific Terms](https://cloud.google.com/terms/service-terms#1). Pre-GA products are available "as is" and might have limited support. For more information, see the [launch stage descriptions](https://cloud.google.com/products#product-launch-stages). <!-- disableFinding(LINE_OVER_80) -->
+This product is subject to the General Service Terms section of the [Service Specific Terms](https://cloud.google.com/terms/service-terms#1). GA products follows standard support. For more information, see the [launch stage descriptions](https://cloud.google.com/products#product-launch-stages). <!-- disableFinding(LINE_OVER_80) -->
 
-Access to the forecasting capabilities requires application and approval. Users must be added to an allowlist to generate forecasts using this service. Review pricing details at [Vertex AI Custom Training pricing,](https://cloud.google.com/vertex-ai/pricing?hl=en&e=48754805#custom-trained-models) [Cloud Storage pricing](https://cloud.google.com/storage/pricing), and use the [Pricing Calculator](https://cloud.google.com/products/calculator/) before running. <!-- disableFinding(LINE_OVER_80) -->
+Please contact your Google Cloud sales person for using WeatherNext 2 on Agent Platform. In case you do not have a salesperson you work with, please submit the form using the Request access button in this model card and a Google Cloud representative will contact you. <!-- disableFinding(LINE_OVER_80) -->
 
 **Overview**
 
