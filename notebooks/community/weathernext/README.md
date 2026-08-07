@@ -74,4 +74,4 @@ To utilize these models for generating real-time forecasts via this service:
 Running these models *will incur costs* for the GPUs and other Google Cloud resources used. Learn about [Vertex AI Custom Training pricing](https://cloud.google.com/vertex-ai/pricing?hl=en&e=48754805#custom-trained-models), [Cloud Storage pricing](https://cloud.google.com/storage/pricing), and use the [Pricing Calculator](https://cloud.google.com/products/calculator/) to generate an estimate.
 
 ## Quick start
-The quickest way to get started with the WeatherNext in Google Cloud Platform is to run [our example notebook](weathernext_2_early_access_program.ipynb) in [Google Colab](https://colab.research.google.com/).
+The quickest way to get started with the WeatherNext in Google Cloud Platform is to run [our example notebook](weathernext_2_ic_pc.ipynb) in [Google Colab](https://colab.research.google.com/).
