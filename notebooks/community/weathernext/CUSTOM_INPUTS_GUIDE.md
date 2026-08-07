@@ -1,6 +1,6 @@
 ```
 The customer provides input Zarr files in a GCS bucket path via the
-`--cns_data_dir` flag. 
+`--input_data_gcs_dir` flag.
 
 #### How to Use
 
