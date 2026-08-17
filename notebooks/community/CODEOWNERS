@@ -28,6 +28,7 @@
 /vertex_endpoints/optimized_tensorflow_runtime @vlasenkoalexey
 /notebooks/community/alphagenome/cloudai_alphagenome_vai_quickstart.ipynb @dpanigra
 /notebooks/community/alphagenome/cloudai_alphagenome_finetune.ipynb @dpanigra
+/notebooks/community/alphafold3/cloudai_alphafold3_vai_quickstart.ipynb @raiamitgit
 /notebooks/community/weathernext/weathernext_2_early_access_program.ipynb @dpanigra
 /notebooks/community/weathernext/weathernext_2_ic_early_access_program.ipynb @dpanigra
 /notebooks/community/weathernext/weathernext_2_dws.ipynb @dpanigra
