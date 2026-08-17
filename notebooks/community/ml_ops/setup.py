@@ -89,7 +89,7 @@ print("UUID", UUID)
 if args.bucket_required:
     BUCKET_NAME = PROJECT_ID + "aip-" + UUID
     BUCKET_URI = f"gs://{BUCKET_NAME}"
-    os.system(f"gsutil mb -l {REGION} {BUCKET_URI}")
+    os.system(f"gcloud storage buckets create --location={REGION} {BUCKET_URI}")
     print("BUCKET_URI", BUCKET_URI)
     
     

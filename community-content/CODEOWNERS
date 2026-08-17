@@ -29,4 +29,5 @@
 /vertex_model_garden/model_oss/vllm @kathyyu-google
 /vertex_model_garden/benchmarking_reports @lavraicse
 /vertex_model_garden/model_oss/autogluon @lavraicse
+/vertex_distributed_training/a3mega/llama-3-8b-nemo-pretraining @mstyer-google @erwinh85 @mchrestkha
 

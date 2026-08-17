@@ -31,7 +31,7 @@ _MERGE_BASE_AND_LORA_OUTPUT_DIR = flags.DEFINE_string(
 
 _MERGE_MODEL_PRECISION_MODE = flags.DEFINE_enum(
     'merge_model_precision_mode',
-    constants.PRECISION_MODE_16,
+    constants.PRECISION_MODE_16B,
     [
         constants.PRECISION_MODE_4,
         constants.PRECISION_MODE_8,
@@ -86,10 +86,19 @@ def main(unused_argv: Sequence[str]) -> None:
         )
     )
 
+  finetuned_lora_model_dir = fileutils.force_gcs_path(
+      _FINETUNED_LORA_MODEL_DIR.value
+  )
+  if dataset_validation_util.is_gcs_path(finetuned_lora_model_dir):
+    finetuned_lora_model_dir = (
+        dataset_validation_util.download_gcs_uri_to_local(
+            finetuned_lora_model_dir
+        )
+    )
   utils.merge_causal_language_model_with_lora(
       pretrained_model_name_or_path=pretrained_model_name_or_path,
       precision_mode=_MERGE_MODEL_PRECISION_MODE.value,
-      finetuned_lora_model_dir=_FINETUNED_LORA_MODEL_DIR.value,
+      finetuned_lora_model_dir=finetuned_lora_model_dir,
       merged_model_output_dir=_MERGE_BASE_AND_LORA_OUTPUT_DIR.value,
       access_token=_HUGGINGFACE_ACCESS_TOKEN.value,
   )

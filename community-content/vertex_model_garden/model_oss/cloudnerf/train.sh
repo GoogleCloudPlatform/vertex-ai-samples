@@ -74,7 +74,7 @@ create_dir_if_not_exists "$local_experiment_path"
 create_dir_if_not_exists "$local_experiment_path/$scene_folder_name"
 
 # Copy experiment from GCS bucket to local.
-gsutil -m cp -r "${gcs_experiment_path}/data" "$local_experiment_path/$scene_folder_name" || exit 1
+gcloud storage cp --recursive "${gcs_experiment_path}/data" "$local_experiment_path/$scene_folder_name" || exit 1
 
 echo "GCS Experiment: $gcs_experiment_path"
 echo "Gin Config File: $gin_config_file"
@@ -89,6 +89,6 @@ accelerate launch train.py --gin_configs="$gin_config_file" \
   --gin_bindings="Config.factor = ${factor}" \
   --gin_bindings="Config.max_steps = ${max_training_steps}"
 
-gsutil -m rm -r "${gcs_experiment_path}/checkpoints/${training_job_name}"
-gsutil -m cp -r "$local_experiment_path/$scene_folder_name/config.gin" "${gcs_experiment_path}/${training_job_name}_config.gin"
-gsutil -m cp -r "$local_experiment_path/$scene_folder_name/checkpoints/*/*" "${gcs_experiment_path}/checkpoints/${training_job_name}"
+gcloud storage rm --recursive "${gcs_experiment_path}/checkpoints/${training_job_name}"
+gcloud storage cp --recursive "$local_experiment_path/$scene_folder_name/config.gin" "${gcs_experiment_path}/${training_job_name}_config.gin"
+gcloud storage cp --recursive "$local_experiment_path/$scene_folder_name/checkpoints/*/*" "${gcs_experiment_path}/checkpoints/${training_job_name}"

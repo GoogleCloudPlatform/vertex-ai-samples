@@ -1,7 +1,6 @@
 """Common libraries for PEFT."""
 
 from collections.abc import Mapping, Sequence
-import dataclasses
 import datetime
 import gc
 import os
@@ -11,12 +10,9 @@ from absl import logging
 import accelerate
 from accelerate import DistributedType
 from accelerate import PartialState
-import numpy as np
 import peft
 from peft import PeftModel
 from peft import prepare_model_for_kbit_training
-import psutil
-import pynvml
 import torch
 import transformers
 from transformers import AutoModelForCausalLM
@@ -27,7 +23,6 @@ import trl
 
 from util import dataset_validation_util
 from util import constants
-
 
 _LLAMA_3_1_405B_MODEL_ID = "Meta-Llama-3.1-405B"
 _LOCAL_MERGED_MODEL_DIR = "/tmp/merged_model"
@@ -126,7 +121,7 @@ def load_model(
       "device_map": device_map,
       "torch_dtype": torch_dtype,
       "quantization_config": quantization_config,
-      "trust_remote_code": True,
+      "trust_remote_code": False,
       "token": access_token,
       "attn_implementation": attn_implementation,
   }
@@ -310,169 +305,10 @@ def convert_model_to_fp8(
   PartialState().wait_for_everyone()
 
 
-@dataclasses.dataclass
-class TuningDataStats:
-  tuning_dataset_example_count: int
-  total_billable_token_count: int
-  tuning_step_count: int
-
-
-def get_dataset_stats(
-    dataset: Any,
-    tokenizer: transformers.PreTrainedTokenizer,
-    column: str,
-    effective_batch_size: int,
-) -> TuningDataStats:
-  """Calculates dataset statistics, e.g., total number of tokens."""
-  tokenized_dataset = dataset.map(lambda x: tokenizer(x[column]))
-  inputs = tokenized_dataset["input_ids"]
-  tuning_dataset_example_count = int(len(inputs))
-  total_billable_token_count = int(np.sum([len(ex) for ex in inputs]))
-  tuning_step_count = (
-      tuning_dataset_example_count + effective_batch_size - 1
-  ) // effective_batch_size
-  return TuningDataStats(
-      tuning_dataset_example_count,
-      total_billable_token_count,
-      tuning_step_count,
-  )
-
-
 def force_gc():
   """Collects garbage immediately to release unused CPU/GPU resources."""
   gc.collect()
   torch.cuda.empty_cache()
-
-
-@dataclasses.dataclass
-class GpuStats:
-  """Holds information about GPU usage stats.
-
-  For memory related, see
-  https://pytorch.org/docs/stable/notes/cuda.html#cuda-memory-management
-  """
-
-  # total memory
-  total_mem: float
-  # memory occupied.
-  occupied: float
-  # memory reserved, but not used.
-  unused: float
-  # nvidia-smi usually reports more memory usages than pytorch (for driver,
-  # kernel and etc). `smi_diff` tracks this difference.
-  smi_diff: float
-  # Gpu utilization.
-  util: float
-
-  # Allows unpacking operation like
-  # total_mem, occupied, unused, smi_diff, util = GpuStats(...)
-  # See https://stackoverflow.com/a/70753113
-  def __iter__(self):
-    return iter(dataclasses.astuple(self))
-
-
-def gpu_stats() -> GpuStats:
-  """Reports GPU memory usage and utilization."""
-  # See https://pytorch.org/docs/stable/notes/cuda.html#memory-management
-  bytes_per_gb = 1024.0**3
-  device = torch.cuda.current_device()
-  occupied = torch.cuda.memory_allocated(device) / bytes_per_gb
-  reserved = torch.cuda.memory_reserved(device) / bytes_per_gb
-  unused = reserved - occupied
-
-  def smi_mem(device):
-    try:
-      pynvml.nvmlInit()
-      handle = pynvml.nvmlDeviceGetHandleByIndex(device)
-      info = pynvml.nvmlDeviceGetMemoryInfo(handle)
-      return info.used / bytes_per_gb
-    except pynvml.NVMLError:
-      return 0.0
-
-  mem_used_smi = smi_mem(device)
-  smi_diff = mem_used_smi - reserved
-
-  util = torch.cuda.utilization(device)
-  return GpuStats(mem_used_smi, occupied, unused, smi_diff, util)
-
-
-def gpu_stats_str(stats: GpuStats | None = None) -> str:
-  if stats is None:
-    stats = gpu_stats()
-  total, occupied, unused, smi_diff, util = stats
-  return (
-      f"GPU memory: {total:.2f}({occupied=:.2f}, {unused=:.2f},"
-      f" {smi_diff=:.2f}) GB. Utilization: {util:.2f}%"
-  )
-
-
-@dataclasses.dataclass
-class CpuStats:
-  """Holds information about CPU usage stats."""
-
-  # Total CPU virtual memory i.e. virtual memory allocated + unallocated.
-  total_virtual_mem: float
-  # CPU virtual memory available for use.
-  unallocated_virtual_mem: float
-  # CPU virtual memory already used.
-  allocated_virtual_mem: float
-  # Total CPU swap memory i.e. swap memory allocated + unallocated.
-  total_swap_mem: float
-  # CPU swap memory available for use.
-  unallocated_swap_mem: float
-  # CPU swap memory already used.
-  allocated_swap_mem: float
-  # CPU utilization percentage.
-  utilization: float
-
-
-def cpu_stats() -> CpuStats:
-  """Reports CPU memory usage and utilization."""
-
-  # https://psutil.readthedocs.io/en/latest/#memory
-  gb = 1024.0**3
-  vmem = psutil.virtual_memory()
-  vmem_total = vmem.total / gb
-  vmem_available = vmem.available / gb
-  vmem_used = vmem_total - vmem_available
-  smem = psutil.swap_memory()
-  swap_total = smem.total / gb
-  swap_free = smem.free / gb
-  swap_used = smem.used / gb
-  # https://psutil.readthedocs.io/en/latest/#psutil.cpu_percent
-  cpu_util = psutil.cpu_percent(interval=1e-6)
-  return CpuStats(
-      total_virtual_mem=vmem_total,
-      unallocated_virtual_mem=vmem_available,
-      allocated_virtual_mem=vmem_used,
-      total_swap_mem=swap_total,
-      unallocated_swap_mem=swap_free,
-      allocated_swap_mem=swap_used,
-      utilization=cpu_util,
-  )
-
-
-def cpu_stats_str(stats: CpuStats | None = None) -> str:
-  """Returns a string representation of the CPU stats."""
-
-  if stats is None:
-    stats = cpu_stats()
-  total, occupied, unused = (
-      stats.total_virtual_mem,
-      stats.allocated_virtual_mem,
-      stats.unallocated_virtual_mem,
-  )
-  virtual_mem = (
-      f"CPU virtual memory: {total:.2f}({occupied=:.2f}, {unused=:.2f}) GB"
-  )
-  total, occupied, unused = (
-      stats.total_swap_mem,
-      stats.allocated_swap_mem,
-      stats.unallocated_swap_mem,
-  )
-  swap_mem = f"CPU swap memory: {total:.2f}({occupied=:.2f}, {unused=:.2f}) GB"
-  percent = stats.utilization
-  return f"{virtual_mem} {swap_mem} CPU Utilization: {percent:.2f}%"
 
 
 def init_partial_state(

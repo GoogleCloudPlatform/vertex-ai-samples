@@ -1,9 +1,12 @@
 """Fileutil lib to copy files between gcs and local."""
 
+import filecmp
 import fnmatch
 import os
 import pathlib
 import shutil
+import subprocess
+import time
 from typing import List, Optional, Tuple
 import uuid
 
@@ -55,6 +58,96 @@ def force_gcs_path(uri: str) -> str:
     )
   else:
     return uri
+
+
+def is_file_available(
+    file_path: str, retry_interval_secs: int = 60, timeout_secs: int = 3600
+) -> bool:
+  """Checks and waits for a file to be available in GCS.
+
+  Args:
+    file_path: The file path to check.
+    retry_interval_secs: The interval in seconds to check the file.
+    timeout_secs: The timeout in seconds to wait for the file.
+
+  Returns:
+    True if the file is available, False otherwise.
+  """
+  start_time = time.time()
+  while True:
+    try:
+      file_check_cmd = ['gcloud', 'storage', 'ls', file_path]
+      result = subprocess.run(
+          file_check_cmd, capture_output=True, text=True, check=True
+      )
+      if file_path in result.stdout:
+        logging.info('File %s exists.', file_path)
+        return True
+    except subprocess.CalledProcessError as e:
+      elapsed_time = time.time() - start_time
+      if elapsed_time > timeout_secs:
+        logging.info(
+            "Timeout: File '%s' not found after %d seconds. Error: %s",
+            file_path,
+            elapsed_time,
+            e,
+        )
+        return False
+
+      logging.info(
+          "File '%s' not found yet. Checking again in %d seconds. Error: %s",
+          file_path,
+          retry_interval_secs,
+          e,
+      )
+      time.sleep(retry_interval_secs)
+
+
+def compare_dirs(
+    local_dir: str,
+    gcsfuse_dir: str,
+    retry_interval_secs: int = 30,
+    timeout_secs: int = 3600,
+) -> bool:
+  """Compares two directories and returns True if they are the same.
+
+  Args:
+    local_dir: The local directory.
+    gcsfuse_dir: The gcsfuse directory.
+    retry_interval_secs: The interval in seconds to check the directories.
+    timeout_secs: The timeout in seconds to wait for the directories.
+
+  Returns:
+    True if the directories are the same, False otherwise.
+  """
+  start_time = time.time()
+  while True:
+    if os.path.exists(local_dir) and os.path.exists(gcsfuse_dir):
+      comparison = filecmp.dircmp(local_dir, gcsfuse_dir)
+      if (
+          not comparison.left_only
+          and not comparison.right_only
+          and not comparison.diff_files
+      ):
+        return True
+    elapsed_time = time.time() - start_time
+    if elapsed_time > timeout_secs:
+      logging.info(
+          "Timeout: Directories '%s' and '%s' do not match after %d seconds.",
+          local_dir,
+          gcsfuse_dir,
+          elapsed_time,
+      )
+      return False
+
+    logging.info(
+        "Directories '%s' and '%s' do not match yet. Checking again in %d"
+        ' seconds.',
+        local_dir,
+        gcsfuse_dir,
+        retry_interval_secs,
+    )
+    time.sleep(retry_interval_secs)
 
 
 def download_gcs_file_to_memory(gcs_uri: str) -> bytes:
@@ -352,3 +445,15 @@ def get_output_video_file(video_output_file_path: str) -> str:
       file_extension, '_overlay' + file_extension
   )
   return out_local_video_file_name
+
+
+def delete_local_file(local_file_path: str) -> None:
+  """Deletes a local file."""
+  if os.path.exists(local_file_path):
+    os.remove(local_file_path)
+
+
+def delete_local_dir(local_dir: str) -> None:
+  """Deletes a local directory recursively."""
+  if os.path.exists(local_dir):
+    shutil.rmtree(local_dir)

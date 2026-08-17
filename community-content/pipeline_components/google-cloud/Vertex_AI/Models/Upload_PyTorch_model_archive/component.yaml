@@ -148,7 +148,7 @@ implementation:
 
       # Downloading the model archive from GCS
       # TODO: Fix gsutil bugs (requires project ID, has auth issues) and use gsutil instead.
-      # gsutil cp "$model_archive_uri" "$model_archive_local_path"
+      # gcloud storage cp "$model_archive_uri" "$model_archive_local_path"
       pip install google-cloud-storage
       python -c '
       import sys

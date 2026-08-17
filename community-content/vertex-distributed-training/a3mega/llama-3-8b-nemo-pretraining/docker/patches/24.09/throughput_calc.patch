@@ -1,0 +1,13 @@
+diff --git a/src/utils/training_metrics/process_training_results.py b/src/utils/training_metrics/process_training_results.py
+index 3e82a66..e61e1d8 100644
+--- a/src/utils/training_metrics/process_training_results.py
++++ b/src/utils/training_metrics/process_training_results.py
+@@ -134,7 +134,7 @@ def get_average_step_time(file: str, start_step: int, end_step: int) -> float:
+     for line in datajson:
+         if line.get("step") != "PARAMETER":
+             step = line.get("step")
+-            if step >= start_step and step <= end_step:
++            if step >= start_step and step <= end_step and "train_step_timing in s" in line["data"]:
+                 time_step_accumulator += line["data"].get("train_step_timing in s")
+                 num_steps += 1
+     if num_steps == 0:

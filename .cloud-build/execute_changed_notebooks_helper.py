@@ -238,7 +238,7 @@ def _get_notebook_python_version(notebook_path: str) -> str:
 
             # Look for the python version specification pattern
             re_match = re.search(
-                "python version = (\d+\.\d+)", markdown, flags=re.IGNORECASE
+                r"python version = (\d+\.\d+)", markdown, flags=re.IGNORECASE
             )
             if re_match:
                 # get the version number
@@ -365,7 +365,7 @@ def process_and_execute_notebook(
             # Use gcloud to get tail
             try:
                 result.error_message = subprocess.check_output(
-                    ["gsutil", "cat", "-r", "-1000", log_file_uri], encoding="UTF-8"
+                    ["gcloud", "storage", "cat", "--range", "-1000", log_file_uri], encoding="UTF-8"
                 )
             except Exception as error:
                 result.error_message = str(error)

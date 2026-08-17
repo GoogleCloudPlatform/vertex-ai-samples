@@ -1,0 +1,13 @@
+diff --git a/scripts/checkpoint_converters/convert_llama_nemo_to_hf.py b/scripts/checkpoint_converters/convert_llama_nemo_to_hf.py
+index 8da15148d..005cae6c9 100644
+--- a/scripts/checkpoint_converters/convert_llama_nemo_to_hf.py
++++ b/scripts/checkpoint_converters/convert_llama_nemo_to_hf.py
+@@ -104,6 +104,8 @@ def convert(input_nemo_file, output_hf_file, precision=None, cpu_only=False) ->
+     dummy_trainer = Trainer(devices=1, accelerator='cpu', strategy=NLPDDPStrategy())
+     model_config = MegatronGPTModel.restore_from(input_nemo_file, trainer=dummy_trainer, return_config=True)
+     model_config.tensor_model_parallel_size = 1
++    model_config.virtual_pipeline_model_parallel_size = None
++    model_config.sequence_parallel = False
+     model_config.pipeline_model_parallel_size = 1
+     if cpu_only:
+         map_location = torch.device('cpu')

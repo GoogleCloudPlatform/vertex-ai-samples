@@ -1,0 +1,41 @@
+diff --git a/nemo/collections/nlp/parts/megatron_trainer_builder.py b/nemo/collections/nlp/parts/megatron_trainer_builder.py
+index b2c85cde4..a3a9670c3 100644
+--- a/nemo/collections/nlp/parts/megatron_trainer_builder.py
++++ b/nemo/collections/nlp/parts/megatron_trainer_builder.py
+@@ -19,6 +19,7 @@ from lightning_fabric.utilities.exceptions import MisconfigurationException
+ from omegaconf import DictConfig
+ from pytorch_lightning import Trainer
+ from pytorch_lightning.callbacks import ModelSummary
++from pytorch_lightning.callbacks import Callback
+ from pytorch_lightning.plugins.environments import TorchElasticEnvironment
+
+ from nemo.collections.common.metrics.perf_metrics import FLOPsMeasurementCallback
+@@ -38,6 +39,23 @@ from nemo.utils.callbacks.dist_ckpt_io import (
+     AsyncFinalizerCallback,
+     DistributedCheckpointIO,
+ )
++from vmg.util.device_stats import gpu_stats_str
++
++class GpuStatsMon(Callback):
++    def on_train_start(self, trainer, pl_module) -> None:
++        rank=pl_module.global_rank
++        print(f'train_start: {rank=} {gpu_stats_str()}', flush=True)
++
++    def on_train_batch_start(self, trainer, pl_module, batch, batch_idx) -> None:
++        rank=pl_module.global_rank
++        print(f'batch_start: {rank=} {gpu_stats_str()}', flush=True)
++
++    def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx) -> None:
++        rank=pl_module.global_rank
++        print(f'batch_end: {rank=} {gpu_stats_str()}', flush=True)
+
+
+ class MegatronTrainerBuilder:
+@@ -178,6 +196,7 @@ class MegatronTrainerBuilder:
+         if self.cfg.get('exp_manager', {}).get('log_tflops_per_sec_per_gpu', True):
+             callbacks.append(FLOPsMeasurementCallback(self.cfg))
+
++        callbacks.append(GpuStatsMon())
+         return callbacks
+
+     def create_trainer(self, callbacks=None) -> Trainer:

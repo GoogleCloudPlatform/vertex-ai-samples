@@ -1,13 +1,14 @@
 """Common util functions for notebook."""
 
 import base64
+from collections.abc import Sequence
 import datetime
 import io
 import json
 import os
 import subprocess
 import time
-from typing import Any, Dict, Sequence
+from typing import Any
 
 from google import auth
 from google.cloud import storage
@@ -283,7 +284,7 @@ def decode_image(
   return image
 
 
-def get_label_map(label_map_yaml_filepath: str) -> Dict[int, str]:
+def get_label_map(label_map_yaml_filepath: str) -> dict[int, str]:
   """Returns class id to label mapping given a filepath to the label map.
 
   Args:
@@ -333,6 +334,7 @@ def vqa_predict(
     image: Any,
     language_code: str = "en",
     new_width: int = 1000,
+    use_dedicated_endpoint: bool = False,
 ) -> Sequence[str]:
   """Predicts the answer to a question about an image using an Endpoint."""
   # Resize and convert image to base64 string.
@@ -356,7 +358,9 @@ def vqa_predict(
         "image": resized_image_base64,
     })
 
-  response = endpoint.predict(instances=instances)
+  response = endpoint.predict(
+      instances=instances, use_dedicated_endpoint=use_dedicated_endpoint
+  )
   return [pred.get("response") for pred in response.predictions]
 
 
@@ -366,6 +370,7 @@ def caption_predict(
     image: Any,
     caption_prompt: bool = False,
     new_width: int = 1000,
+    use_dedicated_endpoint: bool = False,
 ) -> str:
   """Predicts a caption for a given image using an Endpoint."""
   # Resize and convert image to base64 string.
@@ -380,7 +385,9 @@ def caption_predict(
     instance["prompt"] = caption_prompt_format.format(language_code)
 
   instances = [instance]
-  response = endpoint.predict(instances=instances)
+  response = endpoint.predict(
+      instances=instances, use_dedicated_endpoint=use_dedicated_endpoint
+  )
   return response.predictions[0].get("response")
 
 
@@ -389,6 +396,7 @@ def ocr_predict(
     ocr_prompt: str,
     image: Any,
     new_width: int = 1000,
+    use_dedicated_endpoint: bool = False,
 ) -> str:
   """Extracts text from a given image using an Endpoint."""
   # Resize and convert image to base64 string.
@@ -400,7 +408,9 @@ def ocr_predict(
     instance["prompt"] = ocr_prompt
   instances = [instance]
 
-  response = endpoint.predict(instances=instances)
+  response = endpoint.predict(
+      instances=instances, use_dedicated_endpoint=use_dedicated_endpoint
+  )
   return response.predictions[0].get("response")
 
 
@@ -409,6 +419,7 @@ def detect_predict(
     detect_prompt: str,
     image: Any,
     new_width: int = 1000,
+    use_dedicated_endpoint: bool = False,
 ) -> str:
   """Predicts the answer to a question about an image using an Endpoint."""
   # Resize and convert image to base64 string.
@@ -420,7 +431,9 @@ def detect_predict(
     instance["prompt"] = detect_prompt
   instances = [instance]
 
-  response = endpoint.predict(instances=instances)
+  response = endpoint.predict(
+      instances=instances, use_dedicated_endpoint=use_dedicated_endpoint
+  )
   return response.predictions[0].get("response")
 
 
@@ -497,6 +510,17 @@ def get_quota(project_id: str, region: str, resource_id: str) -> int:
   ):
     return -1
   all_regions_data = quota_data[0]["consumerQuotaLimits"][0]["quotaBuckets"]
+
+  # If the quota data does not have dimensions, it is global quota. However,
+  # global quota may be overridden by regional quota. So we need to check the
+  # global quota first.
+  global_quota = -1
+  if (
+      all_regions_data
+      and "dimensions" not in all_regions_data[0]
+      and "effectiveLimit" in all_regions_data[0]
+  ):
+    global_quota = int(all_regions_data[0]["effectiveLimit"])
   for region_data in all_regions_data:
     if (
         region_data.get("dimensions")
@@ -506,12 +530,13 @@ def get_quota(project_id: str, region: str, resource_id: str) -> int:
         return int(region_data["effectiveLimit"])
       else:
         return 0
-  return -1
+  return global_quota
 
 
 def get_resource_id(
     accelerator_type: str,
     is_for_training: bool,
+    is_spot: bool = False,
     is_restricted_image: bool = False,
     is_dynamic_workload_scheduler: bool = False,
 ) -> str:
@@ -521,6 +546,7 @@ def get_resource_id(
     accelerator_type: The accelerator type.
     is_for_training: Whether the resource is used for training. Set false for
       serving use case.
+    is_spot: Whether the resource is used with Spot.
     is_restricted_image: Whether the image is hosted in `vertex-ai-restricted`.
     is_dynamic_workload_scheduler: Whether the resource is used with Dynamic
       Workload Scheduler.
@@ -536,7 +562,9 @@ def get_resource_id(
       "NVIDIA_A100_80GB": "nvidia_a100_80gb_gpus",
       "NVIDIA_H100_80GB": "nvidia_h100_gpus",
       "NVIDIA_H100_MEGA_80GB": "nvidia_h100_mega_gpus",
+      "NVIDIA_H200_141GB": "nvidia_h200_gpus",
       "NVIDIA_TESLA_T4": "nvidia_t4_gpus",
+      "TPU_V6e": "tpu_v6e",
       "TPU_V5e": "tpu_v5e",
       "TPU_V3": "tpu_v3",
   }
@@ -550,6 +578,10 @@ def get_resource_id(
   }
   restricted_image_training_accelerator_map = {
       "NVIDIA_A100_80GB": "restricted_image_training_nvidia_a100_80gb_gpus",
+  }
+  spot_serving_accelerator_map = {
+      key: f"custom_model_serving_preemptible_{accelerator_suffix_map[key]}"
+      for key in accelerator_suffix_map
   }
   serving_accelerator_map = {
       key: f"custom_model_serving_{accelerator_suffix_map[key]}"
@@ -579,8 +611,11 @@ def get_resource_id(
   else:
     if is_dynamic_workload_scheduler:
       raise ValueError("Dynamic Workload Scheduler does not work for serving.")
-    if accelerator_type in serving_accelerator_map:
-      return serving_accelerator_map[accelerator_type]
+    accelerator_map = (
+        spot_serving_accelerator_map if is_spot else serving_accelerator_map
+    )
+    if accelerator_type in accelerator_map:
+      return accelerator_map[accelerator_type]
     else:
       raise ValueError(
           f"Could not find accelerator type: {accelerator_type} for serving."
@@ -593,13 +628,28 @@ def check_quota(
     accelerator_type: str,
     accelerator_count: int,
     is_for_training: bool,
+    is_spot: bool = False,
     is_restricted_image: bool = False,
     is_dynamic_workload_scheduler: bool = False,
-):
-  """Checks if the project and the region has the required quota."""
+) -> None:
+  """Checks if the project and the region has the required quota.
+
+  Args:
+    project_id: The project id.
+    region: The region.
+    accelerator_type: The accelerator type.
+    accelerator_count: The number of accelerators to check quota for.
+    is_for_training: Whether the resource is used for training. Set false for
+      serving use case.
+    is_spot: Whether the resource is used with Spot.
+    is_restricted_image: Whether the image is hosted in `vertex-ai-restricted`.
+    is_dynamic_workload_scheduler: Whether the resource is used with Dynamic
+      Workload Scheduler.
+  """
   resource_id = get_resource_id(
       accelerator_type,
       is_for_training=is_for_training,
+      is_spot=is_spot,
       is_restricted_image=is_restricted_image,
       is_dynamic_workload_scheduler=is_dynamic_workload_scheduler,
   )

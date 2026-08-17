@@ -140,6 +140,70 @@ class TrainedModelQualityTest(test_util.TestBase):
 
     self.assertEqual(self.run_cmd(), 0)
 
+  @parameterized.named_parameters(
+      ('Qwen2.5-32B-Instruct', 'Qwen2.5-32B-Instruct'),
+  )
+  def test_qwen_model_deepspeed(self, model_name):
+    self.setup_output_dir(f'test_deepspeed_{model_name}')
+    self.task_cmd_builder.pretrained_model_name_or_path = model_name
+    self.task_cmd_builder.config_file = (
+        'vertex_vision_model_garden_peft/deepspeed_zero2_8gpu.yaml'
+    )
+    self.task_cmd_builder.train_dataset = test_util.get_test_data_path(
+        'llama-tuning-test/opposite-examples-train.jsonl'
+    )
+    self.task_cmd_builder.train_split = 'train'
+    self.task_cmd_builder.train_column = 'messages'
+    self.task_cmd_builder.train_template = 'qwen2_5'
+    self.task_cmd_builder.eval_dataset = test_util.get_test_data_path(
+        'llama-tuning-test/opposite-examples-eval.jsonl'
+    )
+    self.task_cmd_builder.eval_split = 'train'
+    self.task_cmd_builder.eval_column = self.task_cmd_builder.train_column
+    self.task_cmd_builder.eval_template = self.task_cmd_builder.train_template
+
+    self.command_builder.add_env_var('CUDA_VISIBLE_DEVICES', '0,1,2,3,4,5,6,7')
+    # Note(lavrai): The following parameters are needed for the opposite-word
+    # dataset to converge properly.
+    self.task_cmd_builder.gradient_accumulation_steps = 1
+    self.task_cmd_builder.num_train_epochs = 10.0
+    self.task_cmd_builder.logging_steps = 1
+
+    self.assertEqual(self.run_cmd(), 0)
+
+  @parameterized.named_parameters(
+      ('Qwen2.5-32B-Instruct', 'Qwen2.5-32B-Instruct'),
+  )
+  def test_qwen_model_fsdp(self, model_name):
+    self.setup_output_dir(f'test_fsdp_{model_name}')
+    self.task_cmd_builder.pretrained_model_name_or_path = (
+        test_util.get_pretrained_model_name_or_path(model_name)
+    )
+    self.task_cmd_builder.config_file = (
+        'vertex_vision_model_garden_peft/qwen2_fsdp_8gpu.yaml'
+    )
+    self.task_cmd_builder.train_dataset = test_util.get_test_data_path(
+        'llama-tuning-test/opposite-examples-train.jsonl'
+    )
+    self.task_cmd_builder.train_split = 'train'
+    self.task_cmd_builder.train_column = 'messages'
+    self.task_cmd_builder.train_template = 'qwen2_5'
+    self.task_cmd_builder.eval_dataset = test_util.get_test_data_path(
+        'llama-tuning-test/opposite-examples-eval.jsonl'
+    )
+    self.task_cmd_builder.eval_split = 'train'
+    self.task_cmd_builder.eval_column = self.task_cmd_builder.train_column
+    self.task_cmd_builder.eval_template = self.task_cmd_builder.train_template
+
+    self.command_builder.add_env_var('CUDA_VISIBLE_DEVICES', '0,1,2,3,4,5,6,7')
+    # Note(lavrai): The following parameters are needed for the opposite-word
+    # dataset to converge properly.
+    self.task_cmd_builder.gradient_accumulation_steps = 1
+    self.task_cmd_builder.num_train_epochs = 10.0
+    self.task_cmd_builder.logging_steps = 1
+
+    self.assertEqual(self.run_cmd(), 0)
+
 
 if __name__ == '__main__':
   absltest.main()

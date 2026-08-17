@@ -39,7 +39,6 @@ import argparse
 import json
 import os
 import sys
-import urllib.request
 import csv
 from enum import Enum
 from abc import ABC, abstractmethod
@@ -227,7 +226,7 @@ def parse_dir(directory: str) -> int:
             elif tag == 'bigquery_ml':
                 tag = 'BigQuery ML'
             elif tag == 'custom':
-                tag = 'Vertex AI Training'
+                tag = 'Vertex AI serverless training'
             elif tag == 'experiments':
                 tag = 'Vertex AI Experiments'
             elif tag == 'explainable_ai':
@@ -249,7 +248,7 @@ def parse_dir(directory: str) -> int:
             elif tag == 'pipelines':
                 tag = 'Vertex AI Pipelines'
             elif tag == 'prediction':
-                tag = 'Vertex AI Prediction'
+                tag = 'Vertex AI Inference'
             elif tag == 'pytorch':
                 tag = 'Vertex AI Training'
             elif tag == 'reduction_server':
@@ -1019,8 +1018,8 @@ class BrandingRule(TextRule):
         branding = {
                 'Vertex SDK': 'Vertex AI SDK',
                 'Vertex Training': 'Vertex AI Training',
-                'Vertex Prediction': 'Vertex AI Prediction',
-                'Vertex Batch Prediction': 'Vertex AI batch prediction',
+                'Vertex Prediction': 'Vertex AI Inference',
+                'Vertex Batch Prediction': 'Vertex AI batch inference',
                 'Vertex XAI': 'Vertex Explainable AI',
                 'Vertex Explainability': 'Vertex Explainable AI',
                 'Vertex AI Explainability': 'Vertex Explainable AI',
@@ -1203,13 +1202,13 @@ def add_index(path: str,
         print('        </td>')
         print('        <td>')
         if colab_link:
-            print(f'            <a href="{colab_link}" target="_blank" track-type="notebookTutorial" track-name="colabLink">Colab</a><br/>\n')
+            print(f'            <a href="{colab_link}" target="_blank" track-type="notebookTutorial" track-name="colabLink"><img src="/vertex-ai/images/colab-logo-32px.png" alt="Colab logo" width="24" height="24" style="vertical-align: middle; margin-right: 5px;" /> Colab</a><br/>\n')
         if colab_enterprise_link:
-            print(f'            <a href="{colab_enterprise_link}" target="_blank" track-type="notebookTutorial" track-name="colabEnterpriseLink">Colab Enterprise</a><br/>\n')
+            print(f'            <a href="{colab_enterprise_link}" target="_blank" track-type="notebookTutorial" track-name="colabEnterpriseLink"><img src="/vertex-ai/images/colab-enterprise-logo-32px.png" alt="Colab Enterprise logo" width="24" height="24" style="vertical-align: middle; margin-right: 5px;" /> Colab Enterprise</a><br/>\n')
         if git_link:
-            print(f'            <a href="{git_link}" target="_blank" track-type="notebookTutorial" track-name="gitHubLink">GitHub</a><br/>\n')
+            print(f'            <a href="{git_link}" target="_blank" track-type="notebookTutorial" track-name="gitHubLink"><img src="/vertex-ai/images/github-logo-32px.png" alt="GitHub logo" width="24" height="24" style="vertical-align: middle; margin-right: 5px;" /> GitHub</a><br/>\n')
         if workbench_link:
-            print(f'            <a href="{workbench_link}" target="_blank" track-type="notebookTutorial" track-name="workbenchLink">Vertex AI Workbench</a><br/>\n')
+            print(f'            <a href="{workbench_link}" target="_blank" track-type="notebookTutorial" track-name="workbenchLink"><img src="/vertex-ai/images/vertex-ai-workbench-logo-32px.png" alt="Vertex AI Workbench logo" width="24" height="24" style="vertical-align: middle; margin-right: 5px;" /> Vertex AI Workbench</a><br/>\n')
         print('        </td>')
         print('    </tr>\n')
     elif args.repo:
@@ -1270,8 +1269,8 @@ def replace_cl(text : str ) -> str:
         'Vertex AI Model Registry': '{{vertex_model_registry_name}}',
         'Vertex Training': '{{vertex_training_name}}',
         'Vertex AI Training': '{{vertex_training_name}}',
-        'Vertex Prediction': '{{vertex_prediction_name}}',
-        'Vertex AI Prediction': '{{vertex_prediction_name}}',
+        'Vertex Prediction': '{{vertex_inference_name}}',
+        'Vertex AI Prediction': '{{vertex_inference_name}}',
         'Vertex TensorBoard': '{{vertex_tensorboard_name}}',
         'Vertex AI TensorBoard': '{{vertex_tensorboard_name}}',
         'TensorBoard': '{{vertex_tensorboard_name}}',
@@ -1306,7 +1305,7 @@ def replace_cl(text : str ) -> str:
         #'Vertex SDK': '{{vertex_sdk_name}}',
         #'Vertex AI SDK': '{{vertex_sdk_name}}',
         'Vertex AI SDK for Python': '{{vertex_sdk_python}}',
-        'Vertex AI batch prediction': '{{vertex_ai_name}} {{batch_prediction_name}}',
+        'Vertex AI batch prediction': '{{vertex_ai_name}} batch inference',
         'Vertex AI': '{{vertex_ai_name}}',
         'Ray on Vertex AI': '{{ray_vertex_ai_name}}',
         'Google Cloud console': '{{console_name}}',
@@ -1381,7 +1380,7 @@ if args.web:
     print('        <tr>')
     print('            <th width="180px">Services</th>')
     print('            <th>Description</th>')
-    print('            <th width="80px">Open in</th>')
+    print('            <th style="width: 180px;">Open in</th>')
     print('        </tr>')
     print('    </thead>')
     print('    <tbody class="list">')
