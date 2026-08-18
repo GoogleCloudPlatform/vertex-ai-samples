@@ -12,7 +12,7 @@ bitsandbytes==0.43.2
 cloudml-hypertune==0.1.0.dev6
 datasets==2.20.0
 deepspeed==0.15.2
-diffusers==0.25.1
+diffusers==0.38.0
 evaluate==0.4.3
 fsspec==2024.3.1
 gcsfs==2024.3.1
