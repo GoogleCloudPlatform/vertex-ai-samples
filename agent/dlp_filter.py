@@ -1,4 +1,5 @@
-import google.cloud.dlp
+from google.cloud import dlp_v2
+import logging
 from typing import List, Optional
 
 class DLPFilter:
@@ -8,7 +9,7 @@ class DLPFilter:
     def __init__(self, project_id: str, location: str = "global"):
         self.project_id = project_id
         self.location = location
-        self.client = google.cloud.dlp_v2.DlpServiceClient()
+        self.client = dlp_v2.DlpServiceClient()
         self.parent = f"projects/{project_id}/locations/{location}"
 
     def redact_phi(self, text: str, info_types: List[str] = None) -> str:
@@ -63,7 +64,7 @@ class DLPFilter:
         except Exception as e:
             # Fallback: In case of API failure, return a safe error or log it.
             # In a production HIPAA environment, we might want to "fail closed".
-            print(f"DLP API Error: {e}")
+            logging.error(f"DLP API Error: {e}")
             return "[REDACTED DUE TO FILTER ERROR]"
 
 # Example usage (mocked)

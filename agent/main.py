@@ -1,4 +1,5 @@
 import os
+import logging
 from dlp_filter import DLPFilter
 from vertexai.generative_models import GenerativeModel, ChatSession
 
@@ -19,11 +20,13 @@ class HIPAAHardenedAgent:
         safe_input = self.dlp.redact_phi(user_input)
         
         # 2. Call Gemini
-        # Note: In a real Reasoning Engine, this would be part of a LangChain chain
-        # or a custom class that Vertex AI manages.
-        response = self.model.generate_content(
-            f"You are a helpful medical assistant. Answer based on this SAFE input: {safe_input}"
-        )
+        try:
+            response = self.model.generate_content(
+                f"You are a helpful medical assistant. Answer based on this SAFE input: {safe_input}"
+            )
+        except Exception as e:
+            logging.error(f"Failed to generate content: {e}")
+            return "An error occurred while processing your request."
         
         # 3. Redact Output (PHI from LLM to User)
         # Even if input is safe, LLM might hallucinate or leak internal data.

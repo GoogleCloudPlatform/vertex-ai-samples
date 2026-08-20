@@ -25,9 +25,16 @@ resource "google_kms_key_ring" "vertex_keyring" {
 }
 
 resource "google_kms_crypto_key" "vertex_key" {
-  name     = "vertex-ai-key"
-  key_ring = google_kms_key_ring.vertex_keyring.id
-  purpose  = "ENCRYPT_DECRYPT"
+  name            = "vertex-ai-key"
+  key_ring        = google_kms_key_ring.vertex_keyring.id
+  purpose         = "ENCRYPT_DECRYPT"
+  rotation_period = "7776000s" # 90 days
+}
+
+resource "google_kms_crypto_key_iam_member" "vertex_kms_binding" {
+  crypto_key_id = google_kms_crypto_key.vertex_key.id
+  role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+  member        = "serviceAccount:service-${var.project_number}@gcp-sa-aiplatform.iam.gserviceaccount.com"
 }
 
 # 3. VPC Service Controls (Simplified Perimeter)
