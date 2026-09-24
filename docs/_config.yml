@@ -1,0 +1,5 @@
+# Jekyll configuration for the GitHub Pages site published from this folder.
+#
+# This site uses the GitHub Pages default theme (jekyll-theme-primer), whose
+# layout emits the gtag.js snippet on every page when `google_analytics` is set.
+google_analytics: G-XXXXXXXXXX
