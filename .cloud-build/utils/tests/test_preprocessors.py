@@ -16,6 +16,18 @@ def test_update_value():
     assert new_content.endswith('"')
 
 
+def test_update_value_keeps_single_quotes():
+    preprocessor = NotebookProcessors.UniqueStringsPreprocessor()
+
+    content = "PROJECT_ID = 'your-project-id-unique'"
+
+    new_content = preprocessor.update_unique_strings(content)
+
+    assert new_content != content
+    assert new_content.startswith("PROJECT_ID = 'your-project-id-")
+    assert new_content.endswith("'")
+
+
 WHEEL = "gs://staging-bucket/google-cloud-aiplatform.whl"
 
 

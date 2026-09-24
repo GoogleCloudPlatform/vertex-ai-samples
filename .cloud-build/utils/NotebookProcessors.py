@@ -83,9 +83,9 @@ class UniqueStringsPreprocessor(Preprocessor):
         unique_id = generate_uuid()
         return (
             content.replace('-unique"', f'-{unique_id}"')
-            .replace("-unique'", f'-{unique_id}"')
+            .replace("-unique'", f"-{unique_id}'")
             .replace('_unique"', f'_{unique_id}"')
-            .replace("_unique'", f'_{unique_id}"')
+            .replace("_unique'", f"_{unique_id}'")
         )
 
     def preprocess(self, notebook, resources=None):
