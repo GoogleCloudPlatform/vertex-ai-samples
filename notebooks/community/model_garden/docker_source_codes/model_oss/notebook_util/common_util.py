@@ -233,7 +233,7 @@ def download_image(url: str) -> str:
     base64 encoded image.
   """
   response = requests.get(url)
-  return Image.open(io.BytesIO(response.content))
+  return Image.open(io.BytesIO(response.content))  # pyrefly: ignore[bad-return]
 
 
 def resize_image(image: Any, new_width: int = 1000) -> Any:
@@ -263,7 +263,7 @@ def load_img(path: str) -> Any:
   """
   img = tf.io.read_file(path)
   img = tf.image.decode_jpeg(img, channels=3)
-  return Image.fromarray(np.uint8(img)).convert("RGB")
+  return Image.fromarray(np.uint8(img)).convert("RGB")  # pyrefly: ignore[bad-argument-type]
 
 
 def decode_image(
