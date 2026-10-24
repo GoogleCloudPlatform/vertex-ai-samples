@@ -5,6 +5,6 @@ nbconvert
 black==26.5.1
 pyupgrade==3.21.2
 isort==8.0.1
-flake8==7.3.0
+flake8==7.4.1
 nbqa==1.9.1
 
