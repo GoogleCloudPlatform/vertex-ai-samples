@@ -15,6 +15,7 @@
 
 from typing import Dict
 import random
+import re
 import string
 
 from nbconvert.preprocessors import Preprocessor
@@ -82,9 +83,9 @@ class UniqueStringsPreprocessor(Preprocessor):
         unique_id = generate_uuid()
         return (
             content.replace('-unique"', f'-{unique_id}"')
-            .replace("-unique'", f'-{unique_id}"')
+            .replace("-unique'", f"-{unique_id}'")
             .replace('_unique"', f'_{unique_id}"')
-            .replace("_unique'", f'_{unique_id}"')
+            .replace("_unique'", f"_{unique_id}'")
         )
 
     def preprocess(self, notebook, resources=None):
@@ -99,19 +100,37 @@ class UniqueStringsPreprocessor(Preprocessor):
         notebook.cells = executable_cells
         return notebook, resources
 
+
+# The google-cloud-aiplatform requirement as it appears in an install line,
+# with an optional extras suffix and/or version pin.
+AI_PLATFORM_REQUIREMENT = re.compile(
+    r"google-cloud-aiplatform(?!\.whl)(\[[^\]]*\])?([=<>!~]=?[^\s'\"]+)?"
+)
+
+
 class VertexAIInstallProprocessor(Preprocessor):
     def __init__(self, vertex_ai_wheel):
+        super().__init__()
         self.vertex_ai_wheel = vertex_ai_wheel
 
-    @staticmethod
-    def update_vertex_ai_install(content: str):
+    def update_vertex_ai_install(self, content: str):
         if "google-cloud-aiplatform" not in content:
             return content
-        return (
-            f"gcloud storage cp {self.vertex_ai_wheel} google-cloud-aiplatform.whl\n" + 
-            content.replace("google-cloud-aiplatform\n", "google-cloud-aiplatform.whl\n")
-            .replace("google-cloud-aiplatform ", "google-cloud-aiplatform.whl ")
+
+        # A local wheel replaces the released package, so any version pin or
+        # extras suffix has to be dropped along with it.
+        content = AI_PLATFORM_REQUIREMENT.sub("google-cloud-aiplatform.whl", content)
+        copy_command = (
+            f"gcloud storage cp {self.vertex_ai_wheel} google-cloud-aiplatform.whl\n"
         )
+
+        # A cell that already runs shell through a %% magic needs the command
+        # inside the magic; anywhere else a `!` escape makes it a shell line.
+        if content.lstrip().startswith("%%"):
+            magic, _, body = content.partition("\n")
+            return f"{magic}\n{copy_command}{body}"
+
+        return f"! {copy_command}{content}"
 
     def preprocess(self, notebook, resources=None):
         executable_cells = []
@@ -123,3 +142,4 @@ class VertexAIInstallProprocessor(Preprocessor):
 
             executable_cells.append(cell)
         notebook.cells = executable_cells
+        return notebook, resources
