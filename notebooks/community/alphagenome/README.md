@@ -2,25 +2,9 @@
 
 # AlphaGenome
 [**Overview**](#overview) | [**Use Cases**](#use-cases) | [**Documentation**](#documentation) | [**Pricing**](#pricing) | [**Quick start inference**](#quick-start-inference) | 
-[**Quick start finetune**](#quick-start-finetune)
+[**Batch inference pipeline**](#batch-inference-pipeline) | [**Quick start finetune**](#quick-start-finetune)
 
 ## Overview
-**Disclaimer:** *Experimental*.
-
-*The AlphaGenome Private Preview is a "Pre-GA Offering" subject to the "Pre-GA
-Offerings Terms" in the General Service Terms section of the Google Cloud
-[Service Specific Terms](https://cloud.google.com/terms/service-terms). It is
-also a “Generative AI Preview Product” as defined in and subject to the
-[Additional Terms for Generative AI Preview Products](https://cloud.google.com/trustedtester/aitos?e=48754805&hl=en).
-Pre-GA products are available "as is" and might have limited support. For more
-information, see the [launch stage](https://cloud.google.com/products?e=48754805#product-launch-stages)
-descriptions.*
-
-Access to the AlphaGenome model capabilities requires application and approval.
-Users must be added to an allowlist to use the service.
-If you are interested in applying to the program, **Request Access** above.
-
-&nbsp;
 
 AlphaGenome is Google DeepMind’s unifying model for deciphering the regulatory
 code within DNA sequences.
@@ -66,7 +50,7 @@ directly or use the [colab](cloudai_alphagenome_vai_quickstart.ipynb).
 
 ### Acknowledgements
 
-*Avsec, Ž., Latysheva, N., Cheng, J., Novati, G., Taylor, K. R., Ward, T., ... Kohli, P. (2025). AlphaGenome: advancing regulatory variant effect prediction with a unified DNA sequence model. bioRxiv.* [https://doi.org/10.1101/2025.06.25.661532](https://doi.org/10.1101/2025.06.25.661532)
+*Avsec, Ž., Latysheva, N., Cheng, J., Novati, G., Taylor, K. R., Ward, T., ... Kohli, P. (2025). AlphaGenome: advancing regulatory variant effect prediction with a unified DNA sequence model. bioRxiv.* [ Nature 649, 1206–1218, 2026, DOI 10.1038/s41586-025-10014-0](https://www.nature.com/articles/s41586-025-10014-0)
 
 ### Contact
 If you have any questions on using these models on Google Cloud please contact:
@@ -74,7 +58,7 @@ If you have any questions on using these models on Google Cloud please contact:
 
 ### Links
 
-*   Read our [paper](https://doi.org/10.1101/2025.06.25.661532)
+*   Read our [paper](https://www.nature.com/articles/s41586-025-10014-0)
 *   Read our [blog post](https://deepmind.google/discover/blog/alphagenome-ai-for-better-understanding-the-genome)
 *   Join the [community](https://www.alphagenomecommunity.com/)
 *   Check out the [AlphaGenome 101 Video](https://youtu.be/Xbvloe13nak)
@@ -92,6 +76,9 @@ To utilize these models via this service:
 
 ## Quick start inference
 The quickest way to get started with the AlphaGenome in Google Cloud Platform is to run [our example notebook](cloudai_alphagenome_vai_quickstart.ipynb) in [Google Colab](https://colab.research.google.com/).
+
+## Batch inference pipeline
+To run batch predictions on JSONL input files stored in Google Cloud Storage, run [our batch inference notebook](cloudai_alphagenome_batch_pipeline.ipynb) or see the [Batch Inference Pipeline guide](batch_pipeline/README.md).
 
 ## Quick start finetune
 The quickest way to get started with the AlphaGenome fineutning in Google Cloud Platform is to run [our finetuning notebook](cloudai_alphagenome_finetune.ipynb) in [Google Cloud Platform Enterprise Colab](https://docs.cloud.google.com/colab/docs/introduction).

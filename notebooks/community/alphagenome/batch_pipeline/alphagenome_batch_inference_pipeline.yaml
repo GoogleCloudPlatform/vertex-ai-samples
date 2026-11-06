@@ -1,0 +1,1508 @@
+# PIPELINE DEFINITION
+# Name: alphagenome-batch-inference-pipeline
+# Description: AlphaGenome Batch Inference Pipeline on Vertex AI. Supports existing Shared gRPC endpoints, existing Dedicated HTTP endpoints, and auto-provisioned ephemeral GPU endpoints with automatic ExitHandler teardown and GCS shard checkpointing.
+# Inputs:
+#    cleanup_ephemeral_endpoint: bool [Default: True]
+#    encryption_spec_key_name: str [Default: '']
+#    existing_endpoint: str [Default: '']
+#    existing_vertex_ai_url: str [Default: '']
+#    fail_on_any_error: bool [Default: False]
+#    impersonate_service_account: str [Default: '']
+#    input_gcs_uri: str
+#    max_retries: int [Default: 4.0]
+#    model_version: str [Default: 'ALL_FOLDS']
+#    output_gcs_uri: str
+#    project_id: str [Default: '{{$.pipeline_google_cloud_project_id}}']
+#    region: str [Default: 'us-central1']
+#    save_tidy_scores: bool [Default: True]
+#    sdk_wheel_url: str [Default: 'https://github.com/GoogleCloudPlatform/vertex-ai-samples/raw/main/notebooks/community/alphagenome/whl/alphagenome_cloud_sdk-0.4.2.12-py3-none-any.whl']
+#    serving_accelerator_count: int [Default: 1.0]
+#    serving_accelerator_type: str [Default: 'NVIDIA_H100_80GB']
+#    serving_compute_reservation_id: str [Default: '']
+#    serving_image_uri: str [Default: 'us-docker.pkg.dev/vertex-ai-restricted/alphagenome/alphagenome-inference:agv1_mg_004_rc_20261102']
+#    serving_machine_type: str [Default: '']
+#    serving_replica_count: int [Default: 8.0]
+#    timeout: float [Default: 180.0]
+#    workers: int [Default: 8.0]
+components:
+  comp-cleanup-ephemeral-endpoint-op:
+    executorLabel: exec-cleanup-ephemeral-endpoint-op
+    inputDefinitions:
+      parameters:
+        cleanup_ephemeral_endpoint:
+          defaultValue: true
+          isOptional: true
+          parameterType: BOOLEAN
+        existing_endpoint:
+          defaultValue: ''
+          isOptional: true
+          parameterType: STRING
+        existing_vertex_ai_url:
+          defaultValue: ''
+          isOptional: true
+          parameterType: STRING
+        job_name:
+          parameterType: STRING
+        project_id:
+          parameterType: STRING
+        region:
+          parameterType: STRING
+    outputDefinitions:
+      parameters:
+        Output:
+          parameterType: STRING
+  comp-exit-handler-1:
+    dag:
+      tasks:
+        resolve-or-provision-endpoint-op:
+          cachingOptions: {}
+          componentRef:
+            name: comp-resolve-or-provision-endpoint-op
+          inputs:
+            parameters:
+              encryption_spec_key_name:
+                componentInputParameter: pipelinechannel--encryption_spec_key_name
+              existing_endpoint:
+                componentInputParameter: pipelinechannel--existing_endpoint
+              existing_vertex_ai_url:
+                componentInputParameter: pipelinechannel--existing_vertex_ai_url
+              input_gcs_uri:
+                componentInputParameter: pipelinechannel--input_gcs_uri
+              job_name:
+                runtimeValue:
+                  constant: '{{$.pipeline_job_name}}'
+              max_retries:
+                componentInputParameter: pipelinechannel--max_retries
+              model_version:
+                componentInputParameter: pipelinechannel--model_version
+              output_gcs_uri:
+                componentInputParameter: pipelinechannel--output_gcs_uri
+              project_id:
+                componentInputParameter: pipelinechannel--project_id
+              region:
+                componentInputParameter: pipelinechannel--region
+              sdk_wheel_url:
+                componentInputParameter: pipelinechannel--sdk_wheel_url
+              serving_accelerator_count:
+                componentInputParameter: pipelinechannel--serving_accelerator_count
+              serving_accelerator_type:
+                componentInputParameter: pipelinechannel--serving_accelerator_type
+              serving_compute_reservation_id:
+                componentInputParameter: pipelinechannel--serving_compute_reservation_id
+              serving_image_uri:
+                componentInputParameter: pipelinechannel--serving_image_uri
+              serving_machine_type:
+                componentInputParameter: pipelinechannel--serving_machine_type
+              serving_replica_count:
+                componentInputParameter: pipelinechannel--serving_replica_count
+              timeout:
+                componentInputParameter: pipelinechannel--timeout
+              workers:
+                componentInputParameter: pipelinechannel--workers
+          taskInfo:
+            name: resolve-or-provision-endpoint-op
+        run-batch-inference-op:
+          cachingOptions: {}
+          componentRef:
+            name: comp-run-batch-inference-op
+          dependentTasks:
+          - resolve-or-provision-endpoint-op
+          inputs:
+            parameters:
+              fail_on_any_error:
+                componentInputParameter: pipelinechannel--fail_on_any_error
+              impersonate_service_account:
+                componentInputParameter: pipelinechannel--impersonate_service_account
+              input_gcs_uri:
+                componentInputParameter: pipelinechannel--input_gcs_uri
+              max_retries:
+                componentInputParameter: pipelinechannel--max_retries
+              model_version:
+                componentInputParameter: pipelinechannel--model_version
+              output_gcs_uri:
+                componentInputParameter: pipelinechannel--output_gcs_uri
+              project_id:
+                componentInputParameter: pipelinechannel--project_id
+              protocol:
+                taskOutputParameter:
+                  outputParameterKey: protocol
+                  producerTask: resolve-or-provision-endpoint-op
+              save_tidy_scores:
+                componentInputParameter: pipelinechannel--save_tidy_scores
+              sdk_wheel_url:
+                componentInputParameter: pipelinechannel--sdk_wheel_url
+              target:
+                taskOutputParameter:
+                  outputParameterKey: target
+                  producerTask: resolve-or-provision-endpoint-op
+              timeout:
+                componentInputParameter: pipelinechannel--timeout
+              workers:
+                componentInputParameter: pipelinechannel--workers
+          retryPolicy:
+            backoffDuration: 0s
+            backoffFactor: 2.0
+            backoffMaxDuration: 3600s
+            maxRetryCount: 2
+          taskInfo:
+            name: run-batch-inference-op
+    inputDefinitions:
+      parameters:
+        pipelinechannel--encryption_spec_key_name:
+          parameterType: STRING
+        pipelinechannel--existing_endpoint:
+          parameterType: STRING
+        pipelinechannel--existing_vertex_ai_url:
+          parameterType: STRING
+        pipelinechannel--fail_on_any_error:
+          parameterType: BOOLEAN
+        pipelinechannel--impersonate_service_account:
+          parameterType: STRING
+        pipelinechannel--input_gcs_uri:
+          parameterType: STRING
+        pipelinechannel--max_retries:
+          parameterType: NUMBER_INTEGER
+        pipelinechannel--model_version:
+          parameterType: STRING
+        pipelinechannel--output_gcs_uri:
+          parameterType: STRING
+        pipelinechannel--project_id:
+          parameterType: STRING
+        pipelinechannel--region:
+          parameterType: STRING
+        pipelinechannel--save_tidy_scores:
+          parameterType: BOOLEAN
+        pipelinechannel--sdk_wheel_url:
+          parameterType: STRING
+        pipelinechannel--serving_accelerator_count:
+          parameterType: NUMBER_INTEGER
+        pipelinechannel--serving_accelerator_type:
+          parameterType: STRING
+        pipelinechannel--serving_compute_reservation_id:
+          parameterType: STRING
+        pipelinechannel--serving_image_uri:
+          parameterType: STRING
+        pipelinechannel--serving_machine_type:
+          parameterType: STRING
+        pipelinechannel--serving_replica_count:
+          parameterType: NUMBER_INTEGER
+        pipelinechannel--timeout:
+          parameterType: NUMBER_DOUBLE
+        pipelinechannel--workers:
+          parameterType: NUMBER_INTEGER
+  comp-resolve-or-provision-endpoint-op:
+    executorLabel: exec-resolve-or-provision-endpoint-op
+    inputDefinitions:
+      parameters:
+        encryption_spec_key_name:
+          defaultValue: ''
+          isOptional: true
+          parameterType: STRING
+        existing_endpoint:
+          defaultValue: ''
+          isOptional: true
+          parameterType: STRING
+        existing_vertex_ai_url:
+          defaultValue: ''
+          isOptional: true
+          parameterType: STRING
+        input_gcs_uri:
+          parameterType: STRING
+        job_name:
+          parameterType: STRING
+        max_retries:
+          defaultValue: 4.0
+          isOptional: true
+          parameterType: NUMBER_INTEGER
+        model_version:
+          defaultValue: ALL_FOLDS
+          isOptional: true
+          parameterType: STRING
+        output_gcs_uri:
+          parameterType: STRING
+        project_id:
+          parameterType: STRING
+        region:
+          parameterType: STRING
+        sdk_wheel_url:
+          defaultValue: https://github.com/GoogleCloudPlatform/vertex-ai-samples/raw/main/notebooks/community/alphagenome/whl/alphagenome_cloud_sdk-0.4.2.12-py3-none-any.whl
+          isOptional: true
+          parameterType: STRING
+        serving_accelerator_count:
+          defaultValue: 1.0
+          isOptional: true
+          parameterType: NUMBER_INTEGER
+        serving_accelerator_type:
+          defaultValue: NVIDIA_H100_80GB
+          isOptional: true
+          parameterType: STRING
+        serving_compute_reservation_id:
+          defaultValue: ''
+          isOptional: true
+          parameterType: STRING
+        serving_image_uri:
+          defaultValue: us-docker.pkg.dev/vertex-ai-restricted/alphagenome/alphagenome-inference:agv1_mg_004_rc_20261102
+          isOptional: true
+          parameterType: STRING
+        serving_machine_type:
+          defaultValue: ''
+          isOptional: true
+          parameterType: STRING
+        serving_replica_count:
+          defaultValue: 8.0
+          isOptional: true
+          parameterType: NUMBER_INTEGER
+        timeout:
+          defaultValue: 180.0
+          isOptional: true
+          parameterType: NUMBER_DOUBLE
+        workers:
+          defaultValue: 8.0
+          isOptional: true
+          parameterType: NUMBER_INTEGER
+    outputDefinitions:
+      parameters:
+        ephemeral_endpoint_name:
+          parameterType: STRING
+        ephemeral_model_name:
+          parameterType: STRING
+        protocol:
+          parameterType: STRING
+        target:
+          parameterType: STRING
+  comp-run-batch-inference-op:
+    executorLabel: exec-run-batch-inference-op
+    inputDefinitions:
+      parameters:
+        checkpoint_interval:
+          defaultValue: 50.0
+          isOptional: true
+          parameterType: NUMBER_INTEGER
+        fail_on_any_error:
+          defaultValue: false
+          isOptional: true
+          parameterType: BOOLEAN
+        impersonate_service_account:
+          defaultValue: ''
+          isOptional: true
+          parameterType: STRING
+        input_gcs_uri:
+          parameterType: STRING
+        max_retries:
+          defaultValue: 4.0
+          isOptional: true
+          parameterType: NUMBER_INTEGER
+        model_version:
+          defaultValue: ALL_FOLDS
+          isOptional: true
+          parameterType: STRING
+        output_gcs_uri:
+          parameterType: STRING
+        project_id:
+          parameterType: STRING
+        protocol:
+          parameterType: STRING
+        save_tidy_scores:
+          defaultValue: true
+          isOptional: true
+          parameterType: BOOLEAN
+        sdk_wheel_url:
+          defaultValue: https://github.com/GoogleCloudPlatform/vertex-ai-samples/raw/main/notebooks/community/alphagenome/whl/alphagenome_cloud_sdk-0.4.2.12-py3-none-any.whl
+          isOptional: true
+          parameterType: STRING
+        target:
+          parameterType: STRING
+        timeout:
+          defaultValue: 180.0
+          isOptional: true
+          parameterType: NUMBER_DOUBLE
+        workers:
+          defaultValue: 8.0
+          isOptional: true
+          parameterType: NUMBER_INTEGER
+    outputDefinitions:
+      parameters:
+        errors_gcs_uri:
+          parameterType: STRING
+        failed_requests:
+          parameterType: NUMBER_INTEGER
+        predictions_gcs_uri:
+          parameterType: STRING
+        successful_requests:
+          parameterType: NUMBER_INTEGER
+        summary_gcs_uri:
+          parameterType: STRING
+deploymentSpec:
+  executors:
+    exec-cleanup-ephemeral-endpoint-op:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - cleanup_ephemeral_endpoint_op
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'google-cloud-aiplatform>=1.60.0'\
+          \  &&  python3 -m pip install --quiet --no-warn-script-location 'kfp==2.14.2'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"' && \"\
+          $0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef cleanup_ephemeral_endpoint_op(\n    project_id: str,\n    region:\
+          \ str,\n    job_name: str,\n    existing_endpoint: str = \"\",\n    existing_vertex_ai_url:\
+          \ str = \"\",\n    cleanup_ephemeral_endpoint: bool = True,\n) -> str:\n\
+          \  \"\"\"ExitHandler task: undeploys and deletes any ephemeral Endpoint\
+          \ and Model.\"\"\"\n  import logging\n\n  # pytype: disable=import-error\n\
+          \  import google.auth\n  from google.cloud import aiplatform_v1\n  # pytype:\
+          \ enable=import-error\n\n  logging.basicConfig(\n      level=logging.INFO,\n\
+          \      format=\"%(asctime)s %(levelname)s %(message)s\",\n  )\n\n  if (existing_endpoint\
+          \ or \"\").strip() or (\n      existing_vertex_ai_url or \"\"\n  ).strip():\n\
+          \    logging.info(\n        \"Pre-existing customer endpoint specified;\
+          \ skipping ephemeral cleanup.\"\n    )\n    return \"SKIPPED:existing_endpoint\"\
+          \n\n  if not cleanup_ephemeral_endpoint:\n    logging.info(\n        \"\
+          cleanup_ephemeral_endpoint=False; retaining ephemeral resources.\"\n   \
+          \ )\n    return \"SKIPPED:cleanup_disabled\"\n\n  job_clean = (job_name\
+          \ or \"\").strip()\n  if not job_clean or \"{{\" in job_clean:\n    logging.warning(\n\
+          \        \"Invalid job_name %r; skipping cleanup for safety.\", job_name\n\
+          \    )\n    return \"SKIPPED:invalid_job_name\"\n\n  region_clean = (region\
+          \ or \"\").strip()\n  if not region_clean:\n    return \"SKIPPED:missing_region\"\
+          \n\n  resolved_project = (project_id or \"\").strip()\n  if not resolved_project\
+          \ or \"{{\" in resolved_project:\n    _, default_project = google.auth.default()\n\
+          \    resolved_project = default_project or \"\"\n  if not resolved_project:\n\
+          \    raise ValueError(\"Cannot determine project_id for ephemeral cleanup.\"\
+          )\n\n  display_name = f\"alphagenome-batch-{job_clean}\"\n  parent = f\"\
+          projects/{resolved_project}/locations/{region_clean}\"\n  client_options\
+          \ = {\"api_endpoint\": f\"{region_clean}-aiplatform.googleapis.com\"}\n\n\
+          \  endpoint_client = aiplatform_v1.EndpointServiceClient(\n      client_options=client_options\n\
+          \  )\n  model_client = aiplatform_v1.ModelServiceClient(client_options=client_options)\n\
+          \n  deleted_resources: list[str] = []\n  cleanup_errors: list[str] = []\n\
+          \n  matching_endpoints = [\n      ep\n      for ep in endpoint_client.list_endpoints(\n\
+          \          parent=parent, filter=f'display_name=\"{display_name}\"'\n  \
+          \    )\n      if ep.display_name == display_name\n  ]\n  for ep in matching_endpoints:\n\
+          \    for dm in ep.deployed_models:\n      try:\n        logging.info(\"\
+          Undeploying model %s from %s...\", dm.id, ep.name)\n        endpoint_client.undeploy_model(\n\
+          \            endpoint=ep.name, deployed_model_id=dm.id\n        ).result(timeout=1800)\n\
+          \      except Exception as exc:  # pylint: disable=broad-exception-caught\n\
+          \        msg = f\"Failed undeploying {dm.id} from {ep.name}: {exc}\"\n \
+          \       logging.error(msg)\n        cleanup_errors.append(msg)\n    try:\n\
+          \      logging.info(\"Deleting ephemeral endpoint %s...\", ep.name)\n  \
+          \    endpoint_client.delete_endpoint(name=ep.name).result(timeout=900)\n\
+          \      deleted_resources.append(ep.name)\n    except Exception as exc: \
+          \ # pylint: disable=broad-exception-caught\n      msg = f\"Failed deleting\
+          \ endpoint {ep.name}: {exc}\"\n      logging.error(msg)\n      cleanup_errors.append(msg)\n\
+          \n  matching_models = [\n      m\n      for m in model_client.list_models(\n\
+          \          parent=parent, filter=f'display_name=\"{display_name}\"'\n  \
+          \    )\n      if m.display_name == display_name\n  ]\n  for m in matching_models:\n\
+          \    try:\n      logging.info(\"Deleting ephemeral model %s...\", m.name)\n\
+          \      model_client.delete_model(name=m.name).result(timeout=900)\n    \
+          \  deleted_resources.append(m.name)\n    except Exception as exc:  # pylint:\
+          \ disable=broad-exception-caught\n      msg = f\"Failed deleting model {m.name}:\
+          \ {exc}\"\n      logging.error(msg)\n      cleanup_errors.append(msg)\n\n\
+          \  if cleanup_errors:\n    raise RuntimeError(\n        \"One or more ephemeral\
+          \ resources failed to clean up: \"\n        + \"; \".join(cleanup_errors)\n\
+          \    )\n\n  if not deleted_resources:\n    logging.info(\n        \"No ephemeral\
+          \ resources found matching display_name=%r.\",\n        display_name,\n\
+          \    )\n    return f\"NO_RESOURCES_FOUND:{display_name}\"\n\n  return \"\
+          DELETED:\" + \",\".join(deleted_resources)\n\n"
+        image: python:3.11-slim
+    exec-resolve-or-provision-endpoint-op:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - resolve_or_provision_endpoint_op
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'google-cloud-aiplatform>=1.60.0'\
+          \  &&  python3 -m pip install --quiet --no-warn-script-location 'kfp==2.14.2'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"' && \"\
+          $0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef resolve_or_provision_endpoint_op(\n    project_id: str,\n   \
+          \ region: str,\n    job_name: str,\n    input_gcs_uri: str,\n    output_gcs_uri:\
+          \ str,\n    existing_endpoint: str = \"\",\n    existing_vertex_ai_url:\
+          \ str = \"\",\n    model_version: str = \"ALL_FOLDS\",\n    workers: int\
+          \ = 8,\n    timeout: float = 180.0,\n    max_retries: int = 4,\n    sdk_wheel_url:\
+          \ str = (\n        \"https://github.com/GoogleCloudPlatform/vertex-ai-samples/raw/main/\"\
+          \n        \"notebooks/community/alphagenome/whl/\"\n        \"alphagenome_cloud_sdk-0.4.2.12-py3-none-any.whl\"\
+          \n    ),\n    serving_image_uri: str = (\n        \"us-docker.pkg.dev/vertex-ai-restricted/\"\
+          \n        \"alphagenome/alphagenome-inference:agv1_mg_004_rc_20261102\"\n\
+          \    ),\n    serving_machine_type: str = \"\",\n    serving_accelerator_type:\
+          \ str = \"NVIDIA_H100_80GB\",\n    serving_accelerator_count: int = 1,\n\
+          \    serving_replica_count: int = 8,\n    serving_compute_reservation_id:\
+          \ str = \"\",\n    encryption_spec_key_name: str = \"\",\n) -> NamedTuple(\
+          \  # pytype: disable=invalid-annotation  # pyrefly: ignore[invalid-annotation]\n\
+          \    \"EndpointResolution\",\n    [\n        (\"protocol\", str),\n    \
+          \    (\"target\", str),\n        (\"ephemeral_endpoint_name\", str),\n \
+          \       (\"ephemeral_model_name\", str),\n    ],\n):\n  \"\"\"Validates\
+          \ inputs and resolves an existing endpoint or provisions an ephemeral one.\"\
+          \"\"\n  import datetime\n  import logging\n  import re\n  from urllib.parse\
+          \ import urlparse\n\n  # pytype: disable=import-error\n  import google.auth\n\
+          \  from google.cloud import aiplatform_v1\n  # pytype: enable=import-error\n\
+          \n  logging.basicConfig(\n      level=logging.INFO,\n      format=\"%(asctime)s\
+          \ %(levelname)s %(message)s\",\n  )\n\n  region = (region or \"\").strip()\n\
+          \  if not region:\n    raise ValueError(\"region must be provided (e.g.,\
+          \ 'us-central1').\")\n\n  def _validate_gcs_uri(\n      uri: str, param_name:\
+          \ str, require_object_or_prefix: bool\n  ) -> None:\n    cleaned = (uri\
+          \ or \"\").strip()\n    if not cleaned.startswith(\"gs://\"):\n      raise\
+          \ ValueError(f\"{param_name} must start with 'gs://', got: {uri!r}\")\n\
+          \    without_scheme = cleaned[len(\"gs://\") :]\n    parts = without_scheme.split(\"\
+          /\", 1)\n    bucket_name = parts[0].strip()\n    blob_part = parts[1].strip()\
+          \ if len(parts) > 1 else \"\"\n    if not bucket_name:\n      raise ValueError(f\"\
+          {param_name} is missing a GCS bucket name: {uri!r}\")\n    if require_object_or_prefix\
+          \ and not blob_part:\n      raise ValueError(\n          f\"{param_name}\
+          \ must specify an object path or prefix inside \"\n          f\"gs://{bucket_name}/,\
+          \ got: {uri!r}\"\n      )\n\n  _validate_gcs_uri(\n      input_gcs_uri,\
+          \ \"input_gcs_uri\", require_object_or_prefix=True\n  )\n  _validate_gcs_uri(\n\
+          \      output_gcs_uri, \"output_gcs_uri\", require_object_or_prefix=False\n\
+          \  )\n\n  if workers < 1:\n    raise ValueError(f\"workers must be >= 1,\
+          \ got: {workers}\")\n  if timeout <= 0:\n    raise ValueError(f\"timeout\
+          \ must be > 0, got: {timeout}\")\n  if max_retries < 0:\n    raise ValueError(f\"\
+          max_retries must be >= 0, got: {max_retries}\")\n\n  valid_model_versions\
+          \ = (\"ALL_FOLDS\", \"FOLD_0\", \"FOLD_1\", \"FOLD_2\", \"FOLD_3\")\n  normalized_version\
+          \ = (\n      (model_version or \"\").strip().replace(\"MODEL_VERSION_\"\
+          , \"\").upper()\n  )\n  if normalized_version not in valid_model_versions:\n\
+          \    raise ValueError(\n        f\"Invalid model_version {model_version!r}.\
+          \ \"\n        f\"Must be one of {list(valid_model_versions)}.\"\n    )\n\
+          \n  wheel_clean = (sdk_wheel_url or \"\").strip()\n  parsed_wheel = urlparse(wheel_clean)\n\
+          \  if parsed_wheel.scheme not in (\n      \"https\",\n      \"gs\",\n  )\
+          \ or not parsed_wheel.path.endswith(\".whl\"):\n    raise ValueError(\n\
+          \        \"sdk_wheel_url must be an 'https://' or 'gs://' URL pointing to\
+          \ a \"\n        f\"'.whl' package, got: {sdk_wheel_url!r}\"\n    )\n\n \
+          \ endpoint_clean = (existing_endpoint or \"\").strip()\n  url_clean = (existing_vertex_ai_url\
+          \ or \"\").strip()\n  if endpoint_clean and url_clean:\n    raise ValueError(\n\
+          \        \"Both existing_endpoint and existing_vertex_ai_url are set. \"\
+          \n        \"Please set only one (existing_endpoint for a Shared/Standard\
+          \ gRPC \"\n        \"endpoint, or existing_vertex_ai_url for a Dedicated\
+          \ HTTP endpoint), \"\n        \"or leave both empty to auto-provision an\
+          \ ephemeral endpoint.\"\n    )\n\n  resolved_project = (project_id or \"\
+          \").strip()\n  if not resolved_project or \"{{\" in resolved_project:\n\
+          \    _, default_project = google.auth.default()\n    resolved_project =\
+          \ default_project or \"\"\n\n  # Mode B: Existing Dedicated HTTP Endpoint\
+          \ (:streamRawPredict URL).\n  if url_clean:\n    parsed_url = urlparse(url_clean)\n\
+          \    if parsed_url.scheme != \"https\" or not parsed_url.netloc:\n     \
+          \ raise ValueError(\n          \"existing_vertex_ai_url must be a valid\
+          \ 'https://' URL (e.g.,\"\n          \" https://<DNS>/v1/projects/...:streamRawPredict),\
+          \ got:\"\n          f\" {url_clean!r}\"\n      )\n    logging.info(\"Using\
+          \ existing Dedicated HTTP endpoint: %s\", url_clean)\n    return (\"http\"\
+          , url_clean, \"\", \"\")\n\n  # Mode A: Existing Shared/Standard gRPC Endpoint\
+          \ (resource name, ID, or DNS).\n  if endpoint_clean:\n    if \".prediction.vertexai.goog\"\
+          \ in endpoint_clean:\n      logging.info(\"Using existing gRPC DNS endpoint:\
+          \ %s\", endpoint_clean)\n      return (\"grpc\", endpoint_clean, \"\", \"\
+          \")\n\n    if endpoint_clean.startswith(\"projects/\"):\n      endpoint_resource\
+          \ = endpoint_clean\n      loc_match = re.match(\n          r\"^projects/([^/]+)/locations/([^/]+)/endpoints/([^/]+)$\"\
+          ,\n          endpoint_resource,\n      )\n      if not loc_match:\n    \
+          \    raise ValueError(\n            \"existing_endpoint resource name must\
+          \ match\"\n            \" 'projects/<PROJECT>/locations/<LOCATION>/endpoints/<ENDPOINT_ID>',\"\
+          \n            f\" got: {endpoint_clean!r}\"\n        )\n      endpoint_project,\
+          \ endpoint_region, _ = loc_match.groups()\n    else:\n      if not resolved_project:\n\
+          \        raise ValueError(\n            \"project_id is required when existing_endpoint\
+          \ is passed as \"\n            f\"a bare endpoint ID ({endpoint_clean!r}).\"\
+          \n        )\n      endpoint_project = resolved_project\n      endpoint_region\
+          \ = region\n      endpoint_resource = (\n          f\"projects/{endpoint_project}/locations/{endpoint_region}/\"\
+          \n          f\"endpoints/{endpoint_clean}\"\n      )\n\n    if not endpoint_project.isdigit():\n\
+          \      try:\n        ep_client = aiplatform_v1.EndpointServiceClient(\n\
+          \            client_options={\n                \"api_endpoint\": f\"{endpoint_region}-aiplatform.googleapis.com\"\
+          \n            }\n        )\n        ep_obj = ep_client.get_endpoint(name=endpoint_resource)\n\
+          \        if ep_obj.name:\n          endpoint_resource = ep_obj.name\n  \
+          \    except Exception as exc:  # pylint: disable=broad-exception-caught\n\
+          \        logging.warning(\n            \"Could not resolve numeric project\
+          \ number for %s (%s); \"\n            \"continuing with provided resource\
+          \ name.\",\n            endpoint_resource,\n            exc,\n        )\n\
+          \n    logging.info(\"Using existing Shared gRPC endpoint: %s\", endpoint_resource)\n\
+          \    return (\"grpc\", endpoint_resource, \"\", \"\")\n\n  # Mode C: Auto-provision\
+          \ an ephemeral Shared (Standard) gRPC Endpoint.\n  if not resolved_project:\n\
+          \    raise ValueError(\n        \"Unable to determine GCP project_id for\
+          \ ephemeral endpoint\"\n        \" provisioning.\"\n    )\n  job_clean =\
+          \ (job_name or \"\").strip()\n  if not job_clean or \"{{\" in job_clean:\n\
+          \    raise ValueError(\n        \"Valid pipeline job_name is required for\
+          \ ephemeral naming, got:\"\n        f\" {job_name!r}\"\n    )\n\n  if serving_replica_count\
+          \ < 1:\n    raise ValueError(\n        f\"serving_replica_count must be\
+          \ >= 1, got: {serving_replica_count}\"\n    )\n\n  valid_accelerators =\
+          \ (\n      \"NVIDIA_H100_80GB\",\n      \"NVIDIA_H100_MEGA_80GB\",\n   \
+          \   \"NVIDIA_A100_80GB\",\n  )\n  accel_clean = (serving_accelerator_type\
+          \ or \"\").strip().upper()\n  if accel_clean not in valid_accelerators:\n\
+          \    raise ValueError(\n        f\"Invalid serving_accelerator_type {serving_accelerator_type!r}.\
+          \ \"\n        f\"Must be one of {list(valid_accelerators)}.\"\n    )\n\n\
+          \  if serving_accelerator_count not in (1, 2, 4, 8):\n    raise ValueError(\n\
+          \        f\"Invalid serving_accelerator_count {serving_accelerator_count}.\
+          \ \"\n        \"Must be one of [1, 2, 4, 8].\"\n    )\n\n  resolved_machine_type\
+          \ = (serving_machine_type or \"\").strip()\n  total_gpus = serving_replica_count\
+          \ * serving_accelerator_count\n  reservation_clean = (serving_compute_reservation_id\
+          \ or \"\").strip()\n\n  if not resolved_machine_type:\n    if accel_clean\
+          \ == \"NVIDIA_H100_MEGA_80GB\":\n      if serving_accelerator_count not\
+          \ in (1, 8) or total_gpus % 8 != 0:\n        raise ValueError(\n       \
+          \     \"NVIDIA_H100_MEGA_80GB requires total GPUs \"\n            \"(serving_replica_count\
+          \ * serving_accelerator_count) to be a \"\n            f\"multiple of 8\
+          \ on a3-megagpu-8g, got {serving_replica_count} * \"\n            f\"{serving_accelerator_count}\
+          \ = {total_gpus}.\"\n        )\n      resolved_machine_type = \"a3-megagpu-8g\"\
+          \n    else:\n      prefix = (\n          \"a3-highgpu\" if accel_clean ==\
+          \ \"NVIDIA_H100_80GB\" else \"a2-ultragpu\"\n      )\n      if reservation_clean\
+          \ and reservation_clean.upper() not in (\n          \"NONE\",\n        \
+          \  \"NO_RESERVATION\",\n      ):\n        resolved_machine_type = f\"{prefix}-8g\"\
+          \n      else:\n        chosen_gpus = serving_accelerator_count\n       \
+          \ for candidate_gpus in (8, 4, 2, 1):\n          if (\n              candidate_gpus\
+          \ >= serving_accelerator_count\n              and total_gpus % candidate_gpus\
+          \ == 0\n          ):\n            chosen_gpus = candidate_gpus\n       \
+          \     break\n        resolved_machine_type = f\"{prefix}-{chosen_gpus}g\"\
+          \n\n  image_clean = (serving_image_uri or \"\").strip()\n  if not image_clean:\n\
+          \    raise ValueError(\"serving_image_uri must be non-empty in ephemeral\
+          \ mode.\")\n\n  display_name = f\"alphagenome-batch-{job_clean}\"\n  parent\
+          \ = f\"projects/{resolved_project}/locations/{region}\"\n  client_options\
+          \ = {\"api_endpoint\": f\"{region}-aiplatform.googleapis.com\"}\n  model_client\
+          \ = aiplatform_v1.ModelServiceClient(client_options=client_options)\n  endpoint_client\
+          \ = aiplatform_v1.EndpointServiceClient(\n      client_options=client_options\n\
+          \  )\n\n  encryption_spec = None\n  kms_clean = (encryption_spec_key_name\
+          \ or \"\").strip()\n  if kms_clean:\n    encryption_spec = aiplatform_v1.EncryptionSpec(kms_key_name=kms_clean)\n\
+          \n  # Reuse existing resources if this component is retried mid-provisioning.\n\
+          \  existing_models = [\n      m\n      for m in model_client.list_models(\n\
+          \          parent=parent, filter=f'display_name=\"{display_name}\"'\n  \
+          \    )\n      if m.display_name == display_name\n  ]\n  if existing_models:\n\
+          \    model_resource_name = existing_models[0].name\n    logging.info(\"\
+          Reusing existing ephemeral model: %s\", model_resource_name)\n  else:\n\
+          \    container_spec = aiplatform_v1.ModelContainerSpec(\n        image_uri=image_clean,\n\
+          \        predict_route=\"/predict\",\n        health_route=\"/healthcheck\"\
+          ,\n        ports=[aiplatform_v1.Port(container_port=8080)],\n        grpc_ports=[aiplatform_v1.Port(container_port=8081)],\n\
+          \        deployment_timeout=datetime.timedelta(seconds=3600),\n        env=[\n\
+          \            aiplatform_v1.EnvVar(\n                name=\"DEPLOY_SOURCE\"\
+          , value=\"VERTEX_BATCH_PIPELINE\"\n            ),\n            aiplatform_v1.EnvVar(\n\
+          \                name=\"MODEL_ID\", value=\"google/alpha-genome-preview\"\
+          \n            ),\n            aiplatform_v1.EnvVar(\n                name=\"\
+          MODEL_ARTIFACTS_BUCKET_NAME\",\n                value=\"alphagenome-model-artifacts-prod\"\
+          ,\n            ),\n            aiplatform_v1.EnvVar(\n                name=\"\
+          MODEL_ARTIFACTS_PREFIX\", value=\"alphagenome_v1\"\n            ),\n   \
+          \         aiplatform_v1.EnvVar(name=\"SERVER_PORT\", value=\"8081\"),\n\
+          \            aiplatform_v1.EnvVar(name=\"GPU_TYPE\", value=accel_clean),\n\
+          \        ],\n    )\n    model_proto = aiplatform_v1.Model(\n        display_name=display_name,\n\
+          \        container_spec=container_spec,\n        encryption_spec=encryption_spec,\n\
+          \    )\n    logging.info(\n        \"Uploading ephemeral AlphaGenome model\
+          \ '%s' in %s...\",\n        display_name,\n        parent,\n    )\n    upload_op\
+          \ = model_client.upload_model(parent=parent, model=model_proto)\n    upload_resp\
+          \ = upload_op.result(timeout=1800)\n    model_resource_name = upload_resp.model\n\
+          \    logging.info(\"Uploaded ephemeral model: %s\", model_resource_name)\n\
+          \n  existing_endpoints = [\n      ep\n      for ep in endpoint_client.list_endpoints(\n\
+          \          parent=parent, filter=f'display_name=\"{display_name}\"'\n  \
+          \    )\n      if ep.display_name == display_name\n  ]\n  if existing_endpoints:\n\
+          \    endpoint_obj = existing_endpoints[0]\n    endpoint_resource_name =\
+          \ endpoint_obj.name\n    logging.info(\n        \"Reusing existing ephemeral\
+          \ endpoint: %s\", endpoint_resource_name\n    )\n  else:\n    endpoint_proto\
+          \ = aiplatform_v1.Endpoint(\n        display_name=display_name,\n      \
+          \  encryption_spec=encryption_spec,\n    )\n    logging.info(\n        \"\
+          Creating ephemeral Shared Vertex AI Endpoint '%s'...\", display_name\n \
+          \   )\n    create_ep_op = endpoint_client.create_endpoint(\n        parent=parent,\
+          \ endpoint=endpoint_proto\n    )\n    endpoint_obj = create_ep_op.result(timeout=900)\n\
+          \    endpoint_resource_name = endpoint_obj.name\n    logging.info(\"Created\
+          \ ephemeral endpoint: %s\", endpoint_resource_name)\n\n  if not endpoint_obj.deployed_models:\n\
+          \    if \"deploymentResourcePools\" in reservation_clean:\n      deployed_model\
+          \ = aiplatform_v1.DeployedModel(\n          model=model_resource_name,\n\
+          \          display_name=display_name,\n          shared_resources=reservation_clean,\n\
+          \      )\n    else:\n      reservation_affinity = None\n      if reservation_clean\
+          \ and reservation_clean.upper() not in (\n          \"NONE\",\n        \
+          \  \"NO_RESERVATION\",\n      ):\n        if reservation_clean.upper() in\
+          \ (\"ANY\", \"ANY_RESERVATION\"):\n          reservation_affinity = aiplatform_v1.ReservationAffinity(\n\
+          \              reservation_affinity_type=(\n                  aiplatform_v1.ReservationAffinity.Type.ANY_RESERVATION\n\
+          \              )\n          )\n        else:\n          res_full = (\n \
+          \             reservation_clean\n              if reservation_clean.startswith(\"\
+          projects/\")\n              else (\n                  f\"projects/{resolved_project}/zones/{region}-a/\"\
+          \n                  f\"reservations/{reservation_clean}\"\n            \
+          \  )\n          )\n          reservation_affinity = aiplatform_v1.ReservationAffinity(\n\
+          \              reservation_affinity_type=(\n                  aiplatform_v1.ReservationAffinity.Type.SPECIFIC_RESERVATION\n\
+          \              ),\n              key=\"compute.googleapis.com/reservation-name\"\
+          ,\n              values=[res_full],\n          )\n\n      machine_spec =\
+          \ aiplatform_v1.MachineSpec(\n          machine_type=resolved_machine_type,\n\
+          \          accelerator_type=getattr(aiplatform_v1.AcceleratorType, accel_clean),\n\
+          \          accelerator_count=serving_accelerator_count,\n          reservation_affinity=reservation_affinity,\n\
+          \      )\n      dedicated_resources = aiplatform_v1.DedicatedResources(\n\
+          \          machine_spec=machine_spec,\n          min_replica_count=serving_replica_count,\n\
+          \          max_replica_count=serving_replica_count,\n      )\n      deployed_model\
+          \ = aiplatform_v1.DeployedModel(\n          model=model_resource_name,\n\
+          \          display_name=display_name,\n          dedicated_resources=dedicated_resources,\n\
+          \      )\n\n    logging.info(\n        \"Deploying model %s to %s (%d replica(s)\
+          \ on %s, %dx %s)...\",\n        model_resource_name,\n        endpoint_resource_name,\n\
+          \        serving_replica_count,\n        resolved_machine_type,\n      \
+          \  serving_accelerator_count,\n        accel_clean,\n    )\n    deploy_op\
+          \ = endpoint_client.deploy_model(\n        endpoint=endpoint_resource_name,\n\
+          \        deployed_model=deployed_model,\n        traffic_split={\"0\": 100},\n\
+          \    )\n    deploy_op.result(timeout=4200)\n    logging.info(\n        \"\
+          Ephemeral endpoint deployment ready: %s\", endpoint_resource_name\n    )\n\
+          \n  return (\n      \"grpc\",\n      endpoint_resource_name,\n      endpoint_resource_name,\n\
+          \      model_resource_name,\n  )\n\n"
+        image: python:3.11-slim
+    exec-run-batch-inference-op:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - run_batch_inference_op
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'google-cloud-storage>=2.14.0'\
+          \ 'pyarrow>=14.0.0'  &&  python3 -m pip install --quiet --no-warn-script-location\
+          \ 'kfp==2.14.2' '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"\
+          3.9\"' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef run_batch_inference_op(\n    project_id: str,\n    protocol:\
+          \ str,\n    target: str,\n    input_gcs_uri: str,\n    output_gcs_uri: str,\n\
+          \    model_version: str = \"ALL_FOLDS\",\n    workers: int = 8,\n    timeout:\
+          \ float = 180.0,\n    max_retries: int = 4,\n    save_tidy_scores: bool\
+          \ = True,\n    fail_on_any_error: bool = False,\n    impersonate_service_account:\
+          \ str = \"\",\n    sdk_wheel_url: str = (\n        \"https://github.com/GoogleCloudPlatform/vertex-ai-samples/raw/main/\"\
+          \n        \"notebooks/community/alphagenome/whl/\"\n        \"alphagenome_cloud_sdk-0.4.2.12-py3-none-any.whl\"\
+          \n    ),\n    checkpoint_interval: int = 50,\n) -> NamedTuple(  # pytype:\
+          \ disable=invalid-annotation  # pyrefly: ignore[invalid-annotation]\n  \
+          \  \"BatchSummaryOutputs\",\n    [\n        (\"predictions_gcs_uri\", str),\n\
+          \        (\"errors_gcs_uri\", str),\n        (\"summary_gcs_uri\", str),\n\
+          \        (\"successful_requests\", int),\n        (\"failed_requests\",\
+          \ int),\n    ],\n):\n  \"\"\"Installs AlphaGenome Cloud SDK and runs concurrent\
+          \ batch inference with GCS checkpointing.\"\"\"\n  import concurrent.futures\n\
+          \  import datetime\n  import enum\n  import hashlib\n  import importlib.util\n\
+          \  import json\n  import logging\n  import os\n  import random\n  import\
+          \ re\n  import subprocess\n  import sys\n  import tempfile\n  import threading\n\
+          \  import time\n  from typing import Any, Callable\n  import urllib.error\n\
+          \  from urllib.parse import urlparse\n\n  # pytype: disable=import-error\n\
+          \  import google.auth\n  from google.auth import impersonated_credentials\n\
+          \  from google.cloud import storage\n  # pytype: enable=import-error\n\n\
+          \  logging.basicConfig(\n      level=logging.INFO,\n      format=\"%(asctime)s\
+          \ %(levelname)s %(message)s\",\n  )\n\n  def _parse_gcs_uri(gcs_uri: str)\
+          \ -> tuple[str, str]:\n    cleaned = (gcs_uri or \"\").strip()\n    if not\
+          \ cleaned.startswith(\"gs://\"):\n      raise ValueError(f\"Invalid GCS\
+          \ URI {gcs_uri!r}: must start with 'gs://'\")\n    without_scheme = cleaned[len(\"\
+          gs://\") :]\n    parts = without_scheme.split(\"/\", 1)\n    bucket_name\
+          \ = parts[0].strip()\n    if not bucket_name:\n      raise ValueError(f\"\
+          Invalid GCS URI {gcs_uri!r}: missing bucket name\")\n    blob_path = parts[1]\
+          \ if len(parts) > 1 else \"\"\n    return bucket_name, blob_path\n\n  def\
+          \ _build_credentials(sa_email: str) -> tuple[Any, str]:\n    scopes = [\"\
+          https://www.googleapis.com/auth/cloud-platform\"]\n    base_creds, detected_project\
+          \ = google.auth.default(scopes=scopes)\n    sa_clean = (sa_email or \"\"\
+          ).strip()\n    if sa_clean:\n      principal = getattr(base_creds, \"service_account_email\"\
+          , None)\n      if principal != sa_clean:\n        base_creds = impersonated_credentials.Credentials(\n\
+          \            source_credentials=base_creds,\n            target_principal=sa_clean,\n\
+          \            target_scopes=scopes,\n        )\n    return base_creds, (detected_project\
+          \ or \"\")\n\n  creds, detected_project = _build_credentials(impersonate_service_account)\n\
+          \  resolved_project = (project_id or \"\").strip()\n  if not resolved_project\
+          \ or \"{{\" in resolved_project:\n    resolved_project = detected_project\n\
+          \n  storage_client = storage.Client(\n      project=resolved_project or\
+          \ None, credentials=creds\n  )\n\n  def _ensure_sdk_installed(wheel_url:\
+          \ str, gcs_client: storage.Client) -> None:\n    wheel_clean = (wheel_url\
+          \ or \"\").strip()\n    parsed = urlparse(wheel_clean)\n    if parsed.scheme\
+          \ not in (\"https\", \"gs\") or not parsed.path.endswith(\".whl\"):\n  \
+          \    raise ValueError(\n          \"sdk_wheel_url must be an 'https://'\
+          \ or 'gs://' URL ending in \"\n          f\"'.whl', got: {wheel_url!r}\"\
+          \n      )\n    if importlib.util.find_spec(\"alphagenome_cloud_sdk\") is\
+          \ not None:\n      logging.info(\"alphagenome_cloud_sdk is already installed\
+          \ in environment.\")\n      return\n\n    if parsed.scheme == \"gs\":\n\
+          \      w_bucket, w_blob = _parse_gcs_uri(wheel_clean)\n      if not w_blob:\n\
+          \        raise ValueError(f\"Invalid gs:// wheel URI: {wheel_clean!r}\"\
+          )\n      wheel_filename = os.path.basename(w_blob)\n      if not wheel_filename.endswith(\"\
+          .whl\"):\n        raise ValueError(f\"Invalid wheel filename: {wheel_filename!r}\"\
+          )\n      with tempfile.TemporaryDirectory() as tmp_dir:\n        local_wheel\
+          \ = os.path.join(tmp_dir, wheel_filename)\n        logging.info(\"Downloading\
+          \ SDK wheel from %s...\", wheel_clean)\n        gcs_client.bucket(w_bucket).blob(w_blob).download_to_filename(\n\
+          \            local_wheel\n        )\n        subprocess.check_call(\n  \
+          \          [sys.executable, \"-m\", \"pip\", \"install\", \"--quiet\", local_wheel]\n\
+          \        )\n    else:\n      logging.info(\"Installing AlphaGenome Cloud\
+          \ SDK from %s...\", wheel_clean)\n      subprocess.check_call(\n       \
+          \   [sys.executable, \"-m\", \"pip\", \"install\", \"--quiet\", wheel_clean]\n\
+          \      )\n\n  _ensure_sdk_installed(sdk_wheel_url, storage_client)\n\n \
+          \ # pytype: disable=import-error\n  from alphagenome.data import genome\n\
+          \  from alphagenome.models import dna_client\n  from alphagenome.models\
+          \ import dna_model\n  from alphagenome.models import dna_output\n  from\
+          \ alphagenome.models import interval_scorers\n  from alphagenome.models\
+          \ import variant_scorers\n  from alphagenome_cloud_sdk.models import dna_client_grpc\n\
+          \  from alphagenome_cloud_sdk.models import dna_client_http\n  import anndata\n\
+          \  import grpc\n  import numpy as np\n  import pandas as pd\n  # pytype:\
+          \ enable=import-error\n\n  out_bucket_name, out_blob_path = _parse_gcs_uri(output_gcs_uri)\n\
+          \  if out_blob_path.endswith(\".jsonl\"):\n    predictions_blob_path = out_blob_path\n\
+          \    parent_dir = out_blob_path.rsplit(\"/\", 1)[0] if \"/\" in out_blob_path\
+          \ else \"\"\n    base_prefix_blob = f\"{parent_dir}/\" if parent_dir else\
+          \ \"\"\n  else:\n    base_prefix_blob = (\n        f\"{out_blob_path.rstrip('/')}/\"\
+          \ if out_blob_path.strip(\"/\") else \"\"\n    )\n    predictions_blob_path\
+          \ = f\"{base_prefix_blob}predictions.jsonl\"\n\n  errors_blob_path = f\"\
+          {base_prefix_blob}errors.jsonl\"\n  summary_blob_path = f\"{base_prefix_blob}summary.json\"\
+          \n  checkpoints_prefix_blob = f\"{base_prefix_blob}checkpoints/\"\n  out_bucket\
+          \ = storage_client.bucket(out_bucket_name)\n\n  def _load_input_lines(uri:\
+          \ str) -> list[str]:\n    in_bucket_name, in_blob = _parse_gcs_uri(uri)\n\
+          \    if not in_blob:\n      raise ValueError(\n          f\"input_gcs_uri\
+          \ must point to a .jsonl object or prefix: {uri!r}\"\n      )\n    in_bucket\
+          \ = storage_client.bucket(in_bucket_name)\n    lines: list[str] = []\n \
+          \   if not in_blob.endswith(\"/\"):\n      blob = in_bucket.blob(in_blob)\n\
+          \      if blob.exists():\n        text = blob.download_as_text(encoding=\"\
+          utf-8\")\n        lines.extend(ln.strip() for ln in text.splitlines() if\
+          \ ln.strip())\n        return lines\n\n    blobs = sorted(\n        (\n\
+          \            b\n            for b in in_bucket.list_blobs(prefix=in_blob)\n\
+          \            if not b.name.endswith(\"/\")\n            and (b.name.endswith(\"\
+          .jsonl\") or b.name.endswith(\".json\"))\n        ),\n        key=lambda\
+          \ b: b.name,\n    )\n    if not blobs:\n      raise FileNotFoundError(f\"\
+          No .jsonl input objects found at {uri!r}\")\n    for b in blobs:\n     \
+          \ text = b.download_as_text(encoding=\"utf-8\")\n      lines.extend(ln.strip()\
+          \ for ln in text.splitlines() if ln.strip())\n    return lines\n\n  raw_lines\
+          \ = _load_input_lines(input_gcs_uri)\n  total_requests = len(raw_lines)\n\
+          \  if total_requests == 0:\n    raise ValueError(\n        f\"Input GCS\
+          \ URI contained 0 non-empty JSONL lines: {input_gcs_uri!r}\"\n    )\n\n\
+          \  def _extract_raw_request_id(index: int, raw_line: str) -> str:\n    try:\n\
+          \      parsed = json.loads(raw_line)\n      if isinstance(parsed, dict):\n\
+          \        candidate = parsed.get(\"request_id\") or parsed.get(\"id\")\n\
+          \        if candidate is not None and str(candidate).strip():\n        \
+          \  return str(candidate).strip()\n    except Exception:  # pylint: disable=broad-exception-caught\n\
+          \      pass\n    return f\"req_{index:06d}\"\n\n  raw_request_ids = [\n\
+          \      _extract_raw_request_id(i, raw_lines[i]) for i in range(total_requests)\n\
+          \  ]\n  id_counts: dict[str, int] = {}\n  for rid in raw_request_ids:\n\
+          \    id_counts[rid] = id_counts.get(rid, 0) + 1\n\n  def _make_safe_artifact_stem(index:\
+          \ int, request_id: str) -> str:\n    sanitized = re.sub(r\"[^A-Za-z0-9._-]\"\
+          , \"_\", request_id).strip(\".-_\")\n    if not sanitized:\n      sanitized\
+          \ = f\"req_{index:06d}\"\n    if len(sanitized) > 80:\n      digest = hashlib.sha256(request_id.encode(\"\
+          utf-8\")).hexdigest()[:10]\n      sanitized = f\"{sanitized[:68]}_{digest}\"\
+          \n    if id_counts.get(request_id, 0) > 1 or sanitized != request_id:\n\
+          \      return f\"req_{index:06d}_{sanitized}\"\n    return sanitized\n\n\
+          \  artifact_stems = [\n      _make_safe_artifact_stem(i, raw_request_ids[i])\n\
+          \      for i in range(total_requests)\n  ]\n\n  # Load existing checkpoint\
+          \ shards for crash/retry resume.\n  resumed_records: dict[int, dict[str,\
+          \ Any]] = {}\n  existing_shards = sorted(\n      (\n          b\n      \
+          \    for b in out_bucket.list_blobs(prefix=checkpoints_prefix_blob)\n  \
+          \        if b.name.endswith(\".jsonl\")\n      ),\n      key=lambda b: b.name,\n\
+          \  )\n  for shard_blob in existing_shards:\n    shard_text = shard_blob.download_as_text(encoding=\"\
+          utf-8\")\n    for line in shard_text.splitlines():\n      if not line.strip():\n\
+          \        continue\n      try:\n        rec = json.loads(line)\n      except\
+          \ json.JSONDecodeError:\n        continue\n      rec_idx = rec.get(\"index\"\
+          )\n      if (\n          isinstance(rec_idx, int)\n          and 0 <= rec_idx\
+          \ < total_requests\n          and rec.get(\"status\") == \"SUCCESS\"\n \
+          \         and rec.get(\"request_id\") == raw_request_ids[rec_idx]\n    \
+          \  ):\n        resumed_records[rec_idx] = rec\n\n  if resumed_records:\n\
+          \    logging.info(\n        \"Resumed %d/%d already-completed request(s)\
+          \ from GCS checkpoints.\",\n        len(resumed_records),\n        total_requests,\n\
+          \    )\n\n  def _parse_model_version(val: Any) -> dna_model.ModelVersion:\n\
+          \    if val is None:\n      return dna_model.ModelVersion.ALL_FOLDS\n  \
+          \  if isinstance(val, dna_model.ModelVersion):\n      return val\n    clean\
+          \ = str(val).strip().replace(\"MODEL_VERSION_\", \"\").upper()\n    if not\
+          \ clean:\n      return dna_model.ModelVersion.ALL_FOLDS\n    if clean in\
+          \ dna_model.ModelVersion.__members__:\n      return dna_model.ModelVersion[clean]\n\
+          \    raise ValueError(\n        f\"Unsupported model_version {val!r}. Must\
+          \ be one of \"\n        f\"{list(dna_model.ModelVersion.__members__.keys())}.\"\
+          \n    )\n\n  default_mv = _parse_model_version(model_version)\n  protocol_clean\
+          \ = (protocol or \"\").strip().lower()\n  if protocol_clean not in (\"grpc\"\
+          , \"http\"):\n    raise ValueError(\n        f\"Unsupported protocol {protocol!r};\
+          \ expected 'grpc' or 'http'.\"\n    )\n\n  sa_or_none = (impersonate_service_account\
+          \ or \"\").strip() or None\n  client_lock = threading.Lock()\n  clients_by_fold:\
+          \ dict[str, Any] = {}\n  base_client_holder: list[Any] = []\n\n  def _get_client_for_fold(mv:\
+          \ dna_model.ModelVersion) -> Any:\n    with client_lock:\n      if mv.name\
+          \ in clients_by_fold:\n        return clients_by_fold[mv.name]\n      if\
+          \ not base_client_holder:\n        if protocol_clean == \"grpc\":\n    \
+          \      base = dna_client_grpc.create_vertex_client(\n              endpoint=target,\n\
+          \              service_account=sa_or_none,\n              model_version=default_mv.name,\n\
+          \              timeout=timeout,\n          )\n        else:\n          base\
+          \ = dna_client_http.create_http_client(\n              vertex_ai_url=target,\n\
+          \              service_account=sa_or_none,\n              model_version=default_mv.name,\n\
+          \              timeout=timeout,\n          )\n        base_client_holder.append(base)\n\
+          \        clients_by_fold[default_mv.name] = base\n        if mv.name ==\
+          \ default_mv.name:\n          return base\n\n      base = base_client_holder[0]\n\
+          \      if protocol_clean == \"grpc\":\n        channel = getattr(base, \"\
+          _channel\", None)\n        if channel is not None:\n          fold_client\
+          \ = dna_client_grpc.GrpcDnaClient(\n              channel=channel, model_version=mv\n\
+          \          )\n        else:\n          fold_client = base\n      else:\n\
+          \        http_client = getattr(base, \"_http_client\", None)\n        if\
+          \ http_client is not None:\n          fold_client = dna_client_http.HttpDnaClient(\n\
+          \              http_client=http_client,\n              model_version=mv.name,\n\
+          \              vertex_ai_url=getattr(base, \"_vertex_ai_url\", target),\n\
+          \              credentials=getattr(base, \"_credentials\", None),\n    \
+          \          use_static_token=getattr(base, \"_use_static_token\", False),\n\
+          \          )\n        else:\n          fold_client = base\n      clients_by_fold[mv.name]\
+          \ = fold_client\n      return fold_client\n\n  def _close_clients() -> None:\n\
+          \    if not base_client_holder:\n      return\n    base = base_client_holder[0]\n\
+          \    channel = getattr(base, \"_channel\", None)\n    if channel is not\
+          \ None and hasattr(channel, \"close\"):\n      channel.close()\n    http_client\
+          \ = getattr(base, \"_http_client\", None)\n    if http_client is not None\
+          \ and hasattr(http_client, \"close\"):\n      http_client.close()\n\n  retryable_grpc_codes\
+          \ = frozenset({\n      grpc.StatusCode.UNAVAILABLE,\n      grpc.StatusCode.RESOURCE_EXHAUSTED,\n\
+          \      grpc.StatusCode.DEADLINE_EXCEEDED,\n      grpc.StatusCode.ABORTED,\n\
+          \  })\n  retryable_http_codes = frozenset({408, 429, 500, 502, 503, 504})\n\
+          \n  def _is_retryable(exc: Exception) -> bool:\n    if isinstance(exc, (ValueError,\
+          \ KeyError, TypeError, json.JSONDecodeError)):\n      return False\n   \
+          \ if isinstance(exc, grpc.RpcError) or hasattr(exc, \"code\"):\n      try:\n\
+          \        code = getattr(exc, \"code\")()\n        if code in retryable_grpc_codes:\n\
+          \          return True\n        if code == grpc.StatusCode.INTERNAL:\n \
+          \         details = str(exc).lower()\n          return any(\n          \
+          \    token in details\n              for token in (\n                  \"\
+          rst_stream\",\n                  \"goaway\",\n                  \"transport\"\
+          ,\n                  \"connection\",\n                  \"unavailable\"\
+          ,\n                  \"timed out\",\n              )\n          )\n    \
+          \    return False\n      except Exception:  # pylint: disable=broad-exception-caught\n\
+          \        pass\n    resp = getattr(exc, \"response\", None)\n    status_code\
+          \ = getattr(resp, \"status_code\", None)\n    if isinstance(status_code,\
+          \ int):\n      return status_code in retryable_http_codes\n    if isinstance(exc,\
+          \ urllib.error.HTTPError):\n      return exc.code in retryable_http_codes\n\
+          \    if isinstance(exc, (TimeoutError, ConnectionError, urllib.error.URLError)):\n\
+          \      return True\n    exc_cls_name = type(exc).__name__.lower()\n    if\
+          \ \"timeout\" in exc_cls_name or \"transporterror\" in exc_cls_name:\n \
+          \     return True\n    return False\n\n  def _execute_with_retry(fn: Callable[[],\
+          \ Any]) -> tuple[Any, int]:\n    attempt = 0\n    while True:\n      attempt\
+          \ += 1\n      try:\n        return fn(), attempt\n      except Exception\
+          \ as exc:\n        if attempt > max_retries or not _is_retryable(exc):\n\
+          \          setattr(exc, \"_attempts\", attempt)\n          raise\n     \
+          \   backoff = min(30.0, 1.0 * (2 ** (attempt - 1))) + random.uniform(\n\
+          \            0.0, 0.25\n        )\n        time.sleep(backoff)\n\n  def\
+          \ _sanitize_dataframe_for_parquet(df: pd.DataFrame) -> pd.DataFrame:\n \
+          \   out = df.copy()\n    out.index = out.index.astype(str)\n    for col\
+          \ in out.columns:\n      if out[col].dtype == object:\n        out[col]\
+          \ = out[col].map(\n            lambda v: None\n            if v is None\
+          \ or (isinstance(v, float) and np.isnan(v))\n            else (\n      \
+          \          v\n                if isinstance(v, (str, bytes, bool, int, float,\
+          \ np.generic))\n                else str(v)\n            )\n        )\n\
+          \    return out\n\n  def _sanitize_uns_dict(uns_mapping: Any) -> dict[str,\
+          \ Any]:\n    cleaned: dict[str, Any] = {}\n    if not uns_mapping:\n   \
+          \   return cleaned\n    for key, val in dict(uns_mapping).items():\n   \
+          \   skey = str(key)\n      if val is None or isinstance(\n          val,\
+          \ (bool, int, float, str, np.number, np.bool_, np.ndarray)\n      ):\n \
+          \       cleaned[skey] = val\n      elif isinstance(val, enum.Enum):\n  \
+          \      cleaned[skey] = val.name\n      elif isinstance(val, dict):\n   \
+          \     cleaned[skey] = _sanitize_uns_dict(val)\n      else:\n        cleaned[skey]\
+          \ = str(val)\n    return cleaned\n\n  def _upload_file_to_gcs(\n      local_path:\
+          \ str, blob_rel_path: str, content_type: str\n  ) -> str:\n    blob = out_bucket.blob(blob_rel_path)\n\
+          \    blob.upload_from_filename(local_path, content_type=content_type)\n\
+          \    return f\"gs://{out_bucket_name}/{blob_rel_path}\"\n\n  track_names\
+          \ = (\n      \"atac\",\n      \"cage\",\n      \"dnase\",\n      \"rna_seq\"\
+          ,\n      \"chip_histone\",\n      \"chip_tf\",\n      \"splice_sites\",\n\
+          \      \"splice_site_usage\",\n      \"splice_junctions\",\n      \"contact_maps\"\
+          ,\n      \"procap\",\n  )\n\n  def _save_track_outputs(\n      stem: str,\n\
+          \      outputs_by_prefix: dict[str, Any],\n  ) -> tuple[dict[str, str],\
+          \ dict[str, Any]]:\n    arrays: dict[str, np.ndarray] = {}\n    meta_frames:\
+          \ list[pd.DataFrame] = []\n    summary: dict[str, Any] = {}\n\n    for prefix,\
+          \ out_obj in outputs_by_prefix.items():\n      sub_summary: dict[str, Any]\
+          \ = {}\n      for trk in track_names:\n        trk_obj = getattr(out_obj,\
+          \ trk, None)\n        if trk_obj is None:\n          continue\n        arr_key\
+          \ = f\"{prefix}_{trk}\" if prefix else trk\n        vals = getattr(trk_obj,\
+          \ \"values\", None)\n        if vals is not None:\n          arr = np.asarray(vals)\n\
+          \          arrays[arr_key] = arr\n          sub_summary[trk] = {\n     \
+          \         \"shape\": list(arr.shape),\n              \"dtype\": str(arr.dtype),\n\
+          \              \"min\": float(np.min(arr)) if arr.size > 0 else 0.0,\n \
+          \             \"max\": float(np.max(arr)) if arr.size > 0 else 0.0,\n  \
+          \            \"mean\": float(np.mean(arr)) if arr.size > 0 else 0.0,\n \
+          \         }\n        junctions = getattr(trk_obj, \"junctions\", None)\n\
+          \        if junctions is not None:\n          j_df = (\n              junctions.copy()\n\
+          \              if isinstance(junctions, pd.DataFrame)\n              else\
+          \ pd.DataFrame({\"junction\": [str(j) for j in junctions]})\n          )\n\
+          \          j_df[\"track_key\"] = arr_key\n          meta_frames.append(j_df)\n\
+          \        meta_df = getattr(trk_obj, \"metadata\", None)\n        if isinstance(meta_df,\
+          \ pd.DataFrame) and not meta_df.empty:\n          mdf = meta_df.copy()\n\
+          \          mdf[\"track_key\"] = arr_key\n          meta_frames.append(mdf)\n\
+          \      if prefix:\n        summary[prefix] = sub_summary\n      else:\n\
+          \        summary.update(sub_summary)\n\n    artifact_uris: dict[str, str]\
+          \ = {}\n    with tempfile.TemporaryDirectory() as tmp_dir:\n      if arrays:\n\
+          \        local_npz = os.path.join(tmp_dir, f\"{stem}.npz\")\n        np.savez_compressed(local_npz,\
+          \ **arrays)  # pyrefly: ignore[bad-argument-type]\n        npz_blob = f\"\
+          {base_prefix_blob}tracks/{stem}.npz\"\n        artifact_uris[\"tracks_npz_uri\"\
+          ] = _upload_file_to_gcs(\n            local_npz, npz_blob, \"application/octet-stream\"\
+          \n        )\n      if meta_frames:\n        combined_meta = pd.concat(meta_frames,\
+          \ ignore_index=True)\n        local_pq = os.path.join(tmp_dir, f\"{stem}_metadata.parquet\"\
+          )\n        _sanitize_dataframe_for_parquet(combined_meta).to_parquet(\n\
+          \            local_pq, index=False\n        )\n        pq_blob = f\"{base_prefix_blob}tracks/{stem}_metadata.parquet\"\
+          \n        artifact_uris[\"tracks_metadata_parquet_uri\"] = _upload_file_to_gcs(\n\
+          \            local_pq, pq_blob, \"application/octet-stream\"\n        )\n\
+          \    return artifact_uris, summary\n\n  def _save_anndata_scores(\n    \
+          \  stem: str,\n      scores_input: Any,\n      is_ism: bool,\n  ) -> tuple[dict[str,\
+          \ Any], list[list[int]]]:\n    artifact_uris: dict[str, Any] = {}\n    shapes:\
+          \ list[list[int]] = []\n\n    # Run tidy_scores BEFORE sanitizing AnnData.uns\
+          \ objects.\n    tidy_df = None\n    if save_tidy_scores:\n      try:\n \
+          \       tidy_df = variant_scorers.tidy_scores(\n            scores_input,\
+          \ match_gene_strand=True\n        )\n      except Exception:  # pylint:\
+          \ disable=broad-exception-caught\n        try:\n          tidy_df = variant_scorers.tidy_scores(\n\
+          \              scores_input, match_gene_strand=False\n          )\n    \
+          \    except Exception as tidy_exc:  # pylint: disable=broad-exception-caught\n\
+          \          logging.warning(\n              \"Could not generate tidy_scores\
+          \ for %s: %s\",\n              stem,\n              tidy_exc,\n        \
+          \  )\n\n    adata_list_to_write: list[anndata.AnnData] = []\n    if is_ism:\n\
+          \      # scores_input is list[list[AnnData]] (variants x scorers).\n   \
+          \   if scores_input and isinstance(scores_input[0], (list, tuple)):\n  \
+          \      num_scorers = len(scores_input[0])\n        for s_idx in range(num_scorers):\n\
+          \          per_variant = [row[s_idx] for row in scores_input if len(row)\
+          \ > s_idx]\n          if not per_variant:\n            continue\n      \
+          \    stacked_x = np.vstack([np.asarray(ad.X) for ad in per_variant])\n \
+          \         first_ad = per_variant[0]\n          variant_ids = [\n       \
+          \       str(ad.uns.get(\"variant\", f\"var_{v_idx}\"))\n              for\
+          \ v_idx, ad in enumerate(per_variant)\n          ]\n          obs_rows:\
+          \ list[pd.DataFrame] = []\n          for v_id, ad in zip(variant_ids, per_variant):\n\
+          \            if ad.obs is not None and not ad.obs.empty:\n             \
+          \ o = ad.obs.copy()\n              o[\"variant_id\"] = v_id\n          \
+          \    obs_rows.append(o)\n            else:\n              obs_rows.append(\n\
+          \                  pd.DataFrame({\"variant_id\": [v_id] * ad.X.shape[0]})\n\
+          \              )\n          combined_obs = pd.concat(obs_rows, ignore_index=True)\n\
+          \          combined_obs.index = combined_obs.index.astype(str)\n       \
+          \   combined_uns = _sanitize_uns_dict(first_ad.uns)\n          combined_uns[\"\
+          ism_variant_count\"] = len(per_variant)\n          stacked_ad = anndata.AnnData(\n\
+          \              X=stacked_x,\n              obs=_sanitize_dataframe_for_parquet(combined_obs),\n\
+          \              var=_sanitize_dataframe_for_parquet(first_ad.var),\n    \
+          \          uns=combined_uns,\n          )\n          adata_list_to_write.append(stacked_ad)\n\
+          \    else:\n      for ad in scores_input:\n        clean_ad = anndata.AnnData(\n\
+          \            X=np.asarray(ad.X),\n            obs=_sanitize_dataframe_for_parquet(ad.obs),\n\
+          \            var=_sanitize_dataframe_for_parquet(ad.var),\n            layers={k:\
+          \ np.asarray(v) for k, v in ad.layers.items()},\n            uns=_sanitize_uns_dict(ad.uns),\n\
+          \        )\n        adata_list_to_write.append(clean_ad)\n\n    h5ad_uris:\
+          \ list[str] = []\n    with tempfile.TemporaryDirectory() as tmp_dir:\n \
+          \     for idx_ad, clean_ad in enumerate(adata_list_to_write):\n        shapes.append(list(clean_ad.X.shape))\n\
+          \        suffix = \"\" if len(adata_list_to_write) == 1 else f\"_{idx_ad}\"\
+          \n        local_h5 = os.path.join(tmp_dir, f\"{stem}{suffix}.h5ad\")\n \
+          \       clean_ad.write_h5ad(local_h5)\n        h5_blob = f\"{base_prefix_blob}scores/{stem}{suffix}.h5ad\"\
+          \n        h5ad_uris.append(\n            _upload_file_to_gcs(local_h5, h5_blob,\
+          \ \"application/octet-stream\")\n        )\n\n      if isinstance(tidy_df,\
+          \ pd.DataFrame) and not tidy_df.empty:\n        local_tidy = os.path.join(tmp_dir,\
+          \ f\"{stem}_tidy.parquet\")\n        _sanitize_dataframe_for_parquet(tidy_df).to_parquet(\n\
+          \            local_tidy, index=False\n        )\n        tidy_blob = f\"\
+          {base_prefix_blob}scores/{stem}_tidy.parquet\"\n        artifact_uris[\"\
+          tidy_scores_parquet_uri\"] = _upload_file_to_gcs(\n            local_tidy,\
+          \ tidy_blob, \"application/octet-stream\"\n        )\n\n    if len(h5ad_uris)\
+          \ == 1:\n      artifact_uris[\"scores_h5ad_uri\"] = h5ad_uris[0]\n    elif\
+          \ h5ad_uris:\n      artifact_uris[\"scores_h5ad_uris\"] = h5ad_uris\n\n\
+          \    return artifact_uris, shapes\n\n  def _parse_organism(raw_org: Any)\
+          \ -> dna_model.Organism:\n    if not raw_org:\n      return dna_model.Organism.HOMO_SAPIENS\n\
+          \    clean = str(raw_org).strip().replace(\"ORGANISM_\", \"\").upper()\n\
+          \    if clean in dna_model.Organism.__members__:\n      return dna_model.Organism[clean]\n\
+          \    raise ValueError(\n        f\"Unsupported organism {raw_org!r}. Must\
+          \ be one of \"\n        f\"{list(dna_model.Organism.__members__.keys())}.\"\
+          \n    )\n\n  def _parse_outputs(raw_outputs: Any) -> list[dna_output.OutputType]:\n\
+          \    if not raw_outputs:\n      return [dna_output.OutputType.RNA_SEQ]\n\
+          \    parsed: list[dna_output.OutputType] = []\n    for item in raw_outputs:\n\
+          \      name = str(item).strip().replace(\"OUTPUT_TYPE_\", \"\").upper()\n\
+          \      if name not in dna_output.OutputType.__members__:\n        raise\
+          \ ValueError(\n            f\"Unsupported OutputType {item!r}. Valid types:\
+          \ \"\n            f\"{list(dna_output.OutputType.__members__.keys())}\"\n\
+          \        )\n      parsed.append(dna_output.OutputType[name])\n    return\
+          \ parsed\n\n  def _parse_ontology_terms(raw_terms: Any) -> list[str] | None:\n\
+          \    if not raw_terms:\n      return None\n    parsed: list[str] = []\n\
+          \    for t in raw_terms:\n      if isinstance(t, str):\n        parsed.append(t)\n\
+          \      elif isinstance(t, dict):\n        ont_type = (\n            str(t.get(\"\
+          ontology_type\", \"UBERON\"))\n            .replace(\"ONTOLOGY_TYPE_\",\
+          \ \"\")\n            .upper()\n        )\n        ont_id = int(t[\"id\"\
+          ])\n        parsed.append(f\"{ont_type}:{ont_id:07d}\")\n      else:\n \
+          \       raise ValueError(f\"Invalid ontology term entry: {t!r}\")\n    return\
+          \ parsed or None\n\n  def _parse_interval(raw_iv: Any) -> genome.Interval:\n\
+          \    if isinstance(raw_iv, str):\n      # Support \"chr19:40991281-41018398\"\
+          \ or \"chr19:40991281-41018398:+\"\n      m = re.match(r\"^([^:]+):(\\d+)-(\\\
+          d+)(?::([+-.*]))?$\", raw_iv.strip())\n      if not m:\n        raise ValueError(f\"\
+          Invalid interval string format: {raw_iv!r}\")\n      chrom, s_str, e_str,\
+          \ strand_val = m.groups()\n      return genome.Interval(\n          chromosome=chrom,\n\
+          \          start=int(s_str),\n          end=int(e_str),\n          strand=strand_val\
+          \ or \".\",\n      )\n    if not isinstance(raw_iv, dict):\n      raise\
+          \ ValueError(f\"Expected interval dict or string, got: {raw_iv!r}\")\n \
+          \   iv = genome.Interval(\n        chromosome=str(raw_iv[\"chromosome\"\
+          ]),\n        start=int(raw_iv[\"start\"]),\n        end=int(raw_iv[\"end\"\
+          ]),\n        strand=str(raw_iv.get(\"strand\", \".\")),\n        name=str(raw_iv.get(\"\
+          name\", \"\")),\n    )\n    resize_val = raw_iv.get(\"resize\")\n    if\
+          \ resize_val is not None:\n      iv = iv.resize(int(resize_val))\n    return\
+          \ iv\n\n  def _parse_variant(raw_var: Any) -> genome.Variant:\n    if isinstance(raw_var,\
+          \ str):\n      # Support \"chr22:36201698:A>C\" or \"chr22:36201698 A>C\"\
+          \n      m = re.match(\n          r\"^([^:]+):(\\d+)[:\\s]+([ACGTNacgtn]+)>([ACGTNacgtn]+)$\"\
+          ,\n          raw_var.strip(),\n      )\n      if not m:\n        raise ValueError(\n\
+          \            f\"Invalid variant string {raw_var!r}; expected 'chr:pos:ref>alt'.\"\
+          \n        )\n      chrom, pos_str, ref, alt = m.groups()\n      return genome.Variant(\n\
+          \          chromosome=chrom,\n          position=int(pos_str),\n       \
+          \   reference_bases=ref.upper(),\n          alternate_bases=alt.upper(),\n\
+          \      )\n    if not isinstance(raw_var, dict):\n      raise ValueError(f\"\
+          Expected variant dict or string, got: {raw_var!r}\")\n    ref_bases = (\n\
+          \        raw_var[\"reference_bases\"]\n        if \"reference_bases\" in\
+          \ raw_var\n        else raw_var[\"referenceBases\"]\n    )\n    alt_bases\
+          \ = (\n        raw_var[\"alternate_bases\"]\n        if \"alternate_bases\"\
+          \ in raw_var\n        else raw_var[\"alternateBases\"]\n    )\n    return\
+          \ genome.Variant(\n        chromosome=str(raw_var[\"chromosome\"]),\n  \
+          \      position=int(raw_var[\"position\"]),\n        reference_bases=str(ref_bases),\n\
+          \        alternate_bases=str(alt_bases),\n    )\n\n  def _parse_variant_scorers(raw_scorers:\
+          \ Any) -> list[Any]:\n    if not raw_scorers:\n      return [variant_scorers.RECOMMENDED_VARIANT_SCORERS[\"\
+          RNA_SEQ\"]]\n    if isinstance(raw_scorers, str) and raw_scorers.strip().upper()\
+          \ == \"ALL\":\n      return list(variant_scorers.RECOMMENDED_VARIANT_SCORERS.values())\n\
+          \    scorers: list[Any] = []\n    for s in raw_scorers:\n      if isinstance(s,\
+          \ str):\n        key = s.strip().replace(\"OUTPUT_TYPE_\", \"\").upper()\n\
+          \        if key == \"ALL\":\n          scorers.extend(variant_scorers.RECOMMENDED_VARIANT_SCORERS.values())\n\
+          \        elif key in variant_scorers.RECOMMENDED_VARIANT_SCORERS:\n    \
+          \      scorers.append(variant_scorers.RECOMMENDED_VARIANT_SCORERS[key])\n\
+          \        else:\n          raise ValueError(\n              f\"Unknown recommended\
+          \ variant scorer {s!r}. Valid keys: \"\n              f\"{list(variant_scorers.RECOMMENDED_VARIANT_SCORERS.keys())}\"\
+          \n          )\n      elif isinstance(s, dict):\n        scorer_type = str(s.get(\"\
+          type\", \"\")).strip()\n        if \"centerMask\" in s or scorer_type ==\
+          \ \"CenterMaskScorer\":\n          cfg = s.get(\"centerMask\", s)\n    \
+          \      out_name = (\n              str(\n                  cfg.get(\"requested_output\"\
+          )\n                  or cfg.get(\"requestedOutput\", \"DNASE\")\n      \
+          \        )\n              .replace(\"OUTPUT_TYPE_\", \"\")\n           \
+          \   .upper()\n          )\n          agg_name = (\n              str(\n\
+          \                  cfg.get(\"aggregation_type\")\n                  or cfg.get(\"\
+          aggregationType\", \"DIFF_MEAN\")\n              )\n              .replace(\"\
+          AGGREGATION_TYPE_\", \"\")\n              .upper()\n          )\n      \
+          \    width = cfg.get(\"width\", 501)\n          scorers.append(\n      \
+          \        variant_scorers.CenterMaskScorer(\n                  requested_output=dna_output.OutputType[out_name],\n\
+          \                  width=int(width) if width is not None else None,\n  \
+          \                aggregation_type=variant_scorers.AggregationType[agg_name],\n\
+          \              )\n          )\n        elif \"geneMask\" in s or scorer_type\
+          \ == \"GeneMaskLFCScorer\":\n          cfg = s.get(\"geneMask\", s)\n  \
+          \        out_name = (\n              str(\n                  cfg.get(\"\
+          requested_output\")\n                  or cfg.get(\"requestedOutput\", \"\
+          RNA_SEQ\")\n              )\n              .replace(\"OUTPUT_TYPE_\", \"\
+          \")\n              .upper()\n          )\n          scorers.append(\n  \
+          \            variant_scorers.GeneMaskLFCScorer(\n                  requested_output=dna_output.OutputType[out_name]\n\
+          \              )\n          )\n        else:\n          raise ValueError(f\"\
+          Unsupported variant scorer spec: {s!r}\")\n      else:\n        raise ValueError(f\"\
+          Unsupported variant scorer entry: {s!r}\")\n    return scorers or [variant_scorers.RECOMMENDED_VARIANT_SCORERS[\"\
+          RNA_SEQ\"]]\n\n  def _parse_interval_scorers(raw_scorers: Any) -> list[Any]:\n\
+          \    if not raw_scorers:\n      return [interval_scorers.RECOMMENDED_INTERVAL_SCORERS[\"\
+          RNA_SEQ\"]]\n    scorers: list[Any] = []\n    for s in raw_scorers:\n  \
+          \    if isinstance(s, str):\n        key = s.strip().replace(\"OUTPUT_TYPE_\"\
+          , \"\").upper()\n        if key in interval_scorers.RECOMMENDED_INTERVAL_SCORERS:\n\
+          \          scorers.append(interval_scorers.RECOMMENDED_INTERVAL_SCORERS[key])\n\
+          \        elif key in dna_output.OutputType.__members__:\n          scorers.append(\n\
+          \              interval_scorers.GeneMaskScorer(\n                  requested_output=dna_output.OutputType[key],\n\
+          \                  width=200_001,\n                  aggregation_type=interval_scorers.IntervalAggregationType.MEAN,\n\
+          \              )\n          )\n        else:\n          raise ValueError(f\"\
+          Unsupported interval scorer {s!r}\")\n      elif isinstance(s, dict):\n\
+          \        cfg = s.get(\"geneMask\", s)\n        out_name = (\n          \
+          \  str(\n                cfg.get(\"requested_output\")\n               \
+          \ or cfg.get(\"requestedOutput\", \"RNA_SEQ\")\n            )\n        \
+          \    .replace(\"OUTPUT_TYPE_\", \"\")\n            .upper()\n        )\n\
+          \        agg_name = (\n            str(\n                cfg.get(\"aggregation_type\"\
+          )\n                or cfg.get(\"aggregationType\", \"MEAN\")\n         \
+          \   )\n            .replace(\"INTERVAL_AGGREGATION_TYPE_\", \"\")\n    \
+          \        .upper()\n        )\n        width = cfg.get(\"width\", 200_001)\n\
+          \        scorers.append(\n            interval_scorers.GeneMaskScorer(\n\
+          \                requested_output=dna_output.OutputType[out_name],\n   \
+          \             width=int(width) if width is not None else None,\n       \
+          \         aggregation_type=interval_scorers.IntervalAggregationType[\n \
+          \                   agg_name\n                ],\n            )\n      \
+          \  )\n      else:\n        raise ValueError(f\"Unsupported interval scorer\
+          \ entry: {s!r}\")\n    return scorers or [interval_scorers.RECOMMENDED_INTERVAL_SCORERS[\"\
+          RNA_SEQ\"]]\n\n  def _process_one_row(index: int) -> dict[str, Any]:\n \
+          \   t0 = time.perf_counter()\n    request_id = raw_request_ids[index]\n\
+          \    stem = artifact_stems[index]\n    req_type = \"unknown\"\n    try:\n\
+          \      payload = json.loads(raw_lines[index])\n      if not isinstance(payload,\
+          \ dict):\n        raise ValueError(\n            f\"Row {index} must be\
+          \ a JSON object, got {type(payload).__name__}\"\n        )\n      req_type\
+          \ = str(\n          payload.get(\"request_type\")\n          or payload.get(\"\
+          method\")\n          or \"predict_sequence\"\n      ).strip()\n      data\
+          \ = (\n          payload.get(\"data\")\n          if isinstance(payload.get(\"\
+          data\"), dict)\n          else payload\n      )\n\n      raw_mv = (\n  \
+          \        data.get(\"model_version\")\n          or data.get(\"modelVersion\"\
+          )\n          or payload.get(\"model_version\")\n          or payload.get(\"\
+          modelVersion\")\n          or default_mv\n      )\n      row_mv = _parse_model_version(raw_mv)\n\
+          \      client = _get_client_for_fold(row_mv)\n\n      if req_type == \"\
+          predict_sequence\":\n        seq = str(data[\"sequence\"])\n        pad_to\
+          \ = data.get(\"pad_to_length\")\n        if pad_to is not None:\n      \
+          \    seq = seq.center(int(pad_to), \"N\")\n        org = _parse_organism(data.get(\"\
+          organism\"))\n        req_outputs = _parse_outputs(\n            data.get(\"\
+          requested_outputs\") or data.get(\"requestedOutputs\")\n        )\n    \
+          \    onto = _parse_ontology_terms(\n            data.get(\"ontology_terms\"\
+          ) or data.get(\"ontologyTerms\")\n        )\n        out_obj, attempts =\
+          \ _execute_with_retry(\n            lambda: client.predict_sequence(\n \
+          \               sequence=seq,\n                organism=org,\n         \
+          \       requested_outputs=req_outputs,\n                ontology_terms=onto,\n\
+          \            )\n        )\n        uris, track_summary = _save_track_outputs(stem,\
+          \ {\"\": out_obj})\n        return {\n            \"index\": index,\n  \
+          \          \"request_id\": request_id,\n            \"request_type\": req_type,\n\
+          \            \"model_version\": row_mv.name,\n            \"status\": \"\
+          SUCCESS\",\n            \"attempts\": attempts,\n            \"latency_sec\"\
+          : round(time.perf_counter() - t0, 3),\n            \"artifact_uris\": uris,\n\
+          \            \"output_summary\": track_summary,\n        }\n\n      if req_type\
+          \ == \"predict_interval\":\n        interval = _parse_interval(data[\"interval\"\
+          ])\n        org = _parse_organism(data.get(\"organism\"))\n        req_outputs\
+          \ = _parse_outputs(\n            data.get(\"requested_outputs\") or data.get(\"\
+          requestedOutputs\")\n        )\n        onto = _parse_ontology_terms(\n\
+          \            data.get(\"ontology_terms\") or data.get(\"ontologyTerms\"\
+          )\n        )\n        out_obj, attempts = _execute_with_retry(\n       \
+          \     lambda: client.predict_interval(\n                interval=interval,\n\
+          \                organism=org,\n                requested_outputs=req_outputs,\n\
+          \                ontology_terms=onto,\n            )\n        )\n      \
+          \  uris, track_summary = _save_track_outputs(stem, {\"\": out_obj})\n  \
+          \      return {\n            \"index\": index,\n            \"request_id\"\
+          : request_id,\n            \"request_type\": req_type,\n            \"model_version\"\
+          : row_mv.name,\n            \"status\": \"SUCCESS\",\n            \"attempts\"\
+          : attempts,\n            \"latency_sec\": round(time.perf_counter() - t0,\
+          \ 3),\n            \"artifact_uris\": uris,\n            \"output_summary\"\
+          : track_summary,\n        }\n\n      if req_type == \"predict_variant\"\
+          :\n        variant = _parse_variant(data[\"variant\"])\n        if \"interval\"\
+          \ in data and data[\"interval\"] is not None:\n          interval = _parse_interval(data[\"\
+          interval\"])\n        else:\n          raw_seq_len = data.get(\"sequence_length\"\
+          )\n          seq_len = (\n              int(raw_seq_len)\n             \
+          \ if raw_seq_len is not None\n              else int(dna_client.SEQUENCE_LENGTH_1MB)\n\
+          \          )\n          interval = variant.reference_interval.resize(seq_len)\n\
+          \        org = _parse_organism(data.get(\"organism\"))\n        req_outputs\
+          \ = _parse_outputs(\n            data.get(\"requested_outputs\") or data.get(\"\
+          requestedOutputs\")\n        )\n        onto = _parse_ontology_terms(\n\
+          \            data.get(\"ontology_terms\") or data.get(\"ontologyTerms\"\
+          )\n        )\n        v_out, attempts = _execute_with_retry(\n         \
+          \   lambda: client.predict_variant(\n                interval=interval,\n\
+          \                variant=variant,\n                organism=org,\n     \
+          \           requested_outputs=req_outputs,\n                ontology_terms=onto,\n\
+          \            )\n        )\n        uris, track_summary = _save_track_outputs(\n\
+          \            stem,\n            {\n                \"reference\": v_out.reference,\n\
+          \                \"alternate\": v_out.alternate,\n            },\n     \
+          \   )\n        return {\n            \"index\": index,\n            \"request_id\"\
+          : request_id,\n            \"request_type\": req_type,\n            \"model_version\"\
+          : row_mv.name,\n            \"status\": \"SUCCESS\",\n            \"attempts\"\
+          : attempts,\n            \"latency_sec\": round(time.perf_counter() - t0,\
+          \ 3),\n            \"artifact_uris\": uris,\n            \"output_summary\"\
+          : track_summary,\n        }\n\n      if req_type == \"score_variant\":\n\
+          \        variant = _parse_variant(data[\"variant\"])\n        if \"interval\"\
+          \ in data and data[\"interval\"] is not None:\n          interval = _parse_interval(data[\"\
+          interval\"])\n        else:\n          raw_seq_len = data.get(\"sequence_length\"\
+          )\n          seq_len = (\n              int(raw_seq_len)\n             \
+          \ if raw_seq_len is not None\n              else int(dna_client.SEQUENCE_LENGTH_1MB)\n\
+          \          )\n          interval = variant.reference_interval.resize(seq_len)\n\
+          \        v_scorers = _parse_variant_scorers(\n            data.get(\"variant_scorers\"\
+          ) or data.get(\"variantScorers\")\n        )\n        org = _parse_organism(data.get(\"\
+          organism\"))\n        scores, attempts = _execute_with_retry(\n        \
+          \    lambda: client.score_variant(\n                interval=interval,\n\
+          \                variant=variant,\n                variant_scorers=v_scorers,\n\
+          \                organism=org,\n            )\n        )\n        uris,\
+          \ shapes = _save_anndata_scores(stem, scores, is_ism=False)\n        return\
+          \ {\n            \"index\": index,\n            \"request_id\": request_id,\n\
+          \            \"request_type\": req_type,\n            \"model_version\"\
+          : row_mv.name,\n            \"status\": \"SUCCESS\",\n            \"attempts\"\
+          : attempts,\n            \"latency_sec\": round(time.perf_counter() - t0,\
+          \ 3),\n            \"artifact_uris\": uris,\n            \"scores_count\"\
+          : len(scores),\n            \"score_shapes\": shapes,\n        }\n\n   \
+          \   if req_type == \"score_interval\":\n        interval = _parse_interval(data[\"\
+          interval\"])\n        i_scorers = _parse_interval_scorers(\n           \
+          \ data.get(\"interval_scorers\") or data.get(\"intervalScorers\")\n    \
+          \    )\n        org = _parse_organism(data.get(\"organism\"))\n        scores,\
+          \ attempts = _execute_with_retry(\n            lambda: client.score_interval(\n\
+          \                interval=interval,\n                interval_scorers=i_scorers,\n\
+          \                organism=org,\n            )\n        )\n        uris,\
+          \ shapes = _save_anndata_scores(stem, scores, is_ism=False)\n        return\
+          \ {\n            \"index\": index,\n            \"request_id\": request_id,\n\
+          \            \"request_type\": req_type,\n            \"model_version\"\
+          : row_mv.name,\n            \"status\": \"SUCCESS\",\n            \"attempts\"\
+          : attempts,\n            \"latency_sec\": round(time.perf_counter() - t0,\
+          \ 3),\n            \"artifact_uris\": uris,\n            \"scores_count\"\
+          : len(scores),\n            \"score_shapes\": shapes,\n        }\n\n   \
+          \   if req_type == \"score_ism_variants\":\n        interval = _parse_interval(data[\"\
+          interval\"])\n        raw_ism = data.get(\"ism_interval\") or data.get(\"\
+          ismInterval\")\n        if isinstance(raw_ism, int):\n          ism_interval\
+          \ = interval.resize(raw_ism)\n        elif raw_ism is not None:\n      \
+          \    ism_interval = _parse_interval(raw_ism)\n        else:\n          ism_width\
+          \ = int(data.get(\"ism_width\", 20))\n          ism_interval = interval.resize(ism_width)\n\
+          \        v_scorers = _parse_variant_scorers(\n            data.get(\"variant_scorers\"\
+          )\n            or data.get(\"variantScorers\")\n            or [{\n    \
+          \            \"type\": \"CenterMaskScorer\",\n                \"requested_output\"\
+          : \"DNASE\",\n                \"width\": 501,\n                \"aggregation_type\"\
+          : \"DIFF_MEAN\",\n            }]\n        )\n        org = _parse_organism(data.get(\"\
+          organism\"))\n\n        def _call_ism() -> Any:\n          try:\n      \
+          \      return client.score_ism_variants(\n                interval=interval,\n\
+          \                ism_interval=ism_interval,\n                variant_scorers=v_scorers,\n\
+          \                organism=org,\n                progress_bar=False,\n  \
+          \          )\n          except TypeError:\n            return client.score_ism_variants(\n\
+          \                interval=interval,\n                ism_interval=ism_interval,\n\
+          \                variant_scorers=v_scorers,\n                organism=org,\n\
+          \            )\n\n        ism_scores, attempts = _execute_with_retry(_call_ism)\n\
+          \        uris, shapes = _save_anndata_scores(stem, ism_scores, is_ism=True)\n\
+          \        return {\n            \"index\": index,\n            \"request_id\"\
+          : request_id,\n            \"request_type\": req_type,\n            \"model_version\"\
+          : row_mv.name,\n            \"status\": \"SUCCESS\",\n            \"attempts\"\
+          : attempts,\n            \"latency_sec\": round(time.perf_counter() - t0,\
+          \ 3),\n            \"artifact_uris\": uris,\n            \"ism_variants_scored\"\
+          : len(ism_scores),\n            \"score_shapes\": shapes,\n        }\n\n\
+          \      if req_type == \"output_metadata\":\n        org = _parse_organism(data.get(\"\
+          organism\"))\n        meta_obj, attempts = _execute_with_retry(\n      \
+          \      lambda: client.output_metadata(org)\n        )\n        meta_uris:\
+          \ dict[str, str] = {}\n        meta_counts: dict[str, int] = {}\n      \
+          \  with tempfile.TemporaryDirectory() as tmp_dir:\n          for trk in\
+          \ track_names:\n            mdf = getattr(meta_obj, trk, None)\n       \
+          \     if isinstance(mdf, pd.DataFrame) and not mdf.empty:\n            \
+          \  meta_counts[trk] = len(mdf)\n              local_pq = os.path.join(tmp_dir,\
+          \ f\"{stem}_{trk}.parquet\")\n              _sanitize_dataframe_for_parquet(mdf).to_parquet(\n\
+          \                  local_pq, index=False\n              )\n            \
+          \  pq_blob = f\"{base_prefix_blob}metadata/{stem}_{trk}.parquet\"\n    \
+          \          meta_uris[trk] = _upload_file_to_gcs(\n                  local_pq,\
+          \ pq_blob, \"application/octet-stream\"\n              )\n        return\
+          \ {\n            \"index\": index,\n            \"request_id\": request_id,\n\
+          \            \"request_type\": req_type,\n            \"model_version\"\
+          : row_mv.name,\n            \"status\": \"SUCCESS\",\n            \"attempts\"\
+          : attempts,\n            \"latency_sec\": round(time.perf_counter() - t0,\
+          \ 3),\n            \"artifact_uris\": meta_uris,\n            \"track_counts\"\
+          : meta_counts,\n        }\n\n      raise ValueError(f\"Unsupported request_type:\
+          \ {req_type!r}\")\n\n    except Exception as exc:  # pylint: disable=broad-exception-caught\n\
+          \      return {\n          \"index\": index,\n          \"request_id\":\
+          \ request_id,\n          \"request_type\": req_type,\n          \"status\"\
+          : \"FAILED\",\n          \"attempts\": int(getattr(exc, \"_attempts\", 1)),\n\
+          \          \"latency_sec\": round(time.perf_counter() - t0, 3),\n      \
+          \    \"error\": str(exc),\n      }\n\n  results: list[dict[str, Any]] =\
+          \ [{}] * total_requests\n  for idx, rec in resumed_records.items():\n  \
+          \  results[idx] = rec\n\n  pending_indices = [\n      i for i in range(total_requests)\
+          \ if i not in resumed_records\n  ]\n\n  checkpoint_buffer: list[dict[str,\
+          \ Any]] = []\n  shard_counter = 0\n  run_epoch_ms = int(time.time() * 1000)\n\
+          \  flush_every = max(1, int(checkpoint_interval))\n\n  def _flush_checkpoint_buffer()\
+          \ -> None:\n    nonlocal shard_counter\n    if not checkpoint_buffer:\n\
+          \      return\n    shard_counter += 1\n    shard_blob_name = (\n       \
+          \ f\"{checkpoints_prefix_blob}\"\n        f\"part-{run_epoch_ms}-{shard_counter:05d}.jsonl\"\
+          \n    )\n    shard_payload = (\n        \"\\n\".join(json.dumps(item) for\
+          \ item in checkpoint_buffer) + \"\\n\"\n    )\n    out_bucket.blob(shard_blob_name).upload_from_string(\n\
+          \        shard_payload, content_type=\"application/jsonl\"\n    )\n    checkpoint_buffer.clear()\n\
+          \n  start_wall = time.perf_counter()\n  try:\n    if pending_indices:\n\
+          \      with concurrent.futures.ThreadPoolExecutor(\n          max_workers=max(1,\
+          \ int(workers))\n      ) as executor:\n        future_to_idx = {\n     \
+          \       executor.submit(_process_one_row, idx): idx\n            for idx\
+          \ in pending_indices\n        }\n        for future in concurrent.futures.as_completed(future_to_idx):\n\
+          \          idx = future_to_idx[future]\n          try:\n            rec\
+          \ = future.result()\n          except Exception as exc:  # pylint: disable=broad-exception-caught\n\
+          \            rec = {\n                \"index\": idx,\n                \"\
+          request_id\": raw_request_ids[idx],\n                \"status\": \"FAILED\"\
+          ,\n                \"attempts\": 1,\n                \"error\": str(exc),\n\
+          \            }\n          results[idx] = rec\n          if rec.get(\"status\"\
+          ) == \"SUCCESS\":\n            checkpoint_buffer.append(rec)\n         \
+          \   if len(checkpoint_buffer) >= flush_every:\n              _flush_checkpoint_buffer()\n\
+          \  finally:\n    try:\n      _flush_checkpoint_buffer()\n    finally:\n\
+          \      _close_clients()\n\n  elapsed_sec = time.perf_counter() - start_wall\n\
+          \  successes = sum(1 for r in results if r.get(\"status\") == \"SUCCESS\"\
+          )\n  failures = total_requests - successes\n  newly_processed = len(pending_indices)\n\
+          \  latencies = [\n      float(r[\"latency_sec\"])\n      for r in results\n\
+          \      if \"latency_sec\" in r and r.get(\"index\") in pending_indices\n\
+          \  ]\n\n  predictions_payload = \"\\n\".join(json.dumps(r) for r in results)\
+          \ + (\n      \"\\n\" if results else \"\"\n  )\n  out_bucket.blob(predictions_blob_path).upload_from_string(\n\
+          \      predictions_payload, content_type=\"application/jsonl\"\n  )\n  predictions_uri\
+          \ = f\"gs://{out_bucket_name}/{predictions_blob_path}\"\n\n  written_errors_uri\
+          \ = \"\"\n  if failures > 0:\n    error_records = [\n        {**r, \"raw_input\"\
+          : raw_lines[r[\"index\"]]}\n        for r in results\n        if r.get(\"\
+          status\") != \"SUCCESS\"\n    ]\n    errors_payload = \"\\n\".join(json.dumps(er)\
+          \ for er in error_records) + \"\\n\"\n    out_bucket.blob(errors_blob_path).upload_from_string(\n\
+          \        errors_payload, content_type=\"application/jsonl\"\n    )\n   \
+          \ written_errors_uri = f\"gs://{out_bucket_name}/{errors_blob_path}\"\n\n\
+          \  summary_dict = {\n      \"timestamp_utc\": datetime.datetime.now(datetime.timezone.utc).isoformat(),\n\
+          \      \"protocol\": protocol_clean,\n      \"target\": target,\n      \"\
+          default_model_version\": default_mv.name,\n      \"input_gcs_uri\": input_gcs_uri,\n\
+          \      \"predictions_gcs_uri\": predictions_uri,\n      \"errors_gcs_uri\"\
+          : written_errors_uri or None,\n      \"workers\": workers,\n      \"max_retries\"\
+          : max_retries,\n      \"total_requests\": total_requests,\n      \"resumed_from_checkpoint_count\"\
+          : len(resumed_records),\n      \"newly_processed_count\": newly_processed,\n\
+          \      \"successful_requests\": successes,\n      \"failed_requests\": failures,\n\
+          \      \"success_rate\": round(successes / total_requests, 6),\n      \"\
+          wall_time_sec\": round(elapsed_sec, 3),\n      \"throughput_rps\": (\n \
+          \         round(newly_processed / elapsed_sec, 3)\n          if elapsed_sec\
+          \ > 0 and newly_processed > 0\n          else 0.0\n      ),\n      \"latency_avg_sec\"\
+          : (\n          round(float(np.mean(latencies)), 3) if latencies else 0.0\n\
+          \      ),\n      \"latency_p50_sec\": (\n          round(float(np.median(latencies)),\
+          \ 3) if latencies else 0.0\n      ),\n      \"latency_p95_sec\": (\n   \
+          \       round(float(np.percentile(latencies, 95)), 3) if latencies else\
+          \ 0.0\n      ),\n      \"latency_p99_sec\": (\n          round(float(np.percentile(latencies,\
+          \ 99)), 3) if latencies else 0.0\n      ),\n  }\n  out_bucket.blob(summary_blob_path).upload_from_string(\n\
+          \      json.dumps(summary_dict, indent=2) + \"\\n\",\n      content_type=\"\
+          application/json\",\n  )\n  summary_uri = f\"gs://{out_bucket_name}/{summary_blob_path}\"\
+          \n\n  logging.info(\n      \"Batch complete: %d/%d succeeded (%d resumed\
+          \ from checkpoints), \"\n      \"%d failed. Summary: %s\",\n      successes,\n\
+          \      total_requests,\n      len(resumed_records),\n      failures,\n \
+          \     summary_uri,\n  )\n\n  if successes == 0:\n    raise RuntimeError(\n\
+          \        f\"All {total_requests} batch request(s) failed. \"\n        f\"\
+          Inspect error details at {written_errors_uri}\"\n    )\n  if fail_on_any_error\
+          \ and failures > 0:\n    raise RuntimeError(\n        f\"{failures}/{total_requests}\
+          \ request(s) failed with \"\n        f\"fail_on_any_error=True. Inspect\
+          \ {written_errors_uri}\"\n    )\n\n  return (\n      predictions_uri,\n\
+          \      written_errors_uri,\n      summary_uri,\n      successes,\n     \
+          \ failures,\n  )\n\n"
+        image: python:3.11-slim
+        resources:
+          cpuLimit: 8.0
+          memoryLimit: 32.0
+          resourceCpuLimit: '8'
+          resourceMemoryLimit: 32G
+pipelineInfo:
+  description: AlphaGenome Batch Inference Pipeline on Vertex AI. Supports existing
+    Shared gRPC endpoints, existing Dedicated HTTP endpoints, and auto-provisioned
+    ephemeral GPU endpoints with automatic ExitHandler teardown and GCS shard checkpointing.
+  name: alphagenome-batch-inference-pipeline
+root:
+  dag:
+    tasks:
+      cleanup-ephemeral-endpoint-op:
+        cachingOptions: {}
+        componentRef:
+          name: comp-cleanup-ephemeral-endpoint-op
+        dependentTasks:
+        - exit-handler-1
+        inputs:
+          parameters:
+            cleanup_ephemeral_endpoint:
+              componentInputParameter: cleanup_ephemeral_endpoint
+            existing_endpoint:
+              componentInputParameter: existing_endpoint
+            existing_vertex_ai_url:
+              componentInputParameter: existing_vertex_ai_url
+            job_name:
+              runtimeValue:
+                constant: '{{$.pipeline_job_name}}'
+            project_id:
+              componentInputParameter: project_id
+            region:
+              componentInputParameter: region
+        taskInfo:
+          name: cleanup-ephemeral-endpoint-op
+        triggerPolicy:
+          strategy: ALL_UPSTREAM_TASKS_COMPLETED
+      exit-handler-1:
+        componentRef:
+          name: comp-exit-handler-1
+        inputs:
+          parameters:
+            pipelinechannel--encryption_spec_key_name:
+              componentInputParameter: encryption_spec_key_name
+            pipelinechannel--existing_endpoint:
+              componentInputParameter: existing_endpoint
+            pipelinechannel--existing_vertex_ai_url:
+              componentInputParameter: existing_vertex_ai_url
+            pipelinechannel--fail_on_any_error:
+              componentInputParameter: fail_on_any_error
+            pipelinechannel--impersonate_service_account:
+              componentInputParameter: impersonate_service_account
+            pipelinechannel--input_gcs_uri:
+              componentInputParameter: input_gcs_uri
+            pipelinechannel--max_retries:
+              componentInputParameter: max_retries
+            pipelinechannel--model_version:
+              componentInputParameter: model_version
+            pipelinechannel--output_gcs_uri:
+              componentInputParameter: output_gcs_uri
+            pipelinechannel--project_id:
+              componentInputParameter: project_id
+            pipelinechannel--region:
+              componentInputParameter: region
+            pipelinechannel--save_tidy_scores:
+              componentInputParameter: save_tidy_scores
+            pipelinechannel--sdk_wheel_url:
+              componentInputParameter: sdk_wheel_url
+            pipelinechannel--serving_accelerator_count:
+              componentInputParameter: serving_accelerator_count
+            pipelinechannel--serving_accelerator_type:
+              componentInputParameter: serving_accelerator_type
+            pipelinechannel--serving_compute_reservation_id:
+              componentInputParameter: serving_compute_reservation_id
+            pipelinechannel--serving_image_uri:
+              componentInputParameter: serving_image_uri
+            pipelinechannel--serving_machine_type:
+              componentInputParameter: serving_machine_type
+            pipelinechannel--serving_replica_count:
+              componentInputParameter: serving_replica_count
+            pipelinechannel--timeout:
+              componentInputParameter: timeout
+            pipelinechannel--workers:
+              componentInputParameter: workers
+        taskInfo:
+          name: alphagenome-ephemeral-cleanup-handler
+  inputDefinitions:
+    parameters:
+      cleanup_ephemeral_endpoint:
+        defaultValue: true
+        isOptional: true
+        parameterType: BOOLEAN
+      encryption_spec_key_name:
+        defaultValue: ''
+        isOptional: true
+        parameterType: STRING
+      existing_endpoint:
+        defaultValue: ''
+        isOptional: true
+        parameterType: STRING
+      existing_vertex_ai_url:
+        defaultValue: ''
+        isOptional: true
+        parameterType: STRING
+      fail_on_any_error:
+        defaultValue: false
+        isOptional: true
+        parameterType: BOOLEAN
+      impersonate_service_account:
+        defaultValue: ''
+        isOptional: true
+        parameterType: STRING
+      input_gcs_uri:
+        parameterType: STRING
+      max_retries:
+        defaultValue: 4.0
+        isOptional: true
+        parameterType: NUMBER_INTEGER
+      model_version:
+        defaultValue: ALL_FOLDS
+        isOptional: true
+        parameterType: STRING
+      output_gcs_uri:
+        parameterType: STRING
+      project_id:
+        defaultValue: '{{$.pipeline_google_cloud_project_id}}'
+        isOptional: true
+        parameterType: STRING
+      region:
+        defaultValue: us-central1
+        isOptional: true
+        parameterType: STRING
+      save_tidy_scores:
+        defaultValue: true
+        isOptional: true
+        parameterType: BOOLEAN
+      sdk_wheel_url:
+        defaultValue: https://github.com/GoogleCloudPlatform/vertex-ai-samples/raw/main/notebooks/community/alphagenome/whl/alphagenome_cloud_sdk-0.4.2.12-py3-none-any.whl
+        isOptional: true
+        parameterType: STRING
+      serving_accelerator_count:
+        defaultValue: 1.0
+        isOptional: true
+        parameterType: NUMBER_INTEGER
+      serving_accelerator_type:
+        defaultValue: NVIDIA_H100_80GB
+        isOptional: true
+        parameterType: STRING
+      serving_compute_reservation_id:
+        defaultValue: ''
+        isOptional: true
+        parameterType: STRING
+      serving_image_uri:
+        defaultValue: us-docker.pkg.dev/vertex-ai-restricted/alphagenome/alphagenome-inference:agv1_mg_004_rc_20261102
+        isOptional: true
+        parameterType: STRING
+      serving_machine_type:
+        defaultValue: ''
+        isOptional: true
+        parameterType: STRING
+      serving_replica_count:
+        defaultValue: 8.0
+        isOptional: true
+        parameterType: NUMBER_INTEGER
+      timeout:
+        defaultValue: 180.0
+        isOptional: true
+        parameterType: NUMBER_DOUBLE
+      workers:
+        defaultValue: 8.0
+        isOptional: true
+        parameterType: NUMBER_INTEGER
+schemaVersion: 2.1.0
+sdkVersion: kfp-2.14.2
