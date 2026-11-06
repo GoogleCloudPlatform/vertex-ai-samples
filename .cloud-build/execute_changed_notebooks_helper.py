@@ -189,6 +189,7 @@ def _process_notebook(
     variable_region: str,
     variable_service_account: str,
     variable_vpc_network: Optional[str],
+    aiplatform_whl: Optional[str] = None,
 ):
     # Read notebook
     with open(notebook_path) as f:
@@ -214,6 +215,12 @@ def _process_notebook(
 
     (nb, resources) = update_variables_preprocessor.preprocess(nb, resources)
     (nb, resources) = unique_strings_preprocessor.preprocess(nb, resources)
+
+    if aiplatform_whl:
+        vertex_ai_install_preprocessor = NotebookProcessors.VertexAIInstallProprocessor(
+            vertex_ai_wheel=aiplatform_whl
+        )
+        (nb, resources) = vertex_ai_install_preprocessor.preprocess(nb, resources)
 
     with open(notebook_path, mode="w", encoding="utf-8") as new_file:
         nbformat.write(nb, new_file)
@@ -272,6 +279,7 @@ def process_and_execute_notebook(
     deadline: datetime.datetime,
     notebook: str,
     should_get_tail_logs: bool = True,
+    aiplatform_whl: Optional[str] = None,
 ) -> NotebookExecutionResult:
 
     print(f"Running notebook: {notebook}")
@@ -318,6 +326,7 @@ def process_and_execute_notebook(
             variable_region=variable_region,
             variable_service_account=variable_service_account,
             variable_vpc_network=variable_vpc_network,
+            aiplatform_whl=aiplatform_whl,
         )
 
         # Upload the pre-processed code to a GCS bucket
@@ -575,6 +584,7 @@ def process_and_execute_notebooks(
                             variable_vpc_network,
                             private_pool_id,
                             deadline,
+                            aiplatform_whl=aiplatform_whl,
                         ),
                         notebooks,
                     )
@@ -592,6 +602,7 @@ def process_and_execute_notebooks(
                     private_pool_id=private_pool_id,
                     deadline=deadline,
                     notebook=notebook,
+                    aiplatform_whl=aiplatform_whl,
                 )
                 for notebook in notebooks
             ]
