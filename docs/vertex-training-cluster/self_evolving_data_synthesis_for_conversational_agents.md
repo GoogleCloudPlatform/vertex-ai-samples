@@ -384,6 +384,6 @@ Our experiments highlight three practical principles for post-training tool-usin
 
 ## Acknowledgements
 
-We would like to express our sincere gratitude to the NVIDIA NeMo RL team—specifically Terry Kong—as well as the NVIDIA NeMo Gym team—specifically Brian Yu and Chris Wing—for their invaluable support throughout this project.
+We would like to express our sincere gratitude to the NVIDIA NeMo RL team—specifically Terry Kong, Wenwen Gao—as well as the NVIDIA NeMo Gym team—specifically Brian Yu and Chris Wing—for their invaluable support throughout this project.
 
 We would also like to express our gratitude to our Gemini Enterprise Agent Platform training clusters teammates: Youbao Tang, Genquan Duan, Dustin Luong, Mohammadreza Mohseni, Jiuqiang Tang, Jingya Liu, and Pooya Moradi for their infrastructure support, feedback, and insightful discussions throughout the project. We also thank Bo Wu, Ting Yu, Shengyang Dai, and Peng Xu for their leadership and support.
