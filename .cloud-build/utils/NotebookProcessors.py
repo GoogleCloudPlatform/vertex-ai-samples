@@ -82,9 +82,9 @@ class UniqueStringsPreprocessor(Preprocessor):
         unique_id = generate_uuid()
         return (
             content.replace('-unique"', f'-{unique_id}"')
-            .replace("-unique'", f'-{unique_id}"')
+            .replace("-unique'", f"-{unique_id}'")
             .replace('_unique"', f'_{unique_id}"')
-            .replace("_unique'", f'_{unique_id}"')
+            .replace("_unique'", f"_{unique_id}'")
         )
 
     def preprocess(self, notebook, resources=None):
@@ -99,18 +99,23 @@ class UniqueStringsPreprocessor(Preprocessor):
         notebook.cells = executable_cells
         return notebook, resources
 
-class VertexAIInstallProprocessor(Preprocessor):
+
+class VertexAIInstallPreprocessor(Preprocessor):
     def __init__(self, vertex_ai_wheel):
         self.vertex_ai_wheel = vertex_ai_wheel
 
-    @staticmethod
-    def update_vertex_ai_install(content: str):
+    def update_vertex_ai_install(self, content: str):
         if "google-cloud-aiplatform" not in content:
             return content
+        cp_cmd = (
+            f"gcloud storage cp {self.vertex_ai_wheel} "
+            "google-cloud-aiplatform.whl\n"
+        )
         return (
-            f"gcloud storage cp {self.vertex_ai_wheel} google-cloud-aiplatform.whl\n" + 
-            content.replace("google-cloud-aiplatform\n", "google-cloud-aiplatform.whl\n")
-            .replace("google-cloud-aiplatform ", "google-cloud-aiplatform.whl ")
+            cp_cmd
+            + content.replace(
+                "google-cloud-aiplatform\n", "google-cloud-aiplatform.whl\n"
+            ).replace("google-cloud-aiplatform ", "google-cloud-aiplatform.whl ")
         )
 
     def preprocess(self, notebook, resources=None):
@@ -123,3 +128,8 @@ class VertexAIInstallProprocessor(Preprocessor):
 
             executable_cells.append(cell)
         notebook.cells = executable_cells
+        return notebook, resources
+
+
+# Alias for backward compatibility
+VertexAIInstallProprocessor = VertexAIInstallPreprocessor
