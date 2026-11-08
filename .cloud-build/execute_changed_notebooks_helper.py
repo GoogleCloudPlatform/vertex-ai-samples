@@ -217,7 +217,7 @@ def _process_notebook(
     (nb, resources) = unique_strings_preprocessor.preprocess(nb, resources)
 
     if aiplatform_whl:
-        vertex_ai_install_preprocessor = NotebookProcessors.VertexAIInstallProprocessor(
+        vertex_ai_install_preprocessor = NotebookProcessors.VertexAIInstallPreprocessor(
             vertex_ai_wheel=aiplatform_whl
         )
         (nb, resources) = vertex_ai_install_preprocessor.preprocess(nb, resources)

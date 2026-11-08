@@ -32,7 +32,7 @@ WHEEL = "gs://staging-bucket/google-cloud-aiplatform.whl"
 
 
 def test_install_from_wheel_replaces_pinned_requirement():
-    preprocessor = NotebookProcessors.VertexAIInstallProprocessor(
+    preprocessor = NotebookProcessors.VertexAIInstallPreprocessor(
         vertex_ai_wheel=WHEEL
     )
 
@@ -48,7 +48,7 @@ def test_install_from_wheel_replaces_pinned_requirement():
 
 
 def test_install_from_wheel_keeps_other_packages():
-    preprocessor = NotebookProcessors.VertexAIInstallProprocessor(
+    preprocessor = NotebookProcessors.VertexAIInstallPreprocessor(
         vertex_ai_wheel=WHEEL
     )
 
@@ -60,7 +60,7 @@ def test_install_from_wheel_keeps_other_packages():
 
 
 def test_install_from_wheel_is_skipped_without_the_package():
-    preprocessor = NotebookProcessors.VertexAIInstallProprocessor(
+    preprocessor = NotebookProcessors.VertexAIInstallPreprocessor(
         vertex_ai_wheel=WHEEL
     )
 
@@ -69,8 +69,45 @@ def test_install_from_wheel_is_skipped_without_the_package():
     assert preprocessor.update_vertex_ai_install(content) == content
 
 
+def test_install_from_wheel_skips_non_install_cells():
+    preprocessor = NotebookProcessors.VertexAIInstallPreprocessor(
+        vertex_ai_wheel=WHEEL
+    )
+
+    content = "# We use google-cloud-aiplatform here\nimport google.cloud.aiplatform"
+
+    assert preprocessor.update_vertex_ai_install(content) == content
+
+
+def test_install_from_wheel_handles_spaces_around_the_pin():
+    preprocessor = NotebookProcessors.VertexAIInstallPreprocessor(
+        vertex_ai_wheel=WHEEL
+    )
+
+    new_content = preprocessor.update_vertex_ai_install(
+        "! pip install google-cloud-aiplatform >= 1.36.0 pandas"
+    )
+
+    assert new_content.endswith(
+        "! pip install google-cloud-aiplatform.whl pandas"
+    )
+
+
+def test_install_from_wheel_handles_leading_whitespace_before_cell_magic():
+    preprocessor = NotebookProcessors.VertexAIInstallPreprocessor(
+        vertex_ai_wheel=WHEEL
+    )
+
+    new_content = preprocessor.update_vertex_ai_install(
+        "\n  %%bash\npip install google-cloud-aiplatform"
+    )
+
+    assert new_content.startswith("%%bash\ngcloud storage cp")
+    assert new_content.endswith("pip install google-cloud-aiplatform.whl")
+
+
 def test_install_from_wheel_returns_the_notebook():
-    preprocessor = NotebookProcessors.VertexAIInstallProprocessor(
+    preprocessor = NotebookProcessors.VertexAIInstallPreprocessor(
         vertex_ai_wheel=WHEEL
     )
 
