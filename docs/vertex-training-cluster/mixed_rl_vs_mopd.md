@@ -160,7 +160,7 @@ The experts and the student must share the same tokenizer, so that an expert can
 
 $$\ell = \hat{A}_{i,t}\, \log \pi_\theta(y_{i,t} \mid s_{i,t})$$
 
-MOPD also sets the importance weight $w _ {i,t} = 0$ for any token whose training-to-inference probability ratio $\pi _ {\text{old}}/\pi _ {\text{gen}}$ falls outside $[0.2, 5]$ (ICE-POP, a truncation of tokens with an extreme ratio). Both methods drop a rollout whose token probabilities differ between the two engines by more than a factor of 2 on average (mean over its tokens of $\exp|\log\pi _ {\text{gen}} - \log\pi _ {\text{old}}| > 2$).
+MOPD also sets the importance weight $w _ {i,t} = 0$ for any token whose training-to-inference probability ratio $\pi _ {\text{old}}/\pi _ {\text{gen}}$ falls outside $[0.2, 5]$ (ICE-POP, a truncation of tokens with an extreme ratio). Both methods drop a rollout whose token probabilities differ between the two engines by more than a factor of 2 on average (mean over its tokens of $\exp \vert \log\pi _ {\text{gen}} - \log\pi _ {\text{old}} \vert > 2$).
 
 ### Comparing the Two Objectives
 
@@ -175,7 +175,7 @@ Table 1 puts the two methods side by side. The defining difference is the advant
 | Signal density | One scalar per trajectory | One value per token |
 | Baseline / normalization | Leave-one-out mean and std within the group; clipped to $[-5, 5]$ in our runs | None; clipped to $[-2, 2]$ |
 | Policy term $\ell$ | PPO clipped surrogate (asymmetric clip, dual clip) | REINFORCE |
-| Importance-sampling correction | $\pi _ {\text{old}}/\pi _ {\text{gen}}$, plus a sequence-level filter (sequences whose mean per-token probability-ratio error, $\exp\vert \Delta \log p\vert $, exceeds 2 are masked) | $\pi _ {\text{old}}/\pi _ {\text{gen}}$ with ICE-POP truncation $[0.2, 5]$, plus the same sequence-level filter |
+| Importance-sampling correction | $\pi _ {\text{old}}/\pi _ {\text{gen}}$, plus a sequence-level filter (sequences whose mean per-token probability-ratio error, $\exp \vert \Delta \log p \vert$, exceeds 2 are masked) | $\pi _ {\text{old}}/\pi _ {\text{gen}}$ with ICE-POP truncation $[0.2, 5]$, plus the same sequence-level filter |
 | Models in the training loop | Student | Student + $K$ experts |
 
 </div>
